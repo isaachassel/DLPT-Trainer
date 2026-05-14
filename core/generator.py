@@ -24,6 +24,7 @@ load_dotenv()
 # Output budgets. These are maximum output ceilings, not minimums. Minimum length is enforced by
 # prompt + validation + expansion retry logic below.
 PASSAGE_TOKENS_BY_LEVEL = {
+    "0": 700,
     "0+": 900,
     "1": 1200,
     "1+": 1800,
@@ -32,6 +33,7 @@ PASSAGE_TOKENS_BY_LEVEL = {
     "3": 5000,
 }
 QUESTION_TOKENS_BY_LEVEL = {
+    "0": 1200,
     "0+": 1400,
     "1": 1600,
     "1+": 1800,
@@ -49,7 +51,7 @@ ENABLE_PASSAGE_EXPANSION = os.getenv("ENABLE_PASSAGE_EXPANSION", "false").strip(
 
 # No template fallback. We do not reject live GenAI just because it is short.
 # Length/paragraph targets are preferred targets; after retries, the app uses the best live GenAI output.
-ABSOLUTE_MIN_WORDS_BY_LEVEL = {"0+": 1, "1": 1, "1+": 1, "2": 1, "2+": 1, "3": 1}
+ABSOLUTE_MIN_WORDS_BY_LEVEL = {"0": 1, "0+": 1, "1": 1, "1+": 1, "2": 1, "2+": 1, "3": 1}
 
 class GenerationFailure(RuntimeError):
     """Raised when live GenAI generation fails. There is intentionally no template fallback."""
@@ -232,6 +234,8 @@ def _passage_prompt(level: str, topic: str, attempt: int) -> str:
         paragraphs=r["paragraphs"],
         sentences_per_paragraph=r["sentences_per_paragraph"],
         description=r["description"],
+        official_basis=r["official_basis"],
+        text_requirements=r["text_requirements"],
     )
 
 
@@ -244,6 +248,8 @@ def _expand_prompt(level: str, topic: str, passage_data: Dict[str, Any]) -> str:
         max_words=r["max_words"],
         paragraphs=r["paragraphs"],
         sentences_per_paragraph=r["sentences_per_paragraph"],
+        official_basis=r["official_basis"],
+        text_requirements=r["text_requirements"],
         current_words=passage_data.get("word_count", 0),
         current_paragraphs=passage_data.get("paragraph_count", 0),
         title=passage_data["passage_title"].replace('"', "'"),
@@ -330,6 +336,8 @@ def _generate_questions(client: InferenceClient, model: str, passage_data: Dict[
             title=passage_data["passage_title"],
             passage_ru=passage_data["passage_ru"],
             attempt=attempt,
+            official_basis=_rules(level)["official_basis"],
+            question_profile=_rules(level)["question_profile"],
         )
         try:
             print(f"Live GenAI question call | model={model} | level={level} | max_tokens={max_tokens} | attempt={attempt}")

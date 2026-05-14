@@ -12,7 +12,7 @@ license: mit
 
 # Russian ILR Trainer
 
-Version: v2.2 feedback-stop fix
+Version: v2.5 official ILR criteria tuning
 
 Adaptive Russian reading practice for serious proficiency test preparation. This is an independent DLPT-style, ILR-aligned trainer. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority.
 
@@ -25,7 +25,7 @@ There are **no fallback/demo/template questions**. If the Hugging Face model cal
 ## Current features
 
 - Russian reading practice
-- ILR levels: 0+, 1, 1+, 2, 2+, 3
+- ILR levels: 0, 0+, 1, 1+, 2, 2+, 3
 - Topic domains such as accidents/disasters, government, military/security, economics, public health, and more
 - Live GenAI passage generation
 - Live GenAI question generation
@@ -36,6 +36,28 @@ There are **no fallback/demo/template questions**. If the Hugging Face model cal
 - Continue Practice button after the base session length is complete
 - Finish Session & Show Report button after at least one completed block
 - Feedback report is now shown immediately when the base session ends
+
+
+## ILR criteria tuning in v2.5
+
+This version updates the generation prompts to follow the official ILR reading descriptions more closely. The app now distinguishes:
+
+- **R-0:** no practical prose reading; isolated signs, labels, names, numbers, or very short micro-text only.
+- **R-0+:** memorized recognition of letters, numbers, isolated words/phrases, names, signs, office/shop designations; no connected prose.
+- **R-1:** very simple connected material with high-frequency vocabulary and predictable sequence.
+- **R-1+:** simple informative discourse such as announcements, basic event narration, headlines, and routine professional information.
+- **R-2:** simple authentic factual material on familiar subjects; mostly factual questions, not subtle inference.
+- **R-2+:** most factual non-technical material, concrete professional topics, main/subsidiary idea distinction, sensible contextual guesses.
+- **R-3:** authentic professional prose on unfamiliar subjects, supported opinions, argumentation, implicit intent, and relationships across paragraphs.
+
+Paragraph structure follows the requested rule:
+
+```text
+0 / 0+ / 1 = 1 paragraph
+1+ / 2      = 2 paragraphs
+2+          = 3 paragraphs
+3           = 4 paragraphs
+```
 
 ## Generation pipeline
 

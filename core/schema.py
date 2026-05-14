@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-ILR_LEVELS = ["0+", "1", "1+", "2", "2+", "3"]
+ILR_LEVELS = ["0", "0+", "1", "1+", "2", "2+", "3"]
 
 QUESTION_TYPES = [
     "main idea",
