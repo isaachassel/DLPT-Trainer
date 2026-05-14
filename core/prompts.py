@@ -17,30 +17,35 @@ PASSAGE_LENGTH_GUIDE = {
 }
 
 GENERATION_USER_PROMPT = """
-Create one Russian reading passage and four English multiple-choice comprehension questions.
+Create one Russian reading passage and EXACTLY FOUR English multiple-choice comprehension questions.
 
 Skill: reading
 Target ILR level: {level}
 Topic domain: {topic}
 Passage length and difficulty requirement: {length_guide}
 
-Requirements:
+Critical output rules:
+- Return ONE complete JSON object only.
+- The questions array MUST contain EXACTLY 4 question objects: Q1, Q2, Q3, Q4.
+- Every question MUST have choices A, B, C, and D.
+- Every question MUST have correct_answer as exactly one letter: A, B, C, or D.
+- Do not stop after Q1. Do not summarize the task. Do not add markdown.
+
+Content requirements:
 - Passage must be entirely in Russian.
 - Questions and answer choices must be in English.
 - Passage should feel like realistic source material: news report, official notice, public statement, interview excerpt, security/social/economic report, accident report, or analytical article.
 - Do not make the passage too childish or too short.
 - The passage_ru field must satisfy the requested length range. Do not use filler or repeat sentences.
 - For ILR 2 and above, use multiple paragraphs and make the user connect information across the passage.
-- For ILR 2+ and ILR 3, include more formal register, nuance, implied meaning, and plausible distractors.
-- Match difficulty to ILR level.
+- For ILR 2+ and ILR 3, include formal register, nuance, implied meaning, and plausible distractors.
 - Include a mix of question types: main idea, detail, inference, writer intent, cause/effect, sequence, tone, or meaning from context.
-- Correct answer must be one of A, B, C, D.
 - Evidence must be a short Russian quote or concise Russian evidence from the passage.
 - Explanations must be concise and useful for end-of-test review.
 - Do not reveal the correct answer in the question text.
-- Keep JSON valid: escape quotation marks inside strings and do not add markdown fences.
+- Keep JSON valid: escape quotation marks inside strings.
 
-Return JSON using this exact structure:
+Return JSON using this exact structure with all four questions:
 {{
   "skill": "reading",
   "ilr_level": "{level}",
@@ -55,8 +60,58 @@ Return JSON using this exact structure:
       "correct_answer": "A",
       "explanation": "Why the correct answer is right.",
       "evidence": "Russian evidence from the passage.",
+      "question_type": "main idea"
+    }},
+    {{
+      "id": "Q2",
+      "question": "English question here",
+      "choices": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+      "correct_answer": "B",
+      "explanation": "Why the correct answer is right.",
+      "evidence": "Russian evidence from the passage.",
+      "question_type": "detail"
+    }},
+    {{
+      "id": "Q3",
+      "question": "English question here",
+      "choices": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+      "correct_answer": "C",
+      "explanation": "Why the correct answer is right.",
+      "evidence": "Russian evidence from the passage.",
       "question_type": "inference"
+    }},
+    {{
+      "id": "Q4",
+      "question": "English question here",
+      "choices": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+      "correct_answer": "D",
+      "explanation": "Why the correct answer is right.",
+      "evidence": "Russian evidence from the passage.",
+      "question_type": "cause/effect"
     }}
   ]
 }}
+""".strip()
+
+QUESTION_REPAIR_PROMPT = """
+The previous JSON output did not contain exactly four questions.
+Using ONLY the Russian passage below, return the SAME block with EXACTLY FOUR English multiple-choice comprehension questions.
+
+Rules:
+- Do not change passage_ru except to copy it exactly.
+- Return one valid JSON object only.
+- questions must contain Q1, Q2, Q3, Q4.
+- Each question must have A, B, C, D choices.
+- correct_answer must be exactly A, B, C, or D.
+- Include explanation, evidence, and question_type for every question.
+- Do not add markdown.
+
+Skill: reading
+Target ILR level: {level}
+Topic domain: {topic}
+Passage title: {title}
+Russian passage:
+{passage_ru}
+
+Return JSON in the same schema as before.
 """.strip()

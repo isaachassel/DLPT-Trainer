@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 
-from .prompts import GENERATION_SYSTEM_PROMPT, GENERATION_USER_PROMPT, PASSAGE_LENGTH_GUIDE
+from .prompts import GENERATION_SYSTEM_PROMPT, GENERATION_USER_PROMPT, PASSAGE_LENGTH_GUIDE, QUESTION_REPAIR_PROMPT
 from .schema import Question, TestBlock
 
 load_dotenv()
@@ -171,6 +171,43 @@ def _call_hf_chat(client: InferenceClient, model: str, messages: List[Dict[str, 
             raise first_error
 
 
+
+def _repair_questions_with_model(
+    client: InferenceClient,
+    model: str,
+    partial_data: Dict[str, Any],
+    level: str,
+    topic: str,
+    max_tokens: int,
+) -> Dict[str, Any]:
+    """Ask the model to rebuild the question array when the passage is usable but questions are incomplete."""
+    passage_ru = str(partial_data.get("passage_ru", "")).strip()
+    if not passage_ru:
+        raise ValueError("Cannot repair questions because passage_ru is empty.")
+    repair_prompt = QUESTION_REPAIR_PROMPT.format(
+        level=level,
+        topic=topic,
+        title=str(partial_data.get("passage_title", "Untitled Passage")),
+        passage_ru=passage_ru,
+    )
+    messages = [
+        {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+        {"role": "user", "content": repair_prompt},
+    ]
+    repair_tokens = max(max_tokens, 2200)
+    print(f"Repairing incomplete question set | model={model} | level={level} | max_tokens={repair_tokens}")
+    response = _call_hf_chat(client, model, messages, repair_tokens)
+    content = response.choices[0].message.content
+    repaired = _extract_json(content)
+    # Preserve metadata/passage if the repair forgot them.
+    repaired.setdefault("skill", "reading")
+    repaired.setdefault("ilr_level", level)
+    repaired.setdefault("topic", topic)
+    repaired.setdefault("passage_title", partial_data.get("passage_title", "Untitled Passage"))
+    repaired.setdefault("passage_ru", passage_ru)
+    return repaired
+
+
 def generate_reading_block(level: str, topic: str) -> TestBlock:
     token = os.getenv("HF_TOKEN")
     model = os.getenv("HF_TEXT_MODEL", "Qwen/Qwen2.5-7B-Instruct")
@@ -189,7 +226,13 @@ def generate_reading_block(level: str, topic: str) -> TestBlock:
                 response = _call_hf_chat(client, model, messages, max_tokens)
                 content = response.choices[0].message.content
                 data = _extract_json(content)
-                return _validate_block(data, level, topic, enforce_length=True, generation_source="live")
+                try:
+                    return _validate_block(data, level, topic, enforce_length=True, generation_source="live")
+                except ValueError as validation_error:
+                    if "fewer than 4 questions" in str(validation_error) and data.get("passage_ru"):
+                        repaired = _repair_questions_with_model(client, model, data, level, topic, max_tokens)
+                        return _validate_block(repaired, level, topic, enforce_length=True, generation_source="live")
+                    raise
             except Exception as exc:
                 last_error = exc
                 print(f"Generation attempt {attempt + 1} failed: {type(exc).__name__}: {exc}")
