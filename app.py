@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import gradio as gr
 
-from core.generator import generate_reading_block
+from core.generator import GenerationFailure, generate_reading_block
 from core.schema import AnswerRecord, ILR_LEVELS, SessionState
 from core.scoring import get_level_decision, summarize_records
 
@@ -26,6 +26,8 @@ SESSION_LENGTHS = {
     "Long - 24 questions": 24,
 }
 
+CONTINUE_BLOCK_SIZE = 4
+
 
 def _radio_update(choices):
     """Return a Gradio update that replaces answer choices and clears any old answer."""
@@ -37,14 +39,12 @@ def _empty_radio_update():
 
 
 def _render_block(block, state: SessionState):
-    source_label = "Live AI generation" if getattr(block, "generation_source", "live") == "live" else "Demo fallback mode"
+    source_label = "Live GenAI generation"
     error_note = ""
-    if getattr(block, "generation_source", "live") != "live" and getattr(block, "generation_error", ""):
-        error_note = f"\n\nFallback reason: {block.generation_error}"
     progress = (
         f"Question block {state.block_number} | Current level: ILR {state.current_level} | "
         f"Completed: {state.answered_count}/{state.session_questions}\n\n"
-        f"Generation status: {source_label}{error_note}\n\n"
+        f"Generation status: {source_label}\n\n"
         f"{state.adaptive_note}"
     )
     passage = (
@@ -68,17 +68,34 @@ def _render_block(block, state: SessionState):
     return [progress, passage, *q_texts[:4], *answer_updates[:4]]
 
 
+def _blank_question_area():
+    empty_radios = [_empty_radio_update() for _ in range(4)]
+    return ["", "", "", "", "", *empty_radios]
+
+
 def _new_block(state: SessionState) -> SessionState:
     state.block_number += 1
     state.current_block = generate_reading_block(state.current_level, state.topic)
     return state
 
 
+def _generation_error_area(exc: Exception):
+    msg = (
+        "### Live GenAI generation failed\n\n"
+        "This build does **not** use fallback templates. No questions are shown unless the GenAI model creates them.\n\n"
+        f"**Error:** `{type(exc).__name__}: {exc}`\n\n"
+        "Try again, or check your Hugging Face Space logs, HF_TOKEN secret, model name, and provider settings. "
+        "Recommended starting model: `Qwen/Qwen2.5-7B-Instruct`."
+    )
+    blank = _blank_question_area()
+    return [msg, *blank, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)]
+
+
 def start_session(mode, start_level, target_level, length_label, timer_mode, topic):
     if mode != "Reading Practice":
         msg = "Listening Practice and Full Diagnostic are reserved for Version 2. This build proves the adaptive reading engine first."
-        empty_radios = [_empty_radio_update() for _ in range(4)]
-        return [None, msg, "", "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
+        blank = _blank_question_area()
+        return [None, msg, *blank, gr.update(visible=False), gr.update(visible=False), gr.update(visible=True)]
 
     state = SessionState(
         mode=mode,
@@ -86,24 +103,29 @@ def start_session(mode, start_level, target_level, length_label, timer_mode, top
         current_level=start_level,
         target_level=target_level,
         session_questions=SESSION_LENGTHS[length_label],
+        base_session_questions=SESSION_LENGTHS[length_label],
         timer_mode=timer_mode,
         topic=topic,
     )
-    state = _new_block(state)
+    try:
+        state = _new_block(state)
+    except Exception as exc:
+        err = _generation_error_area(exc)
+        return [state, *err]
     rendered = _render_block(state.current_block, state)
-    return [state, *rendered, gr.update(visible=True), gr.update(visible=False)]
+    return [state, *rendered, gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)]
 
 
 def submit_block(state: SessionState, a1, a2, a3, a4):
     if state is None or state.current_block is None:
-        empty_radios = [_empty_radio_update() for _ in range(4)]
-        return [state, "Start a session first.", "", "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
+        blank = _blank_question_area()
+        return [state, "Start a session first.", *blank, gr.update(visible=False), gr.update(visible=False), gr.update(visible=True)]
 
     answers = [a1, a2, a3, a4]
     if any(a is None or str(a).strip() == "" for a in answers):
         rendered = _render_block(state.current_block, state)
         warning = rendered[0] + "\n\nPlease answer all four questions before submitting the block."
-        return [state, warning, *rendered[1:], gr.update(visible=True), gr.update(visible=False)]
+        return [state, warning, *rendered[1:], gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)]
 
     block = state.current_block
     correct_count = 0
@@ -134,13 +156,42 @@ def submit_block(state: SessionState, a1, a2, a3, a4):
     state.recent_block_scores.append(block_score)
 
     if state.is_complete:
-        _, report = summarize_records(state.records, state.starting_level)
-        empty_radios = [_empty_radio_update() for _ in range(4)]
-        return [state, "Assessment complete.", report, "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
+        _, report = summarize_records(state.records, state.starting_level, state.session_questions)
+        progress = (
+            f"Base session complete | Completed: {state.answered_count}/{state.session_questions}\n\n"
+            f"{adaptive_note}\n\n"
+            "You can stop here, or continue with another 4-question adaptive block. "
+            "Continuing keeps your current adaptive level and improves the estimate."
+        )
+        blank = _blank_question_area()
+        return [state, progress, *blank, gr.update(visible=False), report, gr.update(visible=True)]
 
-    state = _new_block(state)
+    try:
+        state = _new_block(state)
+    except Exception as exc:
+        err = _generation_error_area(exc)
+        return [state, *err]
     rendered = _render_block(state.current_block, state)
-    return [state, *rendered, gr.update(visible=True), gr.update(visible=False)]
+    return [state, *rendered, gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)]
+
+
+def continue_session(state: SessionState):
+    if state is None:
+        blank = _blank_question_area()
+        return [state, "Start a session first.", *blank, gr.update(visible=False), gr.update(visible=False), gr.update(visible=True)]
+
+    state.session_questions += CONTINUE_BLOCK_SIZE
+    state.adaptive_note = (
+        f"Continuing session. Added {CONTINUE_BLOCK_SIZE} more questions. "
+        f"The next block starts at your current adaptive level: ILR {state.current_level}."
+    )
+    try:
+        state = _new_block(state)
+    except Exception as exc:
+        err = _generation_error_area(exc)
+        return [state, *err]
+    rendered = _render_block(state.current_block, state)
+    return [state, *rendered, gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)]
 
 
 def reset_answers():
@@ -166,7 +217,7 @@ with gr.Blocks(title="Russian ILR Trainer") as demo:
         target_level = gr.Dropdown(ILR_LEVELS, value="2", label="Target ILR Level")
 
     with gr.Row():
-        length = gr.Radio(list(SESSION_LENGTHS.keys()), value="Short - 8 questions", label="Session Length")
+        length = gr.Radio(list(SESSION_LENGTHS.keys()), value="Short - 8 questions", label="Base Session Length")
         timer_mode = gr.Radio(["Off", "Standard", "Strict"], value="Off", label="Timer")
         topic = gr.Dropdown(TOPICS, value="Random serious topics", label="Topic Domain")
 
@@ -185,9 +236,10 @@ with gr.Blocks(title="Russian ILR Trainer") as demo:
     a4 = gr.Radio(label="Answer 4", choices=[])
 
     submit_btn = gr.Button("Submit Block", variant="primary", visible=False)
+    continue_btn = gr.Button("Continue Practice (+4 questions)", variant="secondary", visible=False)
     report_box = gr.Markdown(visible=True)
 
-    outputs = [state, progress, passage, q1, q2, q3, q4, a1, a2, a3, a4, submit_btn, report_box]
+    outputs = [state, progress, passage, q1, q2, q3, q4, a1, a2, a3, a4, submit_btn, report_box, continue_btn]
 
     start_btn.click(
         start_session,
@@ -198,6 +250,12 @@ with gr.Blocks(title="Russian ILR Trainer") as demo:
     submit_btn.click(
         submit_block,
         inputs=[state, a1, a2, a3, a4],
+        outputs=outputs,
+    ).then(reset_answers, outputs=[a1, a2, a3, a4])
+
+    continue_btn.click(
+        continue_session,
+        inputs=[state],
         outputs=outputs,
     ).then(reset_answers, outputs=[a1, a2, a3, a4])
 

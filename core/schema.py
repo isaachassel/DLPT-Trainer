@@ -56,6 +56,7 @@ class SessionState:
     current_level: str
     target_level: str
     session_questions: int
+    base_session_questions: int
     timer_mode: str
     topic: str
     block_number: int = 0

@@ -52,7 +52,7 @@ def estimate_level(records: List[AnswerRecord], starting_level: str) -> str:
     return best_supported
 
 
-def summarize_records(records: List[AnswerRecord], starting_level: str) -> Tuple[str, str]:
+def summarize_records(records: List[AnswerRecord], starting_level: str, planned_questions: int | None = None) -> Tuple[str, str]:
     if not records:
         return starting_level, "No completed questions yet."
 
@@ -76,9 +76,12 @@ def summarize_records(records: List[AnswerRecord], starting_level: str) -> Tuple
             weak_types.append(f"{qtype} ({c}/{n})")
 
     lines = []
-    lines.append("## Final Report")
+    header = "## Current Report" if planned_questions and total >= planned_questions else "## Final Report"
+    lines.append(header)
     lines.append(f"**Estimated Reading Level:** ILR {estimated}")
     lines.append(f"**Overall Accuracy:** {correct}/{total} ({accuracy:.0%})")
+    if planned_questions:
+        lines.append(f"**Current Session Progress:** {total}/{planned_questions} questions")
     lines.append("")
     lines.append("### Accuracy by ILR Level")
     for level in ILR_LEVELS:
@@ -119,8 +122,8 @@ def summarize_records(records: List[AnswerRecord], starting_level: str) -> Tuple
     lines.append("")
     lines.append("### Recommended Next Session")
     if weak_types:
-        lines.append(f"Start at ILR {estimated} and practice the weakest question types above.")
+        lines.append(f"Continue at ILR {estimated} and practice the weakest question types above.")
     else:
-        lines.append(f"Start at ILR {estimated} or one half-level higher if this felt too easy.")
+        lines.append(f"Continue at ILR {estimated} or one half-level higher if this felt too easy.")
 
     return estimated, "\n".join(lines)

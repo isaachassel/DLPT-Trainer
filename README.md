@@ -12,37 +12,51 @@ license: mit
 
 # Russian ILR Trainer
 
-Adaptive Russian reading practice for serious proficiency test preparation. This is DLPT-style, ILR-aligned practice, not an official DLPT product.
+Adaptive Russian reading practice for serious proficiency test preparation. This is an independent DLPT-style, ILR-aligned trainer. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority.
 
-## Disclaimer
+## Important v1.7 change
 
-This is an independent Russian ILR-style study tool. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority. The estimated level is for practice guidance only.
+This version uses **live GenAI only**.
 
-## Current version
+There are **no fallback/demo/template questions**. If the Hugging Face model call fails, the app shows an error instead of silently giving canned material. This keeps the trainer honest: every passage, question, answer key, explanation, and evidence line must come from the GenAI model.
 
-Version 1.4 focuses on Reading Practice. Listening Practice and Full Diagnostic are reserved for the next build.
+## Current features
 
-This version includes:
-
-- Russian reading passages by ILR level: 0+, 1, 1+, 2, 2+, 3
+- Russian reading practice
+- ILR levels: 0+, 1, 1+, 2, 2+, 3
+- Topic domains such as accidents/disasters, government, military/security, economics, public health, and more
+- Live GenAI passage generation
+- Live GenAI question generation
 - Four English multiple-choice comprehension questions per block
-- Hidden answer key until final review
-- End-only missed-question explanations
-- Adaptive movement between ILR bands
-- Visible generation status: Live AI generation or Demo fallback mode
-- Larger generation token budgets for longer ILR 2 / 2+ / 3 passages
-- Safer fallback so the app does not crash if model generation fails
+- Hidden answer key during the test
+- End-only feedback
+- Adaptive level movement after each block
+- Continue Practice button after the base session length is complete
+
+## Generation pipeline
+
+The app no longer asks one model call to create everything at once. It uses a more reliable two-step pipeline:
+
+1. **Passage call**
+   - Generate one Russian passage for the chosen ILR level and topic.
+   - Validate length and quality.
+
+2. **Question call**
+   - Send that exact passage back to the model.
+   - Generate exactly four English comprehension questions.
+   - Include A/B/C/D choices, correct answer, explanation, evidence, and question type.
+
+If either step fails after retries, the app stops and displays the error. It does not use fallback content.
 
 ## Hugging Face Space setup
 
-Create a new Hugging Face Space:
+Create a new Space:
 
-1. Go to Hugging Face Spaces.
-2. Create a new Space.
-3. Select Gradio as the SDK.
-4. Upload the contents of this folder to the root of the Space.
+- SDK: Gradio
+- Visibility: Public or Private
+- Hardware: CPU basic is okay for the app because generation uses hosted inference
 
-The Space root should look like this:
+Upload the files so the root of the Space looks like this:
 
 ```text
 app.py
@@ -58,17 +72,13 @@ core/
   scoring.py
 ```
 
-Do not upload the outer folder itself. Upload the files inside it.
+Do not upload `__pycache__` folders.
 
 ## Required Space secret
 
-The app needs a Hugging Face access token for live AI generation.
+Go to:
 
-In your Space, go to:
-
-```text
-Settings -> Variables and secrets -> New secret
-```
+**Space → Settings → Variables and secrets → New secret**
 
 Add:
 
@@ -77,90 +87,97 @@ Name: HF_TOKEN
 Value: hf_your_token_here
 ```
 
-Make sure this is added as a secret, not a public variable.
-
-## Creating the Hugging Face token
-
-Recommended token settings:
+The token should have this permission:
 
 ```text
-Token type: Fine-grained
-Token name: DLPT-Trainer
-User permissions:
-  Inference:
-    Make calls to Inference Providers
+Inference → Make calls to Inference Providers
 ```
-
-You do not need write access to repositories, billing access, webhooks, jobs, or organization permissions.
 
 ## Optional Space variables
 
-You can also add these if needed:
+You may add these under Variables or Secrets:
 
 ```text
 HF_TEXT_MODEL=Qwen/Qwen2.5-7B-Instruct
 HF_PROVIDER=auto
 ```
 
-For debugging only, you can override the output token budget:
+Optional token overrides:
 
 ```text
-HF_MAX_TOKENS=4200
+HF_PASSAGE_MAX_TOKENS=4200
+HF_QUESTION_MAX_TOKENS=2800
 ```
 
-Normally, leave `HF_MAX_TOKENS` unset because the app chooses token budgets by ILR level.
+Usually you do not need to set those manually.
 
-## How to know if live generation is working
+## Recommended first test
 
-Each block shows one of these lines:
+Start with:
 
 ```text
-Generation status: Live AI generation
+Mode: Reading Practice
+Starting ILR Level: 1+
+Target ILR Level: 2
+Base Session Length: Short - 8 questions
+Topic Domain: Accidents and disasters
 ```
 
-or:
+You should see:
 
 ```text
-Generation status: Demo fallback mode
+Generation status: Live GenAI generation
 ```
 
-If you see Demo fallback mode, the app is running, but the model call failed or `HF_TOKEN` is missing. The app will show a short fallback reason in the progress area and more detail in the Space logs.
+If generation fails, the app will show an error and the Space logs will contain the exact failed step.
 
-Common causes:
+## Troubleshooting
 
-- Missing `HF_TOKEN`
-- Token added as a public variable instead of a secret
-- Token does not have Inference Provider permission
-- Model/provider temporarily unavailable
-- Model returned invalid JSON
-- Model output was too short for the requested ILR level
+### Error: HF_TOKEN is missing
+
+Add `HF_TOKEN` as a Space secret, not a public variable.
+
+### Error: Generated question set must contain exactly 4 questions
+
+The model returned incomplete JSON. The app retries automatically. If it still fails, try a stronger model or a different provider.
+
+### Error: Generated passage is too short
+
+The model did not follow the ILR length instruction. The app retries automatically. If it still fails, try increasing `HF_PASSAGE_MAX_TOKENS` or using a stronger model.
+
+### Repeated provider/model errors
+
+Try one of these as `HF_TEXT_MODEL`:
+
+```text
+Qwen/Qwen2.5-7B-Instruct
+Qwen/Qwen2.5-14B-Instruct
+Qwen/Qwen2.5-72B-Instruct
+meta-llama/Llama-3.1-8B-Instruct
+```
+
+Availability depends on your Hugging Face account, provider, and current inference support.
 
 ## Local setup
-
-### Mac / Linux
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
-# edit .env and add your HF_TOKEN
+export HF_TOKEN=hf_your_token_here
 python app.py
 ```
 
-### Windows PowerShell
+Windows PowerShell:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-copy .env.example .env
-# edit .env and add your HF_TOKEN
+$env:HF_TOKEN="hf_your_token_here"
 python app.py
 ```
 
-Then open the local Gradio URL shown in the terminal.
-
 ## License
 
-MIT License. See `LICENSE`.
+MIT License.
