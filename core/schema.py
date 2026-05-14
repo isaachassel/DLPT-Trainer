@@ -60,6 +60,8 @@ class SessionState:
     base_session_questions: int
     timer_mode: str
     topic: str
+    voice_label: str = "Russian Female - Svetlana"
+    speech_rate_label: str = "Auto by ILR level"
     block_number: int = 0
     current_block: Optional[TestBlock] = None
     records: List[AnswerRecord] = field(default_factory=list)

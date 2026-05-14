@@ -95,3 +95,20 @@ python app.py
 ## Disclaimer
 
 This is an independent Russian ILR-style study tool. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority. The estimated level is for practice guidance only.
+
+
+## Listening voice options
+
+The app now includes a UI dropdown for Russian TTS voice and speed. Current voices:
+
+- Russian Female - Svetlana (`ru-RU-SvetlanaNeural`)
+- Russian Male - Dmitry (`ru-RU-DmitryNeural`)
+
+The speed dropdown can be left on `Auto by ILR level`, which slows lower levels and uses normal speed for higher levels.
+
+Optional environment overrides still work:
+
+```text
+EDGE_TTS_VOICE=ru-RU-SvetlanaNeural
+EDGE_TTS_RATE=-5%
+```

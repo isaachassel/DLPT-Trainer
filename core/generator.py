@@ -561,16 +561,22 @@ def _run_async(coro):
             loop.close()
 
 
-def _make_tts_audio(text: str, level: str) -> str:
+def _make_tts_audio(text: str, level: str, voice_label: str | None = None, speech_rate_label: str | None = None) -> str:
     """Create Russian MP3 audio for listening practice using edge-tts."""
     try:
         import edge_tts
     except Exception as exc:
         raise GenerationFailure("edge-tts is not installed. Add edge-tts to requirements.txt and restart the Space.") from exc
 
-    voice = os.getenv("EDGE_TTS_VOICE", "ru-RU-SvetlanaNeural")
+    voice_map = {
+        "Russian Female - Svetlana": "ru-RU-SvetlanaNeural",
+        "Russian Male - Dmitry": "ru-RU-DmitryNeural",
+    }
+    selected_voice = voice_map.get(voice_label or "", None)
+    voice = selected_voice or os.getenv("EDGE_TTS_VOICE", "ru-RU-SvetlanaNeural")
+
     # Slightly slower for low levels; normal for 2+ and 3.
-    rate_by_level = {
+    auto_rate_by_level = {
         "0": "-25%",
         "0+": "-20%",
         "1": "-15%",
@@ -579,14 +585,23 @@ def _make_tts_audio(text: str, level: str) -> str:
         "2+": "+0%",
         "3": "+0%",
     }
-    rate = os.getenv("EDGE_TTS_RATE", rate_by_level.get(level, "-5%"))
+    rate_map = {
+        "Auto by ILR level": auto_rate_by_level.get(level, "-5%"),
+        "Very slow training": "-25%",
+        "Slow training": "-15%",
+        "Slightly slow": "-8%",
+        "Normal": "+0%",
+        "Fast": "+10%",
+    }
+    selected_rate = rate_map.get(speech_rate_label or "", None)
+    rate = selected_rate or os.getenv("EDGE_TTS_RATE", auto_rate_by_level.get(level, "-5%"))
     out_path = os.path.join(tempfile.gettempdir(), f"ilr_listening_{int(time.time())}_{random.randint(100000,999999)}.mp3")
     communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate)
     _run_async(communicate.save(out_path))
     return out_path
 
 
-def generate_listening_block(level: str, topic: str) -> TestBlock:
+def generate_listening_block(level: str, topic: str, voice_label: str | None = None, speech_rate_label: str | None = None) -> TestBlock:
     """Generate one listening block using live GenAI + generated Russian TTS audio. No template fallback."""
     token = os.getenv("HF_TOKEN")
     if not token:
@@ -596,7 +611,7 @@ def generate_listening_block(level: str, topic: str) -> TestBlock:
     client = _make_client(token)
     script_data = _generate_listening_script(client, model, level, topic)
     questions = _generate_listening_questions(client, model, script_data, level, topic)
-    audio_path = _make_tts_audio(script_data["passage_ru"], level)
+    audio_path = _make_tts_audio(script_data["passage_ru"], level, voice_label, speech_rate_label)
 
     return TestBlock(
         skill="listening",

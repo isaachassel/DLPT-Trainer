@@ -20,6 +20,21 @@ TOPICS = [
     "Culture and society",
 ]
 
+
+VOICE_OPTIONS = [
+    "Russian Female - Svetlana",
+    "Russian Male - Dmitry",
+]
+
+SPEECH_RATE_OPTIONS = [
+    "Auto by ILR level",
+    "Very slow training",
+    "Slow training",
+    "Slightly slow",
+    "Normal",
+    "Fast",
+]
+
 SESSION_LENGTHS = {
     "Short - 8 questions": 8,
     "Medium - 16 questions": 16,
@@ -107,13 +122,13 @@ def _blank_question_area():
 def _new_block(state: SessionState) -> SessionState:
     state.block_number += 1
     if state.mode == "Listening Practice":
-        state.current_block = generate_listening_block(state.current_level, state.topic)
+        state.current_block = generate_listening_block(state.current_level, state.topic, state.voice_label, state.speech_rate_label)
     elif state.mode == "Full Diagnostic":
         # Alternate reading and listening blocks. Odd blocks are reading, even blocks are listening.
         if state.block_number % 2 == 1:
             state.current_block = generate_reading_block(state.current_level, state.topic)
         else:
-            state.current_block = generate_listening_block(state.current_level, state.topic)
+            state.current_block = generate_listening_block(state.current_level, state.topic, state.voice_label, state.speech_rate_label)
     else:
         state.current_block = generate_reading_block(state.current_level, state.topic)
     return state
@@ -132,7 +147,7 @@ def _generation_error_area(exc: Exception):
     return [msg, *blank, gr.update(visible=False), *_hide_reports(), gr.update(visible=False), gr.update(visible=False)]
 
 
-def start_session(mode, start_level, target_level, length_label, timer_mode, topic):
+def start_session(mode, start_level, target_level, length_label, timer_mode, topic, voice_label, speech_rate_label):
     state = SessionState(
         mode=mode,
         starting_level=start_level,
@@ -142,6 +157,8 @@ def start_session(mode, start_level, target_level, length_label, timer_mode, top
         base_session_questions=SESSION_LENGTHS[length_label],
         timer_mode=timer_mode,
         topic=topic,
+        voice_label=voice_label,
+        speech_rate_label=speech_rate_label,
     )
     try:
         state = _new_block(state)
@@ -267,7 +284,7 @@ CUSTOM_CSS = """
 with gr.Blocks(title="Russian ILR Trainer", css=CUSTOM_CSS) as demo:
     gr.Markdown(
         "# Russian ILR Trainer\n"
-        "Adaptive Russian reading practice for serious proficiency test preparation. "
+        "Adaptive Russian reading and listening practice for serious proficiency test preparation. "
         "This is DLPT-style, ILR-aligned practice, not an official DLPT product."
     )
 
@@ -286,6 +303,10 @@ with gr.Blocks(title="Russian ILR Trainer", css=CUSTOM_CSS) as demo:
         length = gr.Radio(list(SESSION_LENGTHS.keys()), value="Short - 8 questions", label="Base Session Length")
         timer_mode = gr.Radio(["Off", "Standard", "Strict"], value="Off", label="Timer")
         topic = gr.Dropdown(TOPICS, value="Random serious topics", label="Topic Domain")
+
+    with gr.Row():
+        voice_label = gr.Dropdown(VOICE_OPTIONS, value="Russian Female - Svetlana", label="Listening Voice")
+        speech_rate_label = gr.Dropdown(SPEECH_RATE_OPTIONS, value="Auto by ILR level", label="Listening Speed")
 
     start_btn = gr.Button("Begin Session", variant="primary")
 
@@ -338,7 +359,7 @@ with gr.Blocks(title="Russian ILR Trainer", css=CUSTOM_CSS) as demo:
 
     start_btn.click(
         start_session,
-        inputs=[mode, start_level, target_level, length, timer_mode, topic],
+        inputs=[mode, start_level, target_level, length, timer_mode, topic, voice_label, speech_rate_label],
         outputs=outputs,
     ).then(reset_answers, outputs=[a1, a2, a3, a4])
 
