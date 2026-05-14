@@ -37,9 +37,14 @@ def _empty_radio_update():
 
 
 def _render_block(block, state: SessionState):
+    source_label = "Live AI generation" if getattr(block, "generation_source", "live") == "live" else "Demo fallback mode"
+    error_note = ""
+    if getattr(block, "generation_source", "live") != "live" and getattr(block, "generation_error", ""):
+        error_note = f"\n\nFallback reason: {block.generation_error}"
     progress = (
         f"Question block {state.block_number} | Current level: ILR {state.current_level} | "
         f"Completed: {state.answered_count}/{state.session_questions}\n\n"
+        f"Generation status: {source_label}{error_note}\n\n"
         f"{state.adaptive_note}"
     )
     passage = (

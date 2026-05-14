@@ -29,6 +29,7 @@ Requirements:
 - Questions and answer choices must be in English.
 - Passage should feel like realistic source material: news report, official notice, public statement, interview excerpt, security/social/economic report, accident report, or analytical article.
 - Do not make the passage too childish or too short.
+- The passage_ru field must satisfy the requested length range. Do not use filler or repeat sentences.
 - For ILR 2 and above, use multiple paragraphs and make the user connect information across the passage.
 - For ILR 2+ and ILR 3, include more formal register, nuance, implied meaning, and plausible distractors.
 - Match difficulty to ILR level.
@@ -37,6 +38,7 @@ Requirements:
 - Evidence must be a short Russian quote or concise Russian evidence from the passage.
 - Explanations must be concise and useful for end-of-test review.
 - Do not reveal the correct answer in the question text.
+- Keep JSON valid: escape quotation marks inside strings and do not add markdown fences.
 
 Return JSON using this exact structure:
 {{

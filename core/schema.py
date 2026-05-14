@@ -34,6 +34,8 @@ class TestBlock:
     passage_title: str
     passage_ru: str
     questions: List[Question]
+    generation_source: str = "live"
+    generation_error: str = ""
 
 @dataclass
 class AnswerRecord:
