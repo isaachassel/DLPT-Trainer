@@ -1,8 +1,8 @@
 ---
 title: Russian ILR Trainer
 emoji: 📘
-colorFrom: blue
-colorTo: indigo
+colorFrom: yellow
+colorTo: red
 sdk: gradio
 sdk_version: 5.29.0
 app_file: app.py
@@ -12,77 +12,28 @@ license: mit
 
 # Russian ILR Trainer
 
-Version: v2.5 official ILR criteria tuning
-
-Adaptive Russian reading practice for serious proficiency test preparation. This is an independent DLPT-style, ILR-aligned trainer. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority.
-
-## Important behavior
-
-This version uses **live GenAI only**.
-
-There are **no fallback/demo/template questions**. If the Hugging Face model call fails, the app shows an error instead of silently giving canned material. This keeps the trainer honest: every passage, question, answer key, explanation, and evidence line must come from the GenAI model.
+Adaptive Russian reading and listening practice for serious proficiency test preparation. This is an independent ILR-style study tool and is not official DLPT material.
 
 ## Current features
 
-- Russian reading practice
+- Reading Practice
+- Listening Practice with generated Russian audio
+- Full Diagnostic alternating reading/listening blocks
 - ILR levels: 0, 0+, 1, 1+, 2, 2+, 3
-- Topic domains such as accidents/disasters, government, military/security, economics, public health, and more
-- Live GenAI passage generation
-- Live GenAI question generation
-- Four English multiple-choice comprehension questions per block
-- Hidden answer key during the test
+- Live GenAI generation only; no fallback templates
 - End-only feedback
-- Adaptive level movement after each block
-- Continue Practice button after the base session length is complete
-- Finish Session & Show Report button after at least one completed block
-- Feedback report is now shown immediately when the base session ends
+- Scrollable feedback tabs: Summary, Latest Block, All Missed Questions
+- Continue Practice button for extra adaptive blocks
 
+## Listening behavior
 
-## ILR criteria tuning in v2.5
+The app generates a Russian audio script using GenAI, then creates an MP3 voiceover with `edge-tts`. The Russian transcript is hidden during the test. In feedback, the transcript appears for missed listening questions so the learner can review evidence.
 
-This version updates the generation prompts to follow the official ILR reading descriptions more closely. The app now distinguishes:
+The UI recommends listening no more than 2 times to simulate test pressure, but the audio player does not hard-lock playback. For training, users may replay as needed.
 
-- **R-0:** no practical prose reading; isolated signs, labels, names, numbers, or very short micro-text only.
-- **R-0+:** memorized recognition of letters, numbers, isolated words/phrases, names, signs, office/shop designations; no connected prose.
-- **R-1:** very simple connected material with high-frequency vocabulary and predictable sequence.
-- **R-1+:** simple informative discourse such as announcements, basic event narration, headlines, and routine professional information.
-- **R-2:** simple authentic factual material on familiar subjects; mostly factual questions, not subtle inference.
-- **R-2+:** most factual non-technical material, concrete professional topics, main/subsidiary idea distinction, sensible contextual guesses.
-- **R-3:** authentic professional prose on unfamiliar subjects, supported opinions, argumentation, implicit intent, and relationships across paragraphs.
+## Hugging Face setup
 
-Paragraph structure follows the requested rule:
-
-```text
-0 / 0+ / 1 = 1 paragraph
-1+ / 2      = 2 paragraphs
-2+          = 3 paragraphs
-3           = 4 paragraphs
-```
-
-## Generation pipeline
-
-The app no longer asks one model call to create everything at once. It uses a more reliable two-step pipeline:
-
-1. **Passage call**
-   - Generate one Russian passage for the chosen ILR level and topic.
-   - Validate length and quality.
-
-2. **Question call**
-   - Send that exact passage back to the model.
-   - Generate exactly four English comprehension questions.
-   - Include A/B/C/D choices, correct answer, explanation, evidence, and question type.
-
-If either step fails, the app stops and displays the error. It does not use fallback content.
-
-## Hugging Face Space setup
-
-Create a new Space:
-
-- SDK: Gradio
-- Visibility: Public or Private
-- Hardware: CPU basic is okay for the app because generation uses hosted inference
-
-Upload the files so the root of the Space looks like this:
+Upload these files at the root of the Space:
 
 ```text
 app.py
@@ -98,99 +49,36 @@ core/
   scoring.py
 ```
 
-Do not upload `__pycache__` folders.
-
-## Required Space secret
-
-Go to:
-
-**Space → Settings → Variables and secrets → New secret**
-
-Add:
+Add this Space secret:
 
 ```text
-Name: HF_TOKEN
-Value: hf_your_token_here
+HF_TOKEN=your_huggingface_token_here
 ```
 
-The token should have this permission:
-
-```text
-Inference → Make calls to Inference Providers
-```
-
-## Optional Space variables
-
-You may add these under Variables or Secrets:
+Recommended optional variables:
 
 ```text
 HF_TEXT_MODEL=Qwen/Qwen2.5-7B-Instruct
 HF_PROVIDER=auto
+EDGE_TTS_VOICE=ru-RU-SvetlanaNeural
 ```
 
-Optional token overrides:
+Optional speed/quality controls:
 
 ```text
-HF_PASSAGE_MAX_TOKENS=4200
-HF_QUESTION_MAX_TOKENS=2800
+PASSAGE_MAX_ATTEMPTS=1
+QUESTION_MAX_ATTEMPTS=2
+ENABLE_PASSAGE_EXPANSION=false
 ```
-
-Usually you do not need to set those manually.
-
-## Recommended first test
-
-Start with:
-
-```text
-Mode: Reading Practice
-Starting ILR Level: 1+
-Target ILR Level: 2
-Base Session Length: Short - 8 questions
-Topic Domain: Accidents and disasters
-```
-
-You should see:
-
-```text
-Generation status: Live GenAI generation
-```
-
-If generation fails, the app will show an error and the Space logs will contain the exact failed step.
-
-## Troubleshooting
-
-### Error: HF_TOKEN is missing
-
-Add `HF_TOKEN` as a Space secret, not a public variable.
-
-### Error: Generated question set must contain exactly 4 questions
-
-The model returned incomplete JSON. The app retries automatically. If it still fails, try a stronger model or a different provider.
-
-### Error: Generated passage is too short
-
-The model did not follow the ILR length instruction. The app retries automatically. If it still fails, try increasing `HF_PASSAGE_MAX_TOKENS` or using a stronger model.
-
-### Repeated provider/model errors
-
-Try one of these as `HF_TEXT_MODEL`:
-
-```text
-Qwen/Qwen2.5-7B-Instruct
-Qwen/Qwen2.5-14B-Instruct
-Qwen/Qwen2.5-72B-Instruct
-meta-llama/Llama-3.1-8B-Instruct
-```
-
-Availability depends on your Hugging Face account, provider, and current inference support.
 
 ## Local setup
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # Mac/Linux
 pip install -r requirements.txt
-export HF_TOKEN=hf_your_token_here
+cp .env.example .env
+# edit .env and add HF_TOKEN
 python app.py
 ```
 
@@ -200,44 +88,10 @@ Windows PowerShell:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-$env:HF_TOKEN="hf_your_token_here"
+copy .env.example .env
 python app.py
 ```
 
-## License
+## Disclaimer
 
-MIT License.
-
-## Speed vs. quality settings
-
-This build is **GenAI-only** and uses **no template fallback**. To keep the app from loading too slowly on Hugging Face Spaces, the default generation flow is speed-first:
-
-```text
-PASSAGE_MAX_ATTEMPTS=1
-QUESTION_MAX_ATTEMPTS=2
-ENABLE_PASSAGE_EXPANSION=false
-```
-
-That means the app makes one live passage call, then generates questions. If the passage is usable but shorter than the preferred ILR structure, the app accepts it instead of doing slow expansion loops.
-
-For higher-quality but slower passages, add these Space secrets/variables:
-
-```text
-PASSAGE_MAX_ATTEMPTS=2
-ENABLE_PASSAGE_EXPANSION=true
-```
-
-Use that only if you are okay with slower loading.
-
-
-## v2.3 update
-
-- Feedback report is now clearly cumulative after continued practice.
-- Report includes score by block, latest completed block review, and all missed questions review.
-- Continue Practice keeps adding blocks, and Finish Session & Show Report uses every submitted block so far.
-
-## v2.4 UI update
-
-- Feedback is now split into three report tabs: Summary, Latest Block, and All Missed Questions.
-- Long feedback sections use a scrollable report area.
-- Continuing practice preserves cumulative results while showing the newest block separately.
+This is an independent Russian ILR-style study tool. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority. The estimated level is for practice guidance only.

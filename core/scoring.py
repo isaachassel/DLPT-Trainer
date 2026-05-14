@@ -52,18 +52,19 @@ def estimate_level(records: List[AnswerRecord], starting_level: str) -> str:
     return best_supported
 
 
-def _block_scores(records: List[AnswerRecord]) -> List[Tuple[int, str, int, int]]:
+def _block_scores(records: List[AnswerRecord]) -> List[Tuple[int, str, str, int, int]]:
     """Return block_number, ILR level, correct, total for each completed block."""
     by_block: Dict[int, List[AnswerRecord]] = defaultdict(list)
     for r in records:
         by_block[r.block_number].append(r)
 
-    rows: List[Tuple[int, str, int, int]] = []
+    rows: List[Tuple[int, str, str, int, int]] = []
     for block_num in sorted(by_block):
         block_records = by_block[block_num]
         level = block_records[0].ilr_level if block_records else "?"
+        skill = block_records[0].skill.title() if block_records else "?"
         correct = sum(1 for r in block_records if r.is_correct)
-        rows.append((block_num, level, correct, len(block_records)))
+        rows.append((block_num, skill, level, correct, len(block_records)))
     return rows
 
 
@@ -76,12 +77,14 @@ def _missed_review(missed: List[AnswerRecord], heading: str, limit: int | None =
     items = missed if limit is None else missed[:limit]
     for i, r in enumerate(items, start=1):
         selected = r.selected_answer or "No answer"
-        lines.append(f"\n**Missed Question {i} — Block {r.block_number}, ILR {r.ilr_level}, {r.question.question_type}**")
+        lines.append(f"\n**Missed Question {i} — Block {r.block_number}, {r.skill.title()}, ILR {r.ilr_level}, {r.question.question_type}**")
         lines.append(f"**Question:** {r.question.question}")
         lines.append(f"**Your answer:** {selected}")
         lines.append(f"**Correct answer:** {r.question.correct_answer}. {r.question.choices[r.question.correct_answer]}")
         lines.append(f"**Why:** {r.question.explanation}")
         lines.append(f"**Evidence:** {r.question.evidence}")
+        if r.skill == "listening":
+            lines.append(f"**Transcript for this audio:** {r.passage_ru}")
 
     if limit is not None and len(missed) > limit:
         lines.append(f"\nShowing {limit} of {len(missed)} missed questions in this section.")
@@ -101,6 +104,8 @@ def summarize_records_sections(records: List[AnswerRecord], starting_level: str,
     correct = sum(1 for r in records if r.is_correct)
     accuracy = correct / total if total else 0
     estimated = estimate_level(records, starting_level)
+    skills = sorted(set(r.skill for r in records))
+    skill_label = "Mixed" if len(skills) > 1 else skills[0].title()
 
     by_type = defaultdict(lambda: [0, 0])
     by_level = defaultdict(lambda: [0, 0])
@@ -122,22 +127,32 @@ def summarize_records_sections(records: List[AnswerRecord], starting_level: str,
     latest_correct = sum(1 for r in latest_records if r.is_correct)
     latest_total = len(latest_records)
     latest_level = latest_records[0].ilr_level if latest_records else "?"
+    latest_skill = latest_records[0].skill.title() if latest_records else "?"
     latest_missed = [r for r in latest_records if not r.is_correct]
     all_missed = [r for r in records if not r.is_correct]
 
     summary: List[str] = []
     summary.append(f"## Updated Cumulative Report ({total} completed questions)")
-    summary.append(f"**Estimated Reading Level:** ILR {estimated}")
+    if skill_label == "Mixed":
+        # For mixed diagnostic, show simple separate estimates by skill when enough evidence exists.
+        reading_records = [r for r in records if r.skill == "reading"]
+        listening_records = [r for r in records if r.skill == "listening"]
+        if reading_records:
+            summary.append(f"**Estimated Reading Level:** ILR {estimate_level(reading_records, starting_level)}")
+        if listening_records:
+            summary.append(f"**Estimated Listening Level:** ILR {estimate_level(listening_records, starting_level)}")
+    else:
+        summary.append(f"**Estimated {skill_label} Level:** ILR {estimated}")
     summary.append(f"**Overall Accuracy:** {correct}/{total} ({accuracy:.0%})")
     if planned_questions:
         summary.append(f"**Current Session Progress:** {total}/{planned_questions} questions")
-    summary.append(f"**Latest Completed Block:** Block {latest_block}, ILR {latest_level}, {latest_correct}/{latest_total} correct")
+    summary.append(f"**Latest Completed Block:** Block {latest_block}, {latest_skill}, ILR {latest_level}, {latest_correct}/{latest_total} correct")
     summary.append("")
 
     summary.append("### Score by Block")
-    for block_num, level, c, n in block_rows:
+    for block_num, skill, level, c, n in block_rows:
         marker = " ← latest" if block_num == latest_block else ""
-        summary.append(f"- Block {block_num} — ILR {level}: {c}/{n} ({c/n:.0%}){marker}")
+        summary.append(f"- Block {block_num} — {skill}, ILR {level}: {c}/{n} ({c/n:.0%}){marker}")
     summary.append("")
 
     summary.append("### Accuracy by ILR Level")
@@ -148,8 +163,8 @@ def summarize_records_sections(records: List[AnswerRecord], starting_level: str,
     summary.append("")
 
     summary.append("### Adaptive Path")
-    for block_num, level, _c, _n in block_rows:
-        summary.append(f"- Block {block_num}: ILR {level}")
+    for block_num, skill, level, _c, _n in block_rows:
+        summary.append(f"- Block {block_num}: {skill}, ILR {level}")
     summary.append("")
 
     summary.append("### Main Weak Areas")

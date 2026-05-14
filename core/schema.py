@@ -36,6 +36,7 @@ class TestBlock:
     questions: List[Question]
     generation_source: str = "live"
     generation_error: str = ""
+    audio_path: Optional[str] = None
 
 @dataclass
 class AnswerRecord:

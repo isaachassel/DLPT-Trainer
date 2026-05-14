@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import gradio as gr
 
-from core.generator import generate_reading_block
+from core.generator import generate_reading_block, generate_listening_block
 from core.schema import AnswerRecord, ILR_LEVELS, SessionState
 from core.scoring import get_level_decision, summarize_records_sections
 
@@ -63,11 +63,25 @@ def _render_block(block, state: SessionState):
         f"Generation status: {source_label}{quality_note}\n\n"
         f"{state.adaptive_note}"
     )
-    passage = (
-        f"### {block.passage_title}\n\n"
-        f"**Level:** ILR {block.ilr_level}  \n"
-        f"**Topic:** {block.topic}\n\n---\n\n{block.passage_ru}"
-    )
+
+    if block.skill == "listening":
+        passage = (
+            f"### {block.passage_title}\n\n"
+            f"**Skill:** Listening  \n"
+            f"**Level:** ILR {block.ilr_level}  \n"
+            f"**Topic:** {block.topic}\n\n---\n\n"
+            "Listen to the audio, then answer the questions below. The transcript is hidden during the test and appears only in feedback for missed items.\n\n"
+            "Recommended test condition: listen no more than **2 times**. For training, you may replay if needed."
+        )
+        audio_update = gr.update(value=block.audio_path, visible=True)
+    else:
+        passage = (
+            f"### {block.passage_title}\n\n"
+            f"**Skill:** Reading  \n"
+            f"**Level:** ILR {block.ilr_level}  \n"
+            f"**Topic:** {block.topic}\n\n---\n\n{block.passage_ru}"
+        )
+        audio_update = gr.update(value=None, visible=False)
 
     q_texts = []
     answer_updates = []
@@ -81,18 +95,27 @@ def _render_block(block, state: SessionState):
         q_texts.append("")
         answer_updates.append(_empty_radio_update())
 
-    return [progress, passage, *q_texts[:4], *answer_updates[:4]]
+    return [progress, passage, audio_update, *q_texts[:4], *answer_updates[:4]]
 
 
 def _blank_question_area():
-    # passage, q1, q2, q3, q4, a1, a2, a3, a4
+    # passage, audio, q1, q2, q3, q4, a1, a2, a3, a4
     empty_radios = [_empty_radio_update() for _ in range(4)]
-    return ["", "", "", "", "", *empty_radios]
+    return ["", gr.update(value=None, visible=False), "", "", "", "", *empty_radios]
 
 
 def _new_block(state: SessionState) -> SessionState:
     state.block_number += 1
-    state.current_block = generate_reading_block(state.current_level, state.topic)
+    if state.mode == "Listening Practice":
+        state.current_block = generate_listening_block(state.current_level, state.topic)
+    elif state.mode == "Full Diagnostic":
+        # Alternate reading and listening blocks. Odd blocks are reading, even blocks are listening.
+        if state.block_number % 2 == 1:
+            state.current_block = generate_reading_block(state.current_level, state.topic)
+        else:
+            state.current_block = generate_listening_block(state.current_level, state.topic)
+    else:
+        state.current_block = generate_reading_block(state.current_level, state.topic)
     return state
 
 
@@ -110,11 +133,6 @@ def _generation_error_area(exc: Exception):
 
 
 def start_session(mode, start_level, target_level, length_label, timer_mode, topic):
-    if mode != "Reading Practice":
-        msg = "Listening Practice and Full Diagnostic are reserved for Version 2. This build proves the adaptive reading engine first."
-        blank = _blank_question_area()
-        return [None, msg, *blank, gr.update(visible=False), *_hide_reports(), gr.update(visible=False), gr.update(visible=False)]
-
     state = SessionState(
         mode=mode,
         starting_level=start_level,
@@ -273,6 +291,7 @@ with gr.Blocks(title="Russian ILR Trainer", css=CUSTOM_CSS) as demo:
 
     progress = gr.Markdown()
     passage = gr.Markdown()
+    audio = gr.Audio(label="Listening Audio", type="filepath", visible=False)
 
     q1 = gr.Markdown()
     a1 = gr.Radio(label="Answer 1", choices=[])
@@ -300,6 +319,7 @@ with gr.Blocks(title="Russian ILR Trainer", css=CUSTOM_CSS) as demo:
         state,
         progress,
         passage,
+        audio,
         q1,
         q2,
         q3,

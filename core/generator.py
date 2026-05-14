@@ -5,6 +5,8 @@ import os
 import random
 import re
 import time
+import tempfile
+import asyncio
 from typing import Any, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
@@ -16,6 +18,9 @@ from .prompts import (
     PASSAGE_EXPANSION_PROMPT,
     PASSAGE_GENERATION_PROMPT,
     QUESTION_GENERATION_PROMPT,
+    LISTENING_STRUCTURE_RULES,
+    LISTENING_GENERATION_PROMPT,
+    LISTENING_QUESTION_GENERATION_PROMPT,
 )
 from .schema import Question, TestBlock
 
@@ -412,6 +417,198 @@ def _generate_questions(client: InferenceClient, model: str, passage_data: Dict[
             print(f"Question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
     raise GenerationFailure(f"Live question generation failed after {max(1, QUESTION_MAX_ATTEMPTS)} attempt(s): {type(last_error).__name__}: {last_error}")
 
+
+
+def _listening_rules(level: str) -> Dict[str, Any]:
+    return LISTENING_STRUCTURE_RULES.get(level, LISTENING_STRUCTURE_RULES["2"])
+
+
+def _segment_schema_items(segments: int) -> str:
+    return ",\n    ".join(f'"Russian spoken segment {i}"' for i in range(1, segments + 1))
+
+
+def _listening_prompt(level: str, topic: str, attempt: int) -> str:
+    r = _listening_rules(level)
+    nonce = f"{int(time.time())}-{random.randint(100000, 999999)}"
+    return LISTENING_GENERATION_PROMPT.format(
+        level=level,
+        topic=topic,
+        generation_id=nonce,
+        attempt=attempt,
+        min_words=r["min_words"],
+        max_words=r["max_words"],
+        segments=r["segments"],
+        style=r["style"],
+        delivery=r["delivery"],
+        official_basis=r["official_basis"],
+        text_requirements=r["text_requirements"],
+        segment_items=_segment_schema_items(int(r["segments"])),
+    )
+
+
+def _validate_listening_script(data: Dict[str, Any], level: str, topic: str) -> Dict[str, Any]:
+    title = str(data.get("passage_title", "")).strip()
+    raw_segments = data.get("script_segments")
+    if isinstance(raw_segments, list):
+        segments_list = [str(seg).strip() for seg in raw_segments if str(seg).strip()]
+        passage_ru = "\n\n".join(segments_list).strip()
+        segment_count = len(segments_list)
+    else:
+        passage_ru = str(data.get("passage_ru", data.get("script_ru", ""))).strip()
+        segment_count = _paragraph_count(passage_ru)
+
+    if not title:
+        raise ValueError("Generated listening title is empty.")
+    if not passage_ru:
+        raise ValueError("Generated listening script is empty.")
+    if _has_bad_repetition(passage_ru):
+        raise ValueError("Generated listening script contains repeated consecutive sentences.")
+
+    words = _word_count(passage_ru)
+    r = _listening_rules(level)
+    min_words = int(r["min_words"])
+    required_segments = int(r["segments"])
+    if words < 1:
+        raise ValueError("Generated listening script is empty or unusable.")
+
+    if words < min_words or segment_count < required_segments:
+        note = (
+            f"Live GenAI listening script accepted, but it is below the preferred ILR {level} structure "
+            f"({words}/{min_words} words, {segment_count}/{required_segments} spoken segments)."
+        )
+    else:
+        note = f"Live GenAI listening script meets ILR {level} structure target ({words} words, {segment_count} spoken segments)."
+
+    return {
+        "skill": "listening",
+        "ilr_level": str(data.get("ilr_level", level)).strip() or level,
+        "topic": str(data.get("topic", topic)).strip() or topic,
+        "passage_title": title,
+        "passage_ru": passage_ru,
+        "length_note": note,
+        "word_count": words,
+        "segment_count": segment_count,
+    }
+
+
+def _generate_listening_script(client: InferenceClient, model: str, level: str, topic: str) -> Dict[str, Any]:
+    max_tokens = int(os.getenv("HF_LISTENING_MAX_TOKENS", PASSAGE_TOKENS_BY_LEVEL.get(level, 2600)))
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max(1, PASSAGE_MAX_ATTEMPTS) + 1):
+        try:
+            print(f"Live GenAI listening script call | model={model} | level={level} | max_tokens={max_tokens} | attempt={attempt}")
+            response = _call_hf_chat(
+                client,
+                model,
+                [
+                    {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+                    {"role": "user", "content": _listening_prompt(level, topic, attempt)},
+                ],
+                max_tokens,
+            )
+            data = _extract_json(response.choices[0].message.content)
+            script = _validate_listening_script(data, level, topic)
+            r = _listening_rules(level)
+            print(f"Listening script attempt {attempt} quality: word count {script['word_count']}/{r['min_words']}; segments {script['segment_count']}/{r['segments']}")
+            return script
+        except Exception as exc:
+            last_error = exc
+            print(f"Listening script generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
+    raise GenerationFailure(f"Live listening script generation failed after {max(1, PASSAGE_MAX_ATTEMPTS)} attempt(s): {type(last_error).__name__}: {last_error}")
+
+
+def _generate_listening_questions(client: InferenceClient, model: str, passage_data: Dict[str, Any], level: str, topic: str) -> List[Question]:
+    max_tokens = int(os.getenv("HF_LISTENING_QUESTION_MAX_TOKENS", QUESTION_TOKENS_BY_LEVEL.get(level, 2200)))
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max(1, QUESTION_MAX_ATTEMPTS) + 1):
+        r = _listening_rules(level)
+        user_prompt = LISTENING_QUESTION_GENERATION_PROMPT.format(
+            level=level,
+            topic=topic,
+            title=passage_data["passage_title"],
+            passage_ru=passage_data["passage_ru"],
+            attempt=attempt,
+            official_basis=r["official_basis"],
+            question_profile=r["question_profile"],
+        )
+        try:
+            print(f"Live GenAI listening question call | model={model} | level={level} | max_tokens={max_tokens} | attempt={attempt}")
+            response = _call_hf_chat(
+                client,
+                model,
+                [
+                    {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens,
+            )
+            data = _extract_json(response.choices[0].message.content)
+            return _validate_questions(data)
+        except Exception as exc:
+            last_error = exc
+            print(f"Listening question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
+    raise GenerationFailure(f"Live listening question generation failed after {max(1, QUESTION_MAX_ATTEMPTS)} attempt(s): {type(last_error).__name__}: {last_error}")
+
+
+def _run_async(coro):
+    try:
+        return asyncio.run(coro)
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.close()
+
+
+def _make_tts_audio(text: str, level: str) -> str:
+    """Create Russian MP3 audio for listening practice using edge-tts."""
+    try:
+        import edge_tts
+    except Exception as exc:
+        raise GenerationFailure("edge-tts is not installed. Add edge-tts to requirements.txt and restart the Space.") from exc
+
+    voice = os.getenv("EDGE_TTS_VOICE", "ru-RU-SvetlanaNeural")
+    # Slightly slower for low levels; normal for 2+ and 3.
+    rate_by_level = {
+        "0": "-25%",
+        "0+": "-20%",
+        "1": "-15%",
+        "1+": "-10%",
+        "2": "-5%",
+        "2+": "+0%",
+        "3": "+0%",
+    }
+    rate = os.getenv("EDGE_TTS_RATE", rate_by_level.get(level, "-5%"))
+    out_path = os.path.join(tempfile.gettempdir(), f"ilr_listening_{int(time.time())}_{random.randint(100000,999999)}.mp3")
+    communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate)
+    _run_async(communicate.save(out_path))
+    return out_path
+
+
+def generate_listening_block(level: str, topic: str) -> TestBlock:
+    """Generate one listening block using live GenAI + generated Russian TTS audio. No template fallback."""
+    token = os.getenv("HF_TOKEN")
+    if not token:
+        raise GenerationFailure("HF_TOKEN is missing. Add it as a Hugging Face Space secret. This app does not use fallback questions.")
+
+    model = os.getenv("HF_TEXT_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+    client = _make_client(token)
+    script_data = _generate_listening_script(client, model, level, topic)
+    questions = _generate_listening_questions(client, model, script_data, level, topic)
+    audio_path = _make_tts_audio(script_data["passage_ru"], level)
+
+    return TestBlock(
+        skill="listening",
+        ilr_level=level,
+        topic=topic,
+        passage_title=script_data["passage_title"],
+        passage_ru=script_data["passage_ru"],
+        questions=questions,
+        generation_source="live",
+        generation_error=script_data.get("length_note", ""),
+        audio_path=audio_path,
+    )
 
 def generate_reading_block(level: str, topic: str) -> TestBlock:
     """Generate one reading block using live GenAI only. No template fallback."""
