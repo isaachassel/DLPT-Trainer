@@ -9,7 +9,7 @@ from typing import Any, Dict
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 
-from .prompts import GENERATION_SYSTEM_PROMPT, GENERATION_USER_PROMPT
+from .prompts import GENERATION_SYSTEM_PROMPT, GENERATION_USER_PROMPT, PASSAGE_LENGTH_GUIDE
 from .schema import Question, TestBlock
 
 load_dotenv()
@@ -52,8 +52,11 @@ def _validate_block(data: Dict[str, Any], fallback_level: str, fallback_topic: s
         )
 
     passage_ru = str(data.get("passage_ru", "")).strip()
-    if len(passage_ru) < 250:
-        raise ValueError("Passage is too short.")
+    word_count = len(passage_ru.split())
+    min_words_by_level = {"0+": 70, "1": 110, "1+": 150, "2": 230, "2+": 320, "3": 430}
+    min_words = min_words_by_level.get(fallback_level, 150)
+    if word_count < min_words:
+        raise ValueError(f"Passage is too short for ILR {fallback_level}: {word_count} words, expected at least {min_words}.")
 
     return TestBlock(
         skill="reading",
@@ -75,10 +78,10 @@ def generate_reading_block(level: str, topic: str) -> TestBlock:
             response = client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
-                    {"role": "user", "content": GENERATION_USER_PROMPT.format(level=level, topic=topic)},
+                    {"role": "user", "content": GENERATION_USER_PROMPT.format(level=level, topic=topic, length_guide=PASSAGE_LENGTH_GUIDE.get(level, PASSAGE_LENGTH_GUIDE["2"]))},
                 ],
-                max_tokens=2200,
-                temperature=0.55,
+                max_tokens=3600,
+                temperature=0.5,
             )
             content = response.choices[0].message.content
             data = _extract_json(content)

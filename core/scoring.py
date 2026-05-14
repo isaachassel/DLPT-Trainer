@@ -1,21 +1,39 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 from typing import Dict, List, Tuple
 
-from .schema import AnswerRecord, ILR_LEVELS, SessionState
+from .schema import AnswerRecord, ILR_LEVELS
+
+
+def get_level_decision(current_level: str, block_score: float, recent_scores: List[float]) -> Tuple[str, str]:
+    """Return the next ILR level and a plain-English adaptive decision note."""
+    idx = ILR_LEVELS.index(current_level)
+    pct = int(round(block_score * 100))
+
+    if block_score >= 1.0 and len(recent_scores) >= 1 and recent_scores[-1] >= 0.75:
+        next_level = ILR_LEVELS[min(idx + 1, len(ILR_LEVELS) - 1)]
+        if next_level != current_level:
+            return next_level, f"Adaptive update: last block {pct}%. You performed strongly across two blocks, so the next block moved from ILR {current_level} to ILR {next_level}."
+        return next_level, f"Adaptive update: last block {pct}%. You are already at the highest level available in this MVP, so the level stayed at ILR {current_level}."
+
+    if block_score <= 0.25 and len(recent_scores) >= 1 and recent_scores[-1] <= 0.25:
+        next_level = ILR_LEVELS[max(idx - 1, 0)]
+        if next_level != current_level:
+            return next_level, f"Adaptive update: last block {pct}%. Two weak blocks in a row, so the next block moved from ILR {current_level} to ILR {next_level}."
+        return next_level, f"Adaptive update: last block {pct}%. You are already at the lowest level available, so the level stayed at ILR {current_level}."
+
+    if block_score >= 0.75:
+        return current_level, f"Adaptive update: last block {pct}%. Strong performance. One more strong block can move you up. Current level stays ILR {current_level}."
+
+    if block_score >= 0.50:
+        return current_level, f"Adaptive update: last block {pct}%. Mixed performance. The app is holding you at ILR {current_level} to collect more evidence."
+
+    return current_level, f"Adaptive update: last block {pct}%. Weak block. If this repeats, the app will move you down one half-level. Current level stays ILR {current_level}."
 
 
 def move_level(current_level: str, block_score: float, recent_scores: List[float]) -> str:
-    idx = ILR_LEVELS.index(current_level)
-
-    if block_score >= 1.0 and len(recent_scores) >= 1 and recent_scores[-1] >= 0.75:
-        return ILR_LEVELS[min(idx + 1, len(ILR_LEVELS) - 1)]
-
-    if block_score <= 0.25 and len(recent_scores) >= 1 and recent_scores[-1] <= 0.25:
-        return ILR_LEVELS[max(idx - 1, 0)]
-
-    return current_level
+    return get_level_decision(current_level, block_score, recent_scores)[0]
 
 
 def estimate_level(records: List[AnswerRecord], starting_level: str) -> str:
@@ -58,7 +76,7 @@ def summarize_records(records: List[AnswerRecord], starting_level: str) -> Tuple
             weak_types.append(f"{qtype} ({c}/{n})")
 
     lines = []
-    lines.append(f"## Final Report")
+    lines.append("## Final Report")
     lines.append(f"**Estimated Reading Level:** ILR {estimated}")
     lines.append(f"**Overall Accuracy:** {correct}/{total} ({accuracy:.0%})")
     lines.append("")
@@ -67,6 +85,15 @@ def summarize_records(records: List[AnswerRecord], starting_level: str) -> Tuple
         if level in by_level:
             c, n = by_level[level]
             lines.append(f"- ILR {level}: {c}/{n} ({c/n:.0%})")
+    lines.append("")
+    lines.append("### Adaptive Path")
+    path = []
+    for r in records:
+        label = f"Block {r.block_number}: ILR {r.ilr_level}"
+        if label not in path:
+            path.append(label)
+    for item in path:
+        lines.append(f"- {item}")
     lines.append("")
     if weak_types:
         lines.append("### Main Weak Areas")

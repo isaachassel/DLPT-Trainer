@@ -60,6 +60,7 @@ class SessionState:
     current_block: Optional[TestBlock] = None
     records: List[AnswerRecord] = field(default_factory=list)
     recent_block_scores: List[float] = field(default_factory=list)
+    adaptive_note: str = "Adaptive engine active. Your level may change after each block based on performance."
 
     @property
     def answered_count(self) -> int:

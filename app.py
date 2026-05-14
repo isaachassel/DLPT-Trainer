@@ -4,7 +4,7 @@ import gradio as gr
 
 from core.generator import generate_reading_block
 from core.schema import AnswerRecord, ILR_LEVELS, SessionState
-from core.scoring import move_level, summarize_records
+from core.scoring import get_level_decision, summarize_records
 
 TOPICS = [
     "Random serious topics",
@@ -39,7 +39,8 @@ def _empty_radio_update():
 def _render_block(block, state: SessionState):
     progress = (
         f"Question block {state.block_number} | Current level: ILR {state.current_level} | "
-        f"Completed: {state.answered_count}/{state.session_questions}"
+        f"Completed: {state.answered_count}/{state.session_questions}\n\n"
+        f"{state.adaptive_note}"
     )
     passage = (
         f"### {block.passage_title}\n\n"
@@ -122,7 +123,9 @@ def submit_block(state: SessionState, a1, a2, a3, a4):
 
     block_score = correct_count / 4
     old_recent = list(state.recent_block_scores)
-    state.current_level = move_level(state.current_level, block_score, old_recent)
+    next_level, adaptive_note = get_level_decision(state.current_level, block_score, old_recent)
+    state.current_level = next_level
+    state.adaptive_note = adaptive_note
     state.recent_block_scores.append(block_score)
 
     if state.is_complete:
