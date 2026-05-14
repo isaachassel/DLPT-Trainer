@@ -183,3 +183,24 @@ python app.py
 ## License
 
 MIT License.
+
+## Speed vs. quality settings
+
+This build is **GenAI-only** and uses **no template fallback**. To keep the app from loading too slowly on Hugging Face Spaces, the default generation flow is speed-first:
+
+```text
+PASSAGE_MAX_ATTEMPTS=1
+QUESTION_MAX_ATTEMPTS=2
+ENABLE_PASSAGE_EXPANSION=false
+```
+
+That means the app makes one live passage call, then generates questions. If the passage is usable but shorter than the preferred ILR structure, the app accepts it instead of doing slow expansion loops.
+
+For higher-quality but slower passages, add these Space secrets/variables:
+
+```text
+PASSAGE_MAX_ATTEMPTS=2
+ENABLE_PASSAGE_EXPANSION=true
+```
+
+Use that only if you are okay with slower loading.

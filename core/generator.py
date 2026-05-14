@@ -24,21 +24,28 @@ load_dotenv()
 # Output budgets. These are maximum output ceilings, not minimums. Minimum length is enforced by
 # prompt + validation + expansion retry logic below.
 PASSAGE_TOKENS_BY_LEVEL = {
-    "0+": 1600,
-    "1": 2200,
-    "1+": 3200,
-    "2": 4800,
-    "2+": 6500,
-    "3": 8500,
+    "0+": 900,
+    "1": 1200,
+    "1+": 1800,
+    "2": 2600,
+    "2+": 3600,
+    "3": 5000,
 }
 QUESTION_TOKENS_BY_LEVEL = {
-    "0+": 1800,
-    "1": 2200,
-    "1+": 2600,
-    "2": 3200,
-    "2+": 3800,
-    "3": 4400,
+    "0+": 1400,
+    "1": 1600,
+    "1+": 1800,
+    "2": 2200,
+    "2+": 2600,
+    "3": 3000,
 }
+
+# Speed-first defaults for Hugging Face Spaces.
+# No template fallback. No long retry loops.
+# If the model produces a usable but short live passage, the app accepts it and moves on.
+PASSAGE_MAX_ATTEMPTS = int(os.getenv("PASSAGE_MAX_ATTEMPTS", "1"))
+QUESTION_MAX_ATTEMPTS = int(os.getenv("QUESTION_MAX_ATTEMPTS", "2"))
+ENABLE_PASSAGE_EXPANSION = os.getenv("ENABLE_PASSAGE_EXPANSION", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 # No template fallback. We do not reject live GenAI just because it is short.
 # Length/paragraph targets are preferred targets; after retries, the app uses the best live GenAI output.
@@ -263,7 +270,7 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             if (candidate.get("word_count", 0), candidate.get("paragraph_count", 0)) > (best.get("word_count", 0), best.get("paragraph_count", 0)):
                 best = candidate
 
-    for attempt in range(1, 5):
+    for attempt in range(1, max(1, PASSAGE_MAX_ATTEMPTS) + 1):
         try:
             print(f"Live GenAI passage call | model={model} | level={level} | max_tokens={max_tokens} | attempt={attempt}")
             response = _call_hf_chat(
@@ -280,10 +287,13 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             remember(passage)
             ok, reason = _quality_status(passage, level)
             print(f"Passage attempt {attempt} quality: {reason}")
-            if ok:
+
+            # Speed-first behavior: a valid live GenAI passage is usable even if it is short.
+            # This avoids slow generation loops on Hugging Face Spaces.
+            if ok or not ENABLE_PASSAGE_EXPANSION:
                 return passage
 
-            # Expansion call: this is the key fix. Do not immediately accept short GenAI.
+            # Optional expansion. Disabled by default because it adds another model call and slows the app.
             print(f"Expanding passage attempt {attempt} because: {reason}")
             expand_response = _call_hf_chat(
                 client,
@@ -299,23 +309,21 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             remember(expanded)
             ok, reason = _quality_status(expanded, level)
             print(f"Expanded passage attempt {attempt} quality: {reason}")
-            if ok:
-                return expanded
+            return expanded
 
         except Exception as exc:
             last_error = exc
             print(f"Passage generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
 
     if best is not None:
-        # Still live GenAI, never a template. This prevents total failure while making status honest.
         return best
-    raise GenerationFailure(f"Live passage generation failed after 4 attempts: {type(last_error).__name__}: {last_error}")
+    raise GenerationFailure(f"Live passage generation failed after {max(1, PASSAGE_MAX_ATTEMPTS)} attempt(s): {type(last_error).__name__}: {last_error}")
 
 
 def _generate_questions(client: InferenceClient, model: str, passage_data: Dict[str, Any], level: str, topic: str) -> List[Question]:
     max_tokens = int(os.getenv("HF_QUESTION_MAX_TOKENS", QUESTION_TOKENS_BY_LEVEL.get(level, 3200)))
     last_error: Optional[Exception] = None
-    for attempt in range(1, 5):
+    for attempt in range(1, max(1, QUESTION_MAX_ATTEMPTS) + 1):
         user_prompt = QUESTION_GENERATION_PROMPT.format(
             level=level,
             topic=topic,
@@ -339,7 +347,7 @@ def _generate_questions(client: InferenceClient, model: str, passage_data: Dict[
         except Exception as exc:
             last_error = exc
             print(f"Question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
-    raise GenerationFailure(f"Live question generation failed after 4 attempts: {type(last_error).__name__}: {last_error}")
+    raise GenerationFailure(f"Live question generation failed after {max(1, QUESTION_MAX_ATTEMPTS)} attempt(s): {type(last_error).__name__}: {last_error}")
 
 
 def generate_reading_block(level: str, topic: str) -> TestBlock:
