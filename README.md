@@ -12,6 +12,8 @@ license: mit
 
 # Russian ILR Trainer
 
+Version: v1.8 GenAI-only tolerant length build
+
 Adaptive Russian reading practice for serious proficiency test preparation. This is an independent DLPT-style, ILR-aligned trainer. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority.
 
 ## Important v1.7 change

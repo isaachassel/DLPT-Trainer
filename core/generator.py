@@ -20,9 +20,13 @@ from .schema import Question, TestBlock
 
 load_dotenv()
 
-# Minimum accepted Russian word counts by ILR level. These are practical app thresholds,
-# not official ILR definitions. They stop the model from calling tiny paragraphs ILR 2/3.
-MIN_WORDS_BY_LEVEL = {"0+": 70, "1": 110, "1+": 150, "2": 230, "2+": 320, "3": 430}
+# Soft target Russian word counts by ILR level. These are quality targets, not hard gates.
+# The app should never fall back to templates just because the model wrote a shorter passage.
+TARGET_WORDS_BY_LEVEL = {"0+": 70, "1": 110, "1+": 150, "2": 230, "2+": 320, "3": 430}
+
+# Absolute floor to prevent unusably tiny outputs. Anything above this is accepted as live GenAI.
+# Short live passages are allowed; they are flagged in the UI instead of rejected.
+ABSOLUTE_MIN_WORDS_BY_LEVEL = {"0+": 35, "1": 45, "1+": 55, "2": 70, "2+": 90, "3": 120}
 
 # Output budgets. The pipeline splits generation into passage first, then questions,
 # so each call has a clearer job and less chance of returning incomplete JSON.
@@ -77,17 +81,28 @@ def _validate_passage(data: Dict[str, Any], level: str, topic: str) -> Dict[str,
     if not passage_ru:
         raise ValueError("Generated passage_ru is empty.")
     words = _word_count(passage_ru)
-    min_words = MIN_WORDS_BY_LEVEL.get(level, 150)
-    if words < min_words:
-        raise ValueError(f"Generated passage is too short for ILR {level}: {words} words, expected at least {min_words}.")
+    target_words = TARGET_WORDS_BY_LEVEL.get(level, 150)
+    absolute_min = ABSOLUTE_MIN_WORDS_BY_LEVEL.get(level, 55)
+    if words < absolute_min:
+        raise ValueError(f"Generated passage is unusably short for ILR {level}: {words} words, expected at least {absolute_min}.")
     if _has_bad_repetition(passage_ru):
         raise ValueError("Generated passage contains repeated consecutive sentences.")
+
+    length_note = ""
+    if words < target_words:
+        length_note = (
+            f"Live GenAI passage accepted, but it is shorter than the ILR {level} target "
+            f"({words} words; target is about {target_words}+)."
+        )
+
     return {
         "skill": "reading",
         "ilr_level": str(data.get("ilr_level", level)).strip() or level,
         "topic": str(data.get("topic", topic)).strip() or topic,
         "passage_title": title,
         "passage_ru": passage_ru,
+        "length_note": length_note,
+        "word_count": words,
     }
 
 
@@ -168,7 +183,7 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             level=level,
             topic=topic,
             length_guide=PASSAGE_LENGTH_GUIDE.get(level, PASSAGE_LENGTH_GUIDE["2"]),
-            min_words=MIN_WORDS_BY_LEVEL.get(level, 150),
+            min_words=TARGET_WORDS_BY_LEVEL.get(level, 150),
             generation_id=nonce,
             attempt=attempt,
         )
@@ -244,5 +259,5 @@ def generate_reading_block(level: str, topic: str) -> TestBlock:
         passage_ru=passage_data["passage_ru"],
         questions=questions,
         generation_source="live",
-        generation_error="",
+        generation_error=passage_data.get("length_note", ""),
     )

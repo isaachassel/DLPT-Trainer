@@ -40,11 +40,11 @@ def _empty_radio_update():
 
 def _render_block(block, state: SessionState):
     source_label = "Live GenAI generation"
-    error_note = ""
+    quality_note = f"\n\nNote: {block.generation_error}" if getattr(block, "generation_error", "") else ""
     progress = (
         f"Question block {state.block_number} | Current level: ILR {state.current_level} | "
         f"Completed: {state.answered_count}/{state.session_questions}\n\n"
-        f"Generation status: {source_label}\n\n"
+        f"Generation status: {source_label}{quality_note}\n\n"
         f"{state.adaptive_note}"
     )
     passage = (
