@@ -27,15 +27,39 @@ SESSION_LENGTHS = {
 }
 
 
+def _radio_update(choices):
+    """Return a Gradio update that replaces answer choices and clears any old answer."""
+    return gr.update(choices=choices, value=None, visible=True)
+
+
+def _empty_radio_update():
+    return gr.update(choices=[], value=None, visible=True)
+
+
 def _render_block(block, state: SessionState):
-    progress = f"Question block {state.block_number} | Current level: ILR {state.current_level} | Completed: {state.answered_count}/{state.session_questions}"
-    passage = f"### {block.passage_title}\n\n**Level:** ILR {block.ilr_level}  \n**Topic:** {block.topic}\n\n---\n\n{block.passage_ru}"
+    progress = (
+        f"Question block {state.block_number} | Current level: ILR {state.current_level} | "
+        f"Completed: {state.answered_count}/{state.session_questions}"
+    )
+    passage = (
+        f"### {block.passage_title}\n\n"
+        f"**Level:** ILR {block.ilr_level}  \n"
+        f"**Topic:** {block.topic}\n\n---\n\n{block.passage_ru}"
+    )
+
     q_texts = []
-    choices = []
+    answer_updates = []
     for q in block.questions:
         q_texts.append(f"**{q.id}. {q.question}**")
-        choices.append([f"{key}. {value}" for key, value in q.choices.items()])
-    return [progress, passage, *q_texts, *choices]
+        choice_list = [f"{key}. {value}" for key, value in q.choices.items()]
+        answer_updates.append(_radio_update(choice_list))
+
+    # The UI has exactly four question/answer slots.
+    while len(q_texts) < 4:
+        q_texts.append("")
+        answer_updates.append(_empty_radio_update())
+
+    return [progress, passage, *q_texts[:4], *answer_updates[:4]]
 
 
 def _new_block(state: SessionState) -> SessionState:
@@ -46,8 +70,9 @@ def _new_block(state: SessionState) -> SessionState:
 
 def start_session(mode, start_level, target_level, length_label, timer_mode, topic):
     if mode != "Reading Practice":
-        empty = "Listening Practice and Full Diagnostic are reserved for Version 2. This build proves the adaptive reading engine first."
-        return [None, empty, "", "", "", "", "", [], [], [], [], gr.update(visible=False), gr.update(visible=True)]
+        msg = "Listening Practice and Full Diagnostic are reserved for Version 2. This build proves the adaptive reading engine first."
+        empty_radios = [_empty_radio_update() for _ in range(4)]
+        return [None, msg, "", "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
 
     state = SessionState(
         mode=mode,
@@ -65,10 +90,11 @@ def start_session(mode, start_level, target_level, length_label, timer_mode, top
 
 def submit_block(state: SessionState, a1, a2, a3, a4):
     if state is None or state.current_block is None:
-        return [state, "Start a session first.", "", "", "", "", "", [], [], [], [], gr.update(visible=False), gr.update(visible=True)]
+        empty_radios = [_empty_radio_update() for _ in range(4)]
+        return [state, "Start a session first.", "", "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
 
     answers = [a1, a2, a3, a4]
-    if any(a is None for a in answers):
+    if any(a is None or str(a).strip() == "" for a in answers):
         rendered = _render_block(state.current_block, state)
         warning = rendered[0] + "\n\nPlease answer all four questions before submitting the block."
         return [state, warning, *rendered[1:], gr.update(visible=True), gr.update(visible=False)]
@@ -76,7 +102,7 @@ def submit_block(state: SessionState, a1, a2, a3, a4):
     block = state.current_block
     correct_count = 0
     for q, selected in zip(block.questions, answers):
-        selected_letter = selected.split(".", 1)[0].strip()
+        selected_letter = str(selected).split(".", 1)[0].strip()
         is_correct = selected_letter == q.correct_answer
         if is_correct:
             correct_count += 1
@@ -101,8 +127,8 @@ def submit_block(state: SessionState, a1, a2, a3, a4):
 
     if state.is_complete:
         _, report = summarize_records(state.records, state.starting_level)
-        blank_choices = [[] for _ in range(4)]
-        return [state, "Assessment complete.", report, "", "", "", "", *blank_choices, gr.update(visible=False), gr.update(visible=True)]
+        empty_radios = [_empty_radio_update() for _ in range(4)]
+        return [state, "Assessment complete.", report, "", "", "", "", *empty_radios, gr.update(visible=False), gr.update(visible=True)]
 
     state = _new_block(state)
     rendered = _render_block(state.current_block, state)
@@ -110,7 +136,7 @@ def submit_block(state: SessionState, a1, a2, a3, a4):
 
 
 def reset_answers():
-    return [None, None, None, None]
+    return [gr.update(value=None), gr.update(value=None), gr.update(value=None), gr.update(value=None)]
 
 
 with gr.Blocks(title="Russian ILR Trainer") as demo:
