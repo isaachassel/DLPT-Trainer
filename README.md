@@ -206,3 +206,16 @@ ENABLE_PASSAGE_EXPANSION=true
 ```
 
 Use that only if you are okay with slower loading.
+
+
+## v2.3 update
+
+- Feedback report is now clearly cumulative after continued practice.
+- Report includes score by block, latest completed block review, and all missed questions review.
+- Continue Practice keeps adding blocks, and Finish Session & Show Report uses every submitted block so far.
+
+## v2.4 UI update
+
+- Feedback is now split into three report tabs: Summary, Latest Block, and All Missed Questions.
+- Long feedback sections use a scrollable report area.
+- Continuing practice preserves cumulative results while showing the newest block separately.

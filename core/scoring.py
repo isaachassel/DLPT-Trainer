@@ -52,9 +52,50 @@ def estimate_level(records: List[AnswerRecord], starting_level: str) -> str:
     return best_supported
 
 
-def summarize_records(records: List[AnswerRecord], starting_level: str, planned_questions: int | None = None) -> Tuple[str, str]:
+def _block_scores(records: List[AnswerRecord]) -> List[Tuple[int, str, int, int]]:
+    """Return block_number, ILR level, correct, total for each completed block."""
+    by_block: Dict[int, List[AnswerRecord]] = defaultdict(list)
+    for r in records:
+        by_block[r.block_number].append(r)
+
+    rows: List[Tuple[int, str, int, int]] = []
+    for block_num in sorted(by_block):
+        block_records = by_block[block_num]
+        level = block_records[0].ilr_level if block_records else "?"
+        correct = sum(1 for r in block_records if r.is_correct)
+        rows.append((block_num, level, correct, len(block_records)))
+    return rows
+
+
+def _missed_review(missed: List[AnswerRecord], heading: str, limit: int | None = None) -> str:
+    lines: List[str] = [heading]
+    if not missed:
+        lines.append("No missed questions in this section.")
+        return "\n".join(lines)
+
+    items = missed if limit is None else missed[:limit]
+    for i, r in enumerate(items, start=1):
+        selected = r.selected_answer or "No answer"
+        lines.append(f"\n**Missed Question {i} — Block {r.block_number}, ILR {r.ilr_level}, {r.question.question_type}**")
+        lines.append(f"**Question:** {r.question.question}")
+        lines.append(f"**Your answer:** {selected}")
+        lines.append(f"**Correct answer:** {r.question.correct_answer}. {r.question.choices[r.question.correct_answer]}")
+        lines.append(f"**Why:** {r.question.explanation}")
+        lines.append(f"**Evidence:** {r.question.evidence}")
+
+    if limit is not None and len(missed) > limit:
+        lines.append(f"\nShowing {limit} of {len(missed)} missed questions in this section.")
+    return "\n".join(lines)
+
+
+def summarize_records_sections(records: List[AnswerRecord], starting_level: str, planned_questions: int | None = None) -> Tuple[str, str, str, str]:
+    """Return estimated level plus three UI-friendly report sections.
+
+    Sections are split so the Gradio UI can place them in separate tabs:
+    Summary, Latest Block Review, and All Missed Questions.
+    """
     if not records:
-        return starting_level, "No completed questions yet."
+        return starting_level, "No completed questions yet.", "No completed block yet.", "No missed questions yet."
 
     total = len(records)
     correct = sum(1 for r in records if r.is_correct)
@@ -75,55 +116,63 @@ def summarize_records(records: List[AnswerRecord], starting_level: str, planned_
         if n >= 2 and c / n < 0.70:
             weak_types.append(f"{qtype} ({c}/{n})")
 
-    lines = []
-    header = "## Current Report" if planned_questions and total >= planned_questions else "## Final Report"
-    lines.append(header)
-    lines.append(f"**Estimated Reading Level:** ILR {estimated}")
-    lines.append(f"**Overall Accuracy:** {correct}/{total} ({accuracy:.0%})")
+    block_rows = _block_scores(records)
+    latest_block = max(r.block_number for r in records)
+    latest_records = [r for r in records if r.block_number == latest_block]
+    latest_correct = sum(1 for r in latest_records if r.is_correct)
+    latest_total = len(latest_records)
+    latest_level = latest_records[0].ilr_level if latest_records else "?"
+    latest_missed = [r for r in latest_records if not r.is_correct]
+    all_missed = [r for r in records if not r.is_correct]
+
+    summary: List[str] = []
+    summary.append(f"## Updated Cumulative Report ({total} completed questions)")
+    summary.append(f"**Estimated Reading Level:** ILR {estimated}")
+    summary.append(f"**Overall Accuracy:** {correct}/{total} ({accuracy:.0%})")
     if planned_questions:
-        lines.append(f"**Current Session Progress:** {total}/{planned_questions} questions")
-    lines.append("")
-    lines.append("### Accuracy by ILR Level")
+        summary.append(f"**Current Session Progress:** {total}/{planned_questions} questions")
+    summary.append(f"**Latest Completed Block:** Block {latest_block}, ILR {latest_level}, {latest_correct}/{latest_total} correct")
+    summary.append("")
+
+    summary.append("### Score by Block")
+    for block_num, level, c, n in block_rows:
+        marker = " ← latest" if block_num == latest_block else ""
+        summary.append(f"- Block {block_num} — ILR {level}: {c}/{n} ({c/n:.0%}){marker}")
+    summary.append("")
+
+    summary.append("### Accuracy by ILR Level")
     for level in ILR_LEVELS:
         if level in by_level:
             c, n = by_level[level]
-            lines.append(f"- ILR {level}: {c}/{n} ({c/n:.0%})")
-    lines.append("")
-    lines.append("### Adaptive Path")
-    path = []
-    for r in records:
-        label = f"Block {r.block_number}: ILR {r.ilr_level}"
-        if label not in path:
-            path.append(label)
-    for item in path:
-        lines.append(f"- {item}")
-    lines.append("")
-    if weak_types:
-        lines.append("### Main Weak Areas")
-        for item in weak_types:
-            lines.append(f"- {item}")
-    else:
-        lines.append("### Main Weak Areas")
-        lines.append("- No clear weakness detected in this short session.")
-    lines.append("")
-    lines.append("### Missed Questions Review")
-    missed = [r for r in records if not r.is_correct]
-    if not missed:
-        lines.append("No missed questions. Increase the starting level next session.")
-    else:
-        for i, r in enumerate(missed, start=1):
-            selected = r.selected_answer or "No answer"
-            lines.append(f"\n**Missed Question {i} — ILR {r.ilr_level}, {r.question.question_type}**")
-            lines.append(f"**Question:** {r.question.question}")
-            lines.append(f"**Your answer:** {selected}")
-            lines.append(f"**Correct answer:** {r.question.correct_answer}. {r.question.choices[r.question.correct_answer]}")
-            lines.append(f"**Why:** {r.question.explanation}")
-            lines.append(f"**Evidence:** {r.question.evidence}")
-    lines.append("")
-    lines.append("### Recommended Next Session")
-    if weak_types:
-        lines.append(f"Continue at ILR {estimated} and practice the weakest question types above.")
-    else:
-        lines.append(f"Continue at ILR {estimated} or one half-level higher if this felt too easy.")
+            summary.append(f"- ILR {level}: {c}/{n} ({c/n:.0%})")
+    summary.append("")
 
-    return estimated, "\n".join(lines)
+    summary.append("### Adaptive Path")
+    for block_num, level, _c, _n in block_rows:
+        summary.append(f"- Block {block_num}: ILR {level}")
+    summary.append("")
+
+    summary.append("### Main Weak Areas")
+    if weak_types:
+        for item in weak_types:
+            summary.append(f"- {item}")
+    else:
+        summary.append("- No clear weakness detected yet.")
+    summary.append("")
+
+    summary.append("### Recommended Next Session")
+    if weak_types:
+        summary.append(f"Continue at ILR {estimated} and practice the weakest question types above.")
+    else:
+        summary.append(f"Continue at ILR {estimated} or one half-level higher if this felt too easy.")
+
+    latest_report = _missed_review(latest_missed, f"## Latest Block Review — Block {latest_block} ({latest_correct}/{latest_total})")
+    missed_report = _missed_review(all_missed, f"## All Missed Questions Review ({len(all_missed)} missed of {total})")
+
+    return estimated, "\n".join(summary), latest_report, missed_report
+
+
+def summarize_records(records: List[AnswerRecord], starting_level: str, planned_questions: int | None = None) -> Tuple[str, str]:
+    """Backward-compatible combined report."""
+    estimated, summary, latest, missed = summarize_records_sections(records, starting_level, planned_questions)
+    return estimated, "\n\n---\n\n".join([summary, latest, missed])
