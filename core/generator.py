@@ -68,6 +68,14 @@ def _paragraph_schema_items(paragraphs: int, label: str = "Russian paragraph") -
 
 
 def _extract_json(text: str) -> Dict[str, Any]:
+    """Extract JSON from model output.
+
+    Some hosted chat models return almost-valid JSON with raw newline/control
+    characters inside string values, especially when generating Russian paragraphs.
+    Python's default json.loads(strict=True) rejects those.  We first try normal
+    JSON, then retry with strict=False, which allows those control characters
+    inside strings while still requiring the object structure to be valid.
+    """
     text = (text or "").strip()
     text = re.sub(r"^```(?:json)?", "", text, flags=re.I).strip()
     text = re.sub(r"```$", "", text).strip()
@@ -75,7 +83,17 @@ def _extract_json(text: str) -> Dict[str, Any]:
     end = text.rfind("}")
     if start == -1 or end == -1 or end <= start:
         raise ValueError("Model did not return a complete JSON object.")
-    return json.loads(text[start : end + 1])
+
+    payload = text[start : end + 1]
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError:
+        # Handles raw line breaks/tabs inside JSON string values.
+        try:
+            return json.JSONDecoder(strict=False).decode(payload)
+        except json.JSONDecodeError as exc:
+            preview = payload[:600].replace("\n", " ")
+            raise ValueError(f"Could not parse model JSON: {exc}. Output preview: {preview}") from exc
 
 
 def _word_count(text: str) -> int:
@@ -217,25 +235,43 @@ def _make_client(token: str) -> InferenceClient:
 
 
 def _call_hf_chat(client: InferenceClient, model: str, messages: List[Dict[str, str]], max_tokens: int):
+    common = dict(
+        model=model,
+        messages=messages,
+        max_tokens=max_tokens,
+        temperature=0.25,
+        top_p=0.9,
+    )
+
+    # Ask providers that support OpenAI-style structured JSON mode to enforce a
+    # JSON object. Some HF providers ignore this or raise TypeError, so we fall
+    # back safely.
     try:
         return client.chat.completions.create(
-            model=model,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=0.45,
-            top_p=0.9,
+            **common,
+            response_format={"type": "json_object"},
         )
-    except TypeError as first_error:
+    except TypeError:
         try:
-            legacy_client = InferenceClient(model=model, token=os.getenv("HF_TOKEN"))
-            return legacy_client.chat.completions.create(
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=0.45,
-                top_p=0.9,
-            )
-        except Exception:
-            raise first_error
+            return client.chat.completions.create(**common)
+        except TypeError as first_error:
+            try:
+                legacy_client = InferenceClient(model=model, token=os.getenv("HF_TOKEN"))
+                legacy_common = dict(
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=0.25,
+                    top_p=0.9,
+                )
+                try:
+                    return legacy_client.chat.completions.create(
+                        **legacy_common,
+                        response_format={"type": "json_object"},
+                    )
+                except TypeError:
+                    return legacy_client.chat.completions.create(**legacy_common)
+            except Exception:
+                raise first_error
 
 
 def _passage_prompt(level: str, topic: str, attempt: int) -> str:
