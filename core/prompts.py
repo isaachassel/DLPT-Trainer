@@ -3,7 +3,7 @@ from __future__ import annotations
 GENERATION_SYSTEM_PROMPT = """
 You create Russian ILR-aligned reading comprehension practice for serious linguists.
 You are not creating official DLPT material. You are creating independent DLPT-style practice.
-Return ONLY valid JSON. No markdown. No commentary. No code fences.
+Return ONLY valid JSON. No markdown. No commentary. No code fences. Use JSON arrays for multi-paragraph passages; never put raw line breaks inside a JSON string.
 """.strip()
 
 # One source of truth for passage shape + level behavior.
@@ -102,12 +102,12 @@ Required structure for ILR {level}:
 - Text requirement: {text_requirements}
 
 Hard requirements:
-- Write the passage in Russian only inside passage_ru.
+- Write the Russian passage only inside passage_paragraphs.
 - Do not write questions in this step.
 - Match the selected ILR level. Do not make low levels too complex or high levels too simple.
 - Use natural adult Russian, not textbook Russian.
 - Topic must match the selected domain.
-- Do not use bullet points, numbered lists, headings inside passage_ru, or English inside passage_ru.
+- Do not use bullet points, numbered lists, headings inside the Russian passage, or English inside the Russian passage.
 - Do not repeat sentences to reach length.
 - Do not copy common demo topics such as gas leaks, generic labor-law changes, bridge closures, or rail flooding unless the selected topic clearly demands it.
 - If you are below the required paragraph count, add paragraph breaks before returning JSON.
@@ -115,13 +115,20 @@ Hard requirements:
 
 Return exactly one JSON object with these fields and no extra text.
 
+Important JSON formatting rule:
+- Do NOT put raw line breaks inside JSON string values.
+- Put each Russian paragraph as one separate string in the passage_paragraphs array.
+- The passage_paragraphs array must contain exactly {paragraphs} item(s).
+
 JSON schema:
 {{
   "skill": "reading",
   "ilr_level": "{level}",
   "topic": "{topic}",
   "passage_title": "English title, 3-8 words",
-  "passage_ru": "Full Russian passage here, formatted as exactly {paragraphs} paragraph(s) separated by newline characters when more than one paragraph is required"
+  "passage_paragraphs": [
+    {paragraph_items}
+  ]
 }}
 """.strip()
 
@@ -145,20 +152,28 @@ Expansion requirements:
 - Do not add questions.
 - Do not use bullet points or lists.
 - Do not repeat sentences.
-- Russian only inside passage_ru.
+- Russian only inside passage_paragraphs.
 - If the passage is still below {min_words} Russian words or {paragraphs} paragraph(s), continue expanding before returning JSON.
 
 Original title: {title}
 Original passage:
 {passage_ru}
 
-Return exactly one JSON object and no extra text:
+Return exactly one JSON object and no extra text.
+
+Important JSON formatting rule:
+- Do NOT put raw line breaks inside JSON string values.
+- Put each Russian paragraph as one separate string in the passage_paragraphs array.
+- The passage_paragraphs array must contain exactly {paragraphs} item(s).
+
 {{
   "skill": "reading",
   "ilr_level": "{level}",
   "topic": "{topic}",
   "passage_title": "{title}",
-  "passage_ru": "Expanded Russian passage here, exactly {paragraphs} paragraph(s) separated by newline characters when more than one paragraph is required"
+  "passage_paragraphs": [
+    {paragraph_items}
+  ]
 }}
 """.strip()
 

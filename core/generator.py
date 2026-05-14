@@ -61,6 +61,12 @@ def _rules(level: str) -> Dict[str, Any]:
     return ILR_STRUCTURE_RULES.get(level, ILR_STRUCTURE_RULES["2"])
 
 
+def _paragraph_schema_items(paragraphs: int, label: str = "Russian paragraph") -> str:
+    # JSON example lines used in prompts. Keeping this dynamic prevents the model
+    # from copying a one-item array when multiple paragraphs are required.
+    return ",\n    ".join(f'"{label} {i}"' for i in range(1, paragraphs + 1))
+
+
 def _extract_json(text: str) -> Dict[str, Any]:
     text = (text or "").strip()
     text = re.sub(r"^```(?:json)?", "", text, flags=re.I).strip()
@@ -115,16 +121,27 @@ def _quality_status(passage: Dict[str, Any], level: str) -> Tuple[bool, str]:
 
 def _validate_passage(data: Dict[str, Any], level: str, topic: str) -> Dict[str, Any]:
     title = str(data.get("passage_title", "")).strip()
-    passage_ru = str(data.get("passage_ru", "")).strip()
+
+    # Prefer passage_paragraphs because it avoids invalid JSON caused by raw newlines
+    # inside a single passage_ru string. If an older model response returns passage_ru,
+    # keep supporting it for compatibility.
+    raw_paragraphs = data.get("passage_paragraphs")
+    if isinstance(raw_paragraphs, list):
+        paragraphs_list = [str(p).strip() for p in raw_paragraphs if str(p).strip()]
+        passage_ru = "\n\n".join(paragraphs_list).strip()
+        paragraphs = len(paragraphs_list)
+    else:
+        passage_ru = str(data.get("passage_ru", "")).strip()
+        paragraphs = _paragraph_count(passage_ru)
+
     if not title:
         raise ValueError("Generated passage_title is empty.")
     if not passage_ru:
-        raise ValueError("Generated passage_ru is empty.")
+        raise ValueError("Generated passage content is empty.")
     if _has_bad_repetition(passage_ru):
         raise ValueError("Generated passage contains repeated consecutive sentences.")
 
     words = _word_count(passage_ru)
-    paragraphs = _paragraph_count(passage_ru)
     absolute_min = ABSOLUTE_MIN_WORDS_BY_LEVEL.get(level, 1)
     if words < absolute_min:
         raise ValueError("Generated passage is empty or unusable.")
@@ -236,6 +253,7 @@ def _passage_prompt(level: str, topic: str, attempt: int) -> str:
         description=r["description"],
         official_basis=r["official_basis"],
         text_requirements=r["text_requirements"],
+        paragraph_items=_paragraph_schema_items(int(r["paragraphs"])),
     )
 
 
@@ -254,6 +272,7 @@ def _expand_prompt(level: str, topic: str, passage_data: Dict[str, Any]) -> str:
         current_paragraphs=passage_data.get("paragraph_count", 0),
         title=passage_data["passage_title"].replace('"', "'"),
         passage_ru=passage_data["passage_ru"],
+        paragraph_items=_paragraph_schema_items(int(r["paragraphs"]), "Expanded Russian paragraph"),
     )
 
 
