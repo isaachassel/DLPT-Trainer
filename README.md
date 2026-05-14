@@ -12,11 +12,11 @@ license: mit
 
 # Russian ILR Trainer
 
-Version: v1.8 GenAI-only tolerant length build
+Version: v2.2 feedback-stop fix
 
 Adaptive Russian reading practice for serious proficiency test preparation. This is an independent DLPT-style, ILR-aligned trainer. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority.
 
-## Important v1.7 change
+## Important behavior
 
 This version uses **live GenAI only**.
 
@@ -34,6 +34,8 @@ There are **no fallback/demo/template questions**. If the Hugging Face model cal
 - End-only feedback
 - Adaptive level movement after each block
 - Continue Practice button after the base session length is complete
+- Finish Session & Show Report button after at least one completed block
+- Feedback report is now shown immediately when the base session ends
 
 ## Generation pipeline
 
@@ -48,7 +50,7 @@ The app no longer asks one model call to create everything at once. It uses a mo
    - Generate exactly four English comprehension questions.
    - Include A/B/C/D choices, correct answer, explanation, evidence, and question type.
 
-If either step fails after retries, the app stops and displays the error. It does not use fallback content.
+If either step fails, the app stops and displays the error. It does not use fallback content.
 
 ## Hugging Face Space setup
 
