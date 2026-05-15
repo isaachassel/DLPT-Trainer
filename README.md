@@ -112,3 +112,21 @@ Optional environment overrides still work:
 EDGE_TTS_VOICE=ru-RU-SvetlanaNeural
 EDGE_TTS_RATE=-5%
 ```
+
+## v3.1 listening question-quality update
+
+This build adds a final GenAI audit pass for listening questions. The audit is designed to:
+
+- keep explanations in English instead of duplicating the Russian evidence
+- keep evidence as a short Russian phrase or clause, not the full transcript
+- avoid questions that require math, time subtraction/addition, or unstated inference
+- require every correct answer to be explicitly stated or directly supported by the listening script
+- show each listening transcript once per missed block in the feedback tabs instead of repeating it under every missed question
+
+Optional environment variable:
+
+```text
+ENABLE_LISTENING_QUESTION_AUDIT=true
+```
+
+Set it to `false` only if you want faster but less carefully checked listening question generation.

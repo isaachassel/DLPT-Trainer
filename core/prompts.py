@@ -221,8 +221,8 @@ JSON schema:
       "question": "English question 2",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "B",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "detail"
     }},
     {{
@@ -230,8 +230,8 @@ JSON schema:
       "question": "English question 3",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "C",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "cause and effect"
     }},
     {{
@@ -239,8 +239,8 @@ JSON schema:
       "question": "English question 4",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "D",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "comprehension"
     }}
   ]
@@ -379,13 +379,18 @@ Question profile: {question_profile}
 Rules:
 - Questions must be in English.
 - Choices must be in English.
-- Base every correct answer only on the Russian script.
+- Every correct answer must be directly supported by the Russian script.
+- Prefer questions where the answer is explicitly stated in the audio.
+- Do not ask questions that require the learner to do math, calculate duration, subtract times, add times, or infer a number that is not directly spoken.
+- Do not ask "how long" unless the exact duration is explicitly stated in the script with words like "три часа" or "сорок минут".
+- Do not make the correct answer depend on outside knowledge or assumptions. If it is not said or clearly supported in the script, do not ask it.
 - Include hidden answer key using correct_answer.
-- Include short explanation and Russian evidence from the script.
+- explanation must be in English and explain the answer in plain language. Do NOT simply repeat the Russian evidence.
+- evidence must be short Russian evidence from the script only: a phrase, clause, time, place, name, or sentence fragment that points to the answer. Do NOT put a full transcript in evidence.
 - Match the question difficulty to ILR listening {level}.
 - At 0/0+/1, focus on recognition, obvious facts, survival/travel/courtesy info.
 - At 2, focus on factual content: lines, not between the lines.
-- At 2+/3, include supported implication, attitude, speaker intent, or relationship of ideas when appropriate.
+- At 2+/3, include supported implication, attitude, speaker intent, or relationship of ideas only when the script directly supports it.
 - Distractors must be plausible listening misunderstandings but clearly wrong based on the script.
 - Return exactly one JSON object. No markdown. No commentary.
 - The questions array must contain exactly Q1, Q2, Q3, Q4.
@@ -401,8 +406,8 @@ JSON schema:
       "question": "English question 1",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "A",
-      "explanation": "Short explanation of why the correct answer is right.",
-      "evidence": "Short Russian evidence from the audio script.",
+      "explanation": "English explanation of why the correct answer is right, without simply repeating the evidence.",
+      "evidence": "Short Russian phrase/clause from the audio script that directly supports the answer.",
       "question_type": "main idea"
     }},
     {{
@@ -410,8 +415,8 @@ JSON schema:
       "question": "English question 2",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "B",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "detail"
     }},
     {{
@@ -419,8 +424,8 @@ JSON schema:
       "question": "English question 3",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "C",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "cause and effect"
     }},
     {{
@@ -428,10 +433,83 @@ JSON schema:
       "question": "English question 4",
       "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "D",
-      "explanation": "Short explanation.",
-      "evidence": "Russian evidence.",
+      "explanation": "English explanation, not a duplicate of the evidence.",
+      "evidence": "Short Russian phrase/clause from the script.",
       "question_type": "comprehension"
     }}
   ]
 }}
+""".strip()
+
+
+LISTENING_QUESTION_AUDIT_PROMPT = """
+You are auditing generated listening comprehension questions for a Russian ILR-style practice app.
+Return ONLY valid JSON. No markdown. No commentary.
+
+Target ILR listening level: {level}
+Topic domain: {topic}
+Audio title: {title}
+
+Russian audio script/transcript, hidden from the learner during the test:
+{passage_ru}
+
+Current generated questions JSON:
+{questions_json}
+
+Your task:
+Rewrite or correct the question set so it is clean, fair, and directly answerable from the audio script.
+
+Hard rules:
+- Keep exactly 4 questions: Q1, Q2, Q3, Q4.
+- Questions and choices must be in English.
+- The correct answer must be explicitly stated or directly supported in the Russian script.
+- Do NOT ask questions that require math, duration calculation, time subtraction/addition, or unstated inference.
+- Do NOT ask "how long" unless the exact duration is spoken directly in the script.
+- Do NOT ask vague questions like "Why is this important?" unless the script explicitly states its importance. Prefer "What is the purpose of...?" when the purpose is directly stated.
+- Do NOT make "please", "hello", or "thank you" a correct answer unless the question is specifically recognition of a courtesy phrase at ILR 0/0+.
+- explanation must be in English and explain the answer clearly. It must not simply repeat the Russian evidence.
+- evidence must be a short Russian phrase, clause, time, place, or sentence fragment from the script. It must not be the full transcript.
+- Distractors must be clearly wrong based on the script.
+
+Return exactly this JSON shape:
+{
+  "questions": [
+    {
+      "id": "Q1",
+      "question": "English question",
+      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "correct_answer": "A",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "main idea"
+    },
+    {
+      "id": "Q2",
+      "question": "English question",
+      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "correct_answer": "B",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "detail"
+    },
+    {
+      "id": "Q3",
+      "question": "English question",
+      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "correct_answer": "C",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "comprehension"
+    },
+    {
+      "id": "Q4",
+      "question": "English question",
+      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "correct_answer": "D",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "comprehension"
+    }
+  ]
+}
 """.strip()

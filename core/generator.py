@@ -21,6 +21,7 @@ from .prompts import (
     LISTENING_STRUCTURE_RULES,
     LISTENING_GENERATION_PROMPT,
     LISTENING_QUESTION_GENERATION_PROMPT,
+    LISTENING_QUESTION_AUDIT_PROMPT,
 )
 from .schema import Question, TestBlock
 
@@ -53,6 +54,7 @@ QUESTION_TOKENS_BY_LEVEL = {
 PASSAGE_MAX_ATTEMPTS = int(os.getenv("PASSAGE_MAX_ATTEMPTS", "1"))
 QUESTION_MAX_ATTEMPTS = int(os.getenv("QUESTION_MAX_ATTEMPTS", "2"))
 ENABLE_PASSAGE_EXPANSION = os.getenv("ENABLE_PASSAGE_EXPANSION", "false").strip().lower() in {"1", "true", "yes", "on"}
+ENABLE_LISTENING_QUESTION_AUDIT = os.getenv("ENABLE_LISTENING_QUESTION_AUDIT", "true").strip().lower() in {"1", "true", "yes", "on"}
 
 # No template fallback. We do not reject live GenAI just because it is short.
 # Length/paragraph targets are preferred targets; after retries, the app uses the best live GenAI output.
@@ -230,6 +232,55 @@ def _validate_questions(data: Dict[str, Any]) -> List[Question]:
         )
     return questions
 
+
+
+def _questions_to_json(questions: List[Question]) -> str:
+    payload = {
+        "questions": [
+            {
+                "id": q.id,
+                "question": q.question,
+                "choices": q.choices,
+                "correct_answer": q.correct_answer,
+                "explanation": q.explanation,
+                "evidence": q.evidence,
+                "question_type": q.question_type,
+            }
+            for q in questions
+        ]
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def _audit_listening_questions(client: InferenceClient, model: str, passage_data: Dict[str, Any], level: str, topic: str, questions: List[Question]) -> List[Question]:
+    """Run a final GenAI audit for listening items.
+
+This fixes the exact issue we saw: explanations duplicating evidence, awkward
+questions, and items that require unstated time/math calculations.
+"""
+    if not ENABLE_LISTENING_QUESTION_AUDIT:
+        return questions
+
+    max_tokens = int(os.getenv("HF_LISTENING_AUDIT_MAX_TOKENS", QUESTION_TOKENS_BY_LEVEL.get(level, 2200)))
+    user_prompt = LISTENING_QUESTION_AUDIT_PROMPT.format(
+        level=level,
+        topic=topic,
+        title=passage_data["passage_title"],
+        passage_ru=passage_data["passage_ru"],
+        questions_json=_questions_to_json(questions),
+    )
+    print(f"Live GenAI listening audit call | model={model} | level={level} | max_tokens={max_tokens}")
+    response = _call_hf_chat(
+        client,
+        model,
+        [
+            {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        max_tokens,
+    )
+    data = _extract_json(response.choices[0].message.content)
+    return _validate_questions(data)
 
 def _make_client(token: str) -> InferenceClient:
     provider = os.getenv("HF_PROVIDER", "auto").strip() or "auto"
@@ -543,7 +594,14 @@ def _generate_listening_questions(client: InferenceClient, model: str, passage_d
                 max_tokens,
             )
             data = _extract_json(response.choices[0].message.content)
-            return _validate_questions(data)
+            questions = _validate_questions(data)
+            try:
+                return _audit_listening_questions(client, model, passage_data, level, topic, questions)
+            except Exception as audit_exc:
+                last_error = audit_exc
+                print(f"Listening question audit failed: {type(audit_exc).__name__}: {audit_exc}")
+                # Try the next question-generation attempt rather than showing unaudited weak questions.
+                continue
         except Exception as exc:
             last_error = exc
             print(f"Listening question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")

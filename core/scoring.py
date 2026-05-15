@@ -75,21 +75,29 @@ def _missed_review(missed: List[AnswerRecord], heading: str, limit: int | None =
         return "\n".join(lines)
 
     items = missed if limit is None else missed[:limit]
+    shown_transcripts = set()
+
     for i, r in enumerate(items, start=1):
         selected = r.selected_answer or "No answer"
+
+        # For listening, show the transcript once per missed block instead of
+        # repeating the same transcript under every missed question.
+        transcript_key = (r.block_number, r.skill)
+        if r.skill == "listening" and transcript_key not in shown_transcripts:
+            shown_transcripts.add(transcript_key)
+            lines.append(f"\n### Transcript for Block {r.block_number}")
+            lines.append(r.passage_ru)
+
         lines.append(f"\n**Missed Question {i} — Block {r.block_number}, {r.skill.title()}, ILR {r.ilr_level}, {r.question.question_type}**")
         lines.append(f"**Question:** {r.question.question}")
         lines.append(f"**Your answer:** {selected}")
         lines.append(f"**Correct answer:** {r.question.correct_answer}. {r.question.choices[r.question.correct_answer]}")
-        lines.append(f"**Why:** {r.question.explanation}")
-        lines.append(f"**Evidence:** {r.question.evidence}")
-        if r.skill == "listening":
-            lines.append(f"**Transcript for this audio:** {r.passage_ru}")
+        lines.append(f"**English explanation:** {r.question.explanation}")
+        lines.append(f"**Evidence from Russian:** {r.question.evidence}")
 
     if limit is not None and len(missed) > limit:
         lines.append(f"\nShowing {limit} of {len(missed)} missed questions in this section.")
     return "\n".join(lines)
-
 
 def summarize_records_sections(records: List[AnswerRecord], starting_level: str, planned_questions: int | None = None) -> Tuple[str, str, str, str]:
     """Return estimated level plus three UI-friendly report sections.
