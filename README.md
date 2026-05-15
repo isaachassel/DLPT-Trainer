@@ -31,6 +31,37 @@ The app generates a Russian audio script using GenAI, then creates an MP3 voiceo
 
 The UI recommends listening no more than 2 times to simulate test pressure, but the audio player does not hard-lock playback. For training, users may replay as needed.
 
+
+## GenAI provider setup
+
+This app can use Hugging Face first and automatically fall back to Groq when Hugging Face Inference Provider credits/rate limits fail.
+
+Recommended Space secrets:
+
+```text
+HF_TOKEN=your_huggingface_token_here
+GROQ_API_KEY=your_groq_key_here
+```
+
+Recommended variables:
+
+```text
+GENAI_PROVIDER=hf_then_groq
+HF_TEXT_MODEL=Qwen/Qwen2.5-7B-Instruct
+GROQ_MODEL=llama-3.3-70b-versatile
+```
+
+Provider options:
+
+```text
+GENAI_PROVIDER=hf_then_groq   # default: try Hugging Face, then Groq
+GENAI_PROVIDER=groq           # use Groq only
+GENAI_PROVIDER=groq_then_hf   # try Groq, then Hugging Face
+GENAI_PROVIDER=huggingface    # use Hugging Face only
+```
+
+Do not hard-code API keys in the files. Add them only as Space secrets. If a key is exposed publicly, revoke it and create a new one.
+
 ## Hugging Face setup
 
 Upload these files at the root of the Space:
@@ -136,3 +167,23 @@ Set it to `false` only if you want faster but less carefully checked listening q
 - Fixed listening question audit prompt escaping that could cause `KeyError: '\n  "questions"'`.
 - If the optional audit call fails, the app now keeps the original live GenAI-generated question set instead of crashing. No fallback templates are used.
 - Listening prompts still instruct the model not to ask math/duration questions unless the answer is directly stated.
+
+## Listening speed controls added in v3.3
+
+The listening question audit improves item quality, but it adds an extra GenAI call. The default is now smart audit mode:
+
+```text
+ENABLE_LISTENING_QUESTION_AUDIT=true
+LISTENING_AUDIT_MODE=smart
+LISTENING_PARALLEL_TTS=true
+```
+
+Audit modes:
+
+```text
+LISTENING_AUDIT_MODE=smart   # default; audit only risky question sets
+LISTENING_AUDIT_MODE=always  # highest quality, slowest
+LISTENING_AUDIT_MODE=off     # fastest, uses first generated question set
+```
+
+`LISTENING_PARALLEL_TTS=true` generates the MP3 voiceover at the same time as the question generation/audit step, which reduces listening block wait time.

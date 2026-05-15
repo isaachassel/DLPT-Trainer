@@ -7,10 +7,16 @@ import re
 import time
 import tempfile
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
+
+try:
+    from groq import Groq
+except Exception:  # Groq is optional; app can still run with Hugging Face only.
+    Groq = None
 
 from .prompts import (
     GENERATION_SYSTEM_PROMPT,
@@ -54,6 +60,21 @@ QUESTION_TOKENS_BY_LEVEL = {
 PASSAGE_MAX_ATTEMPTS = int(os.getenv("PASSAGE_MAX_ATTEMPTS", "1"))
 QUESTION_MAX_ATTEMPTS = int(os.getenv("QUESTION_MAX_ATTEMPTS", "2"))
 ENABLE_PASSAGE_EXPANSION = os.getenv("ENABLE_PASSAGE_EXPANSION", "false").strip().lower() in {"1", "true", "yes", "on"}
+
+# Listening quality/speed controls.
+# smart = audit only when the generated questions look risky (time math, vague importance, etc.).
+# always = audit every listening block. off = skip audit entirely.
+LISTENING_AUDIT_MODE = os.getenv("LISTENING_AUDIT_MODE", "smart").strip().lower()
+LISTENING_PARALLEL_TTS = os.getenv("LISTENING_PARALLEL_TTS", "true").strip().lower() in {"1", "true", "yes", "on"}
+AUDIT_TOKENS_BY_LEVEL = {
+    "0": 900,
+    "0+": 1000,
+    "1": 1200,
+    "1+": 1400,
+    "2": 1600,
+    "2+": 1800,
+    "3": 2200,
+}
 ENABLE_LISTENING_QUESTION_AUDIT = os.getenv("ENABLE_LISTENING_QUESTION_AUDIT", "true").strip().lower() in {"1", "true", "yes", "on"}
 
 # No template fallback. We do not reject live GenAI just because it is short.
@@ -252,16 +273,68 @@ def _questions_to_json(questions: List[Question]) -> str:
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
-def _audit_listening_questions(client: InferenceClient, model: str, passage_data: Dict[str, Any], level: str, topic: str, questions: List[Question]) -> List[Question]:
-    """Run a final GenAI audit for listening items.
+def _question_text_bundle(questions: List[Question]) -> str:
+    parts: List[str] = []
+    for q in questions:
+        parts.extend([q.question, q.explanation, q.evidence, q.question_type])
+        parts.extend(q.choices.values())
+    return "\n".join(parts).lower()
 
-This fixes the exact issue we saw: explanations duplicating evidence, awkward
-questions, and items that require unstated time/math calculations.
-"""
-    if not ENABLE_LISTENING_QUESTION_AUDIT:
+
+def _should_audit_listening_questions(level: str, questions: List[Question]) -> Tuple[bool, str]:
+    """Decide whether to spend an extra model call on listening question repair.
+
+    The first prompt already bans unsupported answers and math. This smart gate
+    keeps the app fast by auditing only when the generated questions show risk
+    markers that commonly caused bad items.
+    """
+    if not ENABLE_LISTENING_QUESTION_AUDIT or LISTENING_AUDIT_MODE in {"0", "false", "no", "off"}:
+        return False, "audit disabled"
+    if LISTENING_AUDIT_MODE in {"1", "true", "yes", "on", "always"}:
+        return True, "audit mode is always"
+
+    bundle = _question_text_bundle(questions)
+    risky_patterns = [
+        r"\bhow long\b",
+        r"\bduration\b",
+        r"\bhow many hours\b",
+        r"\bfrom .* to\b",
+        r"\bbetween .* and\b",
+        r"\bbefore\b",
+        r"\bafter\b",
+        r"\bearlier\b",
+        r"\blater\b",
+        r"\bcalculate\b",
+        r"\bimportant\b",
+        r"\bimply\b",
+        r"\binfer\b",
+        r"\bnot directly stated\b",
+    ]
+    for pattern in risky_patterns:
+        if re.search(pattern, bundle):
+            return True, f"risk marker matched: {pattern}"
+
+    # Higher-level listening allows implication/tone, but the answer key quality
+    # matters more there. Audit only if the item types themselves are higher-risk.
+    risky_types = {"inference", "tone or attitude", "speaker/writer intent", "meaning from context"}
+    if level in {"2+", "3"} and any(q.question_type.lower() in risky_types for q in questions):
+        return True, "higher-level risky question type"
+
+    return False, "no risky question markers"
+
+
+def _audit_listening_questions(client: InferenceClient, model: str, passage_data: Dict[str, Any], level: str, topic: str, questions: List[Question]) -> List[Question]:
+    """Run an optional GenAI audit for listening items.
+
+    This improves quality, but it costs an extra model call. The default smart
+    mode only audits risky question sets so listening blocks load faster.
+    """
+    should_audit, audit_reason = _should_audit_listening_questions(level, questions)
+    if not should_audit:
+        print(f"Listening question audit skipped: {audit_reason}")
         return questions
 
-    max_tokens = int(os.getenv("HF_LISTENING_AUDIT_MAX_TOKENS", QUESTION_TOKENS_BY_LEVEL.get(level, 2200)))
+    max_tokens = int(os.getenv("HF_LISTENING_AUDIT_MAX_TOKENS", AUDIT_TOKENS_BY_LEVEL.get(level, 1600)))
     user_prompt = LISTENING_QUESTION_AUDIT_PROMPT.format(
         level=level,
         topic=topic,
@@ -269,7 +342,7 @@ questions, and items that require unstated time/math calculations.
         passage_ru=passage_data["passage_ru"],
         questions_json=_questions_to_json(questions),
     )
-    print(f"Live GenAI listening audit call | model={model} | level={level} | max_tokens={max_tokens}")
+    print(f"Live GenAI listening audit call | model={model} | level={level} | max_tokens={max_tokens} | reason={audit_reason}")
     response = _call_hf_chat(
         client,
         model,
@@ -282,53 +355,158 @@ questions, and items that require unstated time/math calculations.
     data = _extract_json(response.choices[0].message.content)
     return _validate_questions(data)
 
-def _make_client(token: str) -> InferenceClient:
-    provider = os.getenv("HF_PROVIDER", "auto").strip() or "auto"
-    try:
-        return InferenceClient(provider=provider, token=token)
-    except TypeError:
-        return InferenceClient(token=token)
+def _make_client(token: str) -> Dict[str, Any]:
+    """Create GenAI clients.
+
+    Default behavior is HF first, then Groq as a failsafe. This keeps the
+    existing Hugging Face code path while avoiding total failure when HF
+    Inference Providers hit credits/rate limits.
+
+    Environment variables:
+      GENAI_PROVIDER=hf_then_groq | groq | huggingface | groq_then_hf
+      HF_TOKEN=...
+      GROQ_API_KEY=...
+      HF_TEXT_MODEL=...
+      GROQ_MODEL=...
+    """
+    hf_provider = os.getenv("HF_PROVIDER", "auto").strip() or "auto"
+    mode = os.getenv("GENAI_PROVIDER", "hf_then_groq").strip().lower()
+
+    hf_client = None
+    if token:
+        try:
+            hf_client = InferenceClient(provider=hf_provider, token=token)
+        except TypeError:
+            hf_client = InferenceClient(token=token)
+
+    groq_client = None
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if groq_key and Groq is not None:
+        groq_client = Groq(api_key=groq_key)
+
+    if mode in {"groq", "groq_only"}:
+        order = ["groq"]
+    elif mode in {"huggingface", "hf", "hf_only"}:
+        order = ["hf"]
+    elif mode in {"groq_then_hf", "groq_first"}:
+        order = ["groq", "hf"]
+    else:
+        order = ["hf", "groq"]
+
+    return {"hf": hf_client, "groq": groq_client, "order": order, "mode": mode}
 
 
-def _call_hf_chat(client: InferenceClient, model: str, messages: List[Dict[str, str]], max_tokens: int):
-    common = dict(
-        model=model,
-        messages=messages,
-        max_tokens=max_tokens,
-        temperature=0.25,
-        top_p=0.9,
+def _is_hf_limit_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return (
+        "402" in text
+        or "payment required" in text
+        or "depleted" in text
+        or "monthly included credits" in text
+        or "rate limit" in text
+        or "429" in text
     )
 
-    # Ask providers that support OpenAI-style structured JSON mode to enforce a
-    # JSON object. Some HF providers ignore this or raise TypeError, so we fall
-    # back safely.
-    try:
-        return client.chat.completions.create(
-            **common,
-            response_format={"type": "json_object"},
-        )
-    except TypeError:
-        try:
-            return client.chat.completions.create(**common)
-        except TypeError as first_error:
+
+def _call_hf_chat(client: Dict[str, Any], model: str, messages: List[Dict[str, str]], max_tokens: int):
+    """Call the configured GenAI provider.
+
+    The function name is kept as _call_hf_chat so the rest of the code does not
+    need major changes. It now supports HF -> Groq fallback. All returned
+    objects are OpenAI-compatible enough for response.choices[0].message.content.
+    """
+    last_error: Optional[Exception] = None
+
+    for provider in client.get("order", ["hf", "groq"]):
+        if provider == "hf":
+            hf_client = client.get("hf")
+            if hf_client is None:
+                last_error = GenerationFailure("HF_TOKEN is missing or Hugging Face client was not created.")
+                continue
+            common = dict(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=0.25,
+                top_p=0.9,
+            )
             try:
-                legacy_client = InferenceClient(model=model, token=os.getenv("HF_TOKEN"))
-                legacy_common = dict(
-                    messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=0.25,
-                    top_p=0.9,
-                )
+                print(f"GenAI provider call: huggingface | model={model} | max_tokens={max_tokens}")
                 try:
-                    return legacy_client.chat.completions.create(
-                        **legacy_common,
+                    return hf_client.chat.completions.create(
+                        **common,
                         response_format={"type": "json_object"},
                     )
                 except TypeError:
-                    return legacy_client.chat.completions.create(**legacy_common)
-            except Exception:
-                raise first_error
+                    return hf_client.chat.completions.create(**common)
+            except TypeError as first_error:
+                # Some older HF clients expect the model at construction time.
+                try:
+                    legacy_client = InferenceClient(model=model, token=os.getenv("HF_TOKEN"))
+                    legacy_common = dict(
+                        messages=messages,
+                        max_tokens=max_tokens,
+                        temperature=0.25,
+                        top_p=0.9,
+                    )
+                    try:
+                        return legacy_client.chat.completions.create(
+                            **legacy_common,
+                            response_format={"type": "json_object"},
+                        )
+                    except TypeError:
+                        return legacy_client.chat.completions.create(**legacy_common)
+                except Exception:
+                    last_error = first_error
+                    continue
+            except Exception as exc:
+                last_error = exc
+                # On HF credits/rate-limit errors, immediately try Groq if available.
+                if _is_hf_limit_error(exc):
+                    print(f"Hugging Face limit/credit issue detected; trying Groq failsafe: {type(exc).__name__}: {exc}")
+                    continue
+                print(f"Hugging Face call failed; trying next provider if available: {type(exc).__name__}: {exc}")
+                continue
 
+        elif provider == "groq":
+            groq_client = client.get("groq")
+            if groq_client is None:
+                last_error = GenerationFailure("GROQ_API_KEY is missing or groq package is not installed.")
+                continue
+            groq_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip() or "llama-3.3-70b-versatile"
+            common = dict(
+                model=groq_model,
+                messages=messages,
+                temperature=0.25,
+                top_p=0.9,
+            )
+            try:
+                print(f"GenAI provider call: groq | model={groq_model} | max_tokens={max_tokens}")
+                # Groq generally supports max_completion_tokens; keep a max_tokens fallback.
+                try:
+                    return groq_client.chat.completions.create(
+                        **common,
+                        max_completion_tokens=max_tokens,
+                        response_format={"type": "json_object"},
+                    )
+                except TypeError:
+                    try:
+                        return groq_client.chat.completions.create(
+                            **common,
+                            max_tokens=max_tokens,
+                            response_format={"type": "json_object"},
+                        )
+                    except TypeError:
+                        return groq_client.chat.completions.create(
+                            **common,
+                            max_tokens=max_tokens,
+                        )
+            except Exception as exc:
+                last_error = exc
+                print(f"Groq call failed; trying next provider if available: {type(exc).__name__}: {exc}")
+                continue
+
+    raise GenerationFailure(f"All GenAI providers failed. Last error: {type(last_error).__name__}: {last_error}")
 
 def _passage_prompt(level: str, topic: str, attempt: int) -> str:
     r = _rules(level)
@@ -661,16 +839,29 @@ def _make_tts_audio(text: str, level: str, voice_label: str | None = None, speec
 
 
 def generate_listening_block(level: str, topic: str, voice_label: str | None = None, speech_rate_label: str | None = None) -> TestBlock:
-    """Generate one listening block using live GenAI + generated Russian TTS audio. No template fallback."""
-    token = os.getenv("HF_TOKEN")
-    if not token:
-        raise GenerationFailure("HF_TOKEN is missing. Add it as a Hugging Face Space secret. This app does not use fallback questions.")
+    """Generate one listening block using live GenAI + generated Russian TTS audio. No template fallback.
+
+    Speed optimization: after the script is generated, question generation and
+    MP3 voice creation run in parallel because both only depend on the script.
+    """
+    token = os.getenv("HF_TOKEN", "").strip()
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not token and not groq_key:
+        raise GenerationFailure("No GenAI key found. Add HF_TOKEN and/or GROQ_API_KEY as Space secrets. This app does not use fallback questions.")
 
     model = os.getenv("HF_TEXT_MODEL", "Qwen/Qwen2.5-7B-Instruct")
     client = _make_client(token)
     script_data = _generate_listening_script(client, model, level, topic)
-    questions = _generate_listening_questions(client, model, script_data, level, topic)
-    audio_path = _make_tts_audio(script_data["passage_ru"], level, voice_label, speech_rate_label)
+
+    if LISTENING_PARALLEL_TTS:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            questions_future = executor.submit(_generate_listening_questions, client, model, script_data, level, topic)
+            audio_future = executor.submit(_make_tts_audio, script_data["passage_ru"], level, voice_label, speech_rate_label)
+            questions = questions_future.result()
+            audio_path = audio_future.result()
+    else:
+        questions = _generate_listening_questions(client, model, script_data, level, topic)
+        audio_path = _make_tts_audio(script_data["passage_ru"], level, voice_label, speech_rate_label)
 
     return TestBlock(
         skill="listening",
@@ -686,9 +877,10 @@ def generate_listening_block(level: str, topic: str, voice_label: str | None = N
 
 def generate_reading_block(level: str, topic: str) -> TestBlock:
     """Generate one reading block using live GenAI only. No template fallback."""
-    token = os.getenv("HF_TOKEN")
-    if not token:
-        raise GenerationFailure("HF_TOKEN is missing. Add it as a Hugging Face Space secret. This app does not use fallback questions.")
+    token = os.getenv("HF_TOKEN", "").strip()
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not token and not groq_key:
+        raise GenerationFailure("No GenAI key found. Add HF_TOKEN and/or GROQ_API_KEY as Space secrets. This app does not use fallback questions.")
 
     model = os.getenv("HF_TEXT_MODEL", "Qwen/Qwen2.5-7B-Instruct")
     client = _make_client(token)
