@@ -598,10 +598,11 @@ def _generate_listening_questions(client: InferenceClient, model: str, passage_d
             try:
                 return _audit_listening_questions(client, model, passage_data, level, topic, questions)
             except Exception as audit_exc:
-                last_error = audit_exc
-                print(f"Listening question audit failed: {type(audit_exc).__name__}: {audit_exc}")
-                # Try the next question-generation attempt rather than showing unaudited weak questions.
-                continue
+                # Do not crash the app if the optional quality audit fails.
+                # These questions are still live GenAI-generated, not fallback/template items.
+                # The prompt-level fixes still ban math/unsupported questions in the first generation pass.
+                print(f"Listening question audit failed; using original live GenAI questions: {type(audit_exc).__name__}: {audit_exc}")
+                return questions
         except Exception as exc:
             last_error = exc
             print(f"Listening question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")

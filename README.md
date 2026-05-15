@@ -130,3 +130,9 @@ ENABLE_LISTENING_QUESTION_AUDIT=true
 ```
 
 Set it to `false` only if you want faster but less carefully checked listening question generation.
+
+## v3.2 fix
+
+- Fixed listening question audit prompt escaping that could cause `KeyError: '\n  "questions"'`.
+- If the optional audit call fails, the app now keeps the original live GenAI-generated question set instead of crashing. No fallback templates are used.
+- Listening prompts still instruct the model not to ask math/duration questions unless the answer is directly stated.

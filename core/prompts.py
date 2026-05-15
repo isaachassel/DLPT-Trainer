@@ -467,49 +467,50 @@ Hard rules:
 - Do NOT ask "how long" unless the exact duration is spoken directly in the script.
 - Do NOT ask vague questions like "Why is this important?" unless the script explicitly states its importance. Prefer "What is the purpose of...?" when the purpose is directly stated.
 - Do NOT make "please", "hello", or "thank you" a correct answer unless the question is specifically recognition of a courtesy phrase at ILR 0/0+.
-- explanation must be in English and explain the answer clearly. It must not simply repeat the Russian evidence.
+- Do NOT use the same wording for explanation and evidence.
+- explanation must be in English and explain the answer clearly in plain language.
 - evidence must be a short Russian phrase, clause, time, place, or sentence fragment from the script. It must not be the full transcript.
 - Distractors must be clearly wrong based on the script.
 
 Return exactly this JSON shape:
-{
+{{
   "questions": [
-    {
+    {{
       "id": "Q1",
       "question": "English question",
-      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "A",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
       "question_type": "main idea"
-    },
-    {
+    }},
+    {{
       "id": "Q2",
       "question": "English question",
-      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "B",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
       "question_type": "detail"
-    },
-    {
+    }},
+    {{
       "id": "Q3",
       "question": "English question",
-      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "C",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
       "question_type": "comprehension"
-    },
-    {
+    }},
+    {{
       "id": "Q4",
       "question": "English question",
-      "choices": {"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"},
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
       "correct_answer": "D",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
       "question_type": "comprehension"
-    }
+    }}
   ]
-}
+}}
 """.strip()
