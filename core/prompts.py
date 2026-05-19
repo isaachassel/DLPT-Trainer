@@ -52,30 +52,30 @@ ILR_STRUCTURE_RULES = {
         "question_profile": "Ask main idea, routine detail, simple cause/effect, sequence, and one basic reference/time question. Inference must be very limited and highly supported by context.",
     },
     "2": {
-        "min_words": 190,
-        "max_words": 320,
+        "min_words": 250,
+        "max_words": 380,
         "paragraphs": 2,
-        "sentences_per_paragraph": "5-7 sentences",
+        "sentences_per_paragraph": "6-8 sentences",
         "description": "simple authentic factual material on familiar subjects; straightforward news items, social notices, formulaic business letters, simple technical material for general readers",
         "official_basis": "Reading 2: can read simple authentic factual material on familiar subjects; locate main ideas and details; generally not experienced enough to draw inferences directly from linguistic aspects of the text; factual questions are typical.",
         "text_requirements": "Make it authentic and factual with predictable sequence. Include main ideas and details, but do not rely on subtle implication or disguised intent. Use mostly straightforward/high-frequency sentence patterns.",
         "question_profile": "Prioritize factual comprehension: main idea, detail, sequence, cause/effect, who/what/when/where/why. Avoid subtle inference; any inference must be directly supported and concrete.",
     },
     "2+": {
-        "min_words": 280,
-        "max_words": 460,
+        "min_words": 380,
+        "max_words": 560,
         "paragraphs": 3,
-        "sentences_per_paragraph": "4-6 sentences",
+        "sentences_per_paragraph": "5-7 sentences",
         "description": "most factual non-technical prose and concrete professional topics; separates main ideas/details from lesser ones; gist of more difficult material but weak on nuance or disguised meaning",
         "official_basis": "Reading 2+: understands most factual non-technical material and some concrete professional discussions; can separate main and subsidiary ideas; can make sensible guesses, but may miss nuance or intentionally disguised meaning.",
         "text_requirements": "Use denser factual prose with main and subsidiary ideas. Include concrete professional relevance, qualifications, and unfamiliar terms that can be understood from context. Do not require subtle cultural nuance.",
         "question_profile": "Ask main/subsidiary idea distinction, concrete inference from context, detail prioritization, cause/effect, and gist. Include one question that requires separating important from less important information.",
     },
     "3": {
-        "min_words": 400,
-        "max_words": 650,
+        "min_words": 550,
+        "max_words": 800,
         "paragraphs": 4,
-        "sentences_per_paragraph": "4-6 sentences",
+        "sentences_per_paragraph": "5-7 sentences",
         "description": "authentic professional prose on unfamiliar subjects: wire-service style reports, international news, routine correspondence, general reports, and technical/professional material with hypothesis, argumentation, and supported opinion",
         "official_basis": "Reading 3: reads authentic prose on unfamiliar subjects with almost complete comprehension; can interpret correctly, relate ideas, and read between the lines; can handle hypothesis, argumentation, and supported opinions, though subtle nuance may remain difficult.",
         "text_requirements": "Use authentic adult professional style with argumentation, supported opinion, implicit intent, and relationships across paragraphs. Include some abstract language and unfamiliar subject matter, but keep it general-reader accessible.",
@@ -111,7 +111,8 @@ Hard requirements:
 - Do not repeat sentences to reach length.
 - Do not copy common demo topics such as gas leaks, generic labor-law changes, bridge closures, or rail flooding unless the selected topic clearly demands it.
 - If you are below the required paragraph count, add paragraph breaks before returning JSON.
-- If you are below {min_words} Russian words, continue expanding before returning JSON.
+- If you are below {min_words} Russian words, the output is invalid. Keep writing until the passage reaches the required minimum before returning JSON.
+- For ILR 2 and above, each paragraph must be fully developed, not a short summary.
 
 Return exactly one JSON object with these fields and no extra text.
 
@@ -292,8 +293,8 @@ LISTENING_STRUCTURE_RULES = {
         "question_profile": "Ask main idea, routine fact, simple time/reference, sequence, and limited concrete inference supported by context.",
     },
     "2": {
-        "min_words": 130,
-        "max_words": 230,
+        "min_words": 180,
+        "max_words": 280,
         "segments": 2,
         "style": "routine social or limited job-related speech, everyday topics, known current events, office matters, descriptions/narration of current/past/future events",
         "delivery": "standard dialect at a normal but clear rate; some natural rewording is allowed",
@@ -302,8 +303,8 @@ LISTENING_STRUCTURE_RULES = {
         "question_profile": "Prioritize factual listening comprehension: main idea, detail, sequence, cause/effect, who/what/when/where/why. Avoid subtle implication.",
     },
     "2+": {
-        "min_words": 200,
-        "max_words": 340,
+        "min_words": 280,
+        "max_words": 420,
         "segments": 3,
         "style": "routine work requirements and concrete topics in special fields; more ease but may break down under pressure; some implications/emotional overtones",
         "delivery": "standard Russian at normal clear speed, with realistic speech flow",
@@ -312,8 +313,8 @@ LISTENING_STRUCTURE_RULES = {
         "question_profile": "Ask gist, important vs secondary detail, factual detail, concrete implication, emotional overtone or speaker attitude.",
     },
     "3": {
-        "min_words": 300,
-        "max_words": 520,
+        "min_words": 400,
+        "max_words": 650,
         "segments": 4,
         "style": "news broadcast, oral report, public address, technical/professional discussion, supported opinion, hypothesis, educated native speech",
         "delivery": "normal clarity and speed in standard Russian; professional broadcast or briefing style",
@@ -348,11 +349,55 @@ Hard requirements:
 - Do not include speaker labels like "Speaker 1:" unless the level/task clearly needs dialogue.
 - Do not include stage directions, SSML, markdown, bullets, or English.
 - Do not repeat sentences to reach length.
-- If you are below {min_words} Russian words, continue expanding before returning JSON.
+- If you are below {min_words} Russian words, the output is invalid. Keep writing until the passage reaches the required minimum before returning JSON.
+- For ILR 2 and above, each paragraph must be fully developed, not a short summary.
 - Put each spoken segment as a separate string in script_segments.
 - The script_segments array must contain exactly {segments} item(s).
 
 Return exactly one JSON object with these fields and no extra text:
+{{
+  "skill": "listening",
+  "ilr_level": "{level}",
+  "topic": "{topic}",
+  "passage_title": "English title, 3-8 words",
+  "script_segments": [
+    {segment_items}
+  ]
+}}
+""".strip()
+
+
+
+LISTENING_EXPANSION_PROMPT = """
+Your previous Russian listening script is too short for ILR {level}. Expand it while preserving the same scenario and facts.
+
+Target ILR listening level: {level}
+Topic domain: {topic}
+Official ILR listening basis:
+{official_basis}
+
+Required structure:
+- Total length: {min_words}-{max_words} Russian words.
+- Spoken segment count: exactly {segments} segment(s).
+- Style: {style}.
+- Delivery style: {delivery}.
+- Text requirement: {text_requirements}
+
+Current length: {current_words} words and {current_segments} segment(s).
+Current title: {title}
+Current script:
+{script_ru}
+
+Hard requirements:
+- Expand the script to at least {min_words} Russian words.
+- Keep exactly {segments} spoken segment(s).
+- Do not add questions.
+- Do not add speaker labels unless dialogue is truly required.
+- Do not include English, markdown, bullets, or stage directions.
+- Do not repeat sentences just to add length.
+- Put each spoken segment as one separate string in script_segments.
+
+Return exactly one JSON object with no extra text:
 {{
   "skill": "listening",
   "ilr_level": "{level}",

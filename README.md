@@ -199,3 +199,19 @@ LISTENING_AUDIT_MODE=off     # fastest, uses first generated question set
 ```
 
 `LISTENING_PARALLEL_TTS=true` generates the MP3 voiceover at the same time as the question generation/audit step, which reduces listening block wait time.
+
+## Upper-level length controls
+
+For ILR 2 and above, the app now performs one expansion pass when a live GenAI reading passage or listening script is shorter than the target. This prevents upper-level content from staying in the 100-word range while avoiding long retry loops.
+
+Optional variables:
+
+```text
+ENFORCE_LENGTH_LEVELS=2,2+,3
+ENABLE_PASSAGE_EXPANSION=false
+ENABLE_LISTENING_EXPANSION=true
+HF_PASSAGE_MAX_TOKENS=7600
+HF_LISTENING_MAX_TOKENS=7600
+```
+
+`max_tokens` is only a ceiling, not a minimum. The app enforces length by counting words and expanding short ILR 2+ outputs once.

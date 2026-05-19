@@ -29,6 +29,7 @@ from .prompts import (
     QUESTION_GENERATION_PROMPT,
     LISTENING_STRUCTURE_RULES,
     LISTENING_GENERATION_PROMPT,
+    LISTENING_EXPANSION_PROMPT,
     LISTENING_QUESTION_GENERATION_PROMPT,
     LISTENING_QUESTION_AUDIT_PROMPT,
 )
@@ -43,9 +44,9 @@ PASSAGE_TOKENS_BY_LEVEL = {
     "0+": 900,
     "1": 1200,
     "1+": 1800,
-    "2": 2600,
-    "2+": 3600,
-    "3": 5000,
+    "2": 3800,
+    "2+": 5200,
+    "3": 7600,
 }
 QUESTION_TOKENS_BY_LEVEL = {
     "0": 1200,
@@ -58,11 +59,13 @@ QUESTION_TOKENS_BY_LEVEL = {
 }
 
 # Speed-first defaults for Hugging Face Spaces.
-# No template fallback. No long retry loops.
-# If the model produces a usable but short live passage, the app accepts it and moves on.
+# No template fallback. For ILR 2 and above, the app does one short-output expansion pass by default.
 PASSAGE_MAX_ATTEMPTS = int(os.getenv("PASSAGE_MAX_ATTEMPTS", "1"))
 QUESTION_MAX_ATTEMPTS = int(os.getenv("QUESTION_MAX_ATTEMPTS", "2"))
 ENABLE_PASSAGE_EXPANSION = os.getenv("ENABLE_PASSAGE_EXPANSION", "false").strip().lower() in {"1", "true", "yes", "on"}
+# Enforce/expand longer upper-level blocks by default. This keeps low levels fast while preventing ILR 2+ from staying in the 100-word range.
+ENFORCE_LENGTH_LEVELS = {x.strip() for x in os.getenv("ENFORCE_LENGTH_LEVELS", "2,2+,3").split(",") if x.strip()}
+ENABLE_LISTENING_EXPANSION = os.getenv("ENABLE_LISTENING_EXPANSION", "true").strip().lower() in {"1", "true", "yes", "on"}
 
 # Listening quality/speed controls.
 # smart = audit only when the generated questions look risky (time math, vague importance, etc.).
@@ -586,12 +589,11 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             ok, reason = _quality_status(passage, level)
             print(f"Passage attempt {attempt} quality: {reason}")
 
-            # Speed-first behavior: a valid live GenAI passage is usable even if it is short.
-            # This avoids slow generation loops on Hugging Face Spaces.
-            if ok or not ENABLE_PASSAGE_EXPANSION:
+            # Low levels can remain fast. ILR 2+ gets one expansion pass when too short.
+            should_expand = (not ok) and (ENABLE_PASSAGE_EXPANSION or level in ENFORCE_LENGTH_LEVELS)
+            if ok or not should_expand:
                 return passage
 
-            # Optional expansion. Disabled by default because it adds another model call and slows the app.
             print(f"Expanding passage attempt {attempt} because: {reason}")
             expand_response = _call_hf_chat(
                 client,
@@ -607,7 +609,7 @@ def _generate_passage(client: InferenceClient, model: str, level: str, topic: st
             remember(expanded)
             ok, reason = _quality_status(expanded, level)
             print(f"Expanded passage attempt {attempt} quality: {reason}")
-            return expanded
+            return expanded if ok else (best or expanded)
 
         except Exception as exc:
             last_error = exc
@@ -678,6 +680,26 @@ def _listening_prompt(level: str, topic: str, attempt: int) -> str:
     )
 
 
+def _listening_expand_prompt(level: str, topic: str, script_data: Dict[str, Any]) -> str:
+    r = _listening_rules(level)
+    return LISTENING_EXPANSION_PROMPT.format(
+        level=level,
+        topic=topic,
+        min_words=r["min_words"],
+        max_words=r["max_words"],
+        segments=r["segments"],
+        style=r["style"],
+        delivery=r["delivery"],
+        official_basis=r["official_basis"],
+        text_requirements=r["text_requirements"],
+        current_words=script_data.get("word_count", 0),
+        current_segments=script_data.get("segment_count", 0),
+        title=script_data["passage_title"].replace('"', "'"),
+        script_ru=script_data["passage_ru"],
+        segment_items=_segment_schema_items(int(r["segments"]), "Expanded Russian spoken segment"),
+    )
+
+
 def _validate_listening_script(data: Dict[str, Any], level: str, topic: str) -> Dict[str, Any]:
     title = str(data.get("passage_title", "")).strip()
     raw_segments = data.get("script_segments")
@@ -742,7 +764,26 @@ def _generate_listening_script(client: InferenceClient, model: str, level: str, 
             script = _validate_listening_script(data, level, topic)
             r = _listening_rules(level)
             print(f"Listening script attempt {attempt} quality: word count {script['word_count']}/{r['min_words']}; segments {script['segment_count']}/{r['segments']}")
-            return script
+
+            too_short = script["word_count"] < int(r["min_words"]) or script["segment_count"] < int(r["segments"])
+            should_expand = too_short and ENABLE_LISTENING_EXPANSION and level in ENFORCE_LENGTH_LEVELS
+            if not should_expand:
+                return script
+
+            print(f"Expanding listening script attempt {attempt} because: word count {script['word_count']}/{r['min_words']}; segments {script['segment_count']}/{r['segments']}")
+            expand_response = _call_hf_chat(
+                client,
+                model,
+                [
+                    {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+                    {"role": "user", "content": _listening_expand_prompt(level, topic, script)},
+                ],
+                max_tokens,
+            )
+            expanded_data = _extract_json(expand_response.choices[0].message.content)
+            expanded = _validate_listening_script(expanded_data, level, topic)
+            print(f"Expanded listening script attempt {attempt} quality: word count {expanded['word_count']}/{r['min_words']}; segments {expanded['segment_count']}/{r['segments']}")
+            return expanded if expanded["word_count"] >= int(r["min_words"]) else (expanded if expanded["word_count"] >= script["word_count"] else script)
         except Exception as exc:
             last_error = exc
             print(f"Listening script generation attempt {attempt} failed: {type(exc).__name__}: {exc}")
