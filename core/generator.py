@@ -657,8 +657,8 @@ def _listening_rules(level: str) -> Dict[str, Any]:
     return LISTENING_STRUCTURE_RULES.get(level, LISTENING_STRUCTURE_RULES["2"])
 
 
-def _segment_schema_items(segments: int) -> str:
-    return ",\n    ".join(f'"Russian spoken segment {i}"' for i in range(1, segments + 1))
+def _segment_schema_items(segments: int, label: str = "Russian spoken segment") -> str:
+    return ",\n    ".join(f'"{label} {i}"' for i in range(1, segments + 1))
 
 
 def _listening_prompt(level: str, topic: str, attempt: int) -> str:
