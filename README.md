@@ -62,6 +62,18 @@ GENAI_PROVIDER=huggingface    # use Hugging Face only
 
 Do not hard-code API keys in the files. Add them only as Space secrets. If a key is exposed publicly, revoke it and create a new one.
 
+## Listening audio reliability
+
+The listening audio is generated with `edge-tts`. Longer ILR 2+/3 scripts are split into smaller TTS-safe chunks and then joined into one MP3, so the full generated transcript should play instead of cutting off early.
+
+Optional tuning variable:
+
+```text
+EDGE_TTS_MAX_CHARS=900
+```
+
+Lower this if long audio still cuts off on your host; raise it slightly if audio generation feels too slow.
+
 ## Hugging Face setup
 
 Upload these files at the root of the Space:

@@ -7,6 +7,9 @@ import re
 import time
 import tempfile
 import asyncio
+import shutil
+import subprocess
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -798,8 +801,115 @@ def _run_async(coro):
             loop.close()
 
 
+def _normalize_tts_text(text: str) -> str:
+    """Normalize generated Russian script before TTS.
+
+    Edge TTS can occasionally cut or mishandle long multi-paragraph text when it is
+    sent as one large request. Normalizing and chunking keeps the full listening
+    script intact.
+    """
+    cleaned = (text or "").replace("\r\n", "\n").replace("\r", "\n")
+    cleaned = cleaned.replace("—", " — ").replace("–", " — ")
+    cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
+def _split_tts_text(text: str, max_chars: int = 900) -> List[str]:
+    """Split text into TTS-safe chunks without dropping any content."""
+    text = _normalize_tts_text(text)
+    if not text:
+        return []
+
+    # Prefer paragraph boundaries first.
+    paragraphs = [p.strip() for p in re.split(r"\n\s*\n+", text) if p.strip()]
+    chunks: List[str] = []
+
+    def add_piece(piece: str):
+        piece = piece.strip()
+        if not piece:
+            return
+        if len(piece) <= max_chars:
+            chunks.append(piece)
+            return
+        # Split oversized paragraph by sentence boundaries.
+        sentences = [s.strip() for s in re.split(r"(?<=[.!?…])\s+", piece) if s.strip()]
+        buf = ""
+        for sent in sentences:
+            if not buf:
+                buf = sent
+            elif len(buf) + 1 + len(sent) <= max_chars:
+                buf += " " + sent
+            else:
+                chunks.append(buf.strip())
+                buf = sent
+        if buf:
+            chunks.append(buf.strip())
+
+    for paragraph in paragraphs or [text]:
+        add_piece(paragraph)
+
+    # Last-resort hard split for any still oversized chunks.
+    safe_chunks: List[str] = []
+    for chunk in chunks:
+        if len(chunk) <= max_chars:
+            safe_chunks.append(chunk)
+        else:
+            for i in range(0, len(chunk), max_chars):
+                safe_chunks.append(chunk[i : i + max_chars].strip())
+    return [c for c in safe_chunks if c]
+
+
+def _concat_mp3_files(segment_paths: List[str], out_path: str) -> None:
+    """Concatenate MP3 segments into one playable MP3.
+
+    Prefer ffmpeg's concat demuxer when available. If ffmpeg is unavailable in the
+    hosting image, fall back to byte concatenation, which most browsers can play
+    for MP3 streams generated with the same codec/voice settings.
+    """
+    if not segment_paths:
+        raise GenerationFailure("TTS produced no audio segments.")
+    if len(segment_paths) == 1:
+        shutil.copyfile(segment_paths[0], out_path)
+        return
+
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg:
+        list_path = out_path + ".txt"
+        with open(list_path, "w", encoding="utf-8") as f:
+            for seg in segment_paths:
+                # ffmpeg concat file format. Paths are temp-generated, but still escape quotes.
+                f.write("file '" + seg.replace("'", "'\\''") + "'\n")
+        try:
+            subprocess.run(
+                [ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", list_path, "-c", "copy", out_path],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            return
+        finally:
+            try:
+                os.remove(list_path)
+            except OSError:
+                pass
+
+    # Fallback: append MP3 byte streams. This is not as clean as ffmpeg, but it
+    # avoids losing audio if ffmpeg is not installed.
+    with open(out_path, "wb") as outfile:
+        for seg in segment_paths:
+            with open(seg, "rb") as infile:
+                shutil.copyfileobj(infile, outfile)
+
+
 def _make_tts_audio(text: str, level: str, voice_label: str | None = None, speech_rate_label: str | None = None) -> str:
-    """Create Russian MP3 audio for listening practice using edge-tts."""
+    """Create Russian MP3 audio for listening practice using edge-tts.
+
+    The old version sent the full generated script to Edge TTS in one request. For
+    longer ILR 2+/3 scripts, that can result in incomplete audio on Spaces. This
+    version chunks the script, generates each chunk, then concatenates the MP3s so
+    the full transcript is represented in the final audio file.
+    """
     try:
         import edge_tts
     except Exception as exc:
@@ -832,10 +942,41 @@ def _make_tts_audio(text: str, level: str, voice_label: str | None = None, speec
     }
     selected_rate = rate_map.get(speech_rate_label or "", None)
     rate = selected_rate or os.getenv("EDGE_TTS_RATE", auto_rate_by_level.get(level, "-5%"))
-    out_path = os.path.join(tempfile.gettempdir(), f"ilr_listening_{int(time.time())}_{random.randint(100000,999999)}.mp3")
-    communicate = edge_tts.Communicate(text=text, voice=voice, rate=rate)
-    _run_async(communicate.save(out_path))
-    return out_path
+
+    max_chars = int(os.getenv("EDGE_TTS_MAX_CHARS", "900"))
+    chunks = _split_tts_text(text, max_chars=max_chars)
+    if not chunks:
+        raise GenerationFailure("Cannot create listening audio because the generated script is empty.")
+
+    base = f"ilr_listening_{int(time.time())}_{random.randint(100000,999999)}"
+    tmp_dir = tempfile.gettempdir()
+    out_path = os.path.join(tmp_dir, f"{base}.mp3")
+    segment_paths: List[str] = []
+
+    try:
+        for idx, chunk in enumerate(chunks, start=1):
+            seg_path = os.path.join(tmp_dir, f"{base}_part{idx:02d}.mp3")
+            communicate = edge_tts.Communicate(text=chunk, voice=voice, rate=rate)
+            _run_async(communicate.save(seg_path))
+            if not os.path.exists(seg_path) or os.path.getsize(seg_path) < 1024:
+                raise GenerationFailure(f"TTS segment {idx} was not created correctly.")
+            segment_paths.append(seg_path)
+
+        _concat_mp3_files(segment_paths, out_path)
+        if not os.path.exists(out_path) or os.path.getsize(out_path) < 1024:
+            raise GenerationFailure("Final TTS audio file was not created correctly.")
+        print(
+            f"TTS audio created | chunks={len(chunks)} | chars={len(_normalize_tts_text(text))} | "
+            f"bytes={os.path.getsize(out_path)} | path={out_path}"
+        )
+        return out_path
+    finally:
+        # Keep the final output but remove intermediate segment files.
+        for seg in segment_paths:
+            try:
+                os.remove(seg)
+            except OSError:
+                pass
 
 
 def generate_listening_block(level: str, topic: str, voice_label: str | None = None, speech_rate_label: str | None = None) -> TestBlock:
