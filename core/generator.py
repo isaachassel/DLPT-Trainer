@@ -31,6 +31,8 @@ from .prompts import (
     LISTENING_GENERATION_PROMPT,
     LISTENING_EXPANSION_PROMPT,
     LISTENING_QUESTION_GENERATION_PROMPT,
+    LISTENING_SCRIPT_REPAIR_PROMPT,
+    LISTENING_QUESTION_REPAIR_PROMPT,
     LISTENING_QUESTION_AUDIT_PROMPT,
 )
 from .schema import Question, TestBlock
@@ -82,6 +84,13 @@ AUDIT_TOKENS_BY_LEVEL = {
     "3": 2200,
 }
 ENABLE_LISTENING_QUESTION_AUDIT = os.getenv("ENABLE_LISTENING_QUESTION_AUDIT", "true").strip().lower() in {"1", "true", "yes", "on"}
+
+# Deterministic listening quality gate. This catches the exact failure mode you saw:
+# repeated listening-script status lines, weak ILR-3 detail-only questions, and ambiguous cause questions.
+ENABLE_LISTENING_QUALITY_GATE = os.getenv("ENABLE_LISTENING_QUALITY_GATE", "true").strip().lower() in {"1", "true", "yes", "on"}
+LISTENING_SCRIPT_REPAIR_MAX_ATTEMPTS = int(os.getenv("LISTENING_SCRIPT_REPAIR_MAX_ATTEMPTS", "1"))
+LISTENING_QUESTION_REPAIR_MAX_ATTEMPTS = int(os.getenv("LISTENING_QUESTION_REPAIR_MAX_ATTEMPTS", "1"))
+LISTENING_STRICT_SCRIPT_GATE = os.getenv("LISTENING_STRICT_SCRIPT_GATE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 # No template fallback. We do not reject live GenAI just because it is short.
 # Length/paragraph targets are preferred targets; after retries, the app uses the best live GenAI output.
@@ -152,6 +161,178 @@ def _has_bad_repetition(text: str) -> bool:
     if len(parts) < 2:
         return False
     return any(parts[i] == parts[i - 1] for i in range(1, len(parts)))
+
+
+def _split_sentences(text: str) -> List[str]:
+    """Lightweight sentence splitter for generated Russian/English text."""
+    return [s.strip() for s in re.split(r"(?<=[.!?…])\s+", (text or "").strip()) if s.strip()]
+
+
+def _normalize_for_quality(text: str) -> str:
+    """Normalize text for cheap repetition/quality checks without changing output."""
+    text = (text or "").lower().replace("ё", "е")
+    text = re.sub(r"[\u0301\u0300]", "", text)
+    text = re.sub(r"[^0-9a-zа-яё\s]+", " ", text, flags=re.I)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _ngrams(words: List[str], n: int) -> List[str]:
+    if len(words) < n:
+        return []
+    return [" ".join(words[i : i + n]) for i in range(0, len(words) - n + 1)]
+
+
+def _jaccard(a: str, b: str) -> float:
+    aw = set(_normalize_for_quality(a).split())
+    bw = set(_normalize_for_quality(b).split())
+    if not aw or not bw:
+        return 0.0
+    return len(aw & bw) / max(1, len(aw | bw))
+
+
+def _extract_cause_markers(text: str) -> List[str]:
+    """Find simple Russian cause/explanation markers that can create ambiguous question keys."""
+    norm = _normalize_for_quality(text)
+    patterns = [
+        r"причин[аоы]?\s+стало\s+[^.?!]{8,90}",
+        r"причиной\s+стал[ао]?\s+[^.?!]{8,90}",
+        r"произошл[ао]?\s+из\s+за\s+[^.?!]{8,90}",
+        r"из\s+за\s+[^.?!]{8,90}",
+        r"связано\s+с\s+[^.?!]{8,90}",
+    ]
+    markers: List[str] = []
+    for pattern in patterns:
+        markers.extend(re.findall(pattern, norm))
+    # Keep unique shortened markers.
+    unique: List[str] = []
+    for m in markers:
+        m = m.strip()
+        if m and m not in unique:
+            unique.append(m)
+    return unique
+
+
+def _has_preliminary_update_markers(text: str) -> bool:
+    norm = _normalize_for_quality(text)
+    preliminary = any(x in norm for x in ["по предварительным данным", "предварительная версия", "сначала", "первоначально"])
+    updated = any(x in norm for x in ["по последним данным", "позже", "затем", "уточнили", "обновленная версия", "следствие установило"])
+    return preliminary and updated
+
+
+def _listening_script_quality_issues(script_data: Dict[str, Any], level: str) -> Tuple[List[str], List[str]]:
+    """Return (errors, warnings) for generated listening scripts.
+
+    This is intentionally cheap/deterministic. It does not replace the model; it
+    catches obvious bad generations before we spend time creating audio and questions.
+    """
+    if not ENABLE_LISTENING_QUALITY_GATE:
+        return [], []
+
+    text = script_data.get("passage_ru", "") or ""
+    errors: List[str] = []
+    warnings: List[str] = []
+    norm_text = _normalize_for_quality(text)
+    sentences = _split_sentences(text)
+    normalized_sentences = [_normalize_for_quality(s) for s in sentences]
+
+    # Repeated complete sentences anywhere, not just consecutive.
+    seen: Dict[str, int] = {}
+    for s in normalized_sentences:
+        if len(s.split()) < 7:
+            continue
+        seen[s] = seen.get(s, 0) + 1
+    repeated_sentences = [s for s, count in seen.items() if count >= 2]
+    if repeated_sentences:
+        errors.append("script repeats one or more full sentences instead of adding new information")
+
+    # Repeated medium-length chunks catch slightly edited copy/paste loops.
+    words = norm_text.split()
+    repeated_12grams = [g for g, count in {g: _ngrams(words, 12).count(g) for g in set(_ngrams(words, 12))}.items() if count >= 2]
+    if repeated_12grams:
+        errors.append("script repeats the same 12-word status/update phrase more than once")
+
+    # Segment-level similarity: paragraphs should advance, not restate.
+    segments = [p.strip() for p in re.split(r"\n\s*\n+", text) if p.strip()]
+    if len(segments) >= 2:
+        for i in range(1, len(segments)):
+            if _jaccard(segments[i - 1], segments[i]) > 0.58:
+                warnings.append(f"spoken segment {i + 1} is too similar to segment {i}")
+
+    # Cause ambiguity: acceptable only if explicitly framed as preliminary vs updated.
+    causes = _extract_cause_markers(text)
+    if len(causes) >= 2 and not _has_preliminary_update_markers(text):
+        errors.append("script gives multiple causes for the same event without explaining preliminary vs later findings")
+    elif len(causes) >= 2:
+        warnings.append("script contains preliminary and later cause findings; questions must ask about the evolution, not one vague main cause")
+
+    if level == "3":
+        if int(script_data.get("segment_count", 0)) < 4:
+            errors.append("ILR 3 listening script must have exactly four developed spoken segments")
+        if _word_count(text) < int(_listening_rules(level)["min_words"]):
+            warnings.append("ILR 3 script is below the target word count")
+        # ILR 3 should have discourse markers/relationships, not just repeated facts.
+        discourse_markers = ["однако", "при этом", "в то же время", "поэтому", "следовательно", "между тем", "по словам", "эксперты", "власти", "аналитики", "если"]
+        if sum(1 for marker in discourse_markers if marker in norm_text) < 3:
+            warnings.append("ILR 3 script may be too list-like; add relationship markers, viewpoints, or implications")
+
+    return errors, warnings
+
+
+def _append_quality_note(script_data: Dict[str, Any], note: str) -> Dict[str, Any]:
+    note = note.strip()
+    if not note:
+        return script_data
+    existing = script_data.get("length_note", "")
+    script_data["length_note"] = f"{existing} {note}".strip()
+    return script_data
+
+
+def _listening_question_quality_issues(passage_data: Dict[str, Any], level: str, questions: List[Question]) -> Tuple[List[str], List[str]]:
+    """Return (errors, warnings) for generated listening question sets."""
+    if not ENABLE_LISTENING_QUALITY_GATE:
+        return [], []
+
+    errors: List[str] = []
+    warnings: List[str] = []
+    bundle = _question_text_bundle(questions)
+    cause_markers = _extract_cause_markers(passage_data.get("passage_ru", ""))
+    ambiguous_cause = len(cause_markers) >= 2
+
+    simple_stems = ("how many", "when", "where", "who", "what number", "what time")
+    simple_count = 0
+    detail_count = 0
+    higher_order_types = {"main idea", "inference", "speaker/writer intent", "cause and effect", "tone or attitude", "meaning from context", "relationship of ideas", "comprehension"}
+
+    for q in questions:
+        qtext = q.question.strip().lower()
+        qtype = q.question_type.strip().lower()
+        if qtype == "detail" or qtext.startswith(simple_stems):
+            simple_count += 1
+        if qtype == "detail":
+            detail_count += 1
+        if "main cause" in qtext and ambiguous_cause:
+            errors.append("question asks for one vague main cause even though the script has preliminary/later cause information")
+        if re.search(r"\bhow long\b|\bduration\b|\bcalculate\b|\bsubtract\b|\badd\b", qtext):
+            errors.append("question requires duration/math or invites calculation")
+        if not q.evidence.strip():
+            errors.append(f"{q.id} has no Russian evidence")
+        if len(q.evidence.split()) > 28:
+            warnings.append(f"{q.id} evidence is too long; use a short Russian phrase or clause")
+
+    if level == "3":
+        if detail_count > 1 or simple_count > 1:
+            errors.append("ILR 3 listening question set uses too many simple detail/extraction questions")
+        higher_count = sum(1 for q in questions if q.question_type.strip().lower() in higher_order_types and q.question_type.strip().lower() != "detail")
+        if higher_count < 3:
+            errors.append("ILR 3 listening question set needs at least three higher-order questions")
+        if any("how many" in q.question.lower() for q in questions):
+            warnings.append("ILR 3 set includes a how-many question; use only if you intentionally want one simple detail item")
+
+    if "not directly stated" in bundle or "outside knowledge" in bundle:
+        errors.append("question or answer explanation suggests unsupported inference")
+
+    return errors, warnings
+
 
 
 def _quality_status(passage: Dict[str, Any], level: str) -> Tuple[bool, str]:
@@ -514,6 +695,128 @@ def _call_hf_chat(client: Dict[str, Any], model: str, messages: List[Dict[str, s
 
     raise GenerationFailure(f"All GenAI providers failed. Last error: {type(last_error).__name__}: {last_error}")
 
+
+def _repair_listening_script_if_needed(client: Dict[str, Any], model: str, script_data: Dict[str, Any], level: str, topic: str, max_tokens: int) -> Dict[str, Any]:
+    """Run a repair pass when deterministic checks find a bad listening script."""
+    errors, warnings = _listening_script_quality_issues(script_data, level)
+    if not errors and not warnings:
+        return script_data
+
+    issue_text = "\n".join([f"ERROR: {x}" for x in errors] + [f"WARNING: {x}" for x in warnings])
+    print(f"Listening script quality gate found issues | errors={len(errors)} | warnings={len(warnings)} | issues={issue_text}")
+
+    # Warnings alone should not slow every block down. Errors trigger repair; strict mode repairs warnings too.
+    if not errors and not LISTENING_STRICT_SCRIPT_GATE:
+        return _append_quality_note(script_data, f"Quality warning: {'; '.join(warnings)}")
+
+    r = _listening_rules(level)
+    best = script_data
+    best_error_count = len(errors)
+    last_error: Optional[Exception] = None
+
+    for repair_attempt in range(1, max(0, LISTENING_SCRIPT_REPAIR_MAX_ATTEMPTS) + 1):
+        try:
+            user_prompt = LISTENING_SCRIPT_REPAIR_PROMPT.format(
+                level=level,
+                topic=topic,
+                title=script_data["passage_title"].replace('"', "'"),
+                quality_issues=issue_text,
+                script_ru=script_data["passage_ru"],
+                min_words=r["min_words"],
+                max_words=r["max_words"],
+                segments=r["segments"],
+                segment_items=_segment_schema_items(int(r["segments"]), "Repaired Russian spoken segment"),
+            )
+            print(f"Live GenAI listening script repair call | model={model} | level={level} | attempt={repair_attempt}")
+            response = _call_hf_chat(
+                client,
+                model,
+                [
+                    {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens,
+            )
+            repaired_data = _extract_json(response.choices[0].message.content)
+            candidate = _validate_listening_script(repaired_data, level, topic)
+            candidate_errors, candidate_warnings = _listening_script_quality_issues(candidate, level)
+            print(
+                f"Repaired listening script quality | errors={len(candidate_errors)} | warnings={len(candidate_warnings)} | "
+                f"words={candidate['word_count']} | segments={candidate['segment_count']}"
+            )
+            if len(candidate_errors) < best_error_count:
+                best = candidate
+                best_error_count = len(candidate_errors)
+            if not candidate_errors:
+                if candidate_warnings:
+                    candidate = _append_quality_note(candidate, f"Quality warning after repair: {'; '.join(candidate_warnings)}")
+                else:
+                    candidate = _append_quality_note(candidate, "Listening script passed quality gate after repair.")
+                return candidate
+        except Exception as exc:
+            last_error = exc
+            print(f"Listening script repair attempt {repair_attempt} failed: {type(exc).__name__}: {exc}")
+
+    # Prefer a better repaired candidate if available; otherwise either fail in strict mode or continue with a clear note.
+    if best is not script_data and best_error_count < len(errors):
+        return _append_quality_note(best, "Listening script improved by quality repair but still has warnings/errors.")
+    if LISTENING_STRICT_SCRIPT_GATE and errors:
+        raise GenerationFailure(f"Listening script failed quality gate and repair failed: {'; '.join(errors)}. Last repair error: {last_error}")
+    return _append_quality_note(script_data, f"Quality warning: {'; '.join(errors + warnings)}")
+
+
+def _repair_listening_questions_if_needed(client: Dict[str, Any], model: str, passage_data: Dict[str, Any], level: str, topic: str, questions: List[Question]) -> List[Question]:
+    """Repair question sets that pass JSON validation but are weak or unfair."""
+    errors, warnings = _listening_question_quality_issues(passage_data, level, questions)
+    if not errors and not warnings:
+        return questions
+
+    issue_text = "\n".join([f"ERROR: {x}" for x in errors] + [f"WARNING: {x}" for x in warnings])
+    print(f"Listening question quality gate found issues | errors={len(errors)} | warnings={len(warnings)} | issues={issue_text}")
+
+    # Warnings alone do not require another model call unless audit mode is always.
+    if not errors and LISTENING_AUDIT_MODE not in {"always", "1", "true", "yes", "on"}:
+        return questions
+
+    max_tokens = int(os.getenv("HF_LISTENING_AUDIT_MAX_TOKENS", AUDIT_TOKENS_BY_LEVEL.get(level, 1800)))
+    best = questions
+    best_error_count = len(errors)
+
+    for repair_attempt in range(1, max(0, LISTENING_QUESTION_REPAIR_MAX_ATTEMPTS) + 1):
+        try:
+            user_prompt = LISTENING_QUESTION_REPAIR_PROMPT.format(
+                level=level,
+                topic=topic,
+                title=passage_data["passage_title"],
+                passage_ru=passage_data["passage_ru"],
+                questions_json=_questions_to_json(questions),
+                quality_issues=issue_text,
+            )
+            print(f"Live GenAI listening question repair call | model={model} | level={level} | attempt={repair_attempt}")
+            response = _call_hf_chat(
+                client,
+                model,
+                [
+                    {"role": "system", "content": GENERATION_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens,
+            )
+            repaired_data = _extract_json(response.choices[0].message.content)
+            candidate = _validate_questions(repaired_data)
+            candidate_errors, candidate_warnings = _listening_question_quality_issues(passage_data, level, candidate)
+            print(f"Repaired listening question quality | errors={len(candidate_errors)} | warnings={len(candidate_warnings)}")
+            if len(candidate_errors) < best_error_count:
+                best = candidate
+                best_error_count = len(candidate_errors)
+            if not candidate_errors:
+                return candidate
+        except Exception as exc:
+            print(f"Listening question repair attempt {repair_attempt} failed: {type(exc).__name__}: {exc}")
+
+    return best
+
+
 def _passage_prompt(level: str, topic: str, attempt: int) -> str:
     r = _rules(level)
     nonce = f"{int(time.time())}-{random.randint(100000, 999999)}"
@@ -762,6 +1065,7 @@ def _generate_listening_script(client: InferenceClient, model: str, level: str, 
             )
             data = _extract_json(response.choices[0].message.content)
             script = _validate_listening_script(data, level, topic)
+            script = _repair_listening_script_if_needed(client, model, script, level, topic, max_tokens)
             r = _listening_rules(level)
             print(f"Listening script attempt {attempt} quality: word count {script['word_count']}/{r['min_words']}; segments {script['segment_count']}/{r['segments']}")
 
@@ -782,6 +1086,7 @@ def _generate_listening_script(client: InferenceClient, model: str, level: str, 
             )
             expanded_data = _extract_json(expand_response.choices[0].message.content)
             expanded = _validate_listening_script(expanded_data, level, topic)
+            expanded = _repair_listening_script_if_needed(client, model, expanded, level, topic, max_tokens)
             print(f"Expanded listening script attempt {attempt} quality: word count {expanded['word_count']}/{r['min_words']}; segments {expanded['segment_count']}/{r['segments']}")
             return expanded if expanded["word_count"] >= int(r["min_words"]) else (expanded if expanded["word_count"] >= script["word_count"] else script)
         except Exception as exc:
@@ -818,13 +1123,12 @@ def _generate_listening_questions(client: InferenceClient, model: str, passage_d
             data = _extract_json(response.choices[0].message.content)
             questions = _validate_questions(data)
             try:
-                return _audit_listening_questions(client, model, passage_data, level, topic, questions)
+                questions = _audit_listening_questions(client, model, passage_data, level, topic, questions)
             except Exception as audit_exc:
-                # Do not crash the app if the optional quality audit fails.
-                # These questions are still live GenAI-generated, not fallback/template items.
-                # The prompt-level fixes still ban math/unsupported questions in the first generation pass.
-                print(f"Listening question audit failed; using original live GenAI questions: {type(audit_exc).__name__}: {audit_exc}")
-                return questions
+                # Do not crash the app if the optional GenAI audit fails.
+                # A deterministic quality gate still runs below.
+                print(f"Listening question audit failed; continuing to deterministic gate: {type(audit_exc).__name__}: {audit_exc}")
+            return _repair_listening_questions_if_needed(client, model, passage_data, level, topic, questions)
         except Exception as exc:
             last_error = exc
             print(f"Listening question generation attempt {attempt} failed: {type(exc).__name__}: {exc}")

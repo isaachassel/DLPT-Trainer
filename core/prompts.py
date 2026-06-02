@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 GENERATION_SYSTEM_PROMPT = """
-You create Russian ILR-aligned reading comprehension practice for serious linguists.
+You create Russian ILR-aligned reading and listening comprehension practice for serious linguists.
 You are not creating official DLPT material. You are creating independent DLPT-style practice.
-Return ONLY valid JSON. No markdown. No commentary. No code fences. Use JSON arrays for multi-paragraph passages; never put raw line breaks inside a JSON string.
+For listening, write natural spoken Russian with a clear information arc, not padded article prose.
+Return ONLY valid JSON. No markdown. No commentary. No code fences. Use JSON arrays for multi-paragraph passages or multi-segment scripts; never put raw line breaks inside a JSON string.
 """.strip()
 
 # One source of truth for passage shape + level behavior.
@@ -259,7 +260,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "isolated spoken words or very short memorized formulae; no real communication beyond recognition",
         "delivery": "very slow, clear, with natural pauses",
         "official_basis": "Listening 0: no practical understanding; may catch only occasional isolated words.",
-        "text_requirements": "Create a very short audio script with isolated words, names, numbers, or formulaic public phrases. Do not create connected conversation.",
+        "text_requirements": "Create a very short audio script with isolated words, names, numbers, or formulaic public phrases. Do not create connected conversation. Make it one clear recognition moment, not filler.",
         "question_profile": "Recognition only: identify a number, name, place, basic phrase, or purpose of the announcement. No inference.",
     },
     "0+": {
@@ -269,7 +270,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "memorized utterances about immediate needs: greetings, simple requests, prices, times, locations",
         "delivery": "slow and clear, with pauses between short phrases",
         "official_basis": "Listening 0+: understands memorized utterances in immediate needs; requires frequent pauses/repetition; short formulaic utterances only; context strongly supports meaning.",
-        "text_requirements": "Use short memorized utterances and formulae. Strong context. Avoid sustained narration or complex grammar.",
+        "text_requirements": "Use short memorized utterances and formulae in one obvious real-life situation. Strong context. Avoid sustained narration, complex grammar, or repeated phrases.",
         "question_profile": "Ask recognition/extraction questions: time, price, location, speaker request, simple object/action. No implication.",
     },
     "1": {
@@ -279,7 +280,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "simple face-to-face speech about survival needs, travel, meals, lodging, directions, time, and routine courtesy",
         "delivery": "clearer and slower than normal, as if speaking to a foreigner",
         "official_basis": "Listening 1: understands simple questions, answers, statements, and very simple face-to-face conversations about basic survival, courtesy, travel, time, and directions; main ideas only.",
-        "text_requirements": "Use basic vocabulary and simple grammar. Include clear main idea and a few obvious details. Keep it face-to-face or announcement-like.",
+        "text_requirements": "Use basic vocabulary and simple grammar. Include one clear situation, one main need, and a few obvious details. Keep it face-to-face or announcement-like. Do not pad by restating the same idea.",
         "question_profile": "Ask main idea, obvious detail, time/place, simple direction/sequence. Distractors should reflect basic listening misunderstandings.",
     },
     "1+": {
@@ -289,7 +290,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "short conversation or announcement about survival needs plus limited social demands; short discrete utterances",
         "delivery": "clear standard Russian, slightly slower than normal, with short pauses",
         "official_basis": "Listening 1+: understands short conversations about survival needs and limited social demands; uneven consistency; facts are possible; cohesive features and references are unreliable.",
-        "text_requirements": "Use two short spoken segments. Include routine facts, time forms, common question forms, and one simple reference/pronoun connection.",
+        "text_requirements": "Use two short spoken segments: first introduce the routine situation, then add a concrete next step, response, or small change. Include routine facts, time forms, common question forms, and one simple reference/pronoun connection.",
         "question_profile": "Ask main idea, routine fact, simple time/reference, sequence, and limited concrete inference supported by context.",
     },
     "2": {
@@ -299,7 +300,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "routine social or limited job-related speech, everyday topics, known current events, office matters, descriptions/narration of current/past/future events",
         "delivery": "standard dialect at a normal but clear rate; some natural rewording is allowed",
         "official_basis": "Listening 2: understands routine social demands and limited job requirements; factual content; lines but not between or beyond the lines.",
-        "text_requirements": "Create a realistic spoken report, short briefing, phone-style update, or face-to-face conversation. Focus on factual content and predictable sequence.",
+        "text_requirements": "Create a realistic spoken report, short briefing, phone-style update, or face-to-face conversation. Segment 1 introduces the situation; segment 2 adds a result, response, or next step. Focus on factual content and predictable sequence, not subtle implication.",
         "question_profile": "Prioritize factual listening comprehension: main idea, detail, sequence, cause/effect, who/what/when/where/why. Avoid subtle implication.",
     },
     "2+": {
@@ -309,7 +310,7 @@ LISTENING_STRUCTURE_RULES = {
         "style": "routine work requirements and concrete topics in special fields; more ease but may break down under pressure; some implications/emotional overtones",
         "delivery": "standard Russian at normal clear speed, with realistic speech flow",
         "official_basis": "Listening 2+: understands most routine social/work demands and some concrete professional discussions; can sometimes detect emotional overtones and implications.",
-        "text_requirements": "Use three spoken segments with factual detail, speaker attitude, concrete professional relevance, and one implication that is supported but not directly stated.",
+        "text_requirements": "Use three spoken segments: situation, complication or speaker position, and consequence or recommendation. Include factual detail, speaker attitude, concrete professional relevance, and one implication that is supported but not directly stated.",
         "question_profile": "Ask gist, important vs secondary detail, factual detail, concrete implication, emotional overtone or speaker attitude.",
     },
     "3": {
@@ -319,8 +320,8 @@ LISTENING_STRUCTURE_RULES = {
         "style": "news broadcast, oral report, public address, technical/professional discussion, supported opinion, hypothesis, educated native speech",
         "delivery": "normal clarity and speed in standard Russian; professional broadcast or briefing style",
         "official_basis": "Listening 3: understands essentials of standard speech including technical discussions, clear telephone calls, radio broadcasts, oral reports, public addresses, hypothesis, supported opinions, implications, and emotional overtones.",
-        "text_requirements": "Use four spoken segments. Include argumentation, supported opinion or hypothesis, relationships across segments, and implied intent. Keep it standard Russian, not slang-heavy.",
-        "question_profile": "Ask main argument, supported opinion, implication, speaker intent, relationship of ideas, tone/attitude, and conclusion across segments.",
+        "text_requirements": "Use four spoken segments with a real information arc: segment 1 establishes the event or issue and why it matters; segment 2 gives official, stakeholder, or expert response; segment 3 adds a complication, competing explanation, tradeoff, or consequence; segment 4 gives outlook, policy implication, or unresolved question. Include argumentation, supported opinion or hypothesis, relationships across segments, and implied intent. Keep it standard Russian, not slang-heavy. Do not repeat the same operational sentence across segments. If the cause changes, explicitly frame it as preliminary vs later findings.",
+        "question_profile": "Ask main argument, supported opinion, implication, speaker intent, relationship of ideas, tone/attitude, and conclusion across segments. For ILR 3, avoid using more than one simple detail question; do not make the set mostly who/what/how-many extraction.",
     },
 }
 
@@ -342,15 +343,48 @@ Required listening structure for ILR {level}:
 - Delivery style to imply in the script: {delivery}.
 - Text requirement: {text_requirements}
 
+Core generation principle:
+The task is NOT to fill a word count. The task is to create a listenable mini-audio with a clear information arc.
+Use the word target by adding NEW information, not by repeating a status line, repeating a consequence, or rephrasing the same fact.
+
+Internal planning rule before writing:
+Silently plan each segment with a different job. Do not output the plan. Then write the script.
+Every segment must answer a different listener question:
+- What is happening?
+- Who is affected or responding?
+- What changed, complicated the situation, or explains the cause?
+- What consequence, decision, implication, or next step follows?
+
+Level-specific information arc:
+- ILR 0: one recognition moment only: name, number, place, sign-like phrase, or formulaic announcement.
+- ILR 0+: one immediate-needs situation with short memorized phrases; no real story.
+- ILR 1: one simple survival/routine situation with a clear need, action, and obvious detail.
+- ILR 1+: two short segments: situation first, then response, next step, or small change.
+- ILR 2: two developed segments: factual situation first, then result, response, sequence, or next step.
+- ILR 2+: three segments: situation, complication or speaker attitude, then consequence/recommendation.
+- ILR 3: four segments: event/issue, stakeholder response, complication/tradeoff/evolving explanation, then implication/outlook.
+
+Anti-loop requirements:
+- Do not repeat any full sentence.
+- Do not reuse the same 7+ word phrase across segments.
+- Do not repeat generic status lines such as "specialists are assessing the damage" or "authorities are investigating" in multiple segments.
+- If a sentence would say the same thing as an earlier sentence, replace it with a new angle: timeline, stakeholder, cause, consequence, disagreement, limitation, cost, public reaction, operational step, or future decision.
+- Each segment must contain at least one new fact not stated earlier.
+
+Coherence requirements:
+- Keep one coherent scenario.
+- Do not give two different causes for the same event unless the script clearly frames them as preliminary reports versus later findings.
+- If there is an accident, investigation, military/security issue, policy decision, or public-health event, use a clean event arc: event, response, complication, implication/next step.
+- For lower levels, keep the arc simple and concrete. For longer passages, increase information density instead of repeating.
+
 Hard requirements:
 - Write Russian only inside script_segments.
 - Do not write questions in this step.
 - This is for audio: write natural spoken Russian, not written article prose.
 - Do not include speaker labels like "Speaker 1:" unless the level/task clearly needs dialogue.
 - Do not include stage directions, SSML, markdown, bullets, or English.
-- Do not repeat sentences to reach length.
-- If you are below {min_words} Russian words, the output is invalid. Keep writing until the passage reaches the required minimum before returning JSON.
-- For ILR 2 and above, each paragraph must be fully developed, not a short summary.
+- If you are below {min_words} Russian words, continue by adding new information appropriate to ILR {level}; do not pad.
+- For ILR 2 and above, each spoken segment must be fully developed, not a short summary.
 - Put each spoken segment as a separate string in script_segments.
 - The script_segments array must contain exactly {segments} item(s).
 
@@ -369,7 +403,7 @@ Return exactly one JSON object with these fields and no extra text:
 
 
 LISTENING_EXPANSION_PROMPT = """
-Your previous Russian listening script is too short for ILR {level}. Expand it while preserving the same scenario and facts.
+Your previous Russian listening script is too short or underdeveloped for ILR {level}. Expand it while preserving the same scenario and facts.
 
 Target ILR listening level: {level}
 Topic domain: {topic}
@@ -388,21 +422,100 @@ Current title: {title}
 Current script:
 {script_ru}
 
+Expansion principle:
+Do not expand by repeating. Expand by adding a missing information layer.
+
+Good expansion adds one or more of:
+- timeline or sequence
+- official/stakeholder response
+- speaker attitude
+- concrete consequence
+- public or operational impact
+- limitation or uncertainty
+- contrast between early reports and later findings
+- next step or likely outcome
+
+Bad expansion:
+- repeating "authorities are investigating"
+- repeating "specialists are assessing the damage"
+- repeating the same environmental/economic/social consequence
+- adding a new cause that contradicts the first cause
+- restating the same paragraph with different words
+
+Level-specific expansion:
+- ILR 0/0+: add only another recognizable word/phrase if needed.
+- ILR 1: add one obvious detail or next action.
+- ILR 1+: add a short response or concrete change.
+- ILR 2: add factual sequence, result, or next step.
+- ILR 2+: add complication, supported implication, or speaker attitude.
+- ILR 3: add stakeholder position, complication/tradeoff, implication, or outlook.
+
 Hard requirements:
-- Expand the script to at least {min_words} Russian words.
+- Expand the script to at least {min_words} Russian words if possible.
 - Keep exactly {segments} spoken segment(s).
 - Do not add questions.
 - Do not add speaker labels unless dialogue is truly required.
-- Do not include English, markdown, bullets, or stage directions.
-- Do not repeat sentences just to add length.
-- Put each spoken segment as one separate string in script_segments.
+- Do not use bullets or lists.
+- Do not repeat any full sentence from the current script.
+- Do not repeat any 7+ word phrase from the current script.
+- Russian only inside script_segments.
+- Preserve coherence: if causes change, clearly frame preliminary reports versus later findings.
 
-Return exactly one JSON object with no extra text:
+Return exactly one JSON object and no extra text:
 {{
   "skill": "listening",
   "ilr_level": "{level}",
   "topic": "{topic}",
-  "passage_title": "English title, 3-8 words",
+  "passage_title": "{title}",
+  "script_segments": [
+    {segment_items}
+  ]
+}}
+""".strip()
+
+
+LISTENING_SCRIPT_REPAIR_PROMPT = """
+You are repairing a Russian ILR-style listening script for a language training app.
+Return ONLY valid JSON. No markdown. No commentary.
+
+Target ILR listening level: {level}
+Topic domain: {topic}
+Current title: {title}
+
+Quality issues found:
+{quality_issues}
+
+Current script:
+{script_ru}
+
+Repair goal:
+Rewrite the listening script so it sounds like a coherent audio passage with a real information arc.
+Do not merely edit the repeated sentence. Rebuild the weak parts.
+
+Required structure:
+- Total length: {min_words}-{max_words} Russian words.
+- Spoken segment count: exactly {segments} segment(s).
+
+Repair rules:
+- Russian only inside script_segments.
+- Keep the same general topic/domain, but you may change details to make the script coherent.
+- Each segment must add new information.
+- Do not repeat any full sentence.
+- Do not reuse the same 7+ word phrase across segments.
+- Do not pad with repeated status lines.
+- Do not create contradictory causes. If different explanations appear, clearly mark preliminary reports versus later findings.
+- For longer levels, build an arc: event/situation, response, complication, consequence/outlook.
+- For lower levels, keep the repair simple and concrete.
+- Write natural spoken Russian for audio, not stiff written article prose.
+- Put each spoken segment as a separate string in script_segments.
+- The script_segments array must contain exactly {segments} item(s).
+
+Return exactly this JSON shape:
+{{
+  "skill": "listening",
+  "ilr_level": "{level}",
+  "topic": "{topic}",
+  "passage_title": "{title}",
   "script_segments": [
     {segment_items}
   ]
@@ -421,24 +534,35 @@ Official/question design guidance for ILR listening {level}:
 {official_basis}
 Question profile: {question_profile}
 
+Question design principle:
+The questions should test what a listener at ILR {level} should be able to understand from the whole audio.
+Do not make the set easier than the script.
+
 Rules:
 - Questions must be in English.
 - Choices must be in English.
-- Every correct answer must be directly supported by the Russian script.
-- Prefer questions where the answer is explicitly stated in the audio.
+- Every correct answer must be explicitly stated or directly supported by the Russian script.
 - Do not ask questions that require the learner to do math, calculate duration, subtract times, add times, or infer a number that is not directly spoken.
 - Do not ask "how long" unless the exact duration is explicitly stated in the script with words like "три часа" or "сорок минут".
-- Do not make the correct answer depend on outside knowledge or assumptions. If it is not said or clearly supported in the script, do not ask it.
+- Do not make the correct answer depend on outside knowledge or assumptions.
 - Include hidden answer key using correct_answer.
 - explanation must be in English and explain the answer in plain language. Do NOT simply repeat the Russian evidence.
 - evidence must be short Russian evidence from the script only: a phrase, clause, time, place, name, or sentence fragment that points to the answer. Do NOT put a full transcript in evidence.
-- Match the question difficulty to ILR listening {level}.
-- At 0/0+/1, focus on recognition, obvious facts, survival/travel/courtesy info.
-- At 2, focus on factual content: lines, not between the lines.
-- At 2+/3, include supported implication, attitude, speaker intent, or relationship of ideas only when the script directly supports it.
 - Distractors must be plausible listening misunderstandings but clearly wrong based on the script.
 - Return exactly one JSON object. No markdown. No commentary.
 - The questions array must contain exactly Q1, Q2, Q3, Q4.
+
+Level-specific question rules:
+- ILR 0/0+: recognition only: number, name, place, simple object, basic phrase, or purpose.
+- ILR 1: main idea, obvious detail, simple place/time/action, or simple sequence.
+- ILR 1+: main idea, routine fact, simple time/reference, sequence, or very concrete supported inference.
+- ILR 2: factual comprehension: main idea, detail, sequence, cause/effect, who/what/when/where/why. Avoid subtle implication.
+- ILR 2+: include gist, important vs secondary detail, concrete implication, speaker attitude, and cause/effect.
+- ILR 3: use at most one simple detail question. Prefer main argument, relationship of ideas, evolving explanation, stakeholder response, implication, tone/attitude, or likely conclusion across segments.
+
+Special rule for cause questions:
+If the script contains preliminary and later findings, do NOT ask "What was the main cause?" unless the final cause is explicitly settled.
+Instead ask what changed between early reports and later findings, or what explanation officials currently emphasize.
 
 Russian audio script/transcript, hidden from the learner during the test:
 {passage_ru}
@@ -453,7 +577,7 @@ JSON schema:
       "correct_answer": "A",
       "explanation": "English explanation of why the correct answer is right, without simply repeating the evidence.",
       "evidence": "Short Russian phrase/clause from the audio script that directly supports the answer.",
-      "question_type": "main idea"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q2",
@@ -462,7 +586,7 @@ JSON schema:
       "correct_answer": "B",
       "explanation": "English explanation, not a duplicate of the evidence.",
       "evidence": "Short Russian phrase/clause from the script.",
-      "question_type": "detail"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q3",
@@ -471,7 +595,7 @@ JSON schema:
       "correct_answer": "C",
       "explanation": "English explanation, not a duplicate of the evidence.",
       "evidence": "Short Russian phrase/clause from the script.",
-      "question_type": "cause and effect"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q4",
@@ -480,12 +604,92 @@ JSON schema:
       "correct_answer": "D",
       "explanation": "English explanation, not a duplicate of the evidence.",
       "evidence": "Short Russian phrase/clause from the script.",
-      "question_type": "comprehension"
+      "question_type": "level-appropriate type"
     }}
   ]
 }}
 """.strip()
 
+
+
+LISTENING_QUESTION_REPAIR_PROMPT = """
+You are repairing English multiple-choice questions for a Russian ILR-style listening practice app.
+Return ONLY valid JSON. No markdown. No commentary.
+
+Target ILR listening level: {level}
+Topic domain: {topic}
+Audio title: {title}
+
+Russian audio script/transcript, hidden from the learner during the test:
+{passage_ru}
+
+Current generated questions JSON:
+{questions_json}
+
+Quality issues found:
+{quality_issues}
+
+Repair task:
+Rewrite the question set so it is fair, answerable, level-appropriate, and directly supported by the audio script.
+
+Hard rules:
+- Keep exactly 4 questions: Q1, Q2, Q3, Q4.
+- Questions and choices must be in English.
+- Correct answers must be explicitly stated or directly supported by the Russian script.
+- Evidence must be a short Russian phrase, clause, time, place, or sentence fragment from the script.
+- Explanation must be plain English and must not simply repeat the Russian evidence.
+- Do not ask math, duration calculation, or questions requiring outside knowledge.
+- Do not ask "how long" unless the exact duration is spoken directly.
+- If the script has preliminary and later findings, ask about the change clearly; do not ask a vague "main cause" question.
+- At ILR 0/0+, recognition only.
+- At ILR 1/1+, keep questions concrete and simple.
+- At ILR 2, focus on factual comprehension.
+- At ILR 2+, include at least one question about supported implication, speaker attitude, or important vs secondary detail.
+- At ILR 3, use at most one simple detail question. Prefer main argument, relationship of ideas, supported implication, stakeholder position, tone/attitude, or conclusion across segments.
+- Distractors must be plausible listening misunderstandings but clearly wrong based on the script.
+
+Return exactly this JSON shape:
+{{
+  "questions": [
+    {{
+      "id": "Q1",
+      "question": "English question",
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
+      "correct_answer": "A",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "level-appropriate type"
+    }},
+    {{
+      "id": "Q2",
+      "question": "English question",
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
+      "correct_answer": "B",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "level-appropriate type"
+    }},
+    {{
+      "id": "Q3",
+      "question": "English question",
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
+      "correct_answer": "C",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "level-appropriate type"
+    }},
+    {{
+      "id": "Q4",
+      "question": "English question",
+      "choices": {{"A": "choice A", "B": "choice B", "C": "choice C", "D": "choice D"}},
+      "correct_answer": "D",
+      "explanation": "Plain-English explanation.",
+      "evidence": "Short Russian evidence.",
+      "question_type": "level-appropriate type"
+    }}
+  ]
+}}
+""".strip()
 
 LISTENING_QUESTION_AUDIT_PROMPT = """
 You are auditing generated listening comprehension questions for a Russian ILR-style practice app.
@@ -502,7 +706,7 @@ Current generated questions JSON:
 {questions_json}
 
 Your task:
-Rewrite or correct the question set so it is clean, fair, and directly answerable from the audio script.
+Rewrite or correct the question set so it is clean, fair, level-appropriate, and directly answerable from the audio script.
 
 Hard rules:
 - Keep exactly 4 questions: Q1, Q2, Q3, Q4.
@@ -516,6 +720,8 @@ Hard rules:
 - explanation must be in English and explain the answer clearly in plain language.
 - evidence must be a short Russian phrase, clause, time, place, or sentence fragment from the script. It must not be the full transcript.
 - Distractors must be clearly wrong based on the script.
+- At ILR 3, use at most one simple detail question and prefer cross-segment comprehension.
+- If the script contains evolving explanations, ask about the evolution or the currently emphasized explanation, not a vague "main cause."
 
 Return exactly this JSON shape:
 {{
@@ -527,7 +733,7 @@ Return exactly this JSON shape:
       "correct_answer": "A",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
-      "question_type": "main idea"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q2",
@@ -536,7 +742,7 @@ Return exactly this JSON shape:
       "correct_answer": "B",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
-      "question_type": "detail"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q3",
@@ -545,7 +751,7 @@ Return exactly this JSON shape:
       "correct_answer": "C",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
-      "question_type": "comprehension"
+      "question_type": "level-appropriate type"
     }},
     {{
       "id": "Q4",
@@ -554,7 +760,7 @@ Return exactly this JSON shape:
       "correct_answer": "D",
       "explanation": "Plain-English explanation.",
       "evidence": "Short Russian evidence.",
-      "question_type": "comprehension"
+      "question_type": "level-appropriate type"
     }}
   ]
 }}

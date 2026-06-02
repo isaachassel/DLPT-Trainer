@@ -11,6 +11,7 @@ QUESTION_TYPES = [
     "inference",
     "speaker/writer intent",
     "cause and effect",
+    "relationship of ideas",
     "sequence",
     "tone or attitude",
     "meaning from context",
