@@ -1,0 +1,35 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "version": {
+      "default": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "saved_at": {
+      "format": "date-time",
+      "title": "Saved At",
+      "type": "string"
+    },
+    "checksum": {
+      "title": "Checksum",
+      "type": "string"
+    },
+    "session_payload": {
+      "additionalProperties": true,
+      "title": "Session Payload",
+      "type": "object"
+    }
+  },
+  "required": [
+    "session_id",
+    "checksum",
+    "session_payload"
+  ],
+  "title": "SessionCheckpoint",
+  "type": "object"
+}

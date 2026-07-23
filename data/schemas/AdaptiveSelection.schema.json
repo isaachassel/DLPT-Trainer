@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "passage_id": {
+      "title": "Passage Id",
+      "type": "string"
+    },
+    "skill": {
+      "enum": [
+        "reading",
+        "listening"
+      ],
+      "title": "Skill",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "information": {
+      "title": "Information",
+      "type": "number"
+    },
+    "ability_distance": {
+      "title": "Ability Distance",
+      "type": "number"
+    },
+    "target_bias": {
+      "default": 0.0,
+      "title": "Target Bias",
+      "type": "number"
+    },
+    "balance_penalty": {
+      "default": 0.0,
+      "title": "Balance Penalty",
+      "type": "number"
+    },
+    "exposure_penalty": {
+      "default": 0.0,
+      "title": "Exposure Penalty",
+      "type": "number"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "passage_id",
+    "skill",
+    "score",
+    "information",
+    "ability_distance"
+  ],
+  "title": "AdaptiveSelection",
+  "type": "object"
+}

@@ -1,0 +1,114 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "exposure_count": {
+      "default": 0,
+      "title": "Exposure Count",
+      "type": "integer"
+    },
+    "correct_count": {
+      "default": 0,
+      "title": "Correct Count",
+      "type": "integer"
+    },
+    "incorrect_count": {
+      "default": 0,
+      "title": "Incorrect Count",
+      "type": "integer"
+    },
+    "distractor_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Distractor Counts",
+      "type": "object"
+    },
+    "item_total_correlation": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Item Total Correlation"
+    },
+    "passage_effect": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Passage Effect"
+    },
+    "discrimination": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Discrimination"
+    },
+    "calibrated_difficulty": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibrated Difficulty"
+    },
+    "calibration_sample_size": {
+      "default": 0,
+      "title": "Calibration Sample Size",
+      "type": "integer"
+    },
+    "mode_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Mode Counts",
+      "type": "object"
+    },
+    "retired_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retired Reason"
+    },
+    "last_exposed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Exposed At"
+    }
+  },
+  "title": "ItemStatistics",
+  "type": "object"
+}

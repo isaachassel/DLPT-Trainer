@@ -1,0 +1,666 @@
+{
+  "$defs": {
+    "AbilityEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "skill": {
+          "enum": [
+            "reading",
+            "listening"
+          ],
+          "title": "Skill",
+          "type": "string"
+        },
+        "theta": {
+          "default": 0.0,
+          "title": "Theta",
+          "type": "number"
+        },
+        "standard_error": {
+          "default": 1.25,
+          "title": "Standard Error",
+          "type": "number"
+        },
+        "ci_low": {
+          "default": -2.5,
+          "title": "Ci Low",
+          "type": "number"
+        },
+        "ci_high": {
+          "default": 2.5,
+          "title": "Ci High",
+          "type": "number"
+        },
+        "posterior_grid": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Posterior Grid",
+          "type": "array"
+        },
+        "posterior_weights": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Posterior Weights",
+          "type": "array"
+        },
+        "items_answered": {
+          "default": 0,
+          "title": "Items Answered",
+          "type": "integer"
+        },
+        "correct": {
+          "default": 0,
+          "title": "Correct",
+          "type": "integer"
+        },
+        "practice_ilr": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Practice Ilr"
+        },
+        "confidence": {
+          "default": "insufficient",
+          "enum": [
+            "insufficient",
+            "low",
+            "moderate",
+            "high"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "provisional": {
+          "default": true,
+          "title": "Provisional",
+          "type": "boolean"
+        },
+        "stable": {
+          "default": false,
+          "title": "Stable",
+          "type": "boolean"
+        },
+        "predicted_success": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Predicted Success",
+          "type": "object"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skill"
+      ],
+      "title": "AbilityEstimate",
+      "type": "object"
+    },
+    "ResponseRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "passage_id": {
+          "title": "Passage Id",
+          "type": "string"
+        },
+        "question_id": {
+          "title": "Question Id",
+          "type": "string"
+        },
+        "skill": {
+          "enum": [
+            "reading",
+            "listening"
+          ],
+          "title": "Skill",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "training",
+            "diagnostic",
+            "simulation"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "target_ilr": {
+          "title": "Target Ilr",
+          "type": "string"
+        },
+        "item_difficulty": {
+          "title": "Item Difficulty",
+          "type": "number"
+        },
+        "question_type": {
+          "title": "Question Type",
+          "type": "string"
+        },
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "genre": {
+          "title": "Genre",
+          "type": "string"
+        },
+        "stem_en": {
+          "title": "Stem En",
+          "type": "string"
+        },
+        "choices_snapshot": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Choices Snapshot",
+          "type": "object"
+        },
+        "rationale_en": {
+          "title": "Rationale En",
+          "type": "string"
+        },
+        "evidence_ru": {
+          "title": "Evidence Ru",
+          "type": "string"
+        },
+        "selected_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Selected Key"
+        },
+        "correct_key": {
+          "title": "Correct Key",
+          "type": "string"
+        },
+        "is_correct": {
+          "title": "Is Correct",
+          "type": "boolean"
+        },
+        "response_time_seconds": {
+          "title": "Response Time Seconds",
+          "type": "number"
+        },
+        "listening_play_count": {
+          "default": 0,
+          "title": "Listening Play Count",
+          "type": "integer"
+        },
+        "answer_change_count": {
+          "default": 0,
+          "title": "Answer Change Count",
+          "type": "integer"
+        },
+        "provisional_item": {
+          "default": true,
+          "title": "Provisional Item",
+          "type": "boolean"
+        },
+        "submitted_at": {
+          "format": "date-time",
+          "title": "Submitted At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "passage_id",
+        "question_id",
+        "skill",
+        "mode",
+        "target_ilr",
+        "item_difficulty",
+        "question_type",
+        "topic",
+        "genre",
+        "stem_en",
+        "choices_snapshot",
+        "rationale_en",
+        "evidence_ru",
+        "selected_key",
+        "correct_key",
+        "is_correct",
+        "response_time_seconds"
+      ],
+      "title": "ResponseRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "profile_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Id"
+    },
+    "mode": {
+      "enum": [
+        "training",
+        "diagnostic",
+        "simulation"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "selected_skills": {
+      "items": {
+        "enum": [
+          "reading",
+          "listening"
+        ],
+        "type": "string"
+      },
+      "title": "Selected Skills",
+      "type": "array"
+    },
+    "active_skill_index": {
+      "default": 0,
+      "title": "Active Skill Index",
+      "type": "integer"
+    },
+    "start_level": {
+      "default": "1+",
+      "title": "Start Level",
+      "type": "string"
+    },
+    "target_level": {
+      "default": "2",
+      "title": "Target Level",
+      "type": "string"
+    },
+    "topics": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Topics",
+      "type": "array"
+    },
+    "competencies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Competencies",
+      "type": "array"
+    },
+    "max_questions_per_skill": {
+      "default": 16,
+      "title": "Max Questions Per Skill",
+      "type": "integer"
+    },
+    "minimum_questions_per_skill": {
+      "default": 8,
+      "title": "Minimum Questions Per Skill",
+      "type": "integer"
+    },
+    "simulation_full": {
+      "default": false,
+      "title": "Simulation Full",
+      "type": "boolean"
+    },
+    "shortened_simulation": {
+      "default": false,
+      "title": "Shortened Simulation",
+      "type": "boolean"
+    },
+    "timer_mode": {
+      "default": "off",
+      "enum": [
+        "off",
+        "standard",
+        "strict"
+      ],
+      "title": "Timer Mode",
+      "type": "string"
+    },
+    "time_limit_seconds_per_skill": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Time Limit Seconds Per Skill"
+    },
+    "skill_started_at_epoch": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Skill Started At Epoch"
+    },
+    "skill_deadline_epoch": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Skill Deadline Epoch"
+    },
+    "session_started_at_epoch": {
+      "title": "Session Started At Epoch",
+      "type": "number"
+    },
+    "current_passage_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Passage Id"
+    },
+    "current_question_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Current Question Ids",
+      "type": "array"
+    },
+    "current_started_at_epoch": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Started At Epoch"
+    },
+    "current_answers": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Current Answers",
+      "type": "object"
+    },
+    "current_answer_changes": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Current Answer Changes",
+      "type": "object"
+    },
+    "current_listening_plays": {
+      "default": 0,
+      "title": "Current Listening Plays",
+      "type": "integer"
+    },
+    "completed_passage_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Completed Passage Ids",
+      "type": "array"
+    },
+    "completed_question_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Completed Question Ids",
+      "type": "array"
+    },
+    "responses": {
+      "items": {
+        "$ref": "#/$defs/ResponseRecord"
+      },
+      "title": "Responses",
+      "type": "array"
+    },
+    "reading_ability": {
+      "$ref": "#/$defs/AbilityEstimate"
+    },
+    "listening_ability": {
+      "$ref": "#/$defs/AbilityEstimate"
+    },
+    "topic_exposure": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Topic Exposure",
+      "type": "object"
+    },
+    "genre_exposure": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Genre Exposure",
+      "type": "object"
+    },
+    "question_type_exposure": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Question Type Exposure",
+      "type": "object"
+    },
+    "item_exposure": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Item Exposure",
+      "type": "object"
+    },
+    "status": {
+      "default": "active",
+      "enum": [
+        "active",
+        "completed",
+        "stopped",
+        "expired",
+        "error"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "checkpoint_path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checkpoint Path"
+    },
+    "last_error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Error"
+    },
+    "feedback_mode": {
+      "default": "end_only",
+      "enum": [
+        "immediate",
+        "end_of_passage",
+        "end_only"
+      ],
+      "title": "Feedback Mode",
+      "type": "string"
+    },
+    "hints_enabled": {
+      "default": false,
+      "title": "Hints Enabled",
+      "type": "boolean"
+    },
+    "transcript_review_enabled": {
+      "default": false,
+      "title": "Transcript Review Enabled",
+      "type": "boolean"
+    },
+    "replay_allowed": {
+      "default": false,
+      "title": "Replay Allowed",
+      "type": "boolean"
+    },
+    "slow_audio_allowed": {
+      "default": false,
+      "title": "Slow Audio Allowed",
+      "type": "boolean"
+    },
+    "voice_label": {
+      "default": "Russian Female — Svetlana",
+      "title": "Voice Label",
+      "type": "string"
+    },
+    "speech_rate_label": {
+      "default": "Normal",
+      "title": "Speech Rate Label",
+      "type": "string"
+    },
+    "content_source": {
+      "default": "bank_only",
+      "enum": [
+        "bank_only",
+        "fresh_ai_preferred"
+      ],
+      "title": "Content Source",
+      "type": "string"
+    },
+    "generation_requests": {
+      "default": 0,
+      "title": "Generation Requests",
+      "type": "integer"
+    },
+    "generation_api_calls": {
+      "default": 0,
+      "title": "Generation Api Calls",
+      "type": "integer"
+    },
+    "generation_repair_count": {
+      "default": 0,
+      "title": "Generation Repair Count",
+      "type": "integer"
+    },
+    "generated_passage_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Generated Passage Ids",
+      "type": "array"
+    },
+    "generation_failures": {
+      "default": 0,
+      "title": "Generation Failures",
+      "type": "integer"
+    },
+    "bank_fallback_count": {
+      "default": 0,
+      "title": "Bank Fallback Count",
+      "type": "integer"
+    },
+    "last_content_source": {
+      "anyOf": [
+        {
+          "enum": [
+            "starter_bank",
+            "generated_bank",
+            "fresh_ai"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Content Source"
+    },
+    "last_content_note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Content Note"
+    },
+    "request_nonce": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Request Nonce"
+    },
+    "handled_nonces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Handled Nonces",
+      "type": "array"
+    }
+  },
+  "required": [
+    "mode",
+    "selected_skills",
+    "session_started_at_epoch",
+    "reading_ability",
+    "listening_ability"
+  ],
+  "title": "SessionState",
+  "type": "object"
+}

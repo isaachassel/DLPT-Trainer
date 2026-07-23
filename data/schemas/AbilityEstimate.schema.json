@@ -1,0 +1,107 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "skill": {
+      "enum": [
+        "reading",
+        "listening"
+      ],
+      "title": "Skill",
+      "type": "string"
+    },
+    "theta": {
+      "default": 0.0,
+      "title": "Theta",
+      "type": "number"
+    },
+    "standard_error": {
+      "default": 1.25,
+      "title": "Standard Error",
+      "type": "number"
+    },
+    "ci_low": {
+      "default": -2.5,
+      "title": "Ci Low",
+      "type": "number"
+    },
+    "ci_high": {
+      "default": 2.5,
+      "title": "Ci High",
+      "type": "number"
+    },
+    "posterior_grid": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Posterior Grid",
+      "type": "array"
+    },
+    "posterior_weights": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Posterior Weights",
+      "type": "array"
+    },
+    "items_answered": {
+      "default": 0,
+      "title": "Items Answered",
+      "type": "integer"
+    },
+    "correct": {
+      "default": 0,
+      "title": "Correct",
+      "type": "integer"
+    },
+    "practice_ilr": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Practice Ilr"
+    },
+    "confidence": {
+      "default": "insufficient",
+      "enum": [
+        "insufficient",
+        "low",
+        "moderate",
+        "high"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "provisional": {
+      "default": true,
+      "title": "Provisional",
+      "type": "boolean"
+    },
+    "stable": {
+      "default": false,
+      "title": "Stable",
+      "type": "boolean"
+    },
+    "predicted_success": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Predicted Success",
+      "type": "object"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "skill"
+  ],
+  "title": "AbilityEstimate",
+  "type": "object"
+}

@@ -1,0 +1,356 @@
+{
+  "$defs": {
+    "GenerationMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "default": "manual",
+          "title": "Provider",
+          "type": "string"
+        },
+        "model": {
+          "default": "human-authored",
+          "title": "Model",
+          "type": "string"
+        },
+        "model_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Revision"
+        },
+        "prompt_version": {
+          "default": "starter-bank-v1",
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "pipeline_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pipeline Version"
+        },
+        "verifier_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifier Provider"
+        },
+        "verifier_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifier Model"
+        },
+        "secondary_verifier_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secondary Verifier Provider"
+        },
+        "secondary_verifier_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secondary Verifier Model"
+        },
+        "request_count": {
+          "default": 0,
+          "title": "Request Count",
+          "type": "integer"
+        },
+        "repair_count": {
+          "default": 0,
+          "title": "Repair Count",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "authoring_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Authoring Notes"
+        }
+      },
+      "title": "GenerationMetadata",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "language": {
+      "default": "ru",
+      "title": "Language",
+      "type": "string"
+    },
+    "skill": {
+      "enum": [
+        "reading",
+        "listening"
+      ],
+      "title": "Skill",
+      "type": "string"
+    },
+    "target_ilr": {
+      "title": "Target Ilr",
+      "type": "string"
+    },
+    "provisional_difficulty": {
+      "title": "Provisional Difficulty",
+      "type": "number"
+    },
+    "calibrated_difficulty": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibrated Difficulty"
+    },
+    "genre": {
+      "title": "Genre",
+      "type": "string"
+    },
+    "topic": {
+      "title": "Topic",
+      "type": "string"
+    },
+    "subtopic": {
+      "title": "Subtopic",
+      "type": "string"
+    },
+    "orientation_en": {
+      "title": "Orientation En",
+      "type": "string"
+    },
+    "passage_ru": {
+      "title": "Passage Ru",
+      "type": "string"
+    },
+    "source_type": {
+      "default": "synthetic",
+      "enum": [
+        "authentic/open-licensed",
+        "transformed/adapted",
+        "synthetic"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "license": {
+      "default": "Project-authored synthetic content",
+      "title": "License",
+      "type": "string"
+    },
+    "word_count": {
+      "title": "Word Count",
+      "type": "integer"
+    },
+    "audio_duration_seconds": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Audio Duration Seconds"
+    },
+    "segment_count": {
+      "default": 1,
+      "title": "Segment Count",
+      "type": "integer"
+    },
+    "vocabulary_metadata": {
+      "additionalProperties": true,
+      "title": "Vocabulary Metadata",
+      "type": "object"
+    },
+    "discourse_metadata": {
+      "additionalProperties": true,
+      "title": "Discourse Metadata",
+      "type": "object"
+    },
+    "question_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Question Ids",
+      "type": "array"
+    },
+    "audio_asset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Audio Asset Id"
+    },
+    "voice_metadata": {
+      "additionalProperties": true,
+      "title": "Voice Metadata",
+      "type": "object"
+    },
+    "generation": {
+      "$ref": "#/$defs/GenerationMetadata"
+    },
+    "validation_status": {
+      "default": "accepted",
+      "enum": [
+        "accepted",
+        "rejected",
+        "needs_review"
+      ],
+      "title": "Validation Status",
+      "type": "string"
+    },
+    "validation_report_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validation Report Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "exposure_count": {
+      "default": 0,
+      "title": "Exposure Count",
+      "type": "integer"
+    },
+    "status": {
+      "default": "active",
+      "enum": [
+        "active",
+        "quarantined",
+        "retired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "duplicate_detection_hash": {
+      "title": "Duplicate Detection Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "skill",
+    "target_ilr",
+    "provisional_difficulty",
+    "genre",
+    "topic",
+    "subtopic",
+    "orientation_en",
+    "passage_ru",
+    "word_count",
+    "question_ids",
+    "content_hash",
+    "duplicate_detection_hash"
+  ],
+  "title": "PassageItem",
+  "type": "object"
+}

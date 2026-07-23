@@ -1,0 +1,80 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "needs_review"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "deterministic_checks": {
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "title": "Deterministic Checks",
+      "type": "object"
+    },
+    "validator_scores": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Validator Scores",
+      "type": "object"
+    },
+    "ambiguity_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Ambiguity Flags",
+      "type": "array"
+    },
+    "failure_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Failure Reasons",
+      "type": "array"
+    },
+    "blind_verifier_answer": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Blind Verifier Answer"
+    },
+    "proposed_answer": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposed Answer"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status"
+  ],
+  "title": "ValidationReport",
+  "type": "object"
+}

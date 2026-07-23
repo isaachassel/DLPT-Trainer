@@ -1,0 +1,133 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "source_type": {
+      "default": "synthetic",
+      "enum": [
+        "authentic/open-licensed",
+        "transformed/adapted",
+        "synthetic"
+      ],
+      "title": "Source Type",
+      "type": "string"
+    },
+    "path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Path"
+    },
+    "url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Url"
+    },
+    "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "voice": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Voice"
+    },
+    "rate": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rate"
+    },
+    "engine": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engine"
+    },
+    "engine_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engine Version"
+    },
+    "duration_seconds": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duration Seconds"
+    },
+    "transcript_hash": {
+      "title": "Transcript Hash",
+      "type": "string"
+    },
+    "license": {
+      "default": "Project-authored synthetic content",
+      "title": "License",
+      "type": "string"
+    },
+    "synthetic_tts": {
+      "default": true,
+      "title": "Synthetic Tts",
+      "type": "boolean"
+    },
+    "validated": {
+      "default": false,
+      "title": "Validated",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "content_hash",
+    "transcript_hash"
+  ],
+  "title": "AudioAsset",
+  "type": "object"
+}

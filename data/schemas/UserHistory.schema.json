@@ -1,0 +1,196 @@
+{
+  "$defs": {
+    "ResponseRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "passage_id": {
+          "title": "Passage Id",
+          "type": "string"
+        },
+        "question_id": {
+          "title": "Question Id",
+          "type": "string"
+        },
+        "skill": {
+          "enum": [
+            "reading",
+            "listening"
+          ],
+          "title": "Skill",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "training",
+            "diagnostic",
+            "simulation"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "target_ilr": {
+          "title": "Target Ilr",
+          "type": "string"
+        },
+        "item_difficulty": {
+          "title": "Item Difficulty",
+          "type": "number"
+        },
+        "question_type": {
+          "title": "Question Type",
+          "type": "string"
+        },
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "genre": {
+          "title": "Genre",
+          "type": "string"
+        },
+        "stem_en": {
+          "title": "Stem En",
+          "type": "string"
+        },
+        "choices_snapshot": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Choices Snapshot",
+          "type": "object"
+        },
+        "rationale_en": {
+          "title": "Rationale En",
+          "type": "string"
+        },
+        "evidence_ru": {
+          "title": "Evidence Ru",
+          "type": "string"
+        },
+        "selected_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Selected Key"
+        },
+        "correct_key": {
+          "title": "Correct Key",
+          "type": "string"
+        },
+        "is_correct": {
+          "title": "Is Correct",
+          "type": "boolean"
+        },
+        "response_time_seconds": {
+          "title": "Response Time Seconds",
+          "type": "number"
+        },
+        "listening_play_count": {
+          "default": 0,
+          "title": "Listening Play Count",
+          "type": "integer"
+        },
+        "answer_change_count": {
+          "default": 0,
+          "title": "Answer Change Count",
+          "type": "integer"
+        },
+        "provisional_item": {
+          "default": true,
+          "title": "Provisional Item",
+          "type": "boolean"
+        },
+        "submitted_at": {
+          "format": "date-time",
+          "title": "Submitted At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "passage_id",
+        "question_id",
+        "skill",
+        "mode",
+        "target_ilr",
+        "item_difficulty",
+        "question_type",
+        "topic",
+        "genre",
+        "stem_en",
+        "choices_snapshot",
+        "rationale_en",
+        "evidence_ru",
+        "selected_key",
+        "correct_key",
+        "is_correct",
+        "response_time_seconds"
+      ],
+      "title": "ResponseRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "seen_passage_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Seen Passage Ids",
+      "type": "array"
+    },
+    "seen_question_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Seen Question Ids",
+      "type": "array"
+    },
+    "reading_estimates": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Reading Estimates",
+      "type": "array"
+    },
+    "listening_estimates": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Listening Estimates",
+      "type": "array"
+    },
+    "response_records": {
+      "items": {
+        "$ref": "#/$defs/ResponseRecord"
+      },
+      "title": "Response Records",
+      "type": "array"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "profile_id"
+  ],
+  "title": "UserHistory",
+  "type": "object"
+}

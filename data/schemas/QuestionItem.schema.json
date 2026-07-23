@@ -1,0 +1,409 @@
+{
+  "$defs": {
+    "GenerationMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "default": "manual",
+          "title": "Provider",
+          "type": "string"
+        },
+        "model": {
+          "default": "human-authored",
+          "title": "Model",
+          "type": "string"
+        },
+        "model_revision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Revision"
+        },
+        "prompt_version": {
+          "default": "starter-bank-v1",
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "pipeline_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pipeline Version"
+        },
+        "verifier_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifier Provider"
+        },
+        "verifier_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verifier Model"
+        },
+        "secondary_verifier_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secondary Verifier Provider"
+        },
+        "secondary_verifier_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secondary Verifier Model"
+        },
+        "request_count": {
+          "default": 0,
+          "title": "Request Count",
+          "type": "integer"
+        },
+        "repair_count": {
+          "default": 0,
+          "title": "Repair Count",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "authoring_notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Authoring Notes"
+        }
+      },
+      "title": "GenerationMetadata",
+      "type": "object"
+    },
+    "ItemStatistics": {
+      "additionalProperties": false,
+      "properties": {
+        "exposure_count": {
+          "default": 0,
+          "title": "Exposure Count",
+          "type": "integer"
+        },
+        "correct_count": {
+          "default": 0,
+          "title": "Correct Count",
+          "type": "integer"
+        },
+        "incorrect_count": {
+          "default": 0,
+          "title": "Incorrect Count",
+          "type": "integer"
+        },
+        "distractor_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Distractor Counts",
+          "type": "object"
+        },
+        "item_total_correlation": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Total Correlation"
+        },
+        "passage_effect": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Passage Effect"
+        },
+        "discrimination": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Discrimination"
+        },
+        "calibrated_difficulty": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calibrated Difficulty"
+        },
+        "calibration_sample_size": {
+          "default": 0,
+          "title": "Calibration Sample Size",
+          "type": "integer"
+        },
+        "mode_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Mode Counts",
+          "type": "object"
+        },
+        "retired_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retired Reason"
+        },
+        "last_exposed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Exposed At"
+        }
+      },
+      "title": "ItemStatistics",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "passage_id": {
+      "title": "Passage Id",
+      "type": "string"
+    },
+    "stem_en": {
+      "title": "Stem En",
+      "type": "string"
+    },
+    "choices": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Choices",
+      "type": "object"
+    },
+    "correct_key": {
+      "title": "Correct Key",
+      "type": "string"
+    },
+    "rationale_en": {
+      "title": "Rationale En",
+      "type": "string"
+    },
+    "evidence_ru": {
+      "title": "Evidence Ru",
+      "type": "string"
+    },
+    "question_type": {
+      "title": "Question Type",
+      "type": "string"
+    },
+    "target_ilr": {
+      "title": "Target Ilr",
+      "type": "string"
+    },
+    "provisional_difficulty": {
+      "title": "Provisional Difficulty",
+      "type": "number"
+    },
+    "calibrated_difficulty": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibrated Difficulty"
+    },
+    "discrimination": {
+      "default": 1.0,
+      "title": "Discrimination",
+      "type": "number"
+    },
+    "validator_scores": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Validator Scores",
+      "type": "object"
+    },
+    "ambiguity_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Ambiguity Flags",
+      "type": "array"
+    },
+    "answer_position_metadata": {
+      "additionalProperties": true,
+      "title": "Answer Position Metadata",
+      "type": "object"
+    },
+    "distractor_quality": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Distractor Quality",
+      "type": "object"
+    },
+    "generation": {
+      "$ref": "#/$defs/GenerationMetadata"
+    },
+    "validation_status": {
+      "default": "accepted",
+      "enum": [
+        "accepted",
+        "rejected",
+        "needs_review"
+      ],
+      "title": "Validation Status",
+      "type": "string"
+    },
+    "validation_report_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validation Report Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "status": {
+      "default": "active",
+      "enum": [
+        "active",
+        "quarantined",
+        "retired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "statistics": {
+      "$ref": "#/$defs/ItemStatistics"
+    }
+  },
+  "required": [
+    "id",
+    "passage_id",
+    "stem_en",
+    "choices",
+    "correct_key",
+    "rationale_en",
+    "evidence_ru",
+    "question_type",
+    "target_ilr",
+    "provisional_difficulty"
+  ],
+  "title": "QuestionItem",
+  "type": "object"
+}

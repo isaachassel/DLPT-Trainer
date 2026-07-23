@@ -1,0 +1,145 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "provider": {
+      "default": "manual",
+      "title": "Provider",
+      "type": "string"
+    },
+    "model": {
+      "default": "human-authored",
+      "title": "Model",
+      "type": "string"
+    },
+    "model_revision": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Revision"
+    },
+    "prompt_version": {
+      "default": "starter-bank-v1",
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "pipeline_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pipeline Version"
+    },
+    "verifier_provider": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verifier Provider"
+    },
+    "verifier_model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verifier Model"
+    },
+    "secondary_verifier_provider": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Secondary Verifier Provider"
+    },
+    "secondary_verifier_model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Secondary Verifier Model"
+    },
+    "request_count": {
+      "default": 0,
+      "title": "Request Count",
+      "type": "integer"
+    },
+    "repair_count": {
+      "default": 0,
+      "title": "Repair Count",
+      "type": "integer"
+    },
+    "input_tokens": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tokens"
+    },
+    "output_tokens": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Tokens"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "authoring_notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Authoring Notes"
+    }
+  },
+  "title": "GenerationMetadata",
+  "type": "object"
+}

@@ -1,0 +1,43 @@
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from core.config import get_settings
+from core.item_bank import ItemBank
+from core.validation import answer_position_balance, bank_balance_passes
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate the starter bank plus the generated-bank overlay.")
+    parser.add_argument("--starter", default=None)
+    parser.add_argument("--generated", default=None)
+    args = parser.parse_args()
+    settings = get_settings()
+    starter = Path(args.starter) if args.starter else settings.starter_bank_runtime_path(ROOT)
+    generated = Path(args.generated) if args.generated else settings.generated_bank_runtime_path(ROOT)
+    bank = ItemBank([starter, generated], writable_path=generated).load()
+    errors = bank.validate_operational_bank()
+    print(f"Starter bank: {starter}")
+    print(f"Generated overlay: {generated}")
+    print(f"Passages: {len(bank.passages)}")
+    print(f"Questions: {len(bank.questions)}")
+    print(f"Audio assets: {len(bank.audio_assets)}")
+    print(f"Answer positions: {answer_position_balance(bank.questions.values())}")
+    if not bank_balance_passes(bank.questions.values(), tolerance=max(4, len(bank.questions) // 8)):
+        errors.append("Answer-position distribution is outside tolerance.")
+    if errors:
+        print("VALIDATION FAILED")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print("VALIDATION PASSED")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,217 +1,377 @@
 ---
-title: Russian ILR Trainer
-emoji: 📘
-colorFrom: yellow
-colorTo: red
+title: Russian Adaptive Proficiency Practice
+emoji: 🎧
+colorFrom: red
+colorTo: blue
 sdk: gradio
-sdk_version: 5.29.0
+sdk_version: 6.5.1
+python_version: 3.10
 app_file: app.py
 pinned: false
 license: mit
 ---
 
-# Russian ILR Trainer
+# Russian Adaptive Proficiency Practice
 
-Adaptive Russian reading and listening practice for serious proficiency test preparation. This is an independent ILR-style study tool and is not official DLPT material.
+An independent Russian Reading and Listening practice platform with Training, Adaptive Diagnostic, and strict computer-adaptive Simulation modes.
 
-## Current features
+> **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score. Every estimate is for practice guidance only.
 
-- Reading Practice
-- Listening Practice with generated Russian audio
-- Full Diagnostic alternating reading/listening blocks
-- ILR levels: 0, 0+, 1, 1+, 2, 2+, 3
-- Live GenAI generation only; no fallback templates
-- End-only feedback
-- Scrollable feedback tabs: Summary, Latest Block, All Missed Questions
-- Continue Practice button for extra adaptive blocks
+## What happened to the original GenAI code
 
-## Listening behavior
+The original Hugging Face/Groq capability was **not removed**. The current release supports both providers, ordered fallback, user-requested fresh content, validation, TTS, and generated-bank storage.
 
-The app generates a Russian audio script using GenAI, then creates an MP3 voiceover with `edge-tts`. The Russian transcript is hidden during the test. In feedback, the transcript appears for missed listening questions so the learner can review evidence.
-
-The UI recommends listening no more than 2 times to simulate test pressure, but the audio player does not hard-lock playback. For training, users may replay as needed.
-
-
-## GenAI provider setup
-
-This app can use Hugging Face first and automatically fall back to Groq when Hugging Face Inference Provider credits/rate limits fail.
-
-Recommended Space secrets:
+Real API secret values are never stored in the repository. Use the same secret names in a local `.env` or Hugging Face Space secrets:
 
 ```text
-HF_TOKEN=your_huggingface_token_here
-GROQ_API_KEY=your_groq_key_here
+HF_TOKEN
+GROQ_API_KEY
 ```
 
-Recommended variables:
+The original environment names `GENAI_PROVIDER`, `HF_PROVIDER`, `HF_TEXT_MODEL`, and `GROQ_MODEL` remain supported. `GENERATION_PROVIDER` is the preferred replacement for `GENAI_PROVIDER` and takes precedence when both exist.
+
+The original prompt file was not preserved line-for-line. Valuable level-specific Reading/Listening rules were rebuilt in `core/prompts.py`; unsafe fixed answer-letter sequences, fragile JSON extraction, overreliance on paragraph/word counts, and author self-verification were intentionally removed. See `docs/GENAI_AUDIT.md` for the exact audit and migration.
+
+## Hybrid content architecture
+
+The learner chooses one of two content policies:
+
+1. **Validated bank only — fastest:** selects from the bundled starter bank and every previously accepted generated item.
+2. **Fresh AI preferred:** attempts to author a new passage bundle near the active skill estimate. The new bundle must pass typed schema validation, deterministic gates, independent passage audit, blind answer verification, Python answer shuffling, duplicate checks, and Listening audio validation before it is shown. Accepted content is stored and becomes reusable. Any provider, quota, schema, validation, duplicate, timeout, persistence, or TTS failure falls back to an accepted bank item without clearing progress.
+
+The bank is the application’s reliability layer and accumulated content memory—not a replacement for live generation.
+
+## Main capabilities
+
+- Independent Bayesian Reading and Listening estimates.
+- Posterior uncertainty and evidence-aware practice reports.
+- Information-based selection with topic, genre, question-type, and exposure balancing.
+- Meaningful Training target-level bias.
+- Variable bundles: Reading 1–5 questions and Listening 1–3 questions.
+- Strict Simulation timing, locked navigation, and controlled one-play Listening.
+- Session checkpoints, recovery, optional history, and JSON/CSV export.
+- Typed Pydantic bank, session, generation, validation, and reporting models.
+- Provider-independent starter content.
+- Optional staged live generation with repair, quarantine, persistence, quota protection, and bank fallback.
+- Python-side answer shuffling and key remapping; prompts never prescribe answer letters.
+
+## Modes
+
+### Training Mode
+
+- Reading, Listening, or separate Reading + Listening sections.
+- Starting and target ILR bands.
+- Topic and comprehension-competency emphasis.
+- Optional hints and passage-level review.
+- Listening replay, optional voice/speed variants, and post-answer transcript review.
+- Bank-only or Fresh-AI-preferred content.
+
+### Adaptive Diagnostic
+
+- Independent Reading and Listening posteriors.
+- Broad medium prior.
+- End-only feedback.
+- No learner-selected slow audio or voice changes.
+- Minimum evidence plus confidence-aware stopping.
+- Provider/loading time is excluded from the assessment timer.
+
+### Full CA Simulation
+
+- Reading and Listening run as separate sections.
+- Medium-difficulty opening passage.
+- No skipping, back navigation, or answer changes after passage submission.
+- All questions in the bundle must be answered before advancing.
+- Strict countdown timer.
+- Shortened simulations are clearly labeled.
+- A full simulation never completes below 35 questions per selected skill.
+- One controlled Listening play, no replay, and no transcript during the active simulation.
+
+## Starter and generated item banks
+
+The repository ships with:
+
+- 27 starter passages;
+- 88 starter questions;
+- 48 Reading questions and 40 Listening questions;
+- 15 bundled Listening audio assets;
+- balanced starter keys: A=22, B=22, C=22, D=22 before session shuffling.
+
+Immutable starter bank:
 
 ```text
-GENAI_PROVIDER=hf_then_groq
-HF_TEXT_MODEL=Qwen/Qwen2.5-7B-Instruct
-GROQ_MODEL=llama-3.3-70b-versatile
+data/starter_items.jsonl
 ```
 
-Provider options:
+Writable generated overlay:
 
 ```text
-GENAI_PROVIDER=hf_then_groq   # default: try Hugging Face, then Groq
-GENAI_PROVIDER=groq           # use Groq only
-GENAI_PROVIDER=groq_then_hf   # try Groq, then Hugging Face
-GENAI_PROVIDER=huggingface    # use Hugging Face only
+storage/item_bank/generated_items.jsonl
 ```
 
-Do not hard-code API keys in the files. Add them only as Space secrets. If a key is exposed publicly, revoke it and create a new one.
-
-## Listening audio reliability
-
-The listening audio is generated with `edge-tts`. Longer ILR 2+/3 scripts are split into smaller TTS-safe chunks and then joined into one MP3, so the full generated transcript should play instead of cutting off early.
-
-Optional tuning variable:
+With `PERSISTENT_STORAGE_PATH=/data`:
 
 ```text
-EDGE_TTS_MAX_CHARS=900
+/data/item_bank/generated_items.jsonl
 ```
 
-Lower this if long audio still cuts off on your host; raise it slightly if audio generation feels too slow.
+The two files are indexed as one operational bank. Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable.
 
-## Hugging Face setup
+All starter and generated difficulty values remain **provisional** until empirical calibration exists.
 
-Upload these files at the root of the Space:
+## GenAI authoring pipeline
 
-```text
-app.py
-requirements.txt
-README.md
-LICENSE
-.env.example
-core/
-  __init__.py
-  generator.py
-  prompts.py
-  schema.py
-  scoring.py
-```
+A fresh bundle uses separate controlled stages:
 
-Add this Space secret:
+1. Russian passage/transcript authoring.
+2. Deterministic passage checks.
+3. Independent passage naturalness/level audit.
+4. Bounded passage repair when needed.
+5. Separate English question/choice authoring.
+6. Deterministic question and distractor checks.
+7. Blind verification with choices reordered and the proposed answer hidden.
+8. Optional second verifier for higher-risk ILR 2+/3 items.
+9. Bounded question-set repair when needed.
+10. Python choice shuffling, correct-key remapping, and bank-position balancing.
+11. Listening TTS creation and validation.
+12. Atomic generated-bank persistence or redacted quarantine.
 
-```text
-HF_TOKEN=your_huggingface_token_here
-```
+Provider responses prefer strict JSON Schema, then best-effort schema, then JSON-object fallback. Every result must still pass strict Pydantic validation.
 
-Recommended optional variables:
-
-```text
-HF_TEXT_MODEL=Qwen/Qwen2.5-7B-Instruct
-HF_PROVIDER=auto
-EDGE_TTS_VOICE=ru-RU-SvetlanaNeural
-```
-
-Optional speed/quality controls:
-
-```text
-PASSAGE_MAX_ATTEMPTS=1
-QUESTION_MAX_ATTEMPTS=2
-ENABLE_PASSAGE_EXPANSION=false
-```
+Generated metadata records author/verifier providers and models, prompt/pipeline version, request count, repair count, and token totals when the provider reports them.
 
 ## Local setup
 
+Python 3.10 or 3.11 is recommended.
+
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Mac/Linux
+source .venv/bin/activate        # macOS/Linux
+# .venv\Scripts\Activate.ps1    # Windows PowerShell
+pip install --upgrade pip
 pip install -r requirements.txt
 cp .env.example .env
-# edit .env and add HF_TOKEN
 python app.py
 ```
 
-Windows PowerShell:
+Open `http://localhost:7860`.
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
-python app.py
+Validation and tests:
+
+```bash
+python scripts/validate_item_bank.py
+pytest -q
+python scripts/smoke_test_space.py
 ```
 
-## Disclaimer
+## Enabling live generation locally
 
-This is an independent Russian ILR-style study tool. It is not official DLPT material and is not affiliated with DLI, DLIFLC, DoD, or any government testing authority. The estimated level is for practice guidance only.
-
-
-## Listening voice options
-
-The app now includes a UI dropdown for Russian TTS voice and speed. Current voices:
-
-- Russian Female - Svetlana (`ru-RU-SvetlanaNeural`)
-- Russian Male - Dmitry (`ru-RU-DmitryNeural`)
-
-The speed dropdown can be left on `Auto by ILR level`, which slows lower levels and uses normal speed for higher levels.
-
-Optional environment overrides still work:
+Add at least one key to `.env`:
 
 ```text
-EDGE_TTS_VOICE=ru-RU-SvetlanaNeural
-EDGE_TTS_RATE=-5%
+ENABLE_USER_GENERATION=true
+GENERATION_PROVIDER=hf_then_groq
+VERIFICATION_PROVIDER=auto
+HF_TOKEN=your_hugging_face_token
+GROQ_API_KEY=your_groq_key
 ```
 
-## v3.1 listening question-quality update
+One matching key is sufficient. When both are present, `VERIFICATION_PROVIDER=auto` prefers the reverse provider order for auditing and blind verification.
 
-This build adds a final GenAI audit pass for listening questions. The audit is designed to:
-
-- keep explanations in English instead of duplicating the Russian evidence
-- keep evidence as a short Russian phrase or clause, not the full transcript
-- avoid questions that require math, time subtraction/addition, or unstated inference
-- require every correct answer to be explicitly stated or directly supported by the listening script
-- show each listening transcript once per missed block in the feedback tabs instead of repeating it under every missed question
-
-Optional environment variable:
+Current defaults:
 
 ```text
-ENABLE_LISTENING_QUESTION_AUDIT=true
+HF_PROVIDER=auto
+HF_TEXT_MODEL=openai/gpt-oss-120b
+HF_VERIFIER_MODEL=openai/gpt-oss-20b
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_VERIFIER_MODEL=openai/gpt-oss-20b
+STRUCTURED_OUTPUT_MODE=auto
 ```
 
-Set it to `false` only if you want faster but less carefully checked listening question generation.
-
-## v3.2 fix
-
-- Fixed listening question audit prompt escaping that could cause `KeyError: '\n  "questions"'`.
-- If the optional audit call fails, the app now keeps the original live GenAI-generated question set instead of crashing. No fallback templates are used.
-- Listening prompts still instruct the model not to ask math/duration questions unless the answer is directly stated.
-
-## Listening speed controls added in v3.3
-
-The listening question audit improves item quality, but it adds an extra GenAI call. The default is now smart audit mode:
+Original configuration remains compatible:
 
 ```text
-ENABLE_LISTENING_QUESTION_AUDIT=true
-LISTENING_AUDIT_MODE=smart
-LISTENING_PARALLEL_TTS=true
+GENAI_PROVIDER=hf_then_groq
+HF_PROVIDER=auto
+HF_TEXT_MODEL=your_supported_model
+GROQ_MODEL=your_supported_model
 ```
 
-Audit modes:
+Do not set both `GENERATION_PROVIDER` and `GENAI_PROVIDER` to conflicting values.
+
+### Cost, retry, and quality controls
 
 ```text
-LISTENING_AUDIT_MODE=smart   # default; audit only risky question sets
-LISTENING_AUDIT_MODE=always  # highest quality, slowest
-LISTENING_AUDIT_MODE=off     # fastest, uses first generated question set
+MAX_GENERATION_REQUESTS_PER_SESSION=8
+GENERATION_CONCURRENCY_LIMIT=1
+PROVIDER_TIMEOUT_SECONDS=45
+PROVIDER_MAX_RETRIES=2
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
+GENERATION_AUDIT_MODE=always
+GENERATION_REPAIR_ATTEMPTS=1
+SECOND_VERIFIER_HIGH_RISK=true
+AUTHORING_TEMPERATURE=0.25
+VERIFICATION_TEMPERATURE=0.0
+PASSAGE_MAX_TOKENS=3200
+QUESTION_MAX_TOKENS=2600
+REPAIR_MAX_TOKENS=3200
+AUDIT_MAX_TOKENS=1200
+VERIFIER_MAX_TOKENS=900
 ```
 
-`LISTENING_PARALLEL_TTS=true` generates the MP3 voiceover at the same time as the question generation/audit step, which reduces listening block wait time.
+Configured token values are hard caps. The application applies smaller stage-, level-, and bundle-aware budgets when appropriate.
 
-## Upper-level length controls
+`GENERATION_AUDIT_MODE=smart` saves one audit call only for lower-risk Reading Training content. Diagnostic, Simulation, Listening, ILR 2+, and ILR 3 continue to receive the passage audit. `off` is supported but produces a startup warning.
 
-For ILR 2 and above, the app now performs one expansion pass when a live GenAI reading passage or listening script is shorter than the target. This prevents upper-level content from staying in the 100-word range while avoiding long retry loops.
+## Hugging Face Spaces deployment
 
-Optional variables:
+1. Create a **Gradio** Space.
+2. Upload all repository contents to the Space root.
+3. The starter bank launches without secrets.
+4. Add provider secrets in **Settings → Variables and secrets** to enable Fresh AI.
+5. Attach persistent storage and set `PERSISTENT_STORAGE_PATH=/data` to retain generated items across rebuilds.
+6. Run a short Training session and the smoke test after deployment.
+
+### Required Space secrets
+
+None for bank-only operation.
+
+### Fresh-AI secrets
+
+At least one:
 
 ```text
-ENFORCE_LENGTH_LEVELS=2,2+,3
-ENABLE_PASSAGE_EXPANSION=false
-ENABLE_LISTENING_EXPANSION=true
-HF_PASSAGE_MAX_TOKENS=7600
-HF_LISTENING_MAX_TOKENS=7600
+HF_TOKEN
+GROQ_API_KEY
 ```
 
-`max_tokens` is only a ceiling, not a minimum. The app enforces length by counting words and expanding short ILR 2+ outputs once.
+### Recommended Space variables
+
+```text
+ENABLE_USER_GENERATION=true
+GENERATION_PROVIDER=hf_then_groq
+VERIFICATION_PROVIDER=auto
+STRUCTURED_OUTPUT_MODE=auto
+GENERATION_AUDIT_MODE=always
+GENERATION_REPAIR_ATTEMPTS=1
+SECOND_VERIFIER_HIGH_RISK=true
+MAX_GENERATION_REQUESTS_PER_SESSION=8
+GENERATION_CONCURRENCY_LIMIT=1
+PROVIDER_TIMEOUT_SECONDS=45
+PROVIDER_MAX_RETRIES=2
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
+QUEUE_CONCURRENCY_LIMIT=4
+ENABLE_HISTORY=true
+ENABLE_ANALYTICS=false
+CHECKPOINT_AFTER_PASSAGE=true
+PERSISTENT_STORAGE_PATH=/data
+```
+
+Never commit real keys. Settings excludes secret fields from model serialization, provider errors are redacted, and quarantine persistence recursively removes secret-bearing strings.
+
+## Administrator authoring
+
+The same staged validation pipeline is available offline:
+
+```bash
+python scripts/generate_items.py --skill reading --level 2 --count 2
+python scripts/generate_items.py --skill listening --level 2+ --count 2 --topic economics
+```
+
+Then validate the combined bank:
+
+```bash
+python scripts/validate_item_bank.py
+```
+
+## Persistence and restart behavior
+
+Default Space disk is ephemeral. Without mounted storage, generated items remain reusable during the current runtime but may disappear after a rebuild or restart. With `PERSISTENT_STORAGE_PATH=/data`, generated items, checkpoints, history, quarantine records, exports, and audio cache use the mounted volume.
+
+The application checkpoints after each submitted passage. Provider failure does not delete completed responses, and generation/loading time is added back to active timer anchors.
+
+## Troubleshooting
+
+### Fresh AI always falls back
+
+Confirm:
+
+- `ENABLE_USER_GENERATION=true`;
+- a supported `GENERATION_PROVIDER` is selected;
+- a matching secret exists;
+- the configured model is available to the selected provider;
+- quota/rate limits are available;
+- `MAX_GENERATION_REQUESTS_PER_SESSION` is above zero;
+- the candidate is not being rejected by validation or duplicate checks.
+
+The setup banner reports readiness and configuration warnings. Quarantine records include stage traces and redacted failure reasons.
+
+### Generated items disappear after restart
+
+Attach persistent storage and set:
+
+```text
+PERSISTENT_STORAGE_PATH=/data
+```
+
+### A candidate fails validation
+
+This is expected fail-closed behavior. Inspect:
+
+```text
+storage/quarantine/live_generation_failures.jsonl
+```
+
+The failed item remains outside the operational bank.
+
+### Listening audio does not play
+
+Starter audio is bundled. Fresh Listening content requires successful TTS creation and validation before acceptance. If TTS fails, the session falls back to bank content.
+
+### Session interrupted
+
+Use the displayed recovery code under **Recover a Checkpoint**. A corrupted checkpoint is rejected safely.
+
+## Repository structure
+
+```text
+app.py
+core/
+  adaptive.py
+  audio.py
+  config.py
+  constants.py
+  generation.py
+  item_bank.py
+  models.py
+  prompts.py
+  reporting.py
+  scoring.py
+  session.py
+  storage.py
+  validation.py
+ui/
+  callbacks.py
+  layout.py
+data/
+  starter_items.jsonl
+  audio/
+  schemas/
+scripts/
+  generate_items.py
+  validate_item_bank.py
+  calibrate_items.py
+  smoke_test_space.py
+tests/
+docs/
+  ORIGINAL_AUDIT.md
+  GENAI_AUDIT.md
+  ARCHITECTURE.md
+  TEST_RESULTS.md
+  KNOWN_LIMITATIONS.md
+requirements.txt
+.env.example
+LICENSE
+```
+
+See `docs/GENAI_AUDIT.md`, `docs/TEST_RESULTS.md`, and `docs/KNOWN_LIMITATIONS.md` for details.
