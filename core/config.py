@@ -24,6 +24,12 @@ class Settings(BaseModel):
     persistent_storage_path: Path | None = None
     storage_backend: str = "local"
     hf_dataset_repo: str | None = None
+    generated_bank_manifest_path: Path = Path("storage/item_bank/generated_items.meta.json")
+    hf_dataset_bank_filename: str = "generated_items.jsonl"
+    hf_dataset_manifest_filename: str = "generated_items.meta.json"
+    hf_dataset_private: bool = True
+    sync_generated_bank_on_startup: bool = True
+    sync_generated_bank_on_write: bool = True
 
     # Secrets are read only from environment/Space secrets. They are never serialized into app data.
     hf_token: str | None = Field(default=None, exclude=True, repr=False)
@@ -66,6 +72,17 @@ class Settings(BaseModel):
     tts_timeout_seconds: int = Field(default=60, ge=10, le=180)
     app_host: str = "0.0.0.0"
     app_port: int = Field(default=7860, ge=1, le=65535)
+
+    @field_validator("storage_backend")
+    @classmethod
+    def validate_storage_backend(cls, value: str) -> str:
+        value = value.strip().lower()
+        aliases = {"dataset": "hf_dataset", "hf": "hf_dataset", "persistent": "local"}
+        value = aliases.get(value, value)
+        allowed = {"local", "hf_dataset", "hybrid"}
+        if value not in allowed:
+            raise ValueError(f"STORAGE_BACKEND must be one of: {', '.join(sorted(allowed))}")
+        return value
 
     @field_validator("generation_provider")
     @classmethod
@@ -123,6 +140,9 @@ class Settings(BaseModel):
     def generated_bank_runtime_path(self, project_root: Path) -> Path:
         return self.runtime_path(self.generated_item_bank_path, project_root, "item_bank/generated_items.jsonl")
 
+    def generated_bank_manifest_runtime_path(self, project_root: Path) -> Path:
+        return self.runtime_path(self.generated_bank_manifest_path, project_root, "item_bank/generated_items.meta.json")
+
     def audio_cache_runtime_path(self, project_root: Path) -> Path:
         return self.runtime_path(self.audio_cache_dir, project_root, "cache/audio")
 
@@ -139,6 +159,7 @@ class Settings(BaseModel):
         root = project_root or Path.cwd()
         for path in (
             self.generated_bank_runtime_path(root).parent,
+            self.generated_bank_manifest_runtime_path(root).parent,
             self.audio_cache_runtime_path(root),
             self.session_runtime_path(root),
             self.history_runtime_path(root),
@@ -237,6 +258,8 @@ def get_settings() -> Settings:
     # GENERATION_PROVIDER is the new name. GENAI_PROVIDER remains a backward-compatible alias
     # for the original repository and existing Hugging Face Space configuration.
     generation_provider = os.getenv("GENERATION_PROVIDER") or os.getenv("GENAI_PROVIDER") or "hf_then_groq"
+    hf_dataset_repo = os.getenv("HF_DATASET_REPO") or None
+    storage_backend = os.getenv("STORAGE_BACKEND") or ("hybrid" if hf_dataset_repo else "local")
     settings = Settings(
         environment=os.getenv("APP_ENV", "production"),
         data_dir=Path(os.getenv("DATA_DIR", "data")),
@@ -248,8 +271,14 @@ def get_settings() -> Settings:
         history_dir=Path(os.getenv("HISTORY_DIR", "storage/history")),
         quarantine_dir=Path(os.getenv("QUARANTINE_DIR", "storage/quarantine")),
         persistent_storage_path=_optional_path("PERSISTENT_STORAGE_PATH"),
-        storage_backend=os.getenv("STORAGE_BACKEND", "local"),
-        hf_dataset_repo=os.getenv("HF_DATASET_REPO") or None,
+        storage_backend=storage_backend,
+        hf_dataset_repo=hf_dataset_repo,
+        generated_bank_manifest_path=Path(os.getenv("GENERATED_BANK_MANIFEST_PATH", "storage/item_bank/generated_items.meta.json")),
+        hf_dataset_bank_filename=os.getenv("HF_DATASET_BANK_FILENAME", "generated_items.jsonl"),
+        hf_dataset_manifest_filename=os.getenv("HF_DATASET_MANIFEST_FILENAME", "generated_items.meta.json"),
+        hf_dataset_private=_env_bool("HF_DATASET_PRIVATE", True),
+        sync_generated_bank_on_startup=_env_bool("SYNC_GENERATED_BANK_ON_STARTUP", True),
+        sync_generated_bank_on_write=_env_bool("SYNC_GENERATED_BANK_ON_WRITE", True),
         hf_token=os.getenv("HF_TOKEN") or None,
         groq_api_key=os.getenv("GROQ_API_KEY") or None,
         generation_provider=generation_provider,

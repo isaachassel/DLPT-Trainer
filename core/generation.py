@@ -1029,6 +1029,10 @@ class GeneratedBundle:
     verifier_model: str | None = None
     request_count: int = 0
     repair_count: int = 0
+    bank_persistence_note: str = ""
+    bank_remote_synced: bool = False
+    generated_bank_passage_count: int = 0
+    generated_bank_question_count: int = 0
 
 
 @dataclass
@@ -1466,13 +1470,17 @@ class LiveGenerationService:
             if skill == "listening":
                 passage, audio_asset = self._build_audio(passage)
 
-            self.bank.append_validated_bundle(
+            commit_result = self.bank.append_validated_bundle(
                 passage,
                 accepted_questions,
                 passage_report,
                 final_reports,
                 audio_asset,
             )
+            commit_note = getattr(commit_result, "note", "") if commit_result is not None else ""
+            remote_synced = bool(getattr(commit_result, "remote_synced", False)) if commit_result is not None else False
+            generated_passages = int(getattr(commit_result, "passage_count", 0)) if commit_result is not None else 0
+            generated_questions = int(getattr(commit_result, "question_count", 0)) if commit_result is not None else 0
             return GeneratedBundle(
                 passage=passage,
                 questions=accepted_questions,
@@ -1485,6 +1493,10 @@ class LiveGenerationService:
                 verifier_model=final_metadata.verifier_model,
                 request_count=request_count,
                 repair_count=trace.repair_count,
+                bank_persistence_note=commit_note,
+                bank_remote_synced=remote_synced,
+                generated_bank_passage_count=generated_passages,
+                generated_bank_question_count=generated_questions,
             )
         except Exception as exc:
             usage_after = self._total_usage()

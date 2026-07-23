@@ -53,6 +53,7 @@ The bank is the application’s reliability layer and accumulated content memory
 - Typed Pydantic bank, session, generation, validation, and reporting models.
 - Provider-independent starter content.
 - Optional staged live generation with repair, quarantine, persistence, quota protection, and bank fallback.
+- Immediate visible loading feedback with an accessible spinner, busy button labels, and staged progress for slow operations.
 - Python-side answer shuffling and key remapping; prompts never prescribe answer letters.
 
 ## Modes
@@ -108,13 +109,22 @@ Writable generated overlay:
 storage/item_bank/generated_items.jsonl
 ```
 
+Generated-bank health manifest:
+
+```text
+storage/item_bank/generated_items.meta.json
+```
+
 With `PERSISTENT_STORAGE_PATH=/data`:
 
 ```text
 /data/item_bank/generated_items.jsonl
+/data/item_bank/generated_items.meta.json
 ```
 
-The two files are indexed as one operational bank. Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable.
+Every accepted bundle is atomically committed with its passage, questions, shuffled/remapped answer keys, rationales, Russian evidence, validation reports, generation metadata, and Listening audio metadata. The same objects are inserted into the in-memory indexes immediately, so they are eligible for later fallback selection without restarting the app. The manifest records checksum and counts after every write.
+
+The two files are indexed as one operational bank. Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable. Malformed generated-overlay records are excluded without disabling the immutable starter bank.
 
 All starter and generated difficulty values remain **provisional** until empirical calibration exists.
 
@@ -273,7 +283,15 @@ ENABLE_HISTORY=true
 ENABLE_ANALYTICS=false
 CHECKPOINT_AFTER_PASSAGE=true
 PERSISTENT_STORAGE_PATH=/data
+# Optional alternative/additional durable mirror:
+HF_DATASET_REPO=your-username/dlpt-generated-bank
+STORAGE_BACKEND=hybrid
+HF_DATASET_PRIVATE=true
+SYNC_GENERATED_BANK_ON_STARTUP=true
+SYNC_GENERATED_BANK_ON_WRITE=true
 ```
+
+When `HF_DATASET_REPO` is set and `STORAGE_BACKEND` is omitted, the app selects `hybrid` automatically. `HF_TOKEN` must have write access to the Dataset repository. Accepted Listening MP3s are mirrored under `audio/` together with the JSONL bank and health manifest.
 
 Never commit real keys. Settings excludes secret fields from model serialization, provider errors are redacted, and quarantine persistence recursively removes secret-bearing strings.
 
@@ -294,9 +312,16 @@ python scripts/validate_item_bank.py
 
 ## Persistence and restart behavior
 
-Default Space disk is ephemeral. Without mounted storage, generated items remain reusable during the current runtime but may disappear after a rebuild or restart. With `PERSISTENT_STORAGE_PATH=/data`, generated items, checkpoints, history, quarantine records, exports, and audio cache use the mounted volume.
+Default Space disk is ephemeral. Without durable storage, accepted generated items are atomically saved, indexed, and reusable immediately, but they may disappear after a rebuild or restart.
 
-The application checkpoints after each submitted passage. Provider failure does not delete completed responses, and generation/loading time is added back to active timer anchors.
+Two durability options are implemented:
+
+1. **Mounted storage:** set `PERSISTENT_STORAGE_PATH=/data`. Generated items, manifest, audio, checkpoints, history, quarantine records, and exports use the mounted volume.
+2. **Hugging Face Dataset mirror:** set `HF_DATASET_REPO`, a write-capable `HF_TOKEN`, and `STORAGE_BACKEND=hybrid` or `hf_dataset`. The app merges the remote bank at startup and uploads the JSONL snapshot, manifest, and generated Listening MP3 files after every accepted bundle.
+
+The setup screen shows the current generated passage/question counts, checksum prefix, and persistence mode. Active session status updates those counts after live generation. If remote synchronization fails, the local atomic commit remains usable and the UI states that the item is not yet durably mirrored.
+
+The application checkpoints after each submitted passage. Provider failure does not delete completed responses, and generation/loading time is added back to active timer anchors. See `docs/BANK_PERSISTENCE_AND_LOADING.md` for the full commit and recovery flow.
 
 ## Troubleshooting
 
@@ -328,11 +353,23 @@ The setup banner reports readiness and configuration warnings. Quarantine record
 
 ### Generated items disappear after restart
 
-Attach persistent storage and set:
+Use one of the implemented durable modes:
 
 ```text
 PERSISTENT_STORAGE_PATH=/data
 ```
+
+or:
+
+```text
+HF_DATASET_REPO=your-username/dlpt-generated-bank
+STORAGE_BACKEND=hybrid
+HF_TOKEN=<write-capable Space secret>
+SYNC_GENERATED_BANK_ON_STARTUP=true
+SYNC_GENERATED_BANK_ON_WRITE=true
+```
+
+The setup banner identifies whether the current bank is ephemeral, mounted, or Dataset-synchronized.
 
 ### A candidate fails validation
 
@@ -363,6 +400,7 @@ app.py
 core/
   adaptive.py
   audio.py
+  bank_persistence.py
   config.py
   constants.py
   generation.py

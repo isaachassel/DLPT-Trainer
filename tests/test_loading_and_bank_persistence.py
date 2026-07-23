@@ -1,0 +1,194 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from core.bank_persistence import GeneratedBankPersistence
+from core.config import Settings
+from core.generation import LiveGenerationService, MockProvider
+from core.item_bank import ItemBank
+
+
+def _settings(tmp_path: Path, **updates) -> Settings:
+    base = Settings(
+        generation_provider="mock",
+        generated_item_bank_path=tmp_path / "generated.jsonl",
+        generated_bank_manifest_path=tmp_path / "generated.meta.json",
+        audio_cache_dir=tmp_path / "audio",
+        quarantine_dir=tmp_path / "quarantine",
+        session_dir=tmp_path / "sessions",
+        history_dir=tmp_path / "history",
+    )
+    return base.model_copy(update=updates)
+
+
+def test_visible_activity_indicator_and_button_lock_are_wired(project_root):
+    source = (project_root / "ui/layout.py").read_text(encoding="utf-8")
+    assert "operation-spinner" in source
+    assert "aria-busy='true'" in (project_root / "ui/callbacks.py").read_text(encoding="utf-8")
+    assert "Starting session and loading the first passage" in source
+    assert "Preparing validated audio playback" in source
+    assert "Submitting this passage" in source
+    assert "interactive=False" in (project_root / "ui/callbacks.py").read_text(encoding="utf-8")
+    assert "start_prepare.then" in source
+    assert "play_prepare.then" in source
+    assert "submit_prepare.then" in source
+
+
+def test_generated_bank_commit_writes_manifest_and_is_immediately_reloadable(project_root, tmp_path):
+    settings = _settings(tmp_path)
+    persistence = GeneratedBankPersistence(settings, project_root)
+    persistence.bootstrap()
+    generated_path = settings.generated_bank_runtime_path(project_root)
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path],
+        writable_path=generated_path,
+        on_commit=persistence.after_local_commit,
+    ).load()
+    service = LiveGenerationService(settings, bank, project_root, provider=MockProvider())
+
+    result = service.generate_and_store(
+        skill="reading",
+        level="2",
+        mode="training",
+        topics=["education"],
+        competencies=["main idea"],
+        maximum_questions=2,
+    )
+
+    manifest = json.loads(settings.generated_bank_manifest_runtime_path(project_root).read_text(encoding="utf-8"))
+    assert manifest["passage_count"] == 1
+    assert manifest["question_count"] == 2
+    assert manifest["record_count"] == 6
+    assert len(manifest["sha256"]) == 64
+    assert "indexed immediately" in result.bank_persistence_note
+    assert result.passage.id in {item.id for item in bank.active_passages("reading")}
+
+    reloaded = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path],
+        writable_path=generated_path,
+    ).load()
+    assert result.passage.id in reloaded.passages
+    assert len(reloaded.get_questions(result.passage.id)) == 2
+    assert reloaded.origin_for(result.passage.id) == "generated_bank"
+
+
+def test_corrupt_generated_overlay_does_not_disable_starter_bank(project_root, tmp_path):
+    generated_path = tmp_path / "generated.jsonl"
+    generated_path.write_text("not json\n{\"kind\": \"question\"}\n", encoding="utf-8")
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path],
+        writable_path=generated_path,
+    ).load()
+    assert bank.load_warnings
+    assert bank.active_passages("reading")
+    assert bank.active_passages("listening")
+
+
+def test_hf_dataset_sync_uploads_bank_manifest_and_audio(monkeypatch, project_root, tmp_path):
+    import core.generation as generation
+
+    def fake_tts(transcript, cache_dir, voice, rate, engine_version):
+        path = Path(cache_dir) / "generated-fixture.mp3"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"ID3" + b"0" * 2048)
+        return path
+
+    monkeypatch.setattr(generation, "generate_cached_tts", fake_tts)
+    monkeypatch.setattr(generation, "audio_duration_seconds", lambda path: 28.0)
+    remote_bank = tmp_path / "remote.jsonl"
+    remote_bank.write_text("", encoding="utf-8")
+    uploaded: list[str] = []
+
+    class FakeApi:
+        def __init__(self, token=None):
+            self.token = token
+
+        def create_repo(self, **kwargs):
+            return None
+
+        def upload_file(self, **kwargs):
+            uploaded.append(kwargs["path_in_repo"])
+            return None
+
+    monkeypatch.setattr("core.bank_persistence.HfApi", FakeApi)
+    monkeypatch.setattr("core.bank_persistence.hf_hub_download", lambda **kwargs: str(remote_bank))
+
+    settings = _settings(
+        tmp_path,
+        storage_backend="hf_dataset",
+        hf_dataset_repo="example/russian-practice-bank",
+        hf_token="secret-token",
+    )
+    persistence = GeneratedBankPersistence(settings, project_root)
+    persistence.bootstrap()
+    generated_path = settings.generated_bank_runtime_path(project_root)
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path],
+        writable_path=generated_path,
+        on_commit=persistence.after_local_commit,
+    ).load()
+    service = LiveGenerationService(settings, bank, project_root, provider=MockProvider())
+
+    result = service.generate_and_store(
+        skill="listening",
+        level="2",
+        mode="training",
+        topics=[],
+        competencies=["main idea"],
+        maximum_questions=2,
+    )
+
+    assert result.bank_remote_synced is True
+    assert settings.hf_dataset_bank_filename in uploaded
+    assert settings.hf_dataset_manifest_filename in uploaded
+    assert any(item.startswith("audio/") for item in uploaded)
+    assert "synchronized to HF Dataset" in result.bank_persistence_note
+
+
+def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monkeypatch, project_root, tmp_path):
+    remote_audio = tmp_path / "remote-audio.mp3"
+    remote_audio.write_bytes(b"ID3" + b"1" * 1024)
+    remote_bank = tmp_path / "remote-bank.jsonl"
+    remote_bank.write_text(
+        json.dumps(
+            {
+                "kind": "audio",
+                "data": {
+                    "id": "aud_remote",
+                    "path": "/old/runtime/generated-audio.mp3",
+                    "content_hash": "a" * 64,
+                    "voice": "ru-RU-SvetlanaNeural",
+                    "rate": "+0%",
+                    "engine": "edge-tts",
+                    "engine_version": "7.2.8",
+                    "duration_seconds": 20.0,
+                    "transcript_hash": "b" * 64,
+                    "synthetic_tts": True,
+                    "validated": True,
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    def fake_download(**kwargs):
+        return str(remote_audio if kwargs["filename"].startswith("audio/") else remote_bank)
+
+    monkeypatch.setattr("core.bank_persistence.hf_hub_download", fake_download)
+    settings = _settings(
+        tmp_path,
+        storage_backend="hf_dataset",
+        hf_dataset_repo="example/russian-practice-bank",
+        hf_token="secret-token",
+    )
+    persistence = GeneratedBankPersistence(settings, project_root)
+    persistence.bootstrap()
+
+    records = [json.loads(line) for line in settings.generated_bank_runtime_path(project_root).read_text(encoding="utf-8").splitlines()]
+    restored_path = Path(records[0]["data"]["path"])
+    assert restored_path.parent == settings.audio_cache_runtime_path(project_root)
+    assert restored_path.exists()
+    assert restored_path.read_bytes() == remote_audio.read_bytes()

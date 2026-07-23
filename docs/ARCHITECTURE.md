@@ -7,6 +7,7 @@
 - session state and strict flow to `core/session.py`;
 - Bayesian updates and item information to `core/adaptive.py`;
 - starter/generated bank indexing and atomic writes to `core/item_bank.py`;
+- generated-bank manifests, mounted persistence, and optional HF Dataset synchronization to `core/bank_persistence.py`;
 - staged hosted authoring to `core/generation.py`;
 - level- and skill-specific prompt construction to `core/prompts.py`;
 - deterministic bank gates to `core/validation.py`;
@@ -26,7 +27,9 @@ storage/item_bank/generated_items.jsonl
 
 The first is immutable release content. The second is an atomic writable overlay. With mounted Space storage, the overlay resolves to `/data/item_bank/generated_items.jsonl`.
 
-The bank loads once at startup, maintains passage/question/audio indexes in memory, rejects duplicate IDs/content, and immediately indexes newly accepted generated bundles.
+The bank loads once at startup, maintains passage/question/audio indexes in memory, rejects duplicate IDs/content, and immediately indexes newly accepted generated bundles. `generated_items.meta.json` records the overlay checksum and record counts after every commit. Incomplete bundles, invalid questions, malformed overlay records, and Listening items with missing audio are never selectable.
+
+When `HF_DATASET_REPO` is configured, `GeneratedBankPersistence` merges the remote overlay before indexing. After an accepted local atomic commit, it mirrors the JSONL snapshot, health manifest, and generated Listening MP3s. Remote sync failure cannot roll back the already accepted local/in-memory bundle.
 
 ## Content selection paths
 
@@ -138,9 +141,17 @@ No prompt prescribes an A/B/C/D sequence.
 
 Accepted Listening transcripts are content-hash cached by transcript, voice, rate, and engine version. Audio must exist, be non-empty, and have plausible duration before the bundle is persisted.
 
-### 10. Atomic persistence or quarantine
+### 10. Atomic persistence, indexing, and optional remote mirror
 
-Accepted passage, questions, validation reports, and audio metadata are appended atomically to the generated overlay. Failed candidates are quarantined with a stage trace and recursively redacted error data.
+Accepted passage, questions, validation reports, and audio metadata are committed together through atomic file replacement. Only after the file commit succeeds are the objects inserted into the live indexes. A health manifest is refreshed with checksum and counts.
+
+Mounted storage uses the same path abstraction. The optional HF Dataset backend uploads the JSONL, manifest, and generated audio after every accepted bundle and restores/rewrites remote audio paths at startup. Failed candidates are quarantined with a stage trace and recursively redacted error data.
+
+## Visible operation-state UX
+
+Slow actions use a two-step Gradio event chain. A non-queued pre-event immediately displays an accessible animated activity panel and disables/renames the initiating button. The queued assessment callback then performs the work and emits staged `gr.Progress` descriptions. A final event clears the activity panel while preserving mode-specific button interactivity, including strict one-play Listening.
+
+This pattern is applied to session start/recovery, audio preparation, passage submission, hints, report generation, and strict-session abandonment. It supplements—not replaces—idempotent nonce handling and server-side session rules.
 
 ## Hosted provider layer
 

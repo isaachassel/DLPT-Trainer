@@ -6,8 +6,8 @@
 4. **Hosted calls were not made with real user keys in this build environment.** Deterministic integration covers the same code path, but deployed model availability, entitlements, latency, quotas, and provider-specific schema behavior must be confirmed in the Space.
 5. **Token totals depend on provider telemetry.** Outbound calls are always counted; input/output token totals are stored only when the SDK response includes usage fields.
 6. **Fresh content adds latency and cost.** Stage-aware token caps, smart audit, bounded retries, per-stage attempt caps, concurrency limits, per-session bundle limits, and bank fallback reduce cost but cannot eliminate it.
-7. **Generated-content persistence requires durable storage.** Without a mounted volume, generated items remain reusable during the runtime but may disappear after rebuild/restart.
-8. **No Hugging Face Dataset synchronization yet.** Local and mounted overlays are implemented; `HF_DATASET_REPO` is reserved for a future reviewed shared backend.
+7. **Generated-content persistence still depends on configured durability.** Local commits are atomic and immediately reusable, but the default Space filesystem can reset. Mounted storage or the implemented Hugging Face Dataset mirror must be configured for restart durability.
+8. **Dataset synchronization is best-effort, not a transactional multi-writer database.** The app serializes writes within one Space process and merges local/remote records at startup. Multiple independent writers targeting the same Dataset repository could still create last-writer conflicts and should be avoided.
 9. **Synthetic Listening audio.** Fresh Listening uses Edge TTS and starter audio is synthetic. The schema supports authentic/open-licensed audio, but a reviewed native-speaker corpus is not bundled.
 10. **Strict playback is not secure-browser lockdown.** The UI removes replay controls and records plays, but cannot prevent external recording or developer-tool manipulation.
 11. **Timer display is client-rendered while enforcement is server-side.** A sleeping browser tab can visually refresh late, though server deadlines remain authoritative.

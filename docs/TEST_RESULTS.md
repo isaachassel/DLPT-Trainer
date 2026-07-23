@@ -1,16 +1,16 @@
 # Test Results
 
-Executed for the v1.2.3 Hugging Face Listening runtime hardening release on 2026-07-23.
+Executed for the v1.2.4 loading-feedback and generated-bank persistence release on 2026-07-23.
 
 ## Automated unit/integration suite
 
 ```text
-73 passed
+78 passed
 ```
 
 Core coverage includes:
 
-- independent Reading and Listening estimates;
+- independent Reading and Listening Bayesian estimates;
 - posterior uncertainty reduction;
 - Training target-level influence;
 - information, content-balance, and exposure scoring;
@@ -33,8 +33,8 @@ Core coverage includes:
 
 GenAI-specific coverage includes:
 
-- no fixed `Q1=A, Q2=B, Q3=C, Q4=D` or equivalent prompt sequence;
-- zero-based answer indices rather than answer letters;
+- no fixed Q1=A, Q2=B, Q3=C, Q4=D prompt sequence;
+- zero-based proposed-answer indices rather than answer letters;
 - blind verifier receives no proposed key;
 - author, passage-audit, question, and blind-verification stages are separate;
 - strict JSON Schema is attempted before weaker output modes;
@@ -44,16 +44,26 @@ GenAI-specific coverage includes:
 - meaningful smart-audit behavior;
 - provider stage-attempt cap;
 - successful and failed provider-call accounting;
-- generated-bank atomic append and reload;
 - duplicate generated-content quarantine;
 - recursive secret redaction in quarantine;
 - API secret exclusion from Settings serialization;
 - unavailable-provider and generation-limit fallback;
 - generated Listening audio validation and caching.
 
-## Hugging Face metadata regression
+Version 1.2.4 adds direct regression coverage for:
 
-The README front matter is parsed during testing. The release requires:
+- accessible activity spinner and immediate busy-button locking;
+- chained Begin Session, Play Audio, and Submit Passage feedback events;
+- atomic generated-bank commit;
+- generated-bank SHA-256 health manifest;
+- immediate in-memory indexing and reload into a new `ItemBank` instance;
+- malformed generated-overlay isolation without starter-bank failure;
+- Hugging Face Dataset JSONL/manifest/audio upload behavior;
+- remote Listening audio restoration and runtime-path rewriting.
+
+## Hugging Face metadata and dependency validation
+
+README front matter:
 
 ```yaml
 sdk: gradio
@@ -62,18 +72,7 @@ python_version: "3.11"
 app_file: app.py
 ```
 
-Both version fields are asserted to be YAML strings. This prevents `3.10` from being coerced to numeric `3.1` and sent to the container builder as `python:3.1`.
-
-## Space dependency-resolution validation
-
-The failed remote build installed `gradio[mcp,oauth]==6.5.1`, which constrains Pydantic to `>=2.11.10,<=2.12.5`. The release now pins:
-
-```text
-Gradio 6.5.1
-Pydantic 2.12.5
-```
-
-The repository's compatibility checker evaluates the exact production pins against the dependency metadata shipped with Gradio 6.5.1 for base, OAuth, and MCP extras:
+Dependency check:
 
 ```text
 SPACE DEPENDENCY VALIDATION PASSED
@@ -81,23 +80,6 @@ SPACE DEPENDENCY VALIDATION PASSED
 - Pydantic: 2.12.5 (compatible with gradio[mcp,oauth])
 - Hugging Face Hub: 1.16.1
 ```
-
-The execution sandbox had Pydantic 2.13.4 already installed and could not download Pydantic 2.12.5 from its restricted package index. Therefore, the functional test suite ran in the available runtime, while the release-pin compatibility was verified separately against Gradio's installed package metadata. The Hugging Face build log itself confirms that Pydantic 2.12.5 is the accepted upper bound.
-
-
-## Listening runtime regression
-
-The release was launched with SSR explicitly disabled and restricted audio serving paths. Runtime checks produced:
-
-```text
-Application page: HTTP 200
-Starter MP3: HTTP 200, audio/mpeg, Content-Length 29,073 bytes
-Starter MP3 byte range: HTTP 206, Content-Range bytes 0-99/29,073
-Listening callback: stateful Training session started and playback HTML returned a /gradio_api/file= URL
-Callback audio payload: no base64/data URI
-```
-
-The stateful callback test confirmed that the current passage play count advanced to 1 and the checkpoint/status response remained valid.
 
 ## Combined bank validation
 
@@ -109,70 +91,65 @@ Answer positions: {'A': 22, 'B': 22, 'C': 22, 'D': 22}
 VALIDATION PASSED
 ```
 
-The validation command loads both the immutable starter path and writable generated overlay. The packaged overlay is empty by design.
+The packaged generated overlay is empty by design. Runtime-generated accepted bundles are written to the overlay and manifest.
 
+## Full simulation flow
 
-## Full-length simulation flow
-
-Deterministic bank-only Simulation flows completed independently for both skills:
+Deterministic bank-only strict simulations completed independently:
 
 ```text
-Reading:   35 questions across 9 passage bundles
-Listening: 35 questions across 13 passage bundles
+Reading:   35 questions across 9 passage bundles; 9 unique passages
+Listening: 35 questions across 13 passage bundles; 13 unique passages
 ```
-
-Both runs used strict mode state, no repeated passage, all-questions-required submission, and independent ability updates.
 
 ## Gradio Space smoke test
 
 ```text
-Smoke test passed: 27 passages, 88 questions, 84 UI components.
+Smoke test passed: 27 passages, 88 questions, 87 UI components.
 Live generation ready=False: no matching API key; Fresh AI falls back to bank.
 ```
 
-This is the expected no-secret release state.
+The no-secret result is expected for the release package.
 
-## Deterministic staged-generation integration
+## Local server and audio route
 
-The test-only mock provider exercised:
-
-1. passage generation;
-2. deterministic passage checks;
-3. independent passage audit;
-4. separate question generation;
-5. blind verification for each question;
-6. Python answer-position balancing and key remapping;
-7. deterministic post-shuffle validation;
-8. atomic generated-bank append;
-9. reload into a new `ItemBank` instance;
-10. duplicate rejection and quarantine.
-
-A deliberately defective passage was repaired and persisted with `repair_count=1`. A failing provider attached raw call counts to the raised error while quarantine removed the supplied secret string.
-
-
-## Real local launch check
-
-`python app.py` started the v1.2 interface on `127.0.0.1:7860`. An HTTP request returned:
+The v1.2.4 app launched with `ssr_mode=False` and returned:
 
 ```text
-HTTP status: 200
-Rendered HTML: 113,414 bytes
+Application page: HTTP 200, 130,025 bytes
+Starter MP3: HTTP 200, 29,073 bytes
+Starter MP3 byte range: HTTP 206, 100 bytes returned
+Activity-spinner CSS present in rendered application: yes
 ```
 
-## Pinned release dependencies
+## Generated-bank persistence integration
+
+The deterministic provider exercised the complete accepted-item path:
+
+1. passage authoring;
+2. passage validation/audit;
+3. question authoring;
+4. blind verification;
+5. Python choice shuffling and key remapping;
+6. post-shuffle deterministic validation;
+7. atomic JSONL replacement;
+8. health-manifest update;
+9. immediate in-memory indexing;
+10. reload into a new bank instance;
+11. optional Dataset JSONL, manifest, and Listening audio upload.
+
+The manifest test verified one generated Reading passage produced:
 
 ```text
-Gradio 6.5.1
-Pydantic 2.12.5
-huggingface-hub 1.16.1
-python-dotenv 1.2.2
-edge-tts 7.2.8
-groq 1.5.0
-PyYAML 6.0.3
+1 passage
+2 questions
+3 validation reports
+6 total JSONL records
+64-character SHA-256 checksum
 ```
 
-The functional suite ran with the available Gradio 6.5.1 / Pydantic 2.13.4 runtime; the release dependency pin is Pydantic 2.12.5 and was separately checked against Gradio 6.5.1 base, OAuth, and MCP metadata. Hosted Groq and Edge TTS imports are lazy, so bank-only startup and deterministic tests do not require those packages to be imported until their features are used. `pytest==9.0.2` is now isolated in `requirements-dev.txt` and is not installed in the public Space container.
+A simulated remote startup restored a generated MP3 into the current runtime audio cache and rewrote the stored asset path.
 
-## External-provider test limitation
+## External-provider limitation
 
-No real user API keys were available in the execution environment, so the release did not spend tokens or make live hosted-generation calls. The deterministic providers exercise the same prompt builders, schemas, staged pipeline, repair logic, blind verification, persistence, audio integration, and fallback code. Real-provider availability and model entitlement must still be verified in the deployed Space account.
+No real user provider keys were available in the execution environment. No hosted tokens were spent. Deterministic providers exercised the same prompt builders, Pydantic schemas, staged audit/repair, blind verification, persistence, audio linkage, and fallback code. Actual model entitlements, provider latency, quotas, and remote Dataset permissions must be verified in the deployed Space account.

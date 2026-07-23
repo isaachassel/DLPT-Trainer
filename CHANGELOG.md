@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.2.4 — Visible loading feedback and durable generated-bank updates
+
+### User feedback and duplicate-click prevention
+
+- Added a dedicated accessible activity panel with an animated spinner, `aria-live`, and `aria-busy` state.
+- Begin Session, Resume, Play Audio, Submit Passage, Show Hints, partial-report generation, and strict-session abandonment now change the initiating button to a busy label and disable it immediately.
+- Added staged progress reporting for session creation, content selection, live authoring, adaptive scoring, checkpoint writes, and audio preparation.
+- Kept strict one-play behavior intact while making audio preparation visibly acknowledged.
+
+### Generated-bank correctness and durability
+
+- Added `GeneratedBankPersistence` with an atomic local/mounted source of truth and optional Hugging Face Dataset mirroring.
+- Every accepted live bundle now refreshes a SHA-256 health manifest containing record, passage, question, audio, and validation-report counts.
+- Confirmed accepted passage, question, answer, rationale, evidence, validation, generation, and audio records are committed together before entering the in-memory operational indexes.
+- Added immediate dynamic bank counts to setup/session status so users can see the reusable bank grow.
+- Added startup merge and post-commit upload for `generated_items.jsonl`, `generated_items.meta.json`, and generated Listening MP3 files when `HF_DATASET_REPO` is configured.
+- Added remote audio restoration and runtime path rewriting after restart.
+- Added fail-safe generated-overlay loading: malformed overlay records are warned and excluded without disabling the validated starter bank.
+- Tightened operational selection so incomplete bundles and missing Listening audio cannot be selected.
+
+### Configuration and QA
+
+- Added Dataset sync variables and automatic `hybrid` selection when `HF_DATASET_REPO` is configured.
+- Added `docs/BANK_PERSISTENCE_AND_LOADING.md`.
+- Expanded the automated suite from 73 to 78 tests.
+- Added tests for activity feedback wiring, atomic manifest creation, immediate reloadability, corrupted-overlay isolation, and Dataset/audio synchronization.
+
 ## v1.2.3 — Hugging Face Listening runtime hardening
 
 ### Runtime diagnosis

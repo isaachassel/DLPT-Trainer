@@ -5,7 +5,7 @@ import random
 import threading
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Any, Callable, Iterable, Sequence
 
 from .adaptive import select_passage
 from .constants import LETTERS
@@ -21,7 +21,12 @@ class ItemBankError(RuntimeError):
 class ItemBank:
     """In-memory indexed bank backed by an immutable starter file and writable overlay."""
 
-    def __init__(self, path: str | Path | Sequence[str | Path], writable_path: str | Path | None = None):
+    def __init__(
+        self,
+        path: str | Path | Sequence[str | Path],
+        writable_path: str | Path | None = None,
+        on_commit: Callable[[Path], Any] | None = None,
+    ):
         if isinstance(path, (str, Path)):
             self.paths = [Path(path)]
         else:
@@ -36,6 +41,9 @@ class ItemBank:
         self.passage_origin: dict[str, str] = {}
         self._loaded = False
         self._lock = threading.RLock()
+        self.on_commit = on_commit
+        self.last_commit_result: Any | None = None
+        self.load_warnings: list[str] = []
 
     def _load_path(self, source: Path, required: bool) -> None:
         if not source.exists():
@@ -64,7 +72,13 @@ class ItemBank:
                     elif kind == "validation":
                         self.validation_reports[data["id"]] = data
                 except Exception as exc:
-                    raise ItemBankError(f"Invalid item-bank record in {source} at line {line_number}: {exc}") from exc
+                    message = f"Invalid item-bank record in {source} at line {line_number}: {exc}"
+                    if required:
+                        raise ItemBankError(message) from exc
+                    # A malformed generated overlay must never prevent the validated
+                    # starter bank from serving users. Invalid overlay records are
+                    # excluded from indexing and surfaced through bank health status.
+                    self.load_warnings.append(message)
 
     def _reindex(self) -> None:
         self.questions_by_passage = defaultdict(list)
@@ -104,10 +118,42 @@ class ItemBank:
         return errors
 
     def active_passages(self, skill: str) -> list[PassageItem]:
-        return [
-            passage for passage in self.passages.values()
-            if passage.skill == skill and passage.status == "active" and passage.validation_status == "accepted"
-        ]
+        active: list[PassageItem] = []
+        for passage in self.passages.values():
+            if passage.skill != skill or passage.status != "active" or passage.validation_status != "accepted":
+                continue
+            questions = self.questions_by_passage.get(passage.id, [])
+            if len(questions) != len(passage.question_ids):
+                continue
+            if validate_passage(passage, questions).status != "accepted":
+                continue
+            if any(validate_question(question, passage).status != "accepted" for question in questions):
+                continue
+            if passage.skill == "listening":
+                if not passage.audio_asset_id or passage.audio_asset_id not in self.audio_assets:
+                    continue
+                audio_path = Path(self.audio_assets[passage.audio_asset_id].path)
+                if not audio_path.is_absolute():
+                    candidates = [Path.cwd() / audio_path, self.path.parent.parent / audio_path]
+                    audio_path = next((candidate for candidate in candidates if candidate.exists()), candidates[-1])
+                if not audio_path.exists() or audio_path.stat().st_size <= 0:
+                    continue
+            active.append(passage)
+        return active
+
+    def health_summary(self) -> dict[str, int]:
+        return {
+            "passages": len(self.passages),
+            "questions": len(self.questions),
+            "audio_assets": len(self.audio_assets),
+            "generated_passages": sum(1 for passage_id in self.passages if self.origin_for(passage_id) == "generated_bank"),
+            "generated_questions": sum(
+                len(self.questions_by_passage.get(passage_id, []))
+                for passage_id in self.passages
+                if self.origin_for(passage_id) == "generated_bank"
+            ),
+            "load_warnings": len(self.load_warnings),
+        }
 
     def get_passage(self, passage_id: str) -> PassageItem:
         try:
@@ -141,7 +187,7 @@ class ItemBank:
         passage_report: ValidationReport,
         question_reports: list[ValidationReport],
         audio_asset: AudioAsset | None = None,
-    ) -> None:
+    ) -> Any | None:
         """Atomically append an accepted bundle and make it immediately selectable."""
         with self._lock:
             if passage_report.status != "accepted" or any(report.status != "accepted" for report in question_reports):
@@ -178,6 +224,15 @@ class ItemBank:
             for report in question_reports:
                 self.validation_reports[report.id] = report.model_dump(mode="json")
             self._reindex()
+            self.last_commit_result = None
+            if self.on_commit is not None:
+                try:
+                    self.last_commit_result = self.on_commit(self.writable_path)
+                except Exception as exc:
+                    # Persistence metadata/remote mirroring must not roll back a
+                    # bundle that has already been atomically committed locally.
+                    self.last_commit_result = {"remote_synced": False, "note": f"Post-commit sync failed: {type(exc).__name__}."}
+            return self.last_commit_result
 
     def select(
         self,

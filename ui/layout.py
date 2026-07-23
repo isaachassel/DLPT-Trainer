@@ -4,6 +4,8 @@ import gradio as gr
 
 from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
 from ui.callbacks import (
+    BANK_BOOTSTRAP_MESSAGE,
+    BANK_STATUS_MESSAGE,
     CONTENT_SOURCE_CHOICES,
     MAX_SLOTS,
     PROVIDER_MESSAGE,
@@ -11,9 +13,12 @@ from ui.callbacks import (
     QUEUE_CONCURRENCY_LIMIT,
     TOPICS,
     abandon_strict_callback,
+    begin_activity,
     answer_changed_callback,
+    end_activity,
     mode_controls,
     play_audio_callback,
+    restore_activity_button,
     resume_session_callback,
     show_hints_callback,
     start_session_callback,
@@ -63,6 +68,9 @@ CUSTOM_CSS = """
 .timer-card.strict { border-color: #8b1e1e; }
 .report-panel { max-height: 720px; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; }
 .controlled-audio-wrap { padding: 12px; border: 1px solid var(--card-border); border-radius: 12px; }
+.operation-activity { display:flex; align-items:center; gap:12px; padding:13px 15px; margin:10px 0; border:1px solid #345995; border-radius:12px; background:rgba(52,89,149,.09); }
+.operation-spinner { width:22px; height:22px; flex:0 0 22px; border:3px solid rgba(52,89,149,.22); border-top-color:#345995; border-radius:50%; animation:operation-spin .8s linear infinite; }
+@keyframes operation-spin { to { transform:rotate(360deg); } }
 @media (max-width: 760px) { .passage-card { padding: 12px; font-size: 1rem; } }
 """
 
@@ -113,6 +121,9 @@ def build_app() -> gr.Blocks:
                     )
                 provider_icon = "✅" if PROVIDER_READY else "ℹ️"
                 gr.Markdown(f"{provider_icon} **Live generation status:** {PROVIDER_MESSAGE}")
+                bank_status = gr.Markdown(f"💾 **Reusable bank status:** {BANK_STATUS_MESSAGE}")
+                if BANK_BOOTSTRAP_MESSAGE:
+                    gr.Markdown(f"<small>{BANK_BOOTSTRAP_MESSAGE}</small>")
                 start_btn = gr.Button("Begin Session", variant="primary")
 
             with gr.Accordion("Recover a Checkpoint", open=False):
@@ -120,6 +131,7 @@ def build_app() -> gr.Blocks:
                     resume_code = gr.Textbox(label="Session code", placeholder="Example: 4e1ac9f71c2b")
                     resume_btn = gr.Button("Resume Session")
 
+            activity = gr.HTML(value="", visible=False, elem_id="operation-activity")
             status = gr.Markdown(visible=False)
             timer = gr.HTML(visible=False)
             orientation = gr.Markdown(visible=False, elem_classes=["orientation"])
@@ -158,7 +170,7 @@ def build_app() -> gr.Blocks:
                 outputs.extend([q_md, radio])
             outputs.extend([
                 hint_btn, hint_output, submit_btn, stop_training_btn, abandon_btn, confirm_abandon,
-                feedback_output, report, json_export, csv_export,
+                feedback_output, report, json_export, csv_export, bank_status,
             ])
 
             mode.change(
@@ -172,15 +184,58 @@ def build_app() -> gr.Blocks:
                 outputs=[length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing],
             )
 
-            start_btn.click(
+            start_prepare = start_btn.click(
+                lambda: begin_activity("Starting session and loading the first passage…", "Starting…"),
+                outputs=[activity, start_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            start_run = start_prepare.then(
                 start_session_callback,
                 inputs=[
                     mode, skill, start_level, target_level, length, timer_mode, topics, competencies,
                     feedback_timing, hints_enabled, transcript_review, voice, speed, profile_id, content_source,
                 ],
                 outputs=outputs,
+                show_progress="hidden",
+                trigger_mode="once",
             )
-            resume_btn.click(resume_session_callback, inputs=[resume_code], outputs=outputs)
+            start_run.then(
+                lambda: restore_activity_button("Begin Session"),
+                outputs=[activity, start_btn],
+                queue=False,
+                show_progress="hidden",
+            )
+            start_run.failure(
+                lambda: restore_activity_button("Begin Session"),
+                outputs=[activity, start_btn], queue=False, show_progress="hidden",
+            )
+
+            resume_prepare = resume_btn.click(
+                lambda: begin_activity("Restoring and verifying the checkpoint…", "Restoring…"),
+                outputs=[activity, resume_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            resume_run = resume_prepare.then(
+                resume_session_callback,
+                inputs=[resume_code],
+                outputs=outputs,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            resume_run.then(
+                lambda: restore_activity_button("Resume Session"),
+                outputs=[activity, resume_btn],
+                queue=False,
+                show_progress="hidden",
+            )
+            resume_run.failure(
+                lambda: restore_activity_button("Resume Session"),
+                outputs=[activity, resume_btn], queue=False, show_progress="hidden",
+            )
 
             for index, radio in enumerate(answer_radios):
                 radio.change(
@@ -190,19 +245,117 @@ def build_app() -> gr.Blocks:
                     queue=False,
                 )
 
-            play_btn.click(
+            play_prepare = play_btn.click(
+                lambda: begin_activity("Preparing validated audio playback…", "Preparing Audio…"),
+                outputs=[activity, play_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            play_run = play_prepare.then(
                 play_audio_callback,
                 inputs=[state, bundle_state],
                 outputs=[state, audio_html, play_btn, status],
+                show_progress="hidden",
+                trigger_mode="once",
             )
-            hint_btn.click(show_hints_callback, inputs=[state, bundle_state], outputs=[hint_output])
-            submit_btn.click(
+            play_run.then(end_activity, outputs=[activity], queue=False, show_progress="hidden")
+            play_run.failure(
+                lambda: restore_activity_button("Play / Replay Audio"),
+                outputs=[activity, play_btn], queue=False, show_progress="hidden",
+            )
+
+            hint_prepare = hint_btn.click(
+                lambda: begin_activity("Preparing strategy hints…", "Loading Hints…"),
+                outputs=[activity, hint_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            hint_run = hint_prepare.then(
+                show_hints_callback,
+                inputs=[state, bundle_state],
+                outputs=[hint_output],
+                show_progress="hidden",
+            )
+            hint_run.then(
+                lambda: restore_activity_button("Show Strategy Hints"),
+                outputs=[activity, hint_btn],
+                queue=False,
+                show_progress="hidden",
+            )
+            hint_run.failure(
+                lambda: restore_activity_button("Show Strategy Hints"),
+                outputs=[activity, hint_btn], queue=False, show_progress="hidden",
+            )
+
+            submit_prepare = submit_btn.click(
+                lambda: begin_activity("Submitting this passage, updating ability, and saving progress…", "Submitting…"),
+                outputs=[activity, submit_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            submit_run = submit_prepare.then(
                 submit_passage_callback,
                 inputs=[state, bundle_state, nonce_state, *answer_radios],
                 outputs=outputs,
+                show_progress="hidden",
+                trigger_mode="once",
             )
-            stop_training_btn.click(stop_training_callback, inputs=[state], outputs=outputs)
-            abandon_btn.click(abandon_strict_callback, inputs=[state, confirm_abandon], outputs=outputs)
+            submit_run.then(end_activity, outputs=[activity], queue=False, show_progress="hidden")
+            submit_run.failure(
+                lambda: restore_activity_button("Submit Passage"),
+                outputs=[activity, submit_btn], queue=False, show_progress="hidden",
+            )
+
+            stop_prepare = stop_training_btn.click(
+                lambda: begin_activity("Building the partial training report and exports…", "Building Report…"),
+                outputs=[activity, stop_training_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            stop_run = stop_prepare.then(
+                stop_training_callback,
+                inputs=[state],
+                outputs=outputs,
+                show_progress="hidden",
+            )
+            stop_run.then(
+                lambda: restore_activity_button("Stop Training & Show Partial Report"),
+                outputs=[activity, stop_training_btn],
+                queue=False,
+                show_progress="hidden",
+            )
+            stop_run.failure(
+                lambda: restore_activity_button("Stop Training & Show Partial Report"),
+                outputs=[activity, stop_training_btn], queue=False, show_progress="hidden",
+            )
+
+            abandon_prepare = abandon_btn.click(
+                lambda: begin_activity("Processing the strict-session abandon request…", "Processing…"),
+                outputs=[activity, abandon_btn],
+                queue=False,
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+            abandon_run = abandon_prepare.then(
+                abandon_strict_callback,
+                inputs=[state, confirm_abandon],
+                outputs=outputs,
+                show_progress="hidden",
+            )
+            abandon_run.then(
+                lambda: restore_activity_button("Abandon Diagnostic / Simulation"),
+                outputs=[activity, abandon_btn],
+                queue=False,
+                show_progress="hidden",
+            )
+            abandon_run.failure(
+                lambda: restore_activity_button("Abandon Diagnostic / Simulation"),
+                outputs=[activity, abandon_btn], queue=False, show_progress="hidden",
+            )
 
         demo.queue(default_concurrency_limit=QUEUE_CONCURRENCY_LIMIT, max_size=32)
     return demo
