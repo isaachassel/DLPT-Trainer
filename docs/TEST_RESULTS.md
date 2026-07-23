@@ -1,11 +1,11 @@
 # Test Results
 
-Executed in the v1.2.1 Hugging Face metadata-hotfix environment on 2026-07-23.
+Executed for the v1.2.2 Hugging Face dependency-resolution hotfix on 2026-07-23.
 
 ## Automated unit/integration suite
 
 ```text
-65 passed
+68 passed
 ```
 
 Core coverage includes:
@@ -64,6 +64,26 @@ app_file: app.py
 
 Both version fields are asserted to be YAML strings. This prevents `3.10` from being coerced to numeric `3.1` and sent to the container builder as `python:3.1`.
 
+## Space dependency-resolution validation
+
+The failed remote build installed `gradio[mcp,oauth]==6.5.1`, which constrains Pydantic to `>=2.11.10,<=2.12.5`. The release now pins:
+
+```text
+Gradio 6.5.1
+Pydantic 2.12.5
+```
+
+The repository's compatibility checker evaluates the exact production pins against the dependency metadata shipped with Gradio 6.5.1 for base, OAuth, and MCP extras:
+
+```text
+SPACE DEPENDENCY VALIDATION PASSED
+- Gradio: 6.5.1
+- Pydantic: 2.12.5 (compatible with gradio[mcp,oauth])
+- Hugging Face Hub: 1.16.1
+```
+
+The execution sandbox had Pydantic 2.13.4 already installed and could not download Pydantic 2.12.5 from its restricted package index. Therefore, the functional test suite ran in the available runtime, while the release-pin compatibility was verified separately against Gradio's installed package metadata. The Hugging Face build log itself confirms that Pydantic 2.12.5 is the accepted upper bound.
+
 ## Combined bank validation
 
 ```text
@@ -121,22 +141,22 @@ A deliberately defective passage was repaired and persisted with `repair_count=1
 
 ```text
 HTTP status: 200
-Rendered HTML: 113,413 bytes
+Rendered HTML: 113,414 bytes
 ```
 
 ## Pinned release dependencies
 
 ```text
 Gradio 6.5.1
-Pydantic 2.13.4
+Pydantic 2.12.5
 huggingface-hub 1.16.1
 python-dotenv 1.2.2
 edge-tts 7.2.8
 groq 1.5.0
-pytest 9.0.2
+PyYAML 6.0.3
 ```
 
-The current environment contained the Gradio/Pydantic/Hugging Face/pytest runtime used for tests. Hosted Groq and Edge TTS imports are lazy, so bank-only startup and deterministic tests do not require those packages to be imported until their features are used.
+The functional suite ran with the available Gradio 6.5.1 / Pydantic 2.13.4 runtime; the release dependency pin is Pydantic 2.12.5 and was separately checked against Gradio 6.5.1 base, OAuth, and MCP metadata. Hosted Groq and Edge TTS imports are lazy, so bank-only startup and deterministic tests do not require those packages to be imported until their features are used. `pytest==9.0.2` is now isolated in `requirements-dev.txt` and is not installed in the public Space container.
 
 ## External-provider test limitation
 

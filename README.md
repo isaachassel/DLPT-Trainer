@@ -158,10 +158,18 @@ Open `http://localhost:7860`.
 Validation and tests:
 
 ```bash
+pip install -r requirements-dev.txt
+python scripts/check_space_dependencies.py
 python scripts/validate_item_bank.py
 pytest -q
 python scripts/smoke_test_space.py
 ```
+
+## Dependency compatibility
+
+The Space metadata pins Gradio `6.5.1`. Hugging Face installs that release with its `oauth` and `mcp` extras, so the production dependency set pins Pydantic `2.12.5`, the newest version accepted by the Gradio 6.5.1 MCP extra. Do not raise the Pydantic pin independently without also checking the selected Gradio release.
+
+Production dependencies live in `requirements.txt`. Test-only packages such as `pytest` live in `requirements-dev.txt` so they are not installed in the public Space container. The repository includes `python scripts/check_space_dependencies.py`, which checks the pinned versions against the installed Gradio dependency metadata before release.
 
 ## Enabling live generation locally
 
@@ -291,6 +299,18 @@ Default Space disk is ephemeral. Without mounted storage, generated items remain
 The application checkpoints after each submitted passage. Provider failure does not delete completed responses, and generation/loading time is added back to active timer anchors.
 
 ## Troubleshooting
+
+### Build fails with `ResolutionImpossible` for Pydantic
+
+Confirm the repository contains exactly:
+
+```text
+gradio==6.5.1
+pydantic==2.12.5
+```
+
+Hugging Face adds `gradio[mcp,oauth]==6.5.1` during the build. Its MCP extra rejects Pydantic versions above `2.12.5`. A stale `pydantic==2.13.4` line will reproduce the dependency-resolution failure before the application starts. Commit the corrected `requirements.txt`, then use **Factory reboot** or trigger a new commit so the Space rebuilds from the new dependency file.
+
 
 ### Fresh AI always falls back
 

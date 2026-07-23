@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.2 — Hugging Face dependency-resolution hotfix
+
+- Replaced the incompatible `pydantic==2.13.4` pin with `pydantic==2.12.5`, matching the constraint imposed by `gradio[mcp,oauth]==6.5.1` in the Hugging Face Space builder.
+- Kept Gradio `6.5.1`, Python `3.11`, the GenAI provider code, prompts, API secret names, item bank, and application behavior unchanged.
+- Moved `pytest` out of the production Space dependency set into `requirements-dev.txt`.
+- Added `scripts/check_space_dependencies.py` to evaluate repository pins against Gradio base, OAuth, and MCP dependency metadata.
+- Added three dependency regression tests covering the Gradio/Pydantic pair and production/dev requirement separation.
+- Re-ran the complete test suite, bank validator, Gradio smoke test, and HTTP launch check.
+
 ## v1.2.1 — Hugging Face build metadata hotfix
 
 - Quoted `python_version` and `sdk_version` in the README Space YAML metadata.
