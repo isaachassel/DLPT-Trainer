@@ -1,21 +1,102 @@
 from __future__ import annotations
 
 import asyncio
-import base64
+import atexit
 import hashlib
+import html
 import os
 import shutil
 import subprocess
-import tempfile
+import threading
 import time
 from pathlib import Path
-from typing import Iterable
+from typing import Coroutine, Iterable, TypeVar
+from urllib.parse import quote
 
 from .models import AudioAsset
 
 
 class AudioError(RuntimeError):
     pass
+
+
+_T = TypeVar("_T")
+
+
+class _AsyncLoopRunner:
+    """Run async TTS work on one reusable background loop.
+
+    Gradio callbacks execute in worker threads. Creating and destroying an asyncio
+    event loop for every TTS request can produce noisy loop-finalizer errors and is
+    especially fragile under concurrent Space traffic. This runner owns exactly
+    one daemon loop for the process and submits bounded coroutines to it.
+    """
+
+    def __init__(self) -> None:
+        self._ready = threading.Event()
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread = threading.Thread(target=self._run, name="tts-async-loop", daemon=True)
+        self._thread.start()
+        if not self._ready.wait(timeout=5):
+            raise AudioError("The audio worker could not start.")
+
+    def _run(self) -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        self._loop = loop
+        self._ready.set()
+        loop.run_forever()
+        pending = asyncio.all_tasks(loop)
+        for task in pending:
+            task.cancel()
+        if pending:
+            loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+        loop.run_until_complete(loop.shutdown_asyncgens())
+        loop.close()
+
+    def run(self, coroutine: Coroutine[object, object, _T], timeout_seconds: float) -> _T:
+        if self._loop is None or not self._loop.is_running():
+            coroutine.close()
+            raise AudioError("The audio worker is unavailable.")
+        future = asyncio.run_coroutine_threadsafe(coroutine, self._loop)
+        try:
+            return future.result(timeout=timeout_seconds)
+        except TimeoutError as exc:
+            future.cancel()
+            raise AudioError("TTS timed out. Your completed work remains saved.") from exc
+        except AudioError:
+            raise
+        except Exception as exc:
+            raise AudioError(f"TTS failed: {type(exc).__name__}.") from exc
+
+    def close(self) -> None:
+        loop = self._loop
+        if loop is not None and loop.is_running():
+            loop.call_soon_threadsafe(loop.stop)
+            self._thread.join(timeout=2)
+
+
+_RUNNER: _AsyncLoopRunner | None = None
+_RUNNER_LOCK = threading.Lock()
+
+
+def _get_async_runner() -> _AsyncLoopRunner:
+    global _RUNNER
+    if _RUNNER is None:
+        with _RUNNER_LOCK:
+            if _RUNNER is None:
+                _RUNNER = _AsyncLoopRunner()
+    return _RUNNER
+
+
+def _close_async_runner() -> None:
+    global _RUNNER
+    if _RUNNER is not None:
+        _RUNNER.close()
+        _RUNNER = None
+
+
+atexit.register(_close_async_runner)
 
 
 def audio_cache_key(transcript: str, voice: str, rate: str, engine_version: str) -> str:
@@ -35,7 +116,10 @@ def audio_duration_seconds(path: str | Path) -> float | None:
     try:
         result = subprocess.run(
             [ffprobe, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
-            capture_output=True, text=True, check=True, timeout=10,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
         )
         return float(result.stdout.strip())
     except Exception:
@@ -48,6 +132,7 @@ def resolve_audio_path(asset: AudioAsset, project_root: str | Path) -> Path:
     path = Path(asset.path)
     if not path.is_absolute():
         path = Path(project_root) / path
+    path = path.resolve()
     if not validate_audio_file(path):
         raise AudioError("The listening audio is missing or empty. Your completed work is still saved; choose another item.")
     return path
@@ -68,8 +153,9 @@ def generate_cached_tts(
     voice: str = "ru-RU-SvetlanaNeural",
     rate: str = "+0%",
     engine_version: str = "edge-tts-7",
+    timeout_seconds: float = 60.0,
 ) -> Path:
-    cache_dir = Path(cache_dir)
+    cache_dir = Path(cache_dir).resolve()
     cache_dir.mkdir(parents=True, exist_ok=True)
     key = audio_cache_key(transcript, voice, rate, engine_version)
     output = cache_dir / f"{key}.mp3"
@@ -77,17 +163,7 @@ def generate_cached_tts(
         return output
     temp = output.with_suffix(".tmp.mp3")
     try:
-        asyncio.run(_edge_tts_save(transcript, voice, rate, temp))
-        if not validate_audio_file(temp):
-            raise AudioError("TTS returned an empty or incomplete audio file.")
-        os.replace(temp, output)
-        return output
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        try:
-            loop.run_until_complete(_edge_tts_save(transcript, voice, rate, temp))
-        finally:
-            loop.close()
+        _get_async_runner().run(_edge_tts_save(transcript, voice, rate, temp), timeout_seconds)
         if not validate_audio_file(temp):
             raise AudioError("TTS returned an empty or incomplete audio file.")
         os.replace(temp, output)
@@ -124,26 +200,28 @@ def cleanup_audio_files(
     return removed
 
 
+def gradio_audio_url(audio_path: str | Path) -> str:
+    """Return Gradio's authenticated file route for a local audio file.
+
+    The parent directory must also be passed to Blocks.launch(allowed_paths=...).
+    Sending a compact URL instead of base64-embedding the MP3 prevents large
+    callback payloads and Content-Length truncation through the Spaces proxy.
+    """
+
+    absolute = str(Path(audio_path).resolve())
+    return "/gradio_api/file=" + quote(absolute, safe="/:")
+
+
 def controlled_audio_html(audio_path: str, element_id: str, strict: bool) -> str:
     safe_id = "".join(ch for ch in element_id if ch.isalnum() or ch in "_-")
-    encoded = base64.b64encode(Path(audio_path).read_bytes()).decode("ascii")
-    source = f"data:audio/mpeg;base64,{encoded}"
+    source = html.escape(gradio_audio_url(audio_path), quote=True)
     completion = "Playback completed. Replay is disabled." if strict else "Playback completed. Use Play / Replay Audio to listen again."
+    strict_value = "true" if strict else "false"
     return f"""
-<div class="controlled-audio-wrap" aria-live="polite">
-  <audio id="{safe_id}" src="{source}" autoplay preload="auto"></audio>
-  <div id="{safe_id}_status">Playing audio…</div>
+<div class="controlled-audio-wrap" aria-live="polite" data-audio-wrapper="true">
+  <audio id="{safe_id}" data-controlled-audio="true" data-strict="{strict_value}" data-completion="{html.escape(completion, quote=True)}" src="{source}" autoplay preload="auto"></audio>
+  <div data-audio-status="true">Loading audio…</div>
 </div>
-<script>
-(() => {{{{
-  const audio = document.getElementById('{safe_id}');
-  const status = document.getElementById('{safe_id}_status');
-  if (!audio) return;
-  audio.controls = false;
-  audio.addEventListener('ended', () => {{{{ status.textContent = '{completion}'; audio.removeAttribute('src'); audio.load(); }}}});
-  audio.addEventListener('error', () => {{{{ status.textContent = 'Audio could not play. Completed work remains saved.'; }}}});
-}}}})();
-</script>
 """
 
 

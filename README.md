@@ -344,9 +344,13 @@ storage/quarantine/live_generation_failures.jsonl
 
 The failed item remains outside the operational bank.
 
-### Listening audio does not play
+### Listening audio does not play or logs show `/graphql` 405 / `Invalid file descriptor: -1`
 
-Starter audio is bundled. Fresh Listening content requires successful TTS creation and validation before acceptance. If TTS fails, the session falls back to bank content.
+Version 1.2.3 explicitly launches Gradio with `ssr_mode=False`. The application does not need Gradio's experimental Node SSR layer, which can emit `/graphql` 405 responses and event-loop finalizer warnings on Hugging Face Spaces.
+
+Listening MP3 files are served through Gradio's byte-range-capable file route instead of being base64-embedded in callback output. Only `data/audio/` and the controlled runtime TTS cache are exposed through `allowed_paths`. If browser autoplay is blocked, press **Play / Replay Audio** again.
+
+Starter audio is bundled. Fresh Listening content requires successful TTS creation and validation before acceptance. If TTS fails, the session falls back to bank content without clearing completed responses.
 
 ### Session interrupted
 

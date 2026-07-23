@@ -34,5 +34,6 @@ def test_strict_audio_html_exposes_no_controls(bank, project_root):
     asset = next(iter(bank.audio_assets.values()))
     path = resolve_audio_path(asset, project_root)
     rendered = controlled_audio_html(str(path), "x", strict=True)
-    assert "controls" not in rendered.split("<script>")[0]
+    assert " controls" not in rendered
+    assert "data:audio" not in rendered
     assert "Replay is disabled" in rendered

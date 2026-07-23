@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.2.3 — Hugging Face Listening runtime hardening
+
+### Runtime diagnosis
+
+- Identified the repeated `Invalid file descriptor: -1` tracebacks as a known Gradio 6/Hugging Face Spaces event-loop finalizer issue rather than an application scoring or session-state exception.
+- Identified `/graphql` and `/api/graphql` 405 responses as traffic from Gradio's experimental Node SSR layer, which this application does not require.
+- Identified base64-embedded MP3 callback payloads as an unnecessary proxy and Content-Length risk for Listening playback.
+
+### Listening delivery fix
+
+- Explicitly disabled Gradio SSR with `ssr_mode=False` for the stable client-rendered Space path.
+- Replaced base64 MP3 embedding with Gradio's range-capable `/gradio_api/file=` route.
+- Restricted `allowed_paths` to the bundled validated-audio directory and controlled runtime TTS cache only.
+- Added reactive Gradio HTML audio binding, autoplay-status messaging, browser-autoplay recovery text, strict end-of-play source removal, and no visible native audio controls.
+- Replaced per-request asyncio loop creation with one reusable background TTS event loop and bounded TTS timeout handling.
+- Preserved checkpoints and bank fallback on all audio errors.
+
+### QA
+
+- Expanded the suite from 68 to 73 tests.
+- Added regression coverage for SSR disablement, minimal exposed audio paths, URL-based audio delivery, no base64 payloads, path encoding, and reactive strict-playback binding.
+- Verified HTTP 200 app startup, HTTP 200 complete MP3 delivery, HTTP 206 byte-range delivery, and a stateful Listening start/play callback through `gradio_client`.
+
 ## v1.2.2 — Hugging Face dependency-resolution hotfix
 
 - Replaced the incompatible `pydantic==2.13.4` pin with `pydantic==2.12.5`, matching the constraint imposed by `gradio[mcp,oauth]==6.5.1` in the Hugging Face Space builder.

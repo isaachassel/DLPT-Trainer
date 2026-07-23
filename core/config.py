@@ -63,6 +63,7 @@ class Settings(BaseModel):
     orphan_temp_max_age_hours: int = Field(default=12, ge=1, le=168)
     edge_tts_voice: str = "ru-RU-SvetlanaNeural"
     edge_tts_rate: str = "+0%"
+    tts_timeout_seconds: int = Field(default=60, ge=10, le=180)
     app_host: str = "0.0.0.0"
     app_port: int = Field(default=7860, ge=1, le=65535)
 
@@ -283,6 +284,7 @@ def get_settings() -> Settings:
         orphan_temp_max_age_hours=int(os.getenv("ORPHAN_TEMP_MAX_AGE_HOURS", "12")),
         edge_tts_voice=os.getenv("EDGE_TTS_VOICE", "ru-RU-SvetlanaNeural"),
         edge_tts_rate=os.getenv("EDGE_TTS_RATE", "+0%"),
+        tts_timeout_seconds=int(os.getenv("TTS_TIMEOUT_SECONDS", "60")),
         app_host=os.getenv("GRADIO_SERVER_NAME", "0.0.0.0"),
         app_port=int(os.getenv("GRADIO_SERVER_PORT", "7860")),
     )

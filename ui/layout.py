@@ -21,6 +21,37 @@ from ui.callbacks import (
     submit_passage_callback,
 )
 
+
+AUDIO_HTML_JS = r"""
+const bindAudio = () => {
+  const audio = element.querySelector('audio[data-controlled-audio="true"]');
+  const status = element.querySelector('[data-audio-status="true"]');
+  if (!audio || !status || audio.dataset.bound === 'true') return;
+  audio.dataset.bound = 'true';
+  audio.controls = false;
+
+  const setStatus = (message) => { status.textContent = message; };
+  audio.addEventListener('playing', () => setStatus('Playing audio…'), { once: true });
+  audio.addEventListener('ended', () => {
+    setStatus(audio.dataset.completion || 'Playback completed.');
+    if (audio.dataset.strict === 'true') {
+      audio.removeAttribute('src');
+      audio.load();
+    }
+  }, { once: true });
+  audio.addEventListener('error', () => {
+    setStatus('Audio could not play. Your completed work remains saved. Press Play Audio once more or continue after the app recovers.');
+  }, { once: true });
+
+  const playResult = audio.play();
+  if (playResult && typeof playResult.catch === 'function') {
+    playResult.catch(() => setStatus('Browser autoplay was blocked. Press Play / Replay Audio again.'));
+  }
+};
+watch('value', bindAudio);
+bindAudio();
+"""
+
 CUSTOM_CSS = """
 :root { --card-border: rgba(127,127,127,.28); }
 .app-shell { max-width: 1220px; margin: 0 auto; }
@@ -95,7 +126,7 @@ def build_app() -> gr.Blocks:
             passage = gr.Markdown(visible=False, elem_classes=["passage-card"])
             audio_error = gr.Markdown(visible=False)
             play_btn = gr.Button("Play / Replay Audio", visible=False)
-            audio_html = gr.HTML(visible=False)
+            audio_html = gr.HTML(visible=False, js_on_load=AUDIO_HTML_JS, elem_id="controlled-listening-audio")
 
             question_markdowns = []
             answer_radios = []

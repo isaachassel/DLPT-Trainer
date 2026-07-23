@@ -466,7 +466,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None):
             rate_map = {"Very slow": "-25%", "Slow": "-15%", "Normal": "+0%", "Fast": "+10%"}
             try:
                 cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
-                path = generate_cached_tts(bundle.passage.passage_ru, cache_dir, voice_map.get(state.voice_label, SETTINGS.edge_tts_voice), rate_map.get(state.speech_rate_label, "+0%"))
+                path = generate_cached_tts(bundle.passage.passage_ru, cache_dir, voice_map.get(state.voice_label, SETTINGS.edge_tts_voice), rate_map.get(state.speech_rate_label, "+0%"), timeout_seconds=SETTINGS.tts_timeout_seconds)
                 audio_note = " Requested training voice/speed loaded from the deterministic TTS cache."
             except Exception as tts_exc:
                 audio_note = f" Requested training voice/speed was unavailable; cached starter audio was used ({type(tts_exc).__name__})."

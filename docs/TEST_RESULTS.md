@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.2 Hugging Face dependency-resolution hotfix on 2026-07-23.
+Executed for the v1.2.3 Hugging Face Listening runtime hardening release on 2026-07-23.
 
 ## Automated unit/integration suite
 
 ```text
-68 passed
+73 passed
 ```
 
 Core coverage includes:
@@ -83,6 +83,21 @@ SPACE DEPENDENCY VALIDATION PASSED
 ```
 
 The execution sandbox had Pydantic 2.13.4 already installed and could not download Pydantic 2.12.5 from its restricted package index. Therefore, the functional test suite ran in the available runtime, while the release-pin compatibility was verified separately against Gradio's installed package metadata. The Hugging Face build log itself confirms that Pydantic 2.12.5 is the accepted upper bound.
+
+
+## Listening runtime regression
+
+The release was launched with SSR explicitly disabled and restricted audio serving paths. Runtime checks produced:
+
+```text
+Application page: HTTP 200
+Starter MP3: HTTP 200, audio/mpeg, Content-Length 29,073 bytes
+Starter MP3 byte range: HTTP 206, Content-Range bytes 0-99/29,073
+Listening callback: stateful Training session started and playback HTML returned a /gradio_api/file= URL
+Callback audio payload: no base64/data URI
+```
+
+The stateful callback test confirmed that the current passage play count advanced to 1 and the checkpoint/status response remained valid.
 
 ## Combined bank validation
 
