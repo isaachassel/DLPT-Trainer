@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.1 — Hugging Face build metadata hotfix
+
+- Quoted `python_version` and `sdk_version` in the README Space YAML metadata.
+- Changed the Space runtime to the explicit string `"3.11"`.
+- Fixed the YAML coercion that converted unquoted `3.10` into numeric `3.1`, causing Hugging Face to request the nonexistent `docker.io/library/python:3.1` image.
+- Added a regression test that parses the README front matter and verifies both version fields remain strings.
+- Re-ran the full automated suite, bank validation, and Gradio smoke test.
+
 ## Phase 0 — Stabilize
 
 - Preserved the submitted source in `backup/original_v3_3_source.zip`.

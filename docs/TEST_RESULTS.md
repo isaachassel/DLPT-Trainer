@@ -1,11 +1,11 @@
 # Test Results
 
-Executed in the v1.2 GenAI/API overhaul environment on 2026-07-23.
+Executed in the v1.2.1 Hugging Face metadata-hotfix environment on 2026-07-23.
 
 ## Automated unit/integration suite
 
 ```text
-63 passed
+65 passed
 ```
 
 Core coverage includes:
@@ -50,6 +50,19 @@ GenAI-specific coverage includes:
 - API secret exclusion from Settings serialization;
 - unavailable-provider and generation-limit fallback;
 - generated Listening audio validation and caching.
+
+## Hugging Face metadata regression
+
+The README front matter is parsed during testing. The release requires:
+
+```yaml
+sdk: gradio
+sdk_version: "6.5.1"
+python_version: "3.11"
+app_file: app.py
+```
+
+Both version fields are asserted to be YAML strings. This prevents `3.10` from being coerced to numeric `3.1` and sent to the container builder as `python:3.1`.
 
 ## Combined bank validation
 
