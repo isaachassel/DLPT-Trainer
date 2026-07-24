@@ -119,8 +119,12 @@ The item is rejected when the verifier:
 - finds insufficient evidence;
 - finds reasoning-level mismatch;
 - detects answer leakage;
-- supplies evidence not present in the source;
 - reports low confidence.
+
+The verifier's own `evidence_quote_ru` is advisory rather than a duplicate hard
+gate. Its exactness and traceability are recorded in validator scores. The
+operational `QuestionItem.evidence_ru` remains subject to the hard exact-source
+check before verification and again before persistence.
 
 Higher-risk ILR 2+/3 items may receive a second verifier pass.
 

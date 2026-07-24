@@ -35,7 +35,15 @@ from .prompts import (
     question_repair_prompt,
 )
 from .storage import atomic_write_text
-from .validation import answer_position_balance, content_hash, near_duplicate, normalize_text, validate_passage, validate_question
+from .validation import (
+    answer_position_balance,
+    content_hash,
+    evidence_traceability_score,
+    near_duplicate,
+    normalize_text,
+    validate_passage,
+    validate_question,
+)
 
 
 LOGGER = logging.getLogger("dlpt.genai")
@@ -1346,14 +1354,23 @@ def validate_with_blind_verifier(
         failures.append("answer_choice_leakage")
     if verification.confidence < 0.60:
         flags.append("low_verifier_confidence")
-    if verification.evidence_quote_ru and normalize_text(verification.evidence_quote_ru) not in normalize_text(passage.passage_ru):
-        failures.append("verifier_evidence_not_in_passage")
+    evidence_exact = bool(
+        verification.evidence_quote_ru
+        and normalize_text(verification.evidence_quote_ru) in normalize_text(passage.passage_ru)
+    )
+    evidence_traceability = evidence_traceability_score(
+        verification.evidence_quote_ru,
+        passage.passage_ru,
+        question.evidence_ru,
+    )
     return ValidationReport(
         status="accepted" if not failures and not flags else "rejected",
         deterministic_checks=deterministic.deterministic_checks,
         validator_scores={
             "blind_agreement": 1.0 if selected_key == question.correct_key else 0.0,
             "blind_confidence": verification.confidence,
+            "verifier_evidence_exact": 1.0 if evidence_exact else 0.0,
+            "verifier_evidence_traceability": evidence_traceability,
         },
         ambiguity_flags=flags,
         failure_reasons=sorted(set(failures)),
@@ -1451,11 +1468,15 @@ def validate_with_blind_verifier_batch(
             failures.append("answer_choice_leakage")
         if verification.confidence < 0.60:
             flags.append("low_verifier_confidence")
-        if (
+        evidence_exact = bool(
             verification.evidence_quote_ru
-            and normalize_text(verification.evidence_quote_ru) not in normalize_text(passage.passage_ru)
-        ):
-            failures.append("verifier_evidence_not_in_passage")
+            and normalize_text(verification.evidence_quote_ru) in normalize_text(passage.passage_ru)
+        )
+        evidence_traceability = evidence_traceability_score(
+            verification.evidence_quote_ru,
+            passage.passage_ru,
+            question.evidence_ru,
+        )
         reports.append(ValidationReport(
             status="accepted" if not failures and not flags else "rejected",
             deterministic_checks=deterministic.deterministic_checks,
@@ -1463,6 +1484,8 @@ def validate_with_blind_verifier_batch(
                 "blind_agreement": 1.0 if selected_key == question.correct_key else 0.0,
                 "blind_confidence": verification.confidence,
                 "batched_verification": 1.0,
+                "verifier_evidence_exact": 1.0 if evidence_exact else 0.0,
+                "verifier_evidence_traceability": evidence_traceability,
             },
             ambiguity_flags=sorted(set(flags)),
             failure_reasons=sorted(set(failures)),

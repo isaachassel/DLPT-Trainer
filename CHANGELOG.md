@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.2.8 — Verifier evidence-gate correction
+
+### Confirmed runtime failure
+
+- Fresh passage authoring, passage audit, question authoring, and blind answer selection all succeeded.
+- The generated bundle was rejected only because the independent verifier paraphrased or normalized its supporting Russian quote instead of reproducing an exact contiguous substring.
+- The application treated that advisory verifier quote as a second hard evidence gate, even though the operational question's own `evidence_ru` had already passed an exact-substring check against the passage.
+- A repair pass repeated the same brittle rule and could reject another otherwise valid bundle before falling back to the bank.
+
+### Validation correction
+
+- Kept the operational question evidence check strict: `QuestionItem.evidence_ru` must still be an exact, short passage substring.
+- Changed the verifier-supplied `evidence_quote_ru` from a hard acceptance gate to an advisory validation signal.
+- Added `verifier_evidence_exact` and `verifier_evidence_traceability` scores to every blind-verification report.
+- A verifier quote that is shortened, normalized, or paraphrased no longer discards a bundle when the verifier selected the same answer, reported sufficient evidence, and the operational evidence span is exact.
+- Disagreement, ambiguity, outside knowledge, insufficient evidence, reasoning mismatch, answer leakage, and low confidence remain rejection conditions.
+- Updated verifier prompts to request exact contiguous copying and to return `evidence_sufficient=false` when no exact support exists.
+- Bumped the prompt/pipeline contract to `genai-pipeline-v7`.
+
+### QA
+
+- Expanded the suite from 93 to 96 tests.
+- Added single-item and batched verifier regression coverage for paraphrased evidence.
+- Added a full generation-to-persistence regression proving that a supported bundle with a paraphrased verifier quote is accepted without a repair pass.
+- Added a safety regression proving that the operational question evidence still fails when it is not present in the Russian passage.
+- Re-ran the full test suite, starter-bank validation, Gradio smoke test, and local HTTP launch check.
+
 ## v1.2.7 — Hosted question-schema compatibility fix
 
 ### Confirmed root cause

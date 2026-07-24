@@ -80,7 +80,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
     forbidden = ["q1=a", "q2=b", "q3=c", "q4=d", '"correct_key": "a"', "correct answer letter"]
     assert all(pattern not in text for pattern in forbidden)
     assert "zero-based index" in text
-    assert PROMPT_VERSION == "genai-pipeline-v6"
+    assert PROMPT_VERSION == "genai-pipeline-v7"
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):
@@ -299,3 +299,115 @@ def test_settings_serialization_excludes_api_secrets():
     dumped = settings.model_dump()
     assert "hf_token" not in dumped
     assert "groq_api_key" not in dumped
+
+
+class ParaphrasingBatchVerifier(AuthoringProvider):
+    """Returns the correct blind answers but paraphrases its supporting quote."""
+
+    def __init__(self, correct_by_stem: dict[str, str]):
+        super().__init__()
+        self.correct_by_stem = correct_by_stem
+
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        self.usage.add(10, 10)
+        assert schema is BlindVerificationBatch
+        marker = prompt.split("<ITEMS_JSON>", 1)[1].split("</ITEMS_JSON>", 1)[0]
+        items = json.loads(marker.strip())
+        verifications = []
+        from core.generation import BlindVerificationBatchItem
+        for item in items:
+            correct_text = self.correct_by_stem[item["stem_en"]]
+            selected = item["choices"].index(correct_text)
+            verifications.append(BlindVerificationBatchItem(
+                question_index=item["question_index"],
+                selected_index=selected,
+                second_best_index=-1,
+                confidence=0.97,
+                multiple_plausible=False,
+                requires_outside_knowledge=False,
+                evidence_sufficient=True,
+                reasoning_match=True,
+                answer_leakage=False,
+                evidence_quote_ru="В сообщении говорится о вечерних занятиях для взрослых.",
+                explanation="The selected answer is supported, although the evidence was paraphrased.",
+            ))
+        return BlindVerificationBatch(verifications=verifications)
+
+
+def test_batched_verifier_paraphrase_does_not_discard_supported_questions(project_root):
+    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    passage = bank.get_passage("r001")
+    questions = bank.get_questions("r001")[:2]
+
+    correct_by_stem = {
+        question.stem_en: question.choices[question.correct_key]
+        for question in questions
+    }
+    reports = validate_with_blind_verifier_batch(
+        ParaphrasingBatchVerifier(correct_by_stem), passage, questions
+    )
+
+    assert len(reports) == 2
+    assert all(report.status == "accepted" for report in reports)
+    assert all(report.validator_scores["verifier_evidence_exact"] == 0.0 for report in reports)
+    assert all("verifier_evidence_not_in_passage" not in report.failure_reasons for report in reports)
+
+
+def test_operational_question_evidence_still_requires_exact_passage_support(project_root):
+    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    passage = bank.get_passage("r001")
+    question = bank.get_questions("r001")[0].model_copy(
+        update={"evidence_ru": "Этой цитаты в исходном тексте нет."}
+    )
+
+    from core.validation import validate_question
+
+    report = validate_question(question, passage)
+    assert report.status == "rejected"
+    assert "evidence_in_passage" in report.failure_reasons
+
+
+class FullPipelineParaphrasingVerifier(MockProvider):
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        result = super().generate_json(
+            system, prompt, schema, max_tokens=max_tokens, temperature=temperature
+        )
+        if schema is BlindVerificationBatch:
+            return result.model_copy(update={
+                "verifications": [
+                    item.model_copy(update={
+                        "evidence_quote_ru": "Источник сообщает о курсах, сроках и условиях участия."
+                    })
+                    for item in result.verifications
+                ]
+            })
+        return result
+
+
+def test_full_generation_accepts_supported_bundle_when_verifier_paraphrases_evidence(project_root, tmp_path):
+    generated_path = tmp_path / "generated.jsonl"
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path],
+        writable_path=generated_path,
+    ).load()
+    service = LiveGenerationService(
+        _settings(tmp_path),
+        bank,
+        project_root,
+        provider=RecordingMock(),
+        verifier_provider=FullPipelineParaphrasingVerifier(),
+    )
+
+    result = service.generate_and_store(
+        skill="reading",
+        level="2",
+        mode="training",
+        topics=["education"],
+        competencies=["main idea", "prominent detail"],
+        maximum_questions=2,
+    )
+
+    assert result.passage.id in bank.passages
+    assert result.repair_count == 0
+    assert all(report.status == "accepted" for report in result.question_reports)
+    assert all(report.validator_scores["verifier_evidence_exact"] == 0.0 for report in result.question_reports)

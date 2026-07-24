@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.7 hosted question-schema compatibility release on 2026-07-24.
+Executed for the v1.2.8 verifier evidence-gate correction release on 2026-07-24.
 
 ## Automated unit/integration suite
 
 ```text
-93 passed
+96 passed
 ```
 
 Core coverage includes:
@@ -78,6 +78,14 @@ Version 1.2.7 retains all prior regression coverage and additionally verifies:
 - normal multi-value CheckboxGroup preservation;
 - invalid multi-select allow-list rejection;
 - recoverable session-start behavior for malformed direct API selections.
+
+Version 1.2.8 additionally verifies:
+
+- paraphrased blind-verifier evidence is recorded as advisory rather than rejecting an otherwise supported item;
+- batched verification preserves accepted status when the verifier quote is non-exact;
+- a full generated Reading bundle with paraphrased verifier evidence is accepted, atomically stored, and indexed without repair;
+- operational `QuestionItem.evidence_ru` still fails closed when it is not an exact passage substring;
+- verifier evidence exactness and traceability scores are persisted in validation reports.
 
 ## Hugging Face metadata and dependency validation
 

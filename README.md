@@ -413,6 +413,12 @@ Version 1.2.5 fixes a Gradio CheckboxGroup payload edge case. A single selected 
 
 Use the displayed recovery code under **Recover a Checkpoint**. A corrupted checkpoint is rejected safely.
 
+## v1.2.8 verifier evidence correction
+
+A fresh bundle can now remain operational when the blind verifier selects the same answer and confirms sufficient evidence but paraphrases its Russian support quote. The question author's `evidence_ru` remains a strict exact-substring requirement; that is the evidence shown in review and stored in the bank. The verifier's separate quote is now recorded as an advisory exactness/traceability score rather than acting as a duplicate brittle hard gate.
+
+This specifically fixes the runtime fallback reason `q1:verifier_evidence_not_in_passage`. It does not weaken answer agreement, ambiguity, outside-knowledge, insufficient-evidence, reasoning-level, answer-leakage, or confidence checks. See `docs/VERIFIER_EVIDENCE_RUNTIME_FIX.md`.
+
 ## v1.2.7 hosted question-schema correction
 
 The container log can show successful passage authoring and auditing followed by repeated `CandidateQuestionSet: ValidationError` failures. That was a local schema-contract bug, not an invalid API key and not a provider outage. The older provider schema advertised `question_type` and `target_ilr` as arbitrary strings while Python later required exact values, and it unnecessarily required the model to reproduce internal difficulty metadata.

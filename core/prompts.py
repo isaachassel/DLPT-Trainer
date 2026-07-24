@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import Iterable
 
-PROMPT_VERSION = "genai-pipeline-v6"
+PROMPT_VERSION = "genai-pipeline-v7"
 
 
 @dataclass(frozen=True)
@@ -299,7 +299,9 @@ Question type: {question_type}
 
 Select the single best zero-based index from the source alone.
 Identify whether a second option is plausibly defensible, whether outside knowledge is required, whether evidence is sufficient, whether the reasoning demand matches the target, and whether any choice leaks the answer through wording/length/specificity.
-Quote only a short Russian evidence span. Keep the explanation concise.
+Copy a short exact contiguous Russian evidence span. Do not paraphrase it. If no
+exact span supports the selected choice, return an empty evidence_quote_ru and
+set evidence_sufficient=false. Keep the explanation concise.
 """
 
 def blind_verification_batch_prompt(*, passage_ru: str, items: list[dict]) -> str:
@@ -323,7 +325,8 @@ For each item:
 - select the single best zero-based choice index;
 - identify whether a second choice is plausibly defensible;
 - reject outside knowledge, insufficient evidence, reasoning-level mismatch, or answer leakage;
-- quote only a short exact Russian evidence span;
+- copy only a short exact contiguous Russian evidence span; do not paraphrase it;
+- if no exact span supports the answer, return an empty evidence_quote_ru and set evidence_sufficient=false;
 - keep the explanation concise.
 Do not infer or reconstruct any hidden proposed answer.
 """

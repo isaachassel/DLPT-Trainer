@@ -24,6 +24,50 @@ def normalize_text(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+
+
+def evidence_traceability_score(quote: str, passage: str, anchor: str = "") -> float:
+    """Return a soft 0..1 traceability score for verifier-supplied evidence.
+
+    The operational question evidence remains subject to the hard exact-substring
+    check in :func:`validate_question`. A blind verifier's quote is advisory: some
+    hosted models paraphrase, shorten, change ``ё``/``е``, or add omitted-word
+    ellipses even when they select the supported answer. That behavior must not
+    discard an otherwise validated item.
+    """
+    quote_norm = normalize_text(quote)
+    passage_norm = normalize_text(passage)
+    anchor_norm = normalize_text(anchor)
+    if not quote_norm or not passage_norm:
+        return 0.0
+    if quote_norm in passage_norm:
+        return 1.0
+
+    quote_tokens = [token for token in quote_norm.split() if len(token) >= 3]
+    passage_tokens = set(passage_norm.split())
+    anchor_tokens = set(anchor_norm.split())
+    if not quote_tokens:
+        return 0.0
+
+    token_precision = sum(token in passage_tokens for token in quote_tokens) / len(quote_tokens)
+    anchor_overlap = (
+        sum(token in anchor_tokens for token in quote_tokens) / len(quote_tokens)
+        if anchor_tokens else 0.0
+    )
+
+    # Compare against similarly sized passage windows so short omissions and
+    # minor inflection differences receive partial credit without becoming a
+    # semantic acceptance gate.
+    passage_list = passage_norm.split()
+    width = max(1, len(quote_tokens))
+    best_fuzzy = 0.0
+    for window_width in range(max(1, width - 2), min(len(passage_list), width + 3) + 1):
+        for start in range(0, max(1, len(passage_list) - window_width + 1)):
+            window = " ".join(passage_list[start:start + window_width])
+            best_fuzzy = max(best_fuzzy, SequenceMatcher(None, quote_norm, window).ratio())
+
+    return max(0.0, min(1.0, max(token_precision, anchor_overlap, best_fuzzy)))
+
 def content_hash(text: str) -> str:
     return hashlib.sha256(normalize_text(text).encode("utf-8")).hexdigest()
 
