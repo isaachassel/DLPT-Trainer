@@ -1,5 +1,36 @@
 # Changelog
 
+## v1.2.7 — Hosted question-schema compatibility fix
+
+### Confirmed root cause
+
+- Hosted passage authoring and passage audit were succeeding with HTTP 200 responses.
+- Both Hugging Face and Groq then returned question JSON, but local Pydantic validation rejected `CandidateQuestionSet` before deterministic item validation could run.
+- The previous JSON Schema exposed `question_type` and `target_ilr` as unconstrained strings even though custom Python validators required exact values. A provider could therefore satisfy the advertised schema with values such as `detail`, `central idea`, or `ILR 2`, then fail locally.
+- The provider was also being asked to reproduce internal `target_ilr` and `provisional_difficulty` metadata that the application can derive more reliably in Python.
+- Retrying the same incompatible contract through strict, best-effort, JSON-object, and plain-JSON modes could not fix that mismatch.
+
+### Provider contract and parser
+
+- Replaced the unconstrained question-type field with an explicit JSON-Schema enum containing the ten supported competencies.
+- Reduced the provider-facing question object to six content fields only: `stem_en`, `choices`, `proposed_correct_index`, `rationale_en`, `evidence_ru`, and `question_type`.
+- Removed provider responsibility for internal ILR and difficulty metadata; the requested session level and provisional difficulty are now assigned deterministically in Python.
+- Added normalization for common hosted-model variants, including `items`/`question_set` envelopes, `options` dictionaries, answer letters, alternate field names, and safe question-type synonyms.
+- Extra provider metadata is discarded before strict internal validation instead of causing the complete bundle to fail.
+- Short-but-structured stems and rationales now reach deterministic quality validation and targeted repair rather than consuming all provider-output modes at the parsing layer.
+- Validation failures now report exact field locations and messages without logging the generated passage, choices, keys, or secrets.
+- Lowered question-authoring and question-repair temperatures for more stable structured output.
+- Bumped the prompt contract to `genai-pipeline-v6` and explicitly documents the exact top-level and per-question shape.
+
+### QA
+
+- Expanded the suite from 88 to 93 tests.
+- Added regression tests proving that the provider JSON Schema contains the required question-type enum and excludes internal difficulty/ILR fields.
+- Added realistic hosted-payload normalization tests for alternate envelopes, choices dictionaries, answer letters, field aliases, extra metadata, and question-type synonyms.
+- Added a first-attempt provider test showing a previously rejected question payload is accepted without exhausting eight output modes.
+- Added a full generation-and-persistence integration test showing a normalized hosted question bundle is validated, stored, indexed, and assigned the requested ILR in Python.
+- Re-ran the starter-bank validator, Space dependency validator, Gradio smoke test, full automated suite, and HTTP launch check.
+
 ## v1.2.6 — Hosted GenAI runtime reliability fix
 
 ### Root cause

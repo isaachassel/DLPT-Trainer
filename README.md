@@ -413,6 +413,16 @@ Version 1.2.5 fixes a Gradio CheckboxGroup payload edge case. A single selected 
 
 Use the displayed recovery code under **Recover a Checkpoint**. A corrupted checkpoint is rejected safely.
 
+## v1.2.7 hosted question-schema correction
+
+The container log can show successful passage authoring and auditing followed by repeated `CandidateQuestionSet: ValidationError` failures. That was a local schema-contract bug, not an invalid API key and not a provider outage. The older provider schema advertised `question_type` and `target_ilr` as arbitrary strings while Python later required exact values, and it unnecessarily required the model to reproduce internal difficulty metadata.
+
+Version 1.2.7 uses a smaller provider-facing question contract with an explicit question-type enum. The provider returns only the English stem, four English choices, zero-based proposed answer index, English rationale, short Russian evidence, and one supported question type. Python assigns the requested ILR, derives provisional difficulty, shuffles choices, remaps the answer key, validates the bundle, and saves accepted content to the reusable bank.
+
+The parser also accepts safe common variants such as `items` instead of `questions`, A/B/C/D choice dictionaries, `correct_answer: "A"`, `detail` instead of `prominent detail`, and extra provider metadata. It does not silently accept unsupported or incomplete questions: those proceed to deterministic validation and targeted repair, or are quarantined.
+
+When a provider payload still fails, the error now identifies exact locations such as `questions.0.choices` rather than reporting only the generic word `ValidationError`. See `docs/QUESTION_SCHEMA_RUNTIME_FIX.md`.
+
 ## v1.2.6 GenAI runtime correction
 
 This release fixes the production Fresh-AI path for both Reading and Listening. The earlier pipeline was thoroughly tested with deterministic providers but could silently fall back in a real Space after spending its stage-attempt budget on one provider's structured-output modes and then making several sequential verification calls. Version 1.2.6 uses fair cross-provider mode ordering, controlled whole-document JSON fallback, batched blind verification, larger verifier budgets, tolerant audit-flag handling, visible generated-versus-fallback status, and sanitized stage diagnostics. The bank-only path remains available and every accepted fresh bundle is still validated, atomically committed, indexed immediately, and eligible for fallback.

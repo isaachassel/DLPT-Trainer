@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from .audio import audio_duration_seconds, generate_cached_tts, validate_audio_file
 from .config import Settings
@@ -72,6 +72,65 @@ def _redact_payload(value: Any, settings: Settings | None = None) -> Any:
     return value
 
 
+ILRLiteral = Literal["0", "0+", "1", "1+", "2", "2+", "3"]
+QuestionTypeLiteral = Literal[
+    "main idea",
+    "prominent detail",
+    "inference",
+    "speaker/writer intent",
+    "tone or attitude",
+    "reference",
+    "sequence",
+    "cause and effect",
+    "relationship of ideas",
+    "meaning from context",
+]
+
+
+QUESTION_TYPE_ALIASES = {
+    "main idea": "main idea",
+    "main_idea": "main idea",
+    "central idea": "main idea",
+    "central message": "main idea",
+    "gist": "main idea",
+    "detail": "prominent detail",
+    "specific detail": "prominent detail",
+    "prominent detail": "prominent detail",
+    "prominent_detail": "prominent detail",
+    "key detail": "prominent detail",
+    "inference": "inference",
+    "inferencing": "inference",
+    "implied meaning": "inference",
+    "intent": "speaker/writer intent",
+    "author intent": "speaker/writer intent",
+    "writer intent": "speaker/writer intent",
+    "speaker intent": "speaker/writer intent",
+    "speaker/writer intent": "speaker/writer intent",
+    "speaker or writer intent": "speaker/writer intent",
+    "tone": "tone or attitude",
+    "attitude": "tone or attitude",
+    "tone/attitude": "tone or attitude",
+    "tone or attitude": "tone or attitude",
+    "reference": "reference",
+    "referent": "reference",
+    "pronoun reference": "reference",
+    "sequence": "sequence",
+    "chronology": "sequence",
+    "order of events": "sequence",
+    "cause and effect": "cause and effect",
+    "cause/effect": "cause and effect",
+    "causal relationship": "cause and effect",
+    "relationship of ideas": "relationship of ideas",
+    "relationship": "relationship of ideas",
+    "idea relationship": "relationship of ideas",
+    "organization of ideas": "relationship of ideas",
+    "meaning from context": "meaning from context",
+    "contextual meaning": "meaning from context",
+    "vocabulary in context": "meaning from context",
+    "word meaning in context": "meaning from context",
+}
+
+
 class CandidateModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
 
@@ -82,7 +141,7 @@ class CandidatePassageDraft(CandidateModel):
     genre: str = Field(min_length=2, max_length=80)
     topic: str = Field(min_length=2, max_length=80)
     subtopic: str = Field(min_length=2, max_length=120)
-    target_ilr: str
+    target_ilr: ILRLiteral
     register_name: str = Field(alias="register", serialization_alias="register", min_length=2, max_length=80)
     text_mode: str = Field(min_length=2, max_length=80)
     discourse_features: list[str] = Field(min_length=1, max_length=12)
@@ -101,34 +160,153 @@ class CandidatePassageDraft(CandidateModel):
 CandidatePassage = CandidatePassageDraft
 
 
+def _canonical_question_type(value: Any) -> str:
+    text = normalize_text(str(value or "")).replace("_", " ").replace("-", " ")
+    text = re.sub(r"\s+", " ", text).strip()
+    if text in QUESTION_TYPE_ALIASES:
+        return QUESTION_TYPE_ALIASES[text]
+    # Conservative keyword recovery for otherwise well-formed provider output.
+    if "main" in text and ("idea" in text or "point" in text):
+        return "main idea"
+    if "detail" in text:
+        return "prominent detail"
+    if "infer" in text or "impli" in text:
+        return "inference"
+    if "intent" in text or "purpose" in text:
+        return "speaker/writer intent"
+    if "tone" in text or "attitude" in text:
+        return "tone or attitude"
+    if "refer" in text or "pronoun" in text:
+        return "reference"
+    if "sequence" in text or "chronolog" in text or "order" in text:
+        return "sequence"
+    if "cause" in text or "effect" in text or "result" in text:
+        return "cause and effect"
+    if "relationship" in text or "organization" in text or "structure" in text:
+        return "relationship of ideas"
+    if "context" in text or "vocab" in text or "word meaning" in text:
+        return "meaning from context"
+    return text
+
+
+def _normalize_choices(value: Any) -> list[str]:
+    if isinstance(value, dict):
+        ordered: list[str] = []
+        for key in ("A", "B", "C", "D", "a", "b", "c", "d", 0, 1, 2, 3, "0", "1", "2", "3"):
+            if key in value and str(value[key]).strip():
+                ordered.append(str(value[key]).strip())
+        if len(ordered) == 4:
+            return ordered
+        return [str(item).strip() for item in value.values() if str(item).strip()]
+    if isinstance(value, (list, tuple)):
+        normalized: list[str] = []
+        for item in value:
+            if isinstance(item, dict):
+                text = item.get("text") or item.get("choice") or item.get("content") or item.get("value")
+                if text is None and len(item) == 1:
+                    text = next(iter(item.values()))
+                normalized.append(str(text or "").strip())
+            else:
+                normalized.append(str(item).strip())
+        return normalized
+    return []
+
+
+def _normalize_correct_index(value: Any, choices: list[str]) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value if 0 <= value <= 3 else value - 1 if 1 <= value <= 4 else value
+    if isinstance(value, float) and value.is_integer():
+        return _normalize_correct_index(int(value), choices)
+    text = str(value or "").strip()
+    upper = text.upper().replace("OPTION", "").replace("CHOICE", "").strip(" :.-")
+    if upper in LETTERS:
+        return LETTERS.index(upper)
+    if re.fullmatch(r"[0-4]", upper):
+        number = int(upper)
+        return number if 0 <= number <= 3 else number - 1
+    normalized_text = normalize_text(text)
+    for index, choice in enumerate(choices):
+        if normalized_text and normalized_text == normalize_text(choice):
+            return index
+    return -1
+
+
 class CandidateQuestion(CandidateModel):
-    stem_en: str = Field(min_length=8, max_length=500)
+    # Provider parsing only enforces shape and non-empty values. Quality limits
+    # are enforced by deterministic validation, where failures can trigger one
+    # targeted repair instead of eight blind provider retries.
+    stem_en: str = Field(min_length=1, max_length=500)
     choices: list[str] = Field(min_length=4, max_length=4)
     proposed_correct_index: int = Field(ge=0, le=3)
-    rationale_en: str = Field(min_length=12, max_length=1200)
+    rationale_en: str = Field(min_length=1, max_length=1200)
     evidence_ru: str = Field(min_length=1, max_length=500)
-    question_type: str
-    target_ilr: str
-    provisional_difficulty: float = Field(ge=-3.5, le=3.5)
+    question_type: QuestionTypeLiteral
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_provider_payload(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        raw = dict(value)
+        aliases = {
+            "stem_en": ("stem_en", "stem", "question", "question_en", "prompt"),
+            "choices": ("choices", "options", "answer_choices", "answers", "choices_en"),
+            "proposed_correct_index": (
+                "proposed_correct_index", "correct_index", "correct_answer_index", "answer_index",
+                "correct_answer", "correct_choice", "answer",
+            ),
+            "rationale_en": ("rationale_en", "rationale", "explanation", "explanation_en", "reason"),
+            "evidence_ru": ("evidence_ru", "evidence", "evidence_quote_ru", "quote_ru", "supporting_evidence"),
+            "question_type": ("question_type", "type", "competency", "skill", "item_type"),
+        }
+        cleaned: dict[str, Any] = {}
+        for canonical, names in aliases.items():
+            for name in names:
+                if name in raw and raw[name] is not None:
+                    cleaned[canonical] = raw[name]
+                    break
+        choices = _normalize_choices(cleaned.get("choices"))
+        cleaned["choices"] = choices
+        cleaned["proposed_correct_index"] = _normalize_correct_index(
+            cleaned.get("proposed_correct_index"), choices
+        )
+        cleaned["question_type"] = _canonical_question_type(cleaned.get("question_type"))
+        return cleaned
 
     @field_validator("question_type")
     @classmethod
     def valid_question_type(cls, value: str) -> str:
-        value = value.strip().lower()
+        value = _canonical_question_type(value)
         if value not in QUESTION_TYPES:
             raise ValueError(f"Unsupported question_type: {value}")
         return value
 
-    @field_validator("target_ilr")
-    @classmethod
-    def valid_ilr(cls, value: str) -> str:
-        if value not in ILR_LEVELS:
-            raise ValueError(f"target_ilr must be one of {ILR_LEVELS}")
-        return value
-
-
 class CandidateQuestionSet(CandidateModel):
     questions: list[CandidateQuestion] = Field(min_length=1, max_length=5)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_provider_envelope(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return {"questions": value}
+        if not isinstance(value, dict):
+            return value
+        raw = dict(value)
+        questions = raw.get("questions")
+        if questions is None:
+            for key in ("items", "question_set", "questions_en", "data", "results"):
+                if key in raw:
+                    questions = raw[key]
+                    break
+        if isinstance(questions, dict):
+            nested = questions.get("questions") or questions.get("items")
+            if nested is not None:
+                questions = nested
+            else:
+                questions = list(questions.values())
+        return {"questions": questions}
 
 
 class PassageAudit(CandidateModel):
@@ -478,27 +656,45 @@ class HostedProvider(AuthoringProvider):
         return str(content or "")
 
     @staticmethod
-    def _parse_structured_text(text: str, schema: type[BaseModel]) -> BaseModel:
+    def _validation_summary(exc: Exception, limit: int = 6) -> str:
+        if not isinstance(exc, ValidationError):
+            return type(exc).__name__
+        parts: list[str] = []
+        for error in exc.errors(include_url=False, include_input=False)[:limit]:
+            location = ".".join(str(part) for part in error.get("loc", ())) or "root"
+            message = str(error.get("msg", "validation failed"))
+            parts.append(f"{location}: {message}")
+        remaining = max(0, len(exc.errors()) - len(parts))
+        if remaining:
+            parts.append(f"+{remaining} more")
+        return "; ".join(parts)
+
+    @classmethod
+    def _parse_structured_text(cls, text: str, schema: type[BaseModel]) -> BaseModel:
         cleaned = (text or "").strip().lstrip("\ufeff")
         if not cleaned:
             raise ProviderError("Provider returned an empty structured response.")
+        fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", cleaned, flags=re.I | re.S)
+        if fenced:
+            cleaned = fenced.group(1).strip()
         try:
-            return schema.model_validate_json(cleaned)
-        except Exception as direct_error:
-            fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", cleaned, flags=re.I | re.S)
-            if fenced:
-                candidate = fenced.group(1).strip()
-                try:
-                    return schema.model_validate_json(candidate)
-                except Exception:
-                    pass
-            try:
-                payload = json.loads(cleaned)
-                return schema.model_validate(payload)
-            except Exception as exc:
-                raise ProviderError(
-                    f"Provider response did not match {schema.__name__}: {type(direct_error).__name__}."
-                ) from exc
+            payload = json.loads(cleaned)
+        except Exception as exc:
+            raise ProviderError(
+                f"Provider returned invalid JSON for {schema.__name__}: {type(exc).__name__}."
+            ) from exc
+        try:
+            # model_validate, rather than model_validate_json, deliberately runs
+            # provider-compatibility normalizers before strict field validation.
+            return schema.model_validate(payload)
+        except ValidationError as exc:
+            shape = type(payload).__name__
+            if isinstance(payload, dict):
+                shape += f" keys={sorted(str(key) for key in payload)[:10]}"
+            raise ProviderError(
+                f"Provider response did not match {schema.__name__}: "
+                f"{cls._validation_summary(exc)} (payload {shape})."
+            ) from exc
 
     def _call_hf(
         self,
@@ -607,7 +803,7 @@ class HostedProvider(AuthoringProvider):
             "json_schema": {
                 "name": re.sub(r"[^A-Za-z0-9_-]", "_", schema.__name__)[:64],
                 "description": f"Structured output for {schema.__name__}",
-                "schema": schema.model_json_schema(),
+                "schema": schema.model_json_schema(by_alias=True),
                 "strict": mode == "strict",
             },
         }
@@ -617,7 +813,7 @@ class HostedProvider(AuthoringProvider):
         return (
             "\n\nReturn exactly one JSON document matching this JSON Schema. "
             "Do not use markdown fences or add prose:\n"
-            + json.dumps(schema.model_json_schema(), ensure_ascii=False)
+            + json.dumps(schema.model_json_schema(by_alias=True), ensure_ascii=False)
         )
 
     @staticmethod
@@ -1026,7 +1222,9 @@ def materialize_candidate(
             evidence_ru=raw.evidence_ru.strip(),
             question_type=q_type,
             target_ilr=level,
-            provisional_difficulty=_provisional_question_difficulty(level, q_type, raw.provisional_difficulty),
+            # The LLM does not assign operational item difficulty. Difficulty is
+            # derived deterministically from the requested ILR and question type.
+            provisional_difficulty=_provisional_question_difficulty(level, q_type, None),
             generation=generation_metadata,
         )
         questions.append(shuffle_question(question) if shuffle else question)
@@ -1507,7 +1705,7 @@ class LiveGenerationService:
                 self.settings.question_max_tokens, stage="questions", level=level, skill=skill,
                 question_count=desired_count,
             ),
-            temperature=self.settings.authoring_temperature,
+            temperature=min(self.settings.authoring_temperature, 0.15),
         ))
         trace.add("question_generation", "received", count=len(question_set.questions), desired_count=desired_count)
 
@@ -1607,7 +1805,7 @@ class LiveGenerationService:
                     self.settings.repair_max_tokens, stage="repair", level=level, skill=skill,
                     question_count=desired_count,
                 ),
-                temperature=max(0.05, self.settings.authoring_temperature - 0.05),
+                temperature=min(0.10, max(0.0, self.settings.authoring_temperature - 0.10)),
             ))
             trace.repair_count += 1
         raise GenerationValidationError("Question generation ended unexpectedly: " + ", ".join(last_issues))

@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.6 hosted-GenAI runtime-fix release on 2026-07-24.
+Executed for the v1.2.7 hosted question-schema compatibility release on 2026-07-24.
 
 ## Automated unit/integration suite
 
 ```text
-88 passed
+93 passed
 ```
 
 Core coverage includes:
@@ -54,8 +54,16 @@ GenAI-specific coverage includes:
 - rejection of JSON-looking brace fragments embedded in prose;
 - batched blind verification with proposed keys omitted;
 - useful and secret-redacted hosted-provider permission errors;
+- explicit provider JSON-Schema enums for every supported question type;
+- removal of internal target-level and difficulty fields from the provider-facing question contract;
+- normalization of alternate question envelopes and field names;
+- normalization of A/B/C/D choice dictionaries and proposed answer letters;
+- safe normalization of common question-type synonyms;
+- exact field-location diagnostics for rejected hosted payloads;
+- first-attempt acceptance of a realistic previously incompatible hosted question response;
+- full normalized hosted-question generation, validation, persistence, and immediate bank indexing;
 
-Version 1.2.6 retains all prior regression coverage and additionally verifies:
+Version 1.2.7 retains all prior regression coverage and additionally verifies:
 
 - accessible activity spinner and immediate busy-button locking;
 - chained Begin Session, Play Audio, and Submit Passage feedback events;

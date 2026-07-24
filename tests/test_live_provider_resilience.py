@@ -134,3 +134,186 @@ def test_provider_error_message_explains_permission_problem(monkeypatch):
         provider.generate_json(AUTHORING_SYSTEM, "Target ILR: 1", CandidatePassageDraft)
     assert "Inference Providers permission" in str(caught.value)
     assert "hf-test" not in str(caught.value)
+
+
+def test_question_schema_enforces_exact_supported_types_and_omits_internal_metadata():
+    from core.generation import CandidateQuestionSet
+
+    schema = CandidateQuestionSet.model_json_schema()
+    question_schema = schema["$defs"]["CandidateQuestion"]
+    properties = question_schema["properties"]
+    assert set(properties) == {
+        "stem_en",
+        "choices",
+        "proposed_correct_index",
+        "rationale_en",
+        "evidence_ru",
+        "question_type",
+    }
+    assert set(properties["question_type"]["enum"]) == {
+        "main idea",
+        "prominent detail",
+        "inference",
+        "speaker/writer intent",
+        "tone or attitude",
+        "reference",
+        "sequence",
+        "cause and effect",
+        "relationship of ideas",
+        "meaning from context",
+    }
+    assert "target_ilr" not in properties
+    assert "provisional_difficulty" not in properties
+
+
+def test_question_payload_normalizes_common_hosted_model_variants():
+    from core.generation import CandidateQuestionSet
+
+    payload = {
+        "items": [
+            {
+                "question": "What is the main purpose of the announcement?",
+                "options": {
+                    "A": "To announce a new evening course",
+                    "B": "To cancel all weekend classes",
+                    "C": "To advertise a private apartment",
+                    "D": "To report a transportation delay",
+                },
+                "correct_answer": "A",
+                "explanation": "The announcement says that evening courses have opened.",
+                "evidence_quote_ru": "открылись вечерние курсы",
+                "type": "central idea",
+                "target_ilr": "ILR 2",
+                "difficulty": 0.8,
+                "unused_model_note": "must be ignored",
+            }
+        ],
+        "provider_note": "also ignored",
+    }
+
+    parsed = CandidateQuestionSet.model_validate(payload)
+    question = parsed.questions[0]
+    assert question.stem_en.startswith("What is the main purpose")
+    assert question.choices[0].startswith("To announce")
+    assert question.proposed_correct_index == 0
+    assert question.question_type == "main idea"
+    assert not hasattr(question, "target_ilr")
+    assert not hasattr(question, "provisional_difficulty")
+
+
+def test_hosted_provider_accepts_normalized_question_payload_on_first_attempt(monkeypatch):
+    from core.generation import CandidateQuestionSet
+
+    settings = Settings(
+        generation_provider="huggingface",
+        hf_token="hf-test",
+        provider_max_retries=0,
+        max_provider_attempts_per_stage=8,
+        structured_output_mode="auto",
+    )
+    provider = HostedProvider(settings, "author")
+    calls = []
+
+    def fake_hf(*args, **kwargs):
+        calls.append(kwargs["response_format"]["type"])
+        return json.dumps({
+            "questions": [{
+                "stem": "What does the center announce?",
+                "answer_choices": [
+                    "It has opened evening courses.",
+                    "It has closed the building.",
+                    "It has canceled registration.",
+                    "It has moved to another city.",
+                ],
+                "correct_answer": "A",
+                "rationale": "The Russian source directly announces that evening courses have opened.",
+                "evidence": "открылись вечерние курсы",
+                "competency": "detail",
+                "level": "2",
+                "difficulty": 0.5,
+            }]
+        }, ensure_ascii=False)
+
+    monkeypatch.setattr(provider, "_call_hf", fake_hf)
+    result = provider.generate_json(AUTHORING_SYSTEM, "Create questions", CandidateQuestionSet)
+    assert result.questions[0].question_type == "prominent detail"
+    assert result.questions[0].proposed_correct_index == 0
+    assert calls == ["json_schema"]
+
+
+def test_question_validation_error_includes_field_location():
+    from core.generation import CandidateQuestionSet
+
+    bad = json.dumps({"questions": [{"stem_en": "Question?"}]})
+    with pytest.raises(Exception) as caught:
+        HostedProvider._parse_structured_text(bad, CandidateQuestionSet)
+    message = str(caught.value)
+    assert "questions.0.choices" in message
+    assert "questions.0.proposed_correct_index" in message
+
+
+def test_full_live_service_accepts_realistic_question_variants_and_persists(project_root, tmp_path, monkeypatch):
+    from core.generation import CandidateQuestionSet, LiveGenerationService
+
+    generated_path = tmp_path / "generated.jsonl"
+    settings = Settings(
+        generation_provider="huggingface",
+        hf_token="hf-test",
+        provider_max_retries=0,
+        max_provider_attempts_per_stage=2,
+        structured_output_mode="auto",
+        generation_audit_mode="always",
+        generation_repair_attempts=1,
+        generated_item_bank_path=generated_path,
+        audio_cache_dir=tmp_path / "audio",
+        quarantine_dir=tmp_path / "quarantine",
+        session_dir=tmp_path / "sessions",
+        history_dir=tmp_path / "history",
+    )
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path
+    ).load()
+    author = HostedProvider(settings, "author")
+    fixture = MockProvider()
+    calls = []
+
+    def fake_hf(system, prompt, **kwargs):
+        calls.append(prompt)
+        if "Create one original Russian" in prompt:
+            return fixture.generate_json(system, prompt, CandidatePassageDraft).model_dump_json(by_alias=True)
+        if "Create exactly" in prompt:
+            base = fixture.generate_json(system, prompt, CandidateQuestionSet)
+            payload = {"items": []}
+            for question in base.questions:
+                payload["items"].append({
+                    "question": question.stem_en,
+                    "options": {letter: text for letter, text in zip("ABCD", question.choices)},
+                    "correct_answer": "ABCD"[question.proposed_correct_index],
+                    "explanation": question.rationale_en,
+                    "evidence_quote_ru": question.evidence_ru,
+                    "type": "detail" if question.question_type == "prominent detail" else question.question_type,
+                    "target_ilr": "ILR 2",
+                    "difficulty": 0.7,
+                    "provider_extra": "ignored",
+                })
+            return json.dumps(payload, ensure_ascii=False)
+        raise AssertionError("Unexpected author prompt")
+
+    monkeypatch.setattr(author, "_call_hf", fake_hf)
+    service = LiveGenerationService(
+        settings, bank, project_root, provider=author, verifier_provider=MockProvider()
+    )
+    result = service.generate_and_store(
+        skill="reading",
+        level="2",
+        mode="training",
+        topics=["education"],
+        competencies=["main idea", "prominent detail"],
+        maximum_questions=2,
+    )
+
+    assert result.passage.id in bank.passages
+    assert generated_path.exists()
+    assert len(bank.get_questions(result.passage.id)) == 2
+    assert all(question.target_ilr == "2" for question in bank.get_questions(result.passage.id))
+    assert any("Create exactly" in prompt for prompt in calls)

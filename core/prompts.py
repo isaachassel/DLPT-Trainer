@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import Iterable
 
-PROMPT_VERSION = "genai-pipeline-v5"
+PROMPT_VERSION = "genai-pipeline-v6"
 
 
 @dataclass(frozen=True)
@@ -230,6 +230,10 @@ Passage JSON:
 {passage_json}
 
 QUESTION RULES
+- Return one top-level object with exactly one key: questions.
+- Each question object contains exactly: stem_en, choices, proposed_correct_index, rationale_en, evidence_ru, and question_type.
+- question_type must be exactly one of: main idea; prominent detail; inference; speaker/writer intent; tone or attitude; reference; sequence; cause and effect; relationship of ideas; meaning from context.
+- Do not return target_ilr, difficulty, IDs, answer letters, validation fields, or any other metadata. The application assigns those in Python.
 - Each stem and all four choices are in English.
 - proposed_correct_index is zero-based (0-3). Never use answer letters.
 - Every correct answer must be supported by the passage alone.
@@ -268,6 +272,9 @@ Current question-set JSON:
 {questions_json}
 
 Return a complete replacement question set. Use zero-based proposed_correct_index only; never prescribe answer letters.
+Return one top-level object with exactly one key: questions. Each question contains exactly stem_en, choices, proposed_correct_index, rationale_en, evidence_ru, and question_type.
+question_type must use one exact allowed value: main idea; prominent detail; inference; speaker/writer intent; tone or attitude; reference; sequence; cause and effect; relationship of ideas; meaning from context.
+Do not return target_ilr, difficulty, IDs, answer letters, or validation metadata; the application assigns those in Python.
 Every evidence_ru value must be an exact short contiguous quotation from the Russian passage.
 Remove ambiguity, outside knowledge, answer leakage, duplicate competencies, weak distractors, level mismatch, and unsupported rationales.
 """
