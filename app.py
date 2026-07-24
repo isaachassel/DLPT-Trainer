@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+import logging
+import os
 
 from core.config import get_settings
 from ui.layout import CUSTOM_CSS, build_app
+
+logging.basicConfig(
+    level=getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 ROOT = Path(__file__).resolve().parent
 settings = get_settings()

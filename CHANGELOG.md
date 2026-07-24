@@ -1,5 +1,37 @@
 # Changelog
 
+## v1.2.6 — Hosted GenAI runtime reliability fix
+
+### Root cause
+
+- Fresh-AI failures were intentionally recoverable, but the UI could make a silent bank fallback look like successful generation.
+- Structured-output attempts were provider-major rather than mode-major, so one provider could consume most of a stage budget before the configured fallback provider received a comparable attempt.
+- Blind verification made one hosted request per question, multiplying latency, quota consumption, and failure probability for Reading and Listening bundles.
+- Deterministic provider tests did not reproduce all hosted-provider schema and entitlement failure modes.
+
+### Provider and prompt pipeline
+
+- Reordered hosted attempts fairly by output strength and provider: both providers receive strict-schema opportunities before weaker modes are attempted.
+- Added an optional controlled plain-JSON mode that accepts only one complete JSON document and never extracts arbitrary brace substrings.
+- Added batched blind verification for all questions in a passage bundle while continuing to hide proposed keys and independently shuffle verifier choice order.
+- Retained an optional second batch only for higher-risk questions.
+- Increased verifier output budgets and made stage budgets scale with bundle size.
+- Normalized benign audit values such as `none` and `no issues` without weakening substantive rejection gates.
+
+### Diagnostics and UX
+
+- Added sanitized per-stage provider/model/mode/attempt logs controlled by `GENERATION_DIAGNOSTICS` and `LOG_LEVEL`.
+- Added explicit accepted-fresh versus bank-fallback banners in the active session.
+- Expanded fallback reasons while keeping secrets, full prompts, and generated content out of logs.
+- Added useful authentication, permission, quota, rate-limit, model-not-found, and timeout messages.
+
+### QA
+
+- Expanded the suite from 83 to 88 tests.
+- Added hosted-provider failover, complete-document JSON fallback, arbitrary-brace rejection, batched-verifier privacy, and redacted permission-error tests.
+- Ran a live Gradio client Fresh-AI session against the production orchestration with a deterministic provider: one accepted passage, two accepted questions, four provider calls, zero fallback, immediate bank indexing, and manifest persistence.
+- Revalidated the 27-passage/88-question starter bank and all 87 Gradio components.
+
 ## v1.2.5 — Reading session multi-select runtime fix
 
 ### Root cause

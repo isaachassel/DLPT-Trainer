@@ -11,6 +11,7 @@ from core.generation import (
     VERIFIER_SYSTEM,
     AuthoringProvider,
     BlindVerification,
+    BlindVerificationBatch,
     CandidatePassageDraft,
     CandidateQuestionSet,
     HostedProvider,
@@ -18,6 +19,7 @@ from core.generation import (
     MockProvider,
     PassageAudit,
     validate_with_blind_verifier,
+    validate_with_blind_verifier_batch,
 )
 from core.item_bank import ItemBank
 from core.prompts import PROMPT_VERSION
@@ -78,7 +80,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
     forbidden = ["q1=a", "q2=b", "q3=c", "q4=d", '"correct_key": "a"', "correct answer letter"]
     assert all(pattern not in text for pattern in forbidden)
     assert "zero-based index" in text
-    assert PROMPT_VERSION == "genai-pipeline-v4"
+    assert PROMPT_VERSION == "genai-pipeline-v5"
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):
@@ -113,10 +115,10 @@ def test_generation_pipeline_uses_separate_stages_and_verifier(project_root, tmp
     verifier_schemas = [schema for _, _, schema in verifier.calls]
     assert author_schemas[:2] == [CandidatePassageDraft.__name__, CandidateQuestionSet.__name__]
     assert PassageAudit.__name__ in verifier_schemas
-    assert verifier_schemas.count(BlindVerification.__name__) == 2
+    assert verifier_schemas.count(BlindVerificationBatch.__name__) == 1
     assert all(system == AUTHORING_SYSTEM for system, _, _ in author.calls)
     assert all(system == VERIFIER_SYSTEM for system, _, _ in verifier.calls)
-    assert result.request_count >= 5
+    assert result.request_count >= 4
     assert result.passage.generation.request_count == result.request_count
     assert result.passage.generation.pipeline_version == PROMPT_VERSION
 
@@ -252,7 +254,7 @@ def test_smart_audit_skips_only_low_risk_reading_training(project_root, tmp_path
 
     verifier_schemas = [schema for _, _, schema in verifier.calls]
     assert PassageAudit.__name__ not in verifier_schemas
-    assert BlindVerification.__name__ in verifier_schemas
+    assert BlindVerificationBatch.__name__ in verifier_schemas
 
 
 def test_provider_attempt_cap_prevents_runaway_fallback_calls(monkeypatch):

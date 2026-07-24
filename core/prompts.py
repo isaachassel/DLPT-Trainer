@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import Iterable
 
-PROMPT_VERSION = "genai-pipeline-v4"
+PROMPT_VERSION = "genai-pipeline-v5"
 
 
 @dataclass(frozen=True)
@@ -294,3 +294,30 @@ Select the single best zero-based index from the source alone.
 Identify whether a second option is plausibly defensible, whether outside knowledge is required, whether evidence is sufficient, whether the reasoning demand matches the target, and whether any choice leaks the answer through wording/length/specificity.
 Quote only a short Russian evidence span. Keep the explanation concise.
 """
+
+def blind_verification_batch_prompt(*, passage_ru: str, items: list[dict]) -> str:
+    """Blindly verify multiple questions in one independent provider call.
+
+    Each question is evaluated separately. Proposed answer keys are intentionally
+    excluded, and each item carries its own independently shuffled choice order.
+    """
+    return f"""Blindly verify every comprehension item below. The proposed answers are intentionally hidden.
+Evaluate each item independently from the Russian source alone. Return exactly one verification object for every question_index.
+
+<RUSSIAN_SOURCE>
+{passage_ru}
+</RUSSIAN_SOURCE>
+
+<ITEMS_JSON>
+{json.dumps(items, ensure_ascii=False)}
+</ITEMS_JSON>
+
+For each item:
+- select the single best zero-based choice index;
+- identify whether a second choice is plausibly defensible;
+- reject outside knowledge, insufficient evidence, reasoning-level mismatch, or answer leakage;
+- quote only a short exact Russian evidence span;
+- keep the explanation concise.
+Do not infer or reconstruct any hidden proposed answer.
+"""
+

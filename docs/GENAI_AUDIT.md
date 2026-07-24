@@ -114,11 +114,14 @@ The hybrid release correctly restored user-requested live generation and generat
 
 ## Structured output and provider routing
 
-The hosted provider path attempts:
+The hosted provider path attempts, in provider-fair order:
 
 1. strict JSON Schema;
 2. best-effort JSON Schema;
-3. JSON-object fallback only when needed.
+3. JSON-object fallback only when needed;
+4. optional controlled complete-document JSON when hosted structured modes are rejected.
+
+All questions in a passage bundle are blind-verified in one indexed batch rather than one hosted call per question. Proposed keys remain hidden and each question's choices are independently reordered before verification.
 
 Every response is still validated with strict Pydantic models. A response cannot enter the bank merely because it is valid JSON.
 
@@ -181,5 +184,5 @@ VERIFIER_MAX_TOKENS
 - Model verification reduces risk but is not equivalent to expert human item review or empirical calibration.
 - When only one provider/model is configured, validator independence is necessarily weaker; the app warns about same-model configurations.
 - Provider token-usage fields vary. Call counts are always tracked, but token totals are recorded only when returned by the provider SDK.
-- Live generation has not been tested against real user API keys in this build environment; deterministic provider tests exercise the same schemas, repair, validation, persistence, and fallback code.
+- Live generation has not been tested against real user API keys in this build environment. Deterministic provider tests exercise the same schemas, repair, validation, persistence, and fallback code; hosted-adapter regression tests also simulate structured-output failure, cross-provider success, controlled JSON fallback, and permission errors.
 - Authentic/open-licensed source ingestion remains an administrator workflow. Public live generation creates synthetic material only.

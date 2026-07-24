@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import logging
 import time
 from pathlib import Path
 from uuid import uuid4
@@ -41,6 +42,8 @@ from core.session import (
     update_history,
 )
 from core.storage import LocalStorage, StorageError
+
+LOGGER = logging.getLogger("dlpt.genai")
 
 ROOT = Path(__file__).resolve().parents[1]
 SETTINGS = get_settings()
@@ -246,7 +249,7 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                 )
                 _progress(progress, 0.82, "Accepted item validated; updating the reusable bank…")
                 questions = shuffled_bundle(
-                    BANK.get_questions(generated.passage.id),
+                    generated.questions,
                     seed=f"{state.session_id}:{generated.passage.id}",
                 )
                 bundle = activate_bundle(state, generated.passage, questions)
@@ -268,6 +271,11 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                     f"with {generated.repair_count} repair pass(es).{verifier_note} "
                     f"Choices were shuffled in Python. {persistence_note}"
                 )
+                LOGGER.info(
+                    "Fresh bundle accepted session=%s skill=%s passage=%s provider=%s model=%s questions=%s",
+                    state.session_id, state.active_skill, generated.passage.id, generated.provider_name,
+                    generated.model_name, len(generated.questions),
+                )
                 _progress(progress, 0.94, "Fresh item saved and ready…")
                 return bundle
             except Exception as exc:
@@ -276,7 +284,11 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                 state.generation_repair_count += int(getattr(exc, "repair_count", 0) or 0)
                 state.bank_fallback_count += 1
                 state.last_error = str(exc)
-                safe_reason = html.escape(str(exc)[:260])
+                LOGGER.warning(
+                    "Fresh generation failed; using bank fallback session=%s skill=%s error_type=%s reason=%s",
+                    state.session_id, state.active_skill, type(exc).__name__, str(exc)[:500],
+                )
+                safe_reason = html.escape(str(exc)[:500])
                 state.last_content_note = (
                     f"Fresh generation did not produce an operational item ({type(exc).__name__}: {safe_reason}). "
                     "Your session was preserved and a validated bank item was loaded automatically."
@@ -339,8 +351,12 @@ def _status_text(state: SessionState, extra: str = "") -> str:
             f"bank fallbacks: {state.bank_fallback_count} · reusable generated bank: "
             f"{health['generated_passages']} passages / {health['generated_questions']} questions."
         )
+    if state.last_content_source == "fresh_ai":
+        lines.append("✅ **Fresh AI bundle generated, validated, saved to the reusable bank, and selected for this passage.**")
+    elif state.content_source == "fresh_ai_preferred" and state.last_content_source in {"starter_bank", "generated_bank"}:
+        lines.append("⚠️ **Fresh AI fallback:** a validated bank item was selected because live generation was unavailable or rejected.")
     if state.last_content_note:
-        lines.append(state.last_content_note)
+        lines.append(f"> {state.last_content_note}")
     if extra:
         lines.append(extra)
     return "\n\n".join(lines)

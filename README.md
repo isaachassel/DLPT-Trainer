@@ -145,7 +145,9 @@ A fresh bundle uses separate controlled stages:
 11. Listening TTS creation and validation.
 12. Atomic generated-bank persistence or redacted quarantine.
 
-Provider responses prefer strict JSON Schema, then best-effort schema, then JSON-object fallback. Every result must still pass strict Pydantic validation.
+Provider responses prefer strict JSON Schema, then best-effort schema, then JSON-object mode. When a hosted route rejects all structured-output modes, an optional controlled plain-JSON fallback accepts only one complete JSON document (or one fenced JSON document); it never extracts the first apparent `{...}` substring from arbitrary prose. Every result must still pass strict Pydantic validation.
+
+Provider failover is round-robin by output strength: each configured provider gets a strict-schema attempt before either provider consumes weaker modes. Blind verification is batched per passage bundle, so a normal Reading generation can complete with passage authoring, passage audit, question authoring, and one independent verification request instead of one verifier request per question.
 
 Generated metadata records author/verifier providers and models, prompt/pipeline version, request count, repair count, and token totals when the provider reports them.
 
@@ -224,7 +226,7 @@ MAX_GENERATION_REQUESTS_PER_SESSION=8
 GENERATION_CONCURRENCY_LIMIT=1
 PROVIDER_TIMEOUT_SECONDS=45
 PROVIDER_MAX_RETRIES=2
-MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=8
 GENERATION_AUDIT_MODE=always
 GENERATION_REPAIR_ATTEMPTS=1
 SECOND_VERIFIER_HIGH_RISK=true
@@ -234,10 +236,10 @@ PASSAGE_MAX_TOKENS=3200
 QUESTION_MAX_TOKENS=2600
 REPAIR_MAX_TOKENS=3200
 AUDIT_MAX_TOKENS=1200
-VERIFIER_MAX_TOKENS=900
+VERIFIER_MAX_TOKENS=2400
 ```
 
-Configured token values are hard caps. The application applies smaller stage-, level-, and bundle-aware budgets when appropriate.
+Configured token values are hard caps. The application applies smaller stage-, level-, and bundle-aware budgets when appropriate. `ALLOW_PLAIN_JSON_FALLBACK=true` enables the controlled complete-document fallback described above. `GENERATION_DIAGNOSTICS=true` writes sanitized provider/stage/mode/model diagnostics to the Space container log without printing secret values or full prompts.
 
 `GENERATION_AUDIT_MODE=smart` saves one audit call only for lower-risk Reading Training content. Diagnostic, Simulation, Listening, ILR 2+, and ILR 3 continue to receive the passage audit. `off` is supported but produces a startup warning.
 
@@ -277,8 +279,12 @@ MAX_GENERATION_REQUESTS_PER_SESSION=8
 GENERATION_CONCURRENCY_LIMIT=1
 PROVIDER_TIMEOUT_SECONDS=45
 PROVIDER_MAX_RETRIES=2
-MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=8
 QUEUE_CONCURRENCY_LIMIT=4
+ALLOW_PLAIN_JSON_FALLBACK=true
+GENERATION_DIAGNOSTICS=true
+VERIFIER_MAX_TOKENS=2400
+LOG_LEVEL=INFO
 ENABLE_HISTORY=true
 ENABLE_ANALYTICS=false
 CHECKPOINT_AFTER_PASSAGE=true
@@ -341,6 +347,7 @@ Hugging Face adds `gradio[mcp,oauth]==6.5.1` during the build. Its MCP extra rej
 
 Confirm:
 
+- the session content source is **Fresh AI preferred** rather than **Validated bank only**;
 - `ENABLE_USER_GENERATION=true`;
 - a supported `GENERATION_PROVIDER` is selected;
 - a matching secret exists;
@@ -349,7 +356,16 @@ Confirm:
 - `MAX_GENERATION_REQUESTS_PER_SESSION` is above zero;
 - the candidate is not being rejected by validation or duplicate checks.
 
-The setup banner reports readiness and configuration warnings. Quarantine records include stage traces and redacted failure reasons.
+For Hugging Face generation, the token must be authorized to make Inference Providers calls. A read-only repository token can exist yet still fail hosted inference.
+
+The active-session banner now distinguishes:
+
+- `Fresh AI bundle generated, validated, saved, and selected`; or
+- `Fresh AI fallback`, followed by the sanitized reason.
+
+With `GENERATION_DIAGNOSTICS=true` and `LOG_LEVEL=INFO`, the container log records safe lines such as `GenAI request`, `GenAI attempt failed`, `Fresh bundle accepted`, and `Fresh generation failed; using bank fallback`. It records stage, provider, model, output mode, and attempt number, but never the API key or full secret-bearing environment. Quarantine records include stage traces and redacted failure reasons.
+
+The pipeline tries configured providers fairly at each output strength, supports controlled complete-document JSON fallback, and performs one batched blind-verification call per bundle. This reduces silent failures caused by exhausting all attempts on one provider or making one remote verification request per question.
 
 ### Generated items disappear after restart
 
@@ -396,6 +412,14 @@ Version 1.2.5 fixes a Gradio CheckboxGroup payload edge case. A single selected 
 ### Session interrupted
 
 Use the displayed recovery code under **Recover a Checkpoint**. A corrupted checkpoint is rejected safely.
+
+## v1.2.6 GenAI runtime correction
+
+This release fixes the production Fresh-AI path for both Reading and Listening. The earlier pipeline was thoroughly tested with deterministic providers but could silently fall back in a real Space after spending its stage-attempt budget on one provider's structured-output modes and then making several sequential verification calls. Version 1.2.6 uses fair cross-provider mode ordering, controlled whole-document JSON fallback, batched blind verification, larger verifier budgets, tolerant audit-flag handling, visible generated-versus-fallback status, and sanitized stage diagnostics. The bank-only path remains available and every accepted fresh bundle is still validated, atomically committed, indexed immediately, and eligible for fallback.
+
+The recurring `BaseEventLoop.__del__` / `Invalid file descriptor: -1` startup lines are not the generation result. When the log reaches `Running on local URL`, inspect the later `dlpt.genai` lines and the in-app Fresh AI banner to determine whether generation was accepted or why it fell back.
+
+See `docs/GENAI_RUNTIME_FIX.md` for the detailed failure analysis and verification.
 
 ## Repository structure
 

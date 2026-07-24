@@ -47,12 +47,14 @@ class Settings(BaseModel):
     structured_output_mode: str = "auto"
     provider_timeout_seconds: int = Field(default=45, ge=5, le=180)
     provider_max_retries: int = Field(default=2, ge=0, le=6)
-    max_provider_attempts_per_stage: int = Field(default=4, ge=1, le=12)
+    max_provider_attempts_per_stage: int = Field(default=8, ge=1, le=20)
     generation_concurrency_limit: int = Field(default=1, ge=1, le=4)
     queue_concurrency_limit: int = Field(default=4, ge=1, le=16)
     max_generation_requests_per_session: int = Field(default=8, ge=0, le=40)
     generation_repair_attempts: int = Field(default=1, ge=0, le=3)
     generation_audit_mode: str = "always"
+    allow_plain_json_fallback: bool = True
+    generation_diagnostics: bool = True
     second_verifier_high_risk: bool = True
     authoring_temperature: float = Field(default=0.25, ge=0.0, le=1.5)
     verification_temperature: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -60,7 +62,7 @@ class Settings(BaseModel):
     question_max_tokens: int = Field(default=2600, ge=500, le=10000)
     repair_max_tokens: int = Field(default=3200, ge=500, le=12000)
     audit_max_tokens: int = Field(default=1200, ge=300, le=5000)
-    verifier_max_tokens: int = Field(default=900, ge=250, le=4000)
+    verifier_max_tokens: int = Field(default=2400, ge=250, le=6000)
 
     enable_history: bool = True
     enable_analytics: bool = False
@@ -232,7 +234,16 @@ class Settings(BaseModel):
         if not available:
             return False, "The configured provider has no matching API key/secret. Fresh-AI requests will fall back to the bank."
         warning = " ".join(self.model_warnings())
-        message = "Fresh-AI generation is available; accepted items will be audited, independently verified, and saved to the generated bank."
+        providers: list[str] = []
+        if "hf" in order and self.hf_token:
+            providers.append(f"Hugging Face ({self.hf_text_model})")
+        if "groq" in order and self.groq_api_key:
+            providers.append(f"Groq ({self.groq_model})")
+        provider_text = " → ".join(providers) or "configured provider"
+        message = (
+            f"Fresh-AI generation is available through {provider_text}; accepted items will be audited, "
+            "blind-verified, atomically saved, and immediately added to the reusable bank."
+        )
         return True, f"{message} {warning}".strip()
 
 
@@ -292,12 +303,14 @@ def get_settings() -> Settings:
         structured_output_mode=os.getenv("STRUCTURED_OUTPUT_MODE", "auto"),
         provider_timeout_seconds=int(os.getenv("PROVIDER_TIMEOUT_SECONDS", "45")),
         provider_max_retries=int(os.getenv("PROVIDER_MAX_RETRIES", "2")),
-        max_provider_attempts_per_stage=int(os.getenv("MAX_PROVIDER_ATTEMPTS_PER_STAGE", "4")),
+        max_provider_attempts_per_stage=int(os.getenv("MAX_PROVIDER_ATTEMPTS_PER_STAGE", "8")),
         generation_concurrency_limit=int(os.getenv("GENERATION_CONCURRENCY_LIMIT", "1")),
         queue_concurrency_limit=int(os.getenv("QUEUE_CONCURRENCY_LIMIT", "4")),
         max_generation_requests_per_session=int(os.getenv("MAX_GENERATION_REQUESTS_PER_SESSION", "8")),
         generation_repair_attempts=int(os.getenv("GENERATION_REPAIR_ATTEMPTS", "1")),
         generation_audit_mode=os.getenv("GENERATION_AUDIT_MODE", "always"),
+        allow_plain_json_fallback=_env_bool("ALLOW_PLAIN_JSON_FALLBACK", True),
+        generation_diagnostics=_env_bool("GENERATION_DIAGNOSTICS", True),
         second_verifier_high_risk=_env_bool("SECOND_VERIFIER_HIGH_RISK", True),
         authoring_temperature=_env_float("AUTHORING_TEMPERATURE", 0.25),
         verification_temperature=_env_float("VERIFICATION_TEMPERATURE", 0.0),
@@ -305,7 +318,7 @@ def get_settings() -> Settings:
         question_max_tokens=int(os.getenv("QUESTION_MAX_TOKENS", "2600")),
         repair_max_tokens=int(os.getenv("REPAIR_MAX_TOKENS", "3200")),
         audit_max_tokens=int(os.getenv("AUDIT_MAX_TOKENS", "1200")),
-        verifier_max_tokens=int(os.getenv("VERIFIER_MAX_TOKENS", "900")),
+        verifier_max_tokens=int(os.getenv("VERIFIER_MAX_TOKENS", "2400")),
         enable_history=_env_bool("ENABLE_HISTORY", True),
         enable_analytics=_env_bool("ENABLE_ANALYTICS", False),
         checkpoint_after_passage=_env_bool("CHECKPOINT_AFTER_PASSAGE", True),

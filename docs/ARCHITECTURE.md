@@ -164,13 +164,16 @@ Supported routes:
 - deterministic mock for tests/admin development only;
 - disabled bank-only mode.
 
-For each structured stage, the provider attempts:
+For each structured stage, the provider attempts modes in provider-fair order:
 
-1. strict JSON Schema;
-2. best-effort JSON Schema;
-3. JSON-object fallback.
+1. strict JSON Schema across configured providers;
+2. best-effort JSON Schema across configured providers;
+3. JSON-object mode across configured providers;
+4. optional controlled whole-document JSON across configured providers.
 
-A per-stage outbound attempt cap prevents runaway retries. Timeouts, bounded exponential backoff, provider fallback, global generation concurrency, and per-session bundle limits protect quotas.
+The plain-JSON path accepts only one complete JSON document and never scrapes an arbitrary first brace substring. A per-stage outbound attempt cap prevents runaway retries. Timeouts, bounded exponential backoff, provider fallback, global generation concurrency, and per-session bundle limits protect quotas.
+
+Blind answer verification is performed as one indexed batch per passage bundle. Python independently reorders each question's choices before the request and never sends the proposed key. Optional second verification is another batch containing only high-risk items.
 
 Stage/level/bundle-aware token budgets are bounded by administrator-configured caps. Provider-reported prompt/completion tokens are stored when available. Outbound calls are counted even when a request fails.
 

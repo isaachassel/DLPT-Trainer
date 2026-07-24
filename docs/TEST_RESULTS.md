@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.5 Reading multi-select runtime-fix release on 2026-07-23.
+Executed for the v1.2.6 hosted-GenAI runtime-fix release on 2026-07-24.
 
 ## Automated unit/integration suite
 
 ```text
-83 passed
+88 passed
 ```
 
 Core coverage includes:
@@ -49,8 +49,13 @@ GenAI-specific coverage includes:
 - API secret exclusion from Settings serialization;
 - unavailable-provider and generation-limit fallback;
 - generated Listening audio validation and caching.
+- fair provider failover before weaker structured-output modes;
+- controlled one-document plain-JSON fallback;
+- rejection of JSON-looking brace fragments embedded in prose;
+- batched blind verification with proposed keys omitted;
+- useful and secret-redacted hosted-provider permission errors;
 
-Version 1.2.5 additionally adds direct regression coverage for:
+Version 1.2.6 retains all prior regression coverage and additionally verifies:
 
 - accessible activity spinner and immediate busy-button locking;
 - chained Begin Session, Play Audio, and Submit Passage feedback events;
@@ -118,11 +123,11 @@ The no-secret result is expected for the release package.
 
 ## Local server and audio route
 
-The v1.2.5 app launched with `ssr_mode=False` and returned:
+The v1.2.6 app launched with `ssr_mode=False` and returned:
 
 ```text
-Application page: HTTP 200, 130,025 bytes
-Starter MP3: HTTP 200, 29,073 bytes
+Application page: HTTP 200, 135,966 bytes
+Starter MP3: HTTP 200, 273,906 bytes
 Starter MP3 byte range: HTTP 206, 100 bytes returned
 Activity-spinner CSS present in rendered application: yes
 ```
@@ -166,6 +171,23 @@ Result: Reading session started successfully and returned a validated passage bu
 ```
 
 This directly reproduces the payload shape that previously caused Gradio to split the selected topic into individual characters.
+
+## Fresh-AI live callback integration
+
+A local Gradio server was started with the production session callback and deterministic hosted-provider substitute. A stateful client selected **Fresh AI preferred** and started a Reading session. The result was:
+
+```text
+Fresh generated bundles this session: 1
+Bank fallbacks this session: 0
+Generated-bank passages: 1
+Generated-bank questions: 2
+Provider calls: 4
+Repairs: 0
+```
+
+The status banner reported that the fresh bundle was generated, validated, saved, and selected. The accepted bundle was present in the JSONL overlay, in-memory bank index, and SHA-256 bank manifest.
+
+The hosted adapter was also tested under simulated Hugging Face structured-output failure followed by Groq strict-schema success. The call order was Hugging Face strict schema, then Groq strict schema; it did not spend the entire stage budget on one provider first.
 
 ## External-provider limitation
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import math
 import random
 import re
@@ -26,6 +27,7 @@ from .prompts import (
     PROMPT_VERSION,
     VERIFIER_SYSTEM,
     blind_verification_prompt,
+    blind_verification_batch_prompt,
     passage_audit_prompt,
     passage_authoring_prompt,
     passage_repair_prompt,
@@ -34,6 +36,9 @@ from .prompts import (
 )
 from .storage import atomic_write_text
 from .validation import answer_position_balance, content_hash, near_duplicate, normalize_text, validate_passage, validate_question
+
+
+LOGGER = logging.getLogger("dlpt.genai")
 
 
 class ProviderError(RuntimeError):
@@ -159,6 +164,14 @@ class BlindVerification(CandidateModel):
     answer_leakage: bool
     evidence_quote_ru: str
     explanation: str
+
+
+class BlindVerificationBatchItem(BlindVerification):
+    question_index: int = Field(ge=0, le=4)
+
+
+class BlindVerificationBatch(CandidateModel):
+    verifications: list[BlindVerificationBatchItem] = Field(min_length=1, max_length=5)
 
 
 @dataclass
@@ -334,9 +347,7 @@ class MockProvider(AuthoringProvider):
                 ),
             ]
             return CandidateQuestionSet(questions=candidates[:count])
-        if schema is BlindVerification:
-            choices_match = re.search(r"<CHOICES_ZERO_BASED>\s*(\[.*?\])\s*</CHOICES_ZERO_BASED>", prompt, re.S)
-            choices = json.loads(choices_match.group(1)) if choices_match else []
+        if schema in {BlindVerification, BlindVerificationBatch}:
             evidence_map = {
                 "evening Russian courses": "открылись вечерние курсы русского языка для взрослых",
                 "By Friday": "до пятницы",
@@ -344,31 +355,58 @@ class MockProvider(AuthoringProvider):
                 "attention to each participant": "уделять внимание каждому участнику",
                 "registers early": "зарегистрируется заранее",
             }
-            selected = 0
-            quote = ""
-            for needle, evidence in evidence_map.items():
-                for index, choice in enumerate(choices):
-                    if needle.casefold() in choice.casefold():
-                        selected, quote = index, evidence
+
+            def verify_choices(choices: list[str], question_index: int | None = None):
+                selected = 0
+                quote = ""
+                for needle, evidence in evidence_map.items():
+                    for index, choice in enumerate(choices):
+                        if needle.casefold() in choice.casefold():
+                            selected, quote = index, evidence
+                            break
+                    if quote:
                         break
-                if quote:
-                    break
-            return BlindVerification(
-                selected_index=selected,
-                second_best_index=-1,
-                confidence=0.98,
-                multiple_plausible=False,
-                requires_outside_knowledge=False,
-                evidence_sufficient=True,
-                reasoning_match=True,
-                answer_leakage=False,
-                evidence_quote_ru=quote,
-                explanation="One choice is directly supported by the Russian source and the alternatives contradict or are absent from it.",
+                payload = dict(
+                    selected_index=selected,
+                    second_best_index=-1,
+                    confidence=0.98,
+                    multiple_plausible=False,
+                    requires_outside_knowledge=False,
+                    evidence_sufficient=True,
+                    reasoning_match=True,
+                    answer_leakage=False,
+                    evidence_quote_ru=quote,
+                    explanation="One choice is directly supported by the Russian source and the alternatives contradict or are absent from it.",
+                )
+                if question_index is None:
+                    return BlindVerification(**payload)
+                return BlindVerificationBatchItem(question_index=question_index, **payload)
+
+            if schema is BlindVerification:
+                choices_match = re.search(r"<CHOICES_ZERO_BASED>\s*(\[.*?\])\s*</CHOICES_ZERO_BASED>", prompt, re.S)
+                choices = json.loads(choices_match.group(1)) if choices_match else []
+                return verify_choices(choices)
+
+            items_match = re.search(r"<ITEMS_JSON>\s*(\[.*?\])\s*</ITEMS_JSON>", prompt, re.S)
+            items = json.loads(items_match.group(1)) if items_match else []
+            return BlindVerificationBatch(
+                verifications=[
+                    verify_choices(list(item.get("choices", [])), int(item.get("question_index", index)))
+                    for index, item in enumerate(items)
+                ]
             )
         raise ProviderError(f"MockProvider does not support schema {schema.__name__}.")
 
 
 class HostedProvider(AuthoringProvider):
+    """Production provider adapter with fair failover and bounded compatibility modes.
+
+    Provider-enforced JSON Schema is always attempted first. If a provider/model
+    does not support it, the adapter can fall back to JSON-object mode and finally
+    a controlled plain-JSON request. The parser accepts direct JSON or one complete
+    fenced JSON document; it never extracts an arbitrary first ``{...}`` substring.
+    """
+
     def __init__(self, settings: Settings, purpose: Literal["author", "verifier", "secondary_verifier"] = "author"):
         super().__init__()
         self.settings = settings
@@ -377,6 +415,8 @@ class HostedProvider(AuthoringProvider):
         self._groq = None
         self.last_provider = "unknown"
         self.last_model = "unknown"
+        self.last_mode = "unknown"
+        self.last_errors: list[str] = []
         self._mode_cache: dict[tuple[str, str], str] = {}
 
     def _provider_order(self) -> list[str]:
@@ -411,9 +451,16 @@ class HostedProvider(AuthoringProvider):
     @staticmethod
     def _response_text(response: Any) -> str:
         try:
-            content = response.choices[0].message.content
+            message = response.choices[0].message
         except Exception as exc:
-            raise ProviderError("Provider returned no usable assistant content.") from exc
+            raise ProviderError("Provider returned no usable assistant message.") from exc
+        parsed = getattr(message, "parsed", None)
+        if parsed is not None:
+            if isinstance(parsed, BaseModel):
+                return parsed.model_dump_json()
+            if isinstance(parsed, (dict, list)):
+                return json.dumps(parsed, ensure_ascii=False)
+        content = getattr(message, "content", None)
         if isinstance(content, str):
             return content
         if isinstance(content, dict):
@@ -430,13 +477,36 @@ class HostedProvider(AuthoringProvider):
             return "".join(chunks)
         return str(content or "")
 
+    @staticmethod
+    def _parse_structured_text(text: str, schema: type[BaseModel]) -> BaseModel:
+        cleaned = (text or "").strip().lstrip("\ufeff")
+        if not cleaned:
+            raise ProviderError("Provider returned an empty structured response.")
+        try:
+            return schema.model_validate_json(cleaned)
+        except Exception as direct_error:
+            fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", cleaned, flags=re.I | re.S)
+            if fenced:
+                candidate = fenced.group(1).strip()
+                try:
+                    return schema.model_validate_json(candidate)
+                except Exception:
+                    pass
+            try:
+                payload = json.loads(cleaned)
+                return schema.model_validate(payload)
+            except Exception as exc:
+                raise ProviderError(
+                    f"Provider response did not match {schema.__name__}: {type(direct_error).__name__}."
+                ) from exc
+
     def _call_hf(
         self,
         system: str,
         prompt: str,
         *,
         model: str,
-        response_format: dict[str, Any],
+        response_format: dict[str, Any] | None,
         max_tokens: int,
         temperature: float,
     ) -> str:
@@ -453,18 +523,19 @@ class HostedProvider(AuthoringProvider):
                 )
             except TypeError:
                 self._hf = InferenceClient(token=self.settings.hf_token, timeout=self.settings.provider_timeout_seconds)
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": 0.9,
+        }
+        if response_format is not None:
+            kwargs["response_format"] = response_format
         self.usage.start_call()
-        response = self._hf.chat.completions.create(
-            model=model,
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
-            temperature=temperature,
-            response_format=response_format,
-        )
+        response = self._hf.chat.completions.create(**kwargs)
         prompt_tokens, completion_tokens = self._usage_from_response(response)
         self.usage.add_tokens(prompt_tokens, completion_tokens)
-        self.last_provider = "huggingface"
-        self.last_model = model
         return self._response_text(response)
 
     def _call_groq(
@@ -473,7 +544,7 @@ class HostedProvider(AuthoringProvider):
         prompt: str,
         *,
         model: str,
-        response_format: dict[str, Any],
+        response_format: dict[str, Any] | None,
         max_tokens: int,
         temperature: float,
     ) -> str:
@@ -483,38 +554,52 @@ class HostedProvider(AuthoringProvider):
             raise ProviderError("Groq generation was selected but GROQ_API_KEY is unavailable.")
         if self._groq is None:
             self._groq = Groq(api_key=self.settings.groq_api_key, timeout=self.settings.provider_timeout_seconds)
-        common = dict(
-            model=model,
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            response_format=response_format,
-            temperature=temperature,
-        )
+        common: dict[str, Any] = {
+            "model": model,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+            "temperature": temperature,
+            "top_p": 0.9,
+        }
+        if response_format is not None:
+            common["response_format"] = response_format
+        # GPT-OSS reasoning is useful but medium/high effort adds avoidable latency to
+        # assessment authoring. Older Groq SDKs ignore this via the TypeError fallback.
+        if model.startswith("openai/gpt-oss"):
+            common["reasoning_effort"] = "low"
         self.usage.start_call()
         try:
             response = self._groq.chat.completions.create(max_completion_tokens=max_tokens, **common)
         except TypeError:
-            response = self._groq.chat.completions.create(max_tokens=max_tokens, **common)
+            common.pop("reasoning_effort", None)
+            try:
+                response = self._groq.chat.completions.create(max_completion_tokens=max_tokens, **common)
+            except TypeError:
+                response = self._groq.chat.completions.create(max_tokens=max_tokens, **common)
         prompt_tokens, completion_tokens = self._usage_from_response(response)
         self.usage.add_tokens(prompt_tokens, completion_tokens)
-        self.last_provider = "groq"
-        self.last_model = model
         return self._response_text(response)
 
     def _response_modes(self, provider: str, model: str) -> list[str]:
-        cached = self._mode_cache.get((provider, model))
-        if cached:
-            return [cached]
         configured = self.settings.structured_output_mode
         if configured == "strict":
-            return ["strict"]
-        if configured == "best_effort":
-            return ["best_effort"]
-        if configured == "json_object":
-            return ["json_object"]
-        return ["strict", "best_effort", "json_object"]
+            modes = ["strict"]
+        elif configured == "best_effort":
+            modes = ["best_effort", "json_object"]
+        elif configured == "json_object":
+            modes = ["json_object"]
+        else:
+            modes = ["strict", "best_effort", "json_object"]
+        if self.settings.allow_plain_json_fallback and configured != "strict":
+            modes.append("plain_json")
+        cached = self._mode_cache.get((provider, model))
+        if cached in modes:
+            modes = [cached] + [mode for mode in modes if mode != cached]
+        return modes
 
     @staticmethod
-    def _response_format(schema: type[BaseModel], mode: str) -> dict[str, Any]:
+    def _response_format(schema: type[BaseModel], mode: str) -> dict[str, Any] | None:
+        if mode == "plain_json":
+            return None
         if mode == "json_object":
             return {"type": "json_object"}
         return {
@@ -526,6 +611,46 @@ class HostedProvider(AuthoringProvider):
                 "strict": mode == "strict",
             },
         }
+
+    @staticmethod
+    def _schema_instruction(schema: type[BaseModel]) -> str:
+        return (
+            "\n\nReturn exactly one JSON document matching this JSON Schema. "
+            "Do not use markdown fences or add prose:\n"
+            + json.dumps(schema.model_json_schema(), ensure_ascii=False)
+        )
+
+    @staticmethod
+    def _friendly_error(exc: Exception) -> str:
+        text = str(exc)
+        lower = text.lower()
+        if "401" in lower or "unauthorized" in lower:
+            return "authentication failed; verify the secret value"
+        if "403" in lower or "forbidden" in lower:
+            return "token lacks Inference Providers permission or provider access"
+        if "402" in lower or "payment required" in lower or "credits" in lower:
+            return "provider credits/quota are unavailable"
+        if "429" in lower or "rate limit" in lower:
+            return "provider rate limit reached"
+        if "404" in lower or "not found" in lower:
+            return "configured model/provider route was not found"
+        if "timeout" in lower or "timed out" in lower:
+            return "provider request timed out"
+        return _redact_error(exc, None, 220)
+
+    def _attempt_plan(self, order: list[str]) -> list[tuple[str, str, str]]:
+        """Round-robin output modes across providers instead of exhausting one provider first."""
+        provider_modes = {
+            provider: self._response_modes(provider, self._model_for(provider)) for provider in order
+        }
+        max_modes = max((len(modes) for modes in provider_modes.values()), default=0)
+        plan: list[tuple[str, str, str]] = []
+        for mode_index in range(max_modes):
+            for provider in order:
+                modes = provider_modes[provider]
+                if mode_index < len(modes):
+                    plan.append((provider, self._model_for(provider), modes[mode_index]))
+        return plan
 
     def generate_json(
         self,
@@ -540,7 +665,9 @@ class HostedProvider(AuthoringProvider):
         if not order:
             if self.settings.generation_provider == "disabled":
                 raise ProviderError("Live generation is disabled; validated bank content remains available.")
-            raise ProviderError("No configured live provider is currently ready.")
+            raise ProviderError(
+                "No configured live provider is ready. Add an HF_TOKEN with Inference Providers permission and/or GROQ_API_KEY."
+            )
         max_tokens = int(max_tokens or 3200)
         temperature = float(
             self.settings.authoring_temperature if temperature is None and self.purpose == "author"
@@ -551,59 +678,74 @@ class HostedProvider(AuthoringProvider):
         stage_attempts = 0
         attempt_cap = self.settings.max_provider_attempts_per_stage
         exhausted = False
-        for attempt in range(self.settings.provider_max_retries + 1):
-            for provider in order:
-                model = self._model_for(provider)
-                for mode in self._response_modes(provider, model):
-                    if stage_attempts >= attempt_cap:
-                        exhausted = True
-                        break
-                    stage_attempts += 1
-                    response_format = self._response_format(schema, mode)
-                    request_prompt = prompt
-                    if mode == "json_object":
-                        request_prompt += (
-                            "\n\nReturn exactly one JSON object matching this schema. Do not wrap it in markdown:\n"
-                            + json.dumps(schema.model_json_schema(), ensure_ascii=False)
-                        )
-                    try:
-                        text = (
-                            self._call_hf(
-                                system,
-                                request_prompt,
-                                model=model,
-                                response_format=response_format,
-                                max_tokens=max_tokens,
-                                temperature=temperature,
-                            )
-                            if provider == "hf"
-                            else self._call_groq(
-                                system,
-                                request_prompt,
-                                model=model,
-                                response_format=response_format,
-                                max_tokens=max_tokens,
-                                temperature=temperature,
-                            )
-                        )
-                        parsed = schema.model_validate_json(text)
-                        self._mode_cache[(provider, model)] = mode
-                        return parsed
-                    except Exception as exc:
-                        errors.append(
-                            f"{provider}/{model}/{mode}:{type(exc).__name__}:{_redact_error(exc, self.settings, 260)}"
-                        )
-                        # In auto mode, immediately try the next structured-output mode.
-                        continue
-                if exhausted:
+        plan = self._attempt_plan(order)
+        for retry in range(self.settings.provider_max_retries + 1):
+            for provider, model, mode in plan:
+                if stage_attempts >= attempt_cap:
+                    exhausted = True
                     break
+                stage_attempts += 1
+                self.last_provider = "huggingface" if provider == "hf" else provider
+                self.last_model = model
+                self.last_mode = mode
+                response_format = self._response_format(schema, mode)
+                request_prompt = prompt
+                if mode in {"json_object", "plain_json"}:
+                    request_prompt += self._schema_instruction(schema)
+                if self.settings.generation_diagnostics:
+                    LOGGER.info(
+                        "GenAI request purpose=%s schema=%s provider=%s model=%s mode=%s attempt=%s/%s",
+                        self.purpose, schema.__name__, provider, model, mode, stage_attempts, attempt_cap,
+                    )
+                try:
+                    text = (
+                        self._call_hf(
+                            system,
+                            request_prompt,
+                            model=model,
+                            response_format=response_format,
+                            max_tokens=max_tokens,
+                            temperature=temperature,
+                        )
+                        if provider == "hf"
+                        else self._call_groq(
+                            system,
+                            request_prompt,
+                            model=model,
+                            response_format=response_format,
+                            max_tokens=max_tokens,
+                            temperature=temperature,
+                        )
+                    )
+                    parsed = self._parse_structured_text(text, schema)
+                    self._mode_cache[(provider, model)] = mode
+                    self.last_errors = errors[-8:]
+                    if self.settings.generation_diagnostics:
+                        LOGGER.info(
+                            "GenAI success purpose=%s schema=%s provider=%s model=%s mode=%s",
+                            self.purpose, schema.__name__, provider, model, mode,
+                        )
+                    return parsed
+                except Exception as exc:
+                    safe = self._friendly_error(exc)
+                    entry = f"{provider}/{model}/{mode}:{type(exc).__name__}:{safe}"
+                    errors.append(entry)
+                    if self.settings.generation_diagnostics:
+                        LOGGER.warning(
+                            "GenAI attempt failed purpose=%s schema=%s provider=%s model=%s mode=%s reason=%s",
+                            self.purpose, schema.__name__, provider, model, mode, safe,
+                        )
             if exhausted:
                 break
-            if attempt < self.settings.provider_max_retries:
-                time.sleep(min(8.0, (2 ** attempt) + random.random()))
+            if retry < self.settings.provider_max_retries:
+                time.sleep(min(8.0, (2 ** retry) + random.random()))
+        self.last_errors = errors[-8:]
         suffix = f" Stage request cap ({attempt_cap}) reached." if exhausted else ""
+        detail = " | ".join(errors[-8:])
         raise ProviderError(
-            "All configured providers failed structured generation after retry." + suffix + " " + " | ".join(errors[-6:])
+            "All configured providers failed to return valid structured content."
+            + suffix
+            + (" " + detail if detail else "")
         )
 
 
@@ -646,7 +788,8 @@ def _stage_token_budget(
     elif stage == "audit":
         guidance = 1200 if level in {"2+", "3"} else 900
     elif stage == "verifier":
-        guidance = 900 if level in {"2+", "3"} else 700
+        per_item = 360 if level in {"2+", "3"} else 300
+        guidance = 450 + per_item * max(1, question_count)
     else:  # repair
         guidance = max(PASSAGE_TOKEN_GUIDANCE[level], 1000 + 520 * max(1, question_count))
     return max(250, min(int(configured_cap), int(guidance)))
@@ -932,6 +1075,11 @@ def _level_distance(a: str, b: str) -> int:
     return abs(ILR_LEVELS.index(a) - ILR_LEVELS.index(b))
 
 
+def _meaningful_audit_flags(values: list[str]) -> list[str]:
+    benign = {"", "none", "no", "n/a", "not detected", "no issues", "no issue", "нет", "не обнаружено"}
+    return [value.strip() for value in values if value.strip().casefold() not in benign]
+
+
 def _audit_issues(audit: PassageAudit, requested_level: str) -> list[str]:
     issues: list[str] = []
     if not audit.acceptable:
@@ -946,10 +1094,10 @@ def _audit_issues(audit: PassageAudit, requested_level: str) -> list[str]:
         issues.append("independent_audit_detected_protected_content_risk")
     if not audit.level_match or _level_distance(audit.estimated_ilr, requested_level) > 1:
         issues.append(f"independent_audit_level_mismatch_{audit.estimated_ilr}")
-    issues.extend(f"translation_artifact:{item}" for item in audit.translation_artifacts)
-    issues.extend(f"contradiction:{item}" for item in audit.contradiction_flags)
-    issues.extend(f"repetition:{item}" for item in audit.repetition_flags)
-    return issues
+    issues.extend(f"translation_artifact:{item}" for item in _meaningful_audit_flags(audit.translation_artifacts))
+    issues.extend(f"contradiction:{item}" for item in _meaningful_audit_flags(audit.contradiction_flags))
+    issues.extend(f"repetition:{item}" for item in _meaningful_audit_flags(audit.repetition_flags))
+    return sorted(set(issues))
 
 
 def validate_with_blind_verifier(
@@ -1014,6 +1162,116 @@ def validate_with_blind_verifier(
         blind_verifier_answer=selected_key,
         proposed_answer=question.correct_key,
     )
+
+
+
+def validate_with_blind_verifier_batch(
+    provider: AuthoringProvider,
+    passage: PassageItem,
+    questions: list[QuestionItem],
+    *,
+    max_tokens: int = 1800,
+    temperature: float = 0.0,
+    seed_suffix: str = "primary",
+) -> list[ValidationReport]:
+    """Blind-verify a complete passage bundle in one provider call.
+
+    The proposed keys are never included. Each question receives a separate,
+    deterministic shuffled order, and the returned indices are mapped back only
+    after the independent provider has answered.
+    """
+    if not questions:
+        return []
+    prepared: list[tuple[QuestionItem, list[tuple[str, str]]]] = []
+    items: list[dict[str, Any]] = []
+    for question_index, question in enumerate(questions):
+        shuffled = [(letter, question.choices[letter]) for letter in LETTERS]
+        random.Random(f"{question.id}:{seed_suffix}").shuffle(shuffled)
+        prepared.append((question, shuffled))
+        items.append({
+            "question_index": question_index,
+            "target_ilr": question.target_ilr,
+            "question_type": question.question_type,
+            "stem_en": question.stem_en,
+            "choices": [text for _, text in shuffled],
+        })
+
+    try:
+        raw = _provider_generate(
+            provider,
+            VERIFIER_SYSTEM,
+            blind_verification_batch_prompt(passage_ru=passage.passage_ru, items=items),
+            BlindVerificationBatch,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+        batch = BlindVerificationBatch.model_validate(raw)
+    except ProviderError as exc:
+        # Backward compatibility for user-supplied v1.1 providers that only
+        # implemented the single-question verifier schema.
+        if "does not support schema BlindVerificationBatch" not in str(exc):
+            raise
+        return [
+            validate_with_blind_verifier(
+                provider,
+                passage,
+                question,
+                max_tokens=max(600, max_tokens // max(1, len(questions))),
+                temperature=temperature,
+                seed_suffix=seed_suffix,
+            )
+            for question in questions
+        ]
+
+    by_index: dict[int, BlindVerificationBatchItem] = {}
+    for verification in batch.verifications:
+        if verification.question_index in by_index:
+            raise GenerationValidationError("Blind verifier returned a duplicate question_index.")
+        by_index[verification.question_index] = verification
+    expected = set(range(len(questions)))
+    if set(by_index) != expected:
+        raise GenerationValidationError("Blind verifier did not return exactly one result for every question.")
+
+    reports: list[ValidationReport] = []
+    for question_index, (question, shuffled) in enumerate(prepared):
+        verification = by_index[question_index]
+        selected_key = shuffled[verification.selected_index][0]
+        deterministic = validate_question(question, passage)
+        failures = list(deterministic.failure_reasons)
+        flags = list(deterministic.ambiguity_flags)
+        if selected_key != question.correct_key:
+            failures.append("blind_verifier_disagreed")
+        if verification.multiple_plausible:
+            failures.append("multiple_plausible_answers")
+        if verification.requires_outside_knowledge:
+            failures.append("requires_outside_knowledge")
+        if not verification.evidence_sufficient:
+            failures.append("insufficient_evidence")
+        if not verification.reasoning_match:
+            failures.append("reasoning_level_mismatch")
+        if verification.answer_leakage:
+            failures.append("answer_choice_leakage")
+        if verification.confidence < 0.60:
+            flags.append("low_verifier_confidence")
+        if (
+            verification.evidence_quote_ru
+            and normalize_text(verification.evidence_quote_ru) not in normalize_text(passage.passage_ru)
+        ):
+            failures.append("verifier_evidence_not_in_passage")
+        reports.append(ValidationReport(
+            status="accepted" if not failures and not flags else "rejected",
+            deterministic_checks=deterministic.deterministic_checks,
+            validator_scores={
+                "blind_agreement": 1.0 if selected_key == question.correct_key else 0.0,
+                "blind_confidence": verification.confidence,
+                "batched_verification": 1.0,
+            },
+            ambiguity_flags=sorted(set(flags)),
+            failure_reasons=sorted(set(failures)),
+            blind_verifier_answer=selected_key,
+            proposed_answer=question.correct_key,
+        ))
+    return reports
 
 
 @dataclass
@@ -1272,40 +1530,50 @@ class LiveGenerationService:
                 requested_level=level,
             )
             primary_reports: list[ValidationReport] = []
-            secondary_reports: list[ValidationReport | None] = []
+            secondary_reports: list[ValidationReport | None] = [None for _ in questions]
             if not issues:
-                for index, question in enumerate(questions, start=1):
-                    primary = validate_with_blind_verifier(
-                        self.verifier_provider,
-                        passage,
-                        question,
-                        max_tokens=_stage_token_budget(
-                            self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill
-                        ),
-                        temperature=self.settings.verification_temperature,
-                        seed_suffix="primary",
-                    )
-                    primary_reports.append(primary)
+                primary_reports = validate_with_blind_verifier_batch(
+                    self.verifier_provider,
+                    passage,
+                    questions,
+                    max_tokens=_stage_token_budget(
+                        self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill,
+                        question_count=len(questions),
+                    ),
+                    temperature=self.settings.verification_temperature,
+                    seed_suffix="primary",
+                )
+                for index, primary in enumerate(primary_reports, start=1):
                     issues.extend(f"q{index}:{item}" for item in primary.failure_reasons + primary.ambiguity_flags)
-                    second: ValidationReport | None = None
+
+                high_risk_indices = [
+                    index for index, (question, primary) in enumerate(zip(questions, primary_reports))
                     if (
                         self.settings.second_verifier_high_risk
                         and level in {"2+", "3"}
                         and question.question_type in HIGH_RISK_TYPES
                         and primary.status == "accepted"
-                    ):
-                        second = validate_with_blind_verifier(
-                            self.secondary_verifier_provider,
-                            passage,
-                            question,
-                            max_tokens=_stage_token_budget(
-                                self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill
-                            ),
-                            temperature=self.settings.verification_temperature,
-                            seed_suffix="secondary",
+                    )
+                ]
+                if high_risk_indices:
+                    high_risk_questions = [questions[index] for index in high_risk_indices]
+                    secondary_batch = validate_with_blind_verifier_batch(
+                        self.secondary_verifier_provider,
+                        passage,
+                        high_risk_questions,
+                        max_tokens=_stage_token_budget(
+                            self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill,
+                            question_count=len(high_risk_questions),
+                        ),
+                        temperature=self.settings.verification_temperature,
+                        seed_suffix="secondary",
+                    )
+                    for original_index, second in zip(high_risk_indices, secondary_batch):
+                        secondary_reports[original_index] = second
+                        issues.extend(
+                            f"q{original_index + 1}:secondary:{item}"
+                            for item in second.failure_reasons + second.ambiguity_flags
                         )
-                        issues.extend(f"q{index}:secondary:{item}" for item in second.failure_reasons + second.ambiguity_flags)
-                    secondary_reports.append(second)
             if not issues:
                 passage_report = validate_passage(passage, questions)
                 if passage_report.status != "accepted":
