@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.2.5 — Reading session multi-select runtime fix
+
+### Root cause
+
+- Fixed a Gradio 6 runtime payload edge case where one selected CheckboxGroup value could arrive as a scalar string.
+- The stock CheckboxGroup preprocessor treated the scalar as an iterable and validated it character-by-character, so `Government and politics` failed as `G` and `Culture and society` failed as `C` before the Reading callback could run.
+- Confirmed that the repeated `BaseEventLoop.__del__` warnings are unrelated startup/finalizer noise and were not the cause of the failed Reading session.
+
+### Runtime hardening
+
+- Added a scalar-tolerant native CheckboxGroup factory that wraps a single selection into a one-item list before Gradio's standard choice validation.
+- Applied the component to both Topics and Comprehension competencies.
+- Added independent callback-side normalization, duplicate removal, and allow-list validation so direct API clients and future UI changes cannot reintroduce malformed selection state.
+- Invalid selections now fail through the existing recoverable session-start screen instead of raising an uncaught queue preprocessing error.
+
+### QA
+
+- Expanded the automated suite from 78 to 83 tests.
+- Added tests for scalar topic selection, scalar competency selection, normal multi-value selection, invalid-value rejection, and recoverable callback behavior.
+- Verified a live Gradio API session start using scalar `Government and politics` and `main idea` payloads; the Reading session started and returned a valid passage bundle.
+
 ## v1.2.4 — Visible loading feedback and durable generated-bank updates
 
 ### User feedback and duplicate-click prevention

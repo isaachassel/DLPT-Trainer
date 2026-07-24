@@ -389,6 +389,10 @@ Listening MP3 files are served through Gradio's byte-range-capable file route in
 
 Starter audio is bundled. Fresh Listening content requires successful TTS creation and validation before acceptance. If TTS fails, the session falls back to bank content without clearing completed responses.
 
+### Reading session fails with `Value: 'G'` or `Value: 'C'`
+
+Version 1.2.5 fixes a Gradio CheckboxGroup payload edge case. A single selected topic such as `Government and politics` could be submitted as one scalar string, then incorrectly validated character-by-character as `G`. Topics and competencies now normalize scalar selections into one-item lists before validation, with a second allow-list check inside the session callback.
+
 ### Session interrupted
 
 Use the displayed recovery code under **Recover a Checkpoint**. A corrupted checkpoint is rejected safely.
@@ -414,6 +418,7 @@ core/
   validation.py
 ui/
   callbacks.py
+  components.py
   layout.py
 data/
   starter_items.jsonl

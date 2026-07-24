@@ -3,6 +3,7 @@ from __future__ import annotations
 import gradio as gr
 
 from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
+from ui.components import scalar_tolerant_checkbox_group
 from ui.callbacks import (
     BANK_BOOTSTRAP_MESSAGE,
     BANK_STATUS_MESSAGE,
@@ -102,8 +103,8 @@ def build_app() -> gr.Blocks:
                     length = gr.Dropdown(["Short — 8 questions", "Standard — 16 questions", "Long — 24 questions"], value="Standard — 16 questions", label="Session length")
                     timer_mode = gr.Dropdown(["Off", "Standard count-up", "Strict countdown"], value="Off", label="Timer behavior")
                 with gr.Row():
-                    topics = gr.CheckboxGroup(TOPICS, label="Topics (leave blank for balanced selection)")
-                    competencies = gr.CheckboxGroup(QUESTION_TYPES, label="Comprehension competencies to emphasize")
+                    topics = scalar_tolerant_checkbox_group(TOPICS, label="Topics (leave blank for balanced selection)")
+                    competencies = scalar_tolerant_checkbox_group(QUESTION_TYPES, label="Comprehension competencies to emphasize")
                 with gr.Row():
                     feedback_timing = gr.Radio(["After each passage", "End of session"], value="After each passage", label="Feedback timing")
                     hints_enabled = gr.Checkbox(value=False, label="Enable strategy hints")

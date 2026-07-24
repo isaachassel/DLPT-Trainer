@@ -454,6 +454,19 @@ def _length_settings(mode: str, label: str) -> tuple[int, int, bool, bool, int |
     return max_q, max_q, full, shortened, seconds
 
 
+def _normalize_multiselect(value, allowed_values: list[str], field_name: str) -> list[str]:
+    """Normalize a Gradio multi-select payload and reject unknown values safely."""
+
+    if value is None or value == "":
+        return []
+    values = [value] if isinstance(value, str) else list(value)
+    invalid = [item for item in values if item not in allowed_values]
+    if invalid:
+        raise ValueError(f"Invalid {field_name} selection: {', '.join(map(str, invalid))}")
+    # Preserve the user's order while removing accidental duplicates.
+    return list(dict.fromkeys(values))
+
+
 def start_session_callback(
     mode_label, skill_label, start_level, target_level, length_label, timer_label,
     topics, competencies, feedback_timing, hints_enabled, transcript_review,
@@ -464,6 +477,8 @@ def start_session_callback(
         _progress(progress, 0.04, "Validating session settings…")
         mode = MODE_LABELS[mode_label]
         skills = SKILL_LABELS[skill_label]
+        topics = _normalize_multiselect(topics, TOPICS, "topic")
+        competencies = _normalize_multiselect(competencies, QUESTION_TYPES, "competency")
         max_q, minimum, simulation_full, shortened, simulation_seconds = _length_settings(mode, length_label)
         timer_mode = "off" if timer_label == "Off" else ("standard" if timer_label == "Standard count-up" else "strict")
         if mode == "simulation":

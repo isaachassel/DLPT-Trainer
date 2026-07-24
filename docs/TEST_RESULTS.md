@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.4 loading-feedback and generated-bank persistence release on 2026-07-23.
+Executed for the v1.2.5 Reading multi-select runtime-fix release on 2026-07-23.
 
 ## Automated unit/integration suite
 
 ```text
-78 passed
+83 passed
 ```
 
 Core coverage includes:
@@ -50,7 +50,7 @@ GenAI-specific coverage includes:
 - unavailable-provider and generation-limit fallback;
 - generated Listening audio validation and caching.
 
-Version 1.2.4 adds direct regression coverage for:
+Version 1.2.5 additionally adds direct regression coverage for:
 
 - accessible activity spinner and immediate busy-button locking;
 - chained Begin Session, Play Audio, and Submit Passage feedback events;
@@ -59,7 +59,12 @@ Version 1.2.4 adds direct regression coverage for:
 - immediate in-memory indexing and reload into a new `ItemBank` instance;
 - malformed generated-overlay isolation without starter-bank failure;
 - Hugging Face Dataset JSONL/manifest/audio upload behavior;
-- remote Listening audio restoration and runtime-path rewriting.
+- remote Listening audio restoration and runtime-path rewriting;
+- scalar single-topic CheckboxGroup payload normalization;
+- scalar single-competency CheckboxGroup payload normalization;
+- normal multi-value CheckboxGroup preservation;
+- invalid multi-select allow-list rejection;
+- recoverable session-start behavior for malformed direct API selections.
 
 ## Hugging Face metadata and dependency validation
 
@@ -113,7 +118,7 @@ The no-secret result is expected for the release package.
 
 ## Local server and audio route
 
-The v1.2.4 app launched with `ssr_mode=False` and returned:
+The v1.2.5 app launched with `ssr_mode=False` and returned:
 
 ```text
 Application page: HTTP 200, 130,025 bytes
@@ -149,6 +154,18 @@ The manifest test verified one generated Reading passage produced:
 ```
 
 A simulated remote startup restored a generated MP3 into the current runtime audio cache and rewrote the stored asset path.
+
+## Reading scalar-selection runtime integration
+
+A live Gradio client invoked `/start_session_callback` using scalar payloads rather than arrays:
+
+```text
+Topic: Government and politics
+Competency: main idea
+Result: Reading session started successfully and returned a validated passage bundle
+```
+
+This directly reproduces the payload shape that previously caused Gradio to split the selected topic into individual characters.
 
 ## External-provider limitation
 
