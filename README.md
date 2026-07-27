@@ -103,7 +103,7 @@ Immutable starter bank:
 data/starter_items.jsonl
 ```
 
-Writable generated overlay:
+Runtime generated overlay (created automatically; it is intentionally not shipped as a blank release file):
 
 ```text
 storage/item_bank/generated_items.jsonl
@@ -123,6 +123,10 @@ With `PERSISTENT_STORAGE_PATH=/data`:
 ```
 
 Every accepted bundle is atomically committed with its passage, questions, shuffled/remapped answer keys, rationales, Russian evidence, validation reports, generation metadata, and Listening audio metadata. The same objects are inserted into the in-memory indexes immediately, so they are eligible for later fallback selection without restarting the app. The manifest records checksum and counts after every write.
+
+On a Hugging Face Space, the application now attempts to create a private Dataset bank automatically when `HF_BANK_TOKEN` or `HF_TOKEN` has repository write permission. The default derived name is based on the Space identity, for example `alsubij/DLPT-Trainer-dlpt-generated-bank`. Accepted items are uploaded after every successful bundle and restored before the operational bank loads on the next startup.
+
+The setup screen also provides **Download Generated Bank Backup** and **Import and Merge Backup** controls. The portable ZIP includes the JSONL records, manifest, and generated Listening MP3 files.
 
 The two files are indexed as one operational bank. Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable. Malformed generated-overlay records are excluded without disabling the immutable starter bank.
 
@@ -289,7 +293,10 @@ ENABLE_HISTORY=true
 ENABLE_ANALYTICS=false
 CHECKPOINT_AFTER_PASSAGE=true
 PERSISTENT_STORAGE_PATH=/data
-# Optional alternative/additional durable mirror:
+# Recommended free/private Dataset durability:
+HF_BANK_TOKEN=<write-capable Space secret>
+AUTO_PROVISION_DATASET_BANK=true
+# Optional explicit repository instead of the derived private name:
 HF_DATASET_REPO=your-username/dlpt-generated-bank
 STORAGE_BACKEND=hybrid
 HF_DATASET_PRIVATE=true
@@ -297,7 +304,7 @@ SYNC_GENERATED_BANK_ON_STARTUP=true
 SYNC_GENERATED_BANK_ON_WRITE=true
 ```
 
-When `HF_DATASET_REPO` is set and `STORAGE_BACKEND` is omitted, the app selects `hybrid` automatically. `HF_TOKEN` must have write access to the Dataset repository. Accepted Listening MP3s are mirrored under `audio/` together with the JSONL bank and health manifest.
+When `HF_DATASET_REPO` is set, the app selects `hybrid` automatically unless another backend is explicitly requested. On Spaces, `AUTO_PROVISION_DATASET_BANK=true` also selects hybrid persistence when `HF_BANK_TOKEN` or `HF_TOKEN` is present. `HF_BANK_TOKEN` is preferred so bank-write permission remains separate from inference access. Accepted Listening MP3s are mirrored under `audio/` together with the JSONL bank and health manifest.
 
 Never commit real keys. Settings excludes secret fields from model serialization, provider errors are redacted, and quarantine persistence recursively removes secret-bearing strings.
 
@@ -318,12 +325,15 @@ python scripts/validate_item_bank.py
 
 ## Persistence and restart behavior
 
-Default Space disk is ephemeral. Without durable storage, accepted generated items are atomically saved, indexed, and reusable immediately, but they may disappear after a rebuild or restart.
+Default Space disk is ephemeral. Without durable storage, accepted generated items are atomically saved, indexed, and reusable immediately, but they disappear after the container is replaced.
 
-Two durability options are implemented:
+Three protection layers are implemented:
 
 1. **Mounted storage:** set `PERSISTENT_STORAGE_PATH=/data`. Generated items, manifest, audio, checkpoints, history, quarantine records, and exports use the mounted volume.
-2. **Hugging Face Dataset mirror:** set `HF_DATASET_REPO`, a write-capable `HF_TOKEN`, and `STORAGE_BACKEND=hybrid` or `hf_dataset`. The app merges the remote bank at startup and uploads the JSONL snapshot, manifest, and generated Listening MP3 files after every accepted bundle.
+2. **Automatic private Hugging Face Dataset:** add a write-capable `HF_BANK_TOKEN` secret and leave `AUTO_PROVISION_DATASET_BANK=true`. The app derives/creates a private Dataset, restores it at startup, and uploads after every accepted bundle. `HF_TOKEN` is used as a backwards-compatible fallback when it already has write permission.
+3. **Explicit Dataset mirror:** set `HF_DATASET_REPO` and `STORAGE_BACKEND=hybrid` or `hf_dataset` when you want to control the exact repository name.
+
+Regardless of backend, the UI can export a portable bank ZIP and import/merge it later. Release archives omit blank generated-bank runtime files, so copying new source folders cannot overwrite an existing mounted or restored bank.
 
 The setup screen shows the current generated passage/question counts, checksum prefix, and persistence mode. Active session status updates those counts after live generation. If remote synchronization fails, the local atomic commit remains usable and the UI states that the item is not yet durably mirrored.
 
@@ -369,7 +379,21 @@ The pipeline tries configured providers fairly at each output strength, supports
 
 ### Generated items disappear after restart
 
-Use one of the implemented durable modes:
+The setup banner must say **restart-safe**. If it says `NOT restart-safe — ephemeral local Space storage`, add this Space secret:
+
+```text
+HF_BANK_TOKEN=<a Hugging Face token with repository write permission>
+```
+
+Keep these variables:
+
+```text
+AUTO_PROVISION_DATASET_BANK=true
+SYNC_GENERATED_BANK_ON_STARTUP=true
+SYNC_GENERATED_BANK_ON_WRITE=true
+```
+
+The next startup creates or restores a private Dataset automatically. An explicit repository remains supported:
 
 ```text
 PERSISTENT_STORAGE_PATH=/data
@@ -380,12 +404,12 @@ or:
 ```text
 HF_DATASET_REPO=your-username/dlpt-generated-bank
 STORAGE_BACKEND=hybrid
-HF_TOKEN=<write-capable Space secret>
+HF_BANK_TOKEN=<write-capable Space secret>
 SYNC_GENERATED_BANK_ON_STARTUP=true
 SYNC_GENERATED_BANK_ON_WRITE=true
 ```
 
-The setup banner identifies whether the current bank is ephemeral, mounted, or Dataset-synchronized.
+The setup banner identifies whether the current bank is ephemeral, mounted, or Dataset-synchronized. Use **Download Generated Bank Backup** before any update whenever the banner is not restart-safe.
 
 ### A candidate fails validation
 
@@ -482,3 +506,14 @@ LICENSE
 ```
 
 See `docs/GENAI_AUDIT.md`, `docs/TEST_RESULTS.md`, and `docs/KNOWN_LIMITATIONS.md` for details.
+
+
+## v1.2.9 item-level disclosure
+
+The application reveals item levels only at feedback-safe points:
+
+- Training with passage feedback: each completed question shows its intended ILR band.
+- Training with end-only feedback: levels appear in the final report.
+- Adaptive Diagnostic and Full CA Simulation: levels remain hidden during the active test and appear only after completion.
+
+Uncalibrated items are labeled as an **intended provisional ILR level**. When empirical calibration exists, the report shows the approximate calibrated operational band and separately preserves the original authoring target. These are practice metadata, not official DLPT item classifications.

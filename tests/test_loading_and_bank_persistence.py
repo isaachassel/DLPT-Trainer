@@ -192,3 +192,86 @@ def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monk
     assert restored_path.parent == settings.audio_cache_runtime_path(project_root)
     assert restored_path.exists()
     assert restored_path.read_bytes() == remote_audio.read_bytes()
+
+
+def test_auto_provisions_private_dataset_bank_from_space_id(monkeypatch, project_root, tmp_path):
+    uploaded: list[str] = []
+    created: list[str] = []
+
+    class FakeApi:
+        def __init__(self, token=None):
+            self.token = token
+
+        def create_repo(self, **kwargs):
+            created.append(kwargs["repo_id"])
+            return None
+
+        def upload_file(self, **kwargs):
+            uploaded.append(kwargs["path_in_repo"])
+            return None
+
+        def whoami(self, **kwargs):
+            return {"name": "alsubij"}
+
+    def missing_remote(**kwargs):
+        from huggingface_hub.utils import EntryNotFoundError
+
+        raise EntryNotFoundError("not initialized")
+
+    monkeypatch.setenv("SPACE_ID", "alsubij/DLPT-Trainer")
+    monkeypatch.setattr("core.bank_persistence.HfApi", FakeApi)
+    monkeypatch.setattr("core.bank_persistence.hf_hub_download", missing_remote)
+    settings = _settings(
+        tmp_path,
+        storage_backend="hybrid",
+        hf_dataset_repo=None,
+        hf_token="inference-token",
+        hf_bank_token="write-token",
+        auto_provision_dataset_bank=True,
+    )
+    persistence = GeneratedBankPersistence(settings, project_root)
+    note = persistence.bootstrap()
+
+    assert persistence.resolved_repo_id == "alsubij/DLPT-Trainer-dlpt-generated-bank"
+    assert created == [persistence.resolved_repo_id]
+    assert settings.hf_dataset_bank_filename in uploaded
+    assert settings.hf_dataset_manifest_filename in uploaded
+    assert persistence.last_remote_synced is True
+    assert "initialized" in note
+    assert "restart-safe" in persistence.status_text()
+
+
+def test_generated_bank_backup_zip_round_trip(project_root, tmp_path):
+    source_settings = _settings(tmp_path / "source")
+    source_persistence = GeneratedBankPersistence(source_settings, project_root)
+    source_persistence.bootstrap()
+    source_bank_path = source_settings.generated_bank_runtime_path(project_root)
+    source_bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", source_bank_path],
+        writable_path=source_bank_path,
+        on_commit=source_persistence.after_local_commit,
+    ).load()
+    generated = LiveGenerationService(source_settings, source_bank, project_root, provider=MockProvider()).generate_and_store(
+        skill="reading",
+        level="2",
+        mode="training",
+        topics=["education"],
+        competencies=["main idea"],
+        maximum_questions=2,
+    )
+    backup = source_persistence.export_backup(tmp_path / "exports")
+    assert backup.exists()
+
+    destination_settings = _settings(tmp_path / "destination")
+    destination_persistence = GeneratedBankPersistence(destination_settings, project_root)
+    destination_persistence.bootstrap()
+    result = destination_persistence.import_backup(backup)
+    destination_bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", destination_settings.generated_bank_runtime_path(project_root)],
+        writable_path=destination_settings.generated_bank_runtime_path(project_root),
+    ).load()
+
+    assert result.passage_count == 1
+    assert result.question_count == 2
+    assert generated.passage.id in destination_bank.passages
+    assert destination_bank.origin_for(generated.passage.id) == "generated_bank"

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from core.reporting import build_full_report
 from core.session import create_session, select_next_bundle, submit_current_bundle
-from core.scoring import accuracy
+from core.scoring import accuracy, item_level_label
 
 
 def make_completed_piece(bank, mode="training", skill="reading"):
@@ -44,3 +44,32 @@ def test_training_review_displays_correct_evidence(bank):
     state.responses[0].is_correct = False
     report = build_full_report(state, bank)
     assert state.responses[0].evidence_ru in report
+
+
+def test_final_report_reveals_level_for_every_completed_question(bank):
+    state = make_completed_piece(bank)
+    report = build_full_report(state, bank)
+    assert "Question-level ILR review" in report
+    for record in state.responses:
+        assert item_level_label(record) in report
+
+
+def test_provisional_level_label_is_transparent(bank):
+    state = make_completed_piece(bank)
+    record = state.responses[0]
+    assert record.provisional_item is True
+    label = item_level_label(record)
+    assert f"Intended ILR {record.target_ilr}" in label
+    assert "provisional" in label.lower()
+
+
+def test_calibrated_level_label_distinguishes_authoring_target(bank):
+    state = make_completed_piece(bank)
+    record = state.responses[0].model_copy(update={
+        "provisional_item": False,
+        "target_ilr": "1",
+        "item_difficulty": 1.22,
+    })
+    label = item_level_label(record)
+    assert "Approximately ILR 2+" in label
+    assert "original authoring target ILR 1" in label

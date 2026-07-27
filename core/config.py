@@ -24,6 +24,8 @@ class Settings(BaseModel):
     persistent_storage_path: Path | None = None
     storage_backend: str = "local"
     hf_dataset_repo: str | None = None
+    auto_provision_dataset_bank: bool = True
+    auto_dataset_repo_suffix: str = "dlpt-generated-bank"
     generated_bank_manifest_path: Path = Path("storage/item_bank/generated_items.meta.json")
     hf_dataset_bank_filename: str = "generated_items.jsonl"
     hf_dataset_manifest_filename: str = "generated_items.meta.json"
@@ -33,6 +35,7 @@ class Settings(BaseModel):
 
     # Secrets are read only from environment/Space secrets. They are never serialized into app data.
     hf_token: str | None = Field(default=None, exclude=True, repr=False)
+    hf_bank_token: str | None = Field(default=None, exclude=True, repr=False)
     groq_api_key: str | None = Field(default=None, exclude=True, repr=False)
 
     # Hybrid authoring/provider configuration.
@@ -128,6 +131,17 @@ class Settings(BaseModel):
     @property
     def effective_storage_dir(self) -> Path:
         return self.persistent_storage_path or self.storage_dir
+
+    @property
+    def bank_token(self) -> str | None:
+        """Token used only for generated-bank backup/restore operations.
+
+        HF_BANK_TOKEN is preferred so deployments may keep repository-write
+        permission separate from inference access. HF_TOKEN remains a backwards-
+        compatible fallback for existing Spaces.
+        """
+
+        return self.hf_bank_token or self.hf_token
 
     def runtime_path(self, configured: Path, project_root: Path, persistent_relative: str | None = None) -> Path:
         if configured.is_absolute():
@@ -270,7 +284,25 @@ def get_settings() -> Settings:
     # for the original repository and existing Hugging Face Space configuration.
     generation_provider = os.getenv("GENERATION_PROVIDER") or os.getenv("GENAI_PROVIDER") or "hf_then_groq"
     hf_dataset_repo = os.getenv("HF_DATASET_REPO") or None
-    storage_backend = os.getenv("STORAGE_BACKEND") or ("hybrid" if hf_dataset_repo else "local")
+    hf_token = os.getenv("HF_TOKEN") or None
+    hf_bank_token = os.getenv("HF_BANK_TOKEN") or hf_token
+    auto_provision_dataset_bank = _env_bool("AUTO_PROVISION_DATASET_BANK", True)
+    # On a Hugging Face Space, default to a Dataset-backed overlay whenever a
+    # write-capable token is present. The persistence layer derives a private
+    # repository name from SPACE_ID and verifies permission at startup.
+    automatic_hybrid_candidate = bool(
+        auto_provision_dataset_bank
+        and hf_bank_token
+        and (os.getenv("SPACE_ID") or os.getenv("SPACE_HOST"))
+    )
+    requested_storage_backend = os.getenv("STORAGE_BACKEND", "").strip().lower()
+    # Older releases recommended STORAGE_BACKEND=local. On an actual Space,
+    # automatic durability intentionally upgrades that legacy value to hybrid
+    # unless AUTO_PROVISION_DATASET_BANK is explicitly disabled.
+    if hf_dataset_repo or automatic_hybrid_candidate:
+        storage_backend = "hybrid" if requested_storage_backend in {"", "local"} else requested_storage_backend
+    else:
+        storage_backend = requested_storage_backend or "local"
     settings = Settings(
         environment=os.getenv("APP_ENV", "production"),
         data_dir=Path(os.getenv("DATA_DIR", "data")),
@@ -284,13 +316,16 @@ def get_settings() -> Settings:
         persistent_storage_path=_optional_path("PERSISTENT_STORAGE_PATH"),
         storage_backend=storage_backend,
         hf_dataset_repo=hf_dataset_repo,
+        auto_provision_dataset_bank=auto_provision_dataset_bank,
+        auto_dataset_repo_suffix=os.getenv("AUTO_DATASET_REPO_SUFFIX", "dlpt-generated-bank"),
         generated_bank_manifest_path=Path(os.getenv("GENERATED_BANK_MANIFEST_PATH", "storage/item_bank/generated_items.meta.json")),
         hf_dataset_bank_filename=os.getenv("HF_DATASET_BANK_FILENAME", "generated_items.jsonl"),
         hf_dataset_manifest_filename=os.getenv("HF_DATASET_MANIFEST_FILENAME", "generated_items.meta.json"),
         hf_dataset_private=_env_bool("HF_DATASET_PRIVATE", True),
         sync_generated_bank_on_startup=_env_bool("SYNC_GENERATED_BANK_ON_STARTUP", True),
         sync_generated_bank_on_write=_env_bool("SYNC_GENERATED_BANK_ON_WRITE", True),
-        hf_token=os.getenv("HF_TOKEN") or None,
+        hf_token=hf_token,
+        hf_bank_token=hf_bank_token,
         groq_api_key=os.getenv("GROQ_API_KEY") or None,
         generation_provider=generation_provider,
         verification_provider=os.getenv("VERIFICATION_PROVIDER", "auto"),

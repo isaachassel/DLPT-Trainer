@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.3.0 — Durable generated-bank protection
+
+- Added automatic private Hugging Face Dataset provisioning for generated content.
+- Added `HF_BANK_TOKEN` so bank-write permission can be separated from inference access.
+- Derived a private Dataset name from the running Space identity when `HF_DATASET_REPO` is not supplied.
+- Restored and merged the remote bank before the operational item bank loads.
+- Mirrored accepted JSONL records, health metadata, and generated Listening audio after every successful bundle.
+- Added portable ZIP export and duplicate-safe import/merge controls to the Gradio interface.
+- Added in-place item-bank reload after import.
+- Added explicit restart-safe versus ephemeral status messaging.
+- Removed blank generated runtime-bank files from release packaging.
+- Added automatic-provisioning and backup round-trip tests.
+
+
+## v1.2.9 — Mode-sensitive item-level disclosure
+
+- Added item-level disclosure to Training passage feedback.
+- Added a question-by-question ILR section to every final Reading and Listening report.
+- Kept item levels hidden during active Adaptive Diagnostic and Full CA Simulation sections.
+- Distinguished provisional authoring targets from empirically calibrated operational difficulty.
+- Added regression tests for provisional labels, calibrated labels, complete final-report coverage, Training feedback, and strict-mode non-disclosure.
+
+
 ## v1.2.8 — Verifier evidence-gate correction
 
 ### Confirmed runtime failure

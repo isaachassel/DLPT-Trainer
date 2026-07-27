@@ -23,8 +23,10 @@ def launch_kwargs() -> dict:
 
     starter_audio = (ROOT / "data" / "audio").resolve()
     runtime_audio = settings.audio_cache_runtime_path(ROOT).resolve()
+    runtime_exports = settings.runtime_path(Path("storage/exports"), ROOT, "exports").resolve()
     starter_audio.mkdir(parents=True, exist_ok=True)
     runtime_audio.mkdir(parents=True, exist_ok=True)
+    runtime_exports.mkdir(parents=True, exist_ok=True)
     return {
         "server_name": settings.app_host,
         "server_port": settings.app_port,
@@ -35,7 +37,7 @@ def launch_kwargs() -> dict:
         # does not need SSR, so use the stable client-rendered path explicitly.
         "ssr_mode": False,
         # Serve only validated starter audio and the controlled TTS cache.
-        "allowed_paths": [str(starter_audio), str(runtime_audio)],
+        "allowed_paths": [str(starter_audio), str(runtime_audio), str(runtime_exports)],
     }
 
 

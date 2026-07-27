@@ -17,6 +17,8 @@ from ui.callbacks import (
     begin_activity,
     answer_changed_callback,
     end_activity,
+    export_generated_bank_callback,
+    import_generated_bank_callback,
     mode_controls,
     play_audio_callback,
     restore_activity_button,
@@ -83,11 +85,11 @@ def build_app() -> gr.Blocks:
             gr.Markdown(DISCLAIMER, elem_classes=["disclaimer"])
             with gr.Row():
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Training Mode**\n\nTargeted practice, replay, optional hints, and passage-level review.")
+                    gr.Markdown("**Training Mode**\n\nTargeted practice, replay, optional hints, and passage-level review with item-level disclosure.")
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Reading and Listening estimates with uncertainty and confidence-based stopping.")
+                    gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Reading and Listening estimates. Item levels stay hidden during testing and appear in the final report.")
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Full CA Simulation**\n\nStrict timing, locked progression, one controlled listening play, and no feedback until completion.")
+                    gr.Markdown("**Full CA Simulation**\n\nStrict timing and locked progression. Item levels remain hidden until the completed final report.")
 
             state = gr.State(value=None)
             bundle_state = gr.State(value=None)
@@ -131,6 +133,24 @@ def build_app() -> gr.Blocks:
                 with gr.Row():
                     resume_code = gr.Textbox(label="Session code", placeholder="Example: 4e1ac9f71c2b")
                     resume_btn = gr.Button("Resume Session")
+
+            with gr.Accordion("Generated Bank Backup & Persistence", open=False):
+                gr.Markdown(
+                    "Generated content must live outside the disposable Space container to survive restarts. "
+                    "When private Dataset synchronization is active, the bank restores automatically. "
+                    "The manual ZIP backup remains available as an additional safety copy."
+                )
+                with gr.Row():
+                    export_bank_btn = gr.Button("Download Generated Bank Backup")
+                    bank_backup_file = gr.File(label="Generated bank backup", visible=False)
+                with gr.Row():
+                    bank_import_file = gr.File(
+                        label="Import a prior generated-bank ZIP or JSONL",
+                        file_types=[".zip", ".jsonl"],
+                        type="filepath",
+                    )
+                    import_bank_btn = gr.Button("Import and Merge Backup")
+                bank_backup_status = gr.Markdown(visible=False)
 
             activity = gr.HTML(value="", visible=False, elem_id="operation-activity")
             status = gr.Markdown(visible=False)
@@ -236,6 +256,26 @@ def build_app() -> gr.Blocks:
             resume_run.failure(
                 lambda: restore_activity_button("Resume Session"),
                 outputs=[activity, resume_btn], queue=False, show_progress="hidden",
+            )
+
+            export_bank_btn.click(
+                export_generated_bank_callback,
+                outputs=[bank_backup_file, bank_backup_status, bank_status],
+                show_progress="minimal",
+                trigger_mode="once",
+            ).then(
+                lambda: gr.update(visible=True),
+                outputs=[bank_backup_file],
+                queue=False,
+                show_progress="hidden",
+            )
+
+            import_bank_btn.click(
+                import_generated_bank_callback,
+                inputs=[bank_import_file],
+                outputs=[bank_backup_status, bank_status],
+                show_progress="minimal",
+                trigger_mode="once",
             )
 
             for index, radio in enumerate(answer_radios):

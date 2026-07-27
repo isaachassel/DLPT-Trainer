@@ -97,6 +97,24 @@ class ItemBank:
             self._loaded = True
         return self
 
+    def reload(self) -> "ItemBank":
+        """Reload starter and generated overlays in place.
+
+        The object identity is preserved so services that hold a reference to
+        the bank immediately see imported or remotely restored generated items.
+        """
+
+        with self._lock:
+            self.passages.clear()
+            self.questions.clear()
+            self.audio_assets.clear()
+            self.validation_reports.clear()
+            self.questions_by_passage = defaultdict(list)
+            self.passage_origin.clear()
+            self.load_warnings.clear()
+            self._loaded = False
+        return self.load()
+
     def validate_operational_bank(self) -> list[str]:
         errors: list[str] = []
         seen_hashes: dict[str, str] = {}

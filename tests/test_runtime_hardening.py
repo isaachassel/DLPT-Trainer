@@ -15,7 +15,8 @@ def test_only_audio_directories_are_exposed() -> None:
     kwargs = launch_kwargs()
     allowed = {Path(path).resolve() for path in kwargs["allowed_paths"]}
     assert (ROOT / "data" / "audio").resolve() in allowed
-    assert all(path.name == "audio" for path in allowed)
+    assert (ROOT / "storage" / "exports").resolve() in allowed
+    assert all(path.name in {"audio", "exports"} for path in allowed)
     assert ROOT.resolve() not in allowed
 
 

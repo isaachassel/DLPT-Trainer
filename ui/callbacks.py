@@ -26,6 +26,7 @@ from core.generation import LiveGenerationService, ProviderError
 from core.item_bank import ItemBank, shuffled_bundle
 from core.models import PassageItem, QuestionItem, SessionState, UserHistory
 from core.reporting import build_exports, build_full_report
+from core.scoring import item_level_label
 from core.session import (
     PassageBundle,
     SessionFlowError,
@@ -83,6 +84,59 @@ CONTENT_SOURCE_CHOICES = [
 
 QUEUE_CONCURRENCY_LIMIT = SETTINGS.queue_concurrency_limit
 MAX_SLOTS = 5
+
+
+def export_generated_bank_callback():
+    """Create a user-downloadable bank+audio backup without mutating the bank."""
+
+    try:
+        path = BANK_PERSISTENCE.export_backup(EXPORT_DIR)
+        return (
+            str(path),
+            gr.update(
+                value=(
+                    "✅ Generated-bank backup created. Keep this ZIP before updating or restarting an "
+                    "ephemeral Space. It contains the JSONL bank, manifest, and generated Listening audio."
+                ),
+                visible=True,
+            ),
+            bank_status_markdown(),
+        )
+    except Exception as exc:
+        return (
+            None,
+            gr.update(value=f"❌ Could not create the bank backup: {html.escape(str(exc))}", visible=True),
+            bank_status_markdown(),
+        )
+
+
+def import_generated_bank_callback(uploaded_file):
+    """Merge a portable backup and reload the shared in-memory bank in place."""
+
+    if not uploaded_file:
+        return (
+            gr.update(value="Select a generated-bank ZIP or JSONL file first.", visible=True),
+            bank_status_markdown(),
+        )
+    source = getattr(uploaded_file, "name", uploaded_file)
+    try:
+        result = BANK_PERSISTENCE.import_backup(source)
+        BANK.reload()
+        return (
+            gr.update(
+                value=(
+                    f"✅ Backup merged successfully: {result.passage_count} generated passages / "
+                    f"{result.question_count} questions are now indexed. {result.note}"
+                ),
+                visible=True,
+            ),
+            bank_status_markdown(),
+        )
+    except Exception as exc:
+        return (
+            gr.update(value=f"❌ Backup import failed safely: {html.escape(str(exc))}", visible=True),
+            bank_status_markdown(),
+        )
 
 
 def activity_html(message: str) -> str:
@@ -623,10 +677,15 @@ def show_hints_callback(state: SessionState | None, bundle_data: dict | None):
 
 
 def _passage_feedback(records, passage: PassageItem, state: SessionState) -> str:
-    lines = ["### Passage Feedback"]
+    calibration = "provisional" if all(record.provisional_item for record in records) else "mixed provisional/calibrated"
+    lines = [
+        "### Passage Feedback",
+        f"**Passage authoring target:** ILR {passage.target_ilr} ({calibration} item metadata).",
+    ]
     for index, record in enumerate(records, start=1):
         mark = "✅ Correct" if record.is_correct else "❌ Incorrect"
         lines.append(f"**{index}. {mark} — {record.stem_en}**")
+        lines.append(f"- Item level: **{item_level_label(record)}**")
         lines.append(f"- Correct answer: {record.correct_key}. {record.choices_snapshot[record.correct_key]}")
         lines.append(f"- Explanation: {record.rationale_en}")
         lines.append(f"- Russian evidence: `{record.evidence_ru}`")

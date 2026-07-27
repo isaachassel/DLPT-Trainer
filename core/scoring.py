@@ -2,8 +2,27 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 
+from .constants import ILR_THETA
 from .models import AbilityEstimate, ResponseRecord
 
+
+
+def nearest_ilr_band(difficulty: float) -> str:
+    """Map a continuous item difficulty to the nearest displayed ILR half-band."""
+    return min(ILR_THETA, key=lambda level: abs(ILR_THETA[level] - difficulty))
+
+
+def item_level_label(record: ResponseRecord) -> str:
+    """Describe an item's level without overstating provisional metadata."""
+    if record.provisional_item:
+        return f"Intended ILR {record.target_ilr} — provisional item level"
+    operational = nearest_ilr_band(record.item_difficulty)
+    if operational == record.target_ilr:
+        return f"Approximately ILR {operational} — empirically calibrated item difficulty"
+    return (
+        f"Approximately ILR {operational} — empirically calibrated item difficulty; "
+        f"original authoring target ILR {record.target_ilr}"
+    )
 
 def estimate_label(estimate: AbilityEstimate) -> str:
     if estimate.practice_ilr is None or not estimate.stable:

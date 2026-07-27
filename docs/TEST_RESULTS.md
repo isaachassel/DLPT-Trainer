@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.2.8 verifier evidence-gate correction release on 2026-07-24.
+Executed for the v1.3.0 durable generated-bank release on 2026-07-27.
 
 ## Automated unit/integration suite
 
 ```text
-96 passed
+104 passed
 ```
 
 Core coverage includes:
@@ -87,6 +87,26 @@ Version 1.2.8 additionally verifies:
 - operational `QuestionItem.evidence_ru` still fails closed when it is not an exact passage substring;
 - verifier evidence exactness and traceability scores are persisted in validation reports.
 
+Version 1.2.9 additionally verifies:
+
+- Training passage feedback reveals the passage authoring target and each completed question's intended ILR band;
+- every completed question appears in the final question-level ILR review, including correctly answered items;
+- provisional item labels explicitly state that the level is provisional;
+- empirically calibrated item difficulty is mapped to the nearest displayed half-band while preserving a differing original authoring target;
+- active Diagnostic passage presentation does not reveal the passage or question level before submission/completion.
+
+Version 1.3.0 additionally verifies:
+
+- automatic private Dataset repository derivation from the running Space identity;
+- automatic private Dataset initialization when no remote bank file exists;
+- separate `HF_BANK_TOKEN` use with `HF_TOKEN` fallback;
+- legacy `STORAGE_BACKEND=local` upgrade to hybrid persistence on Spaces when auto-provisioning is enabled;
+- generated-bank JSONL and manifest upload during automatic provisioning;
+- portable generated-bank ZIP export;
+- backup import/merge and immediate generated-overlay reload;
+- generated Listening audio inclusion and restoration through backup and Dataset paths;
+- controlled serving of only audio and generated-bank export directories.
+
 ## Hugging Face metadata and dependency validation
 
 README front matter:
@@ -117,7 +137,7 @@ Answer positions: {'A': 22, 'B': 22, 'C': 22, 'D': 22}
 VALIDATION PASSED
 ```
 
-The packaged generated overlay is empty by design. Runtime-generated accepted bundles are written to the overlay and manifest.
+The release archive intentionally omits blank generated-overlay runtime files. The app creates them only when absent, then mirrors accepted bundles to the configured private Dataset or mounted storage. Portable backup ZIP export/import is also available in the UI.
 
 ## Full simulation flow
 
