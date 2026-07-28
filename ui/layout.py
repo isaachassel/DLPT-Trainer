@@ -85,11 +85,11 @@ def build_app() -> gr.Blocks:
             gr.Markdown(DISCLAIMER, elem_classes=["disclaimer"])
             with gr.Row():
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Training Mode**\n\nTargeted practice, replay, optional hints, and passage-level review with item-level disclosure.")
+                    gr.Markdown("**Training Mode**\n\nTargeted adaptive practice with a selectable ILR floor/ceiling, replay, optional hints, and passage-level review.")
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Reading and Listening estimates. Item levels stay hidden during testing and appear in the final report.")
+                    gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Bayesian Reading and Listening routing. Passages move up or down one adjacent ILR half-step as evidence accumulates.")
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Full CA Simulation**\n\nStrict timing and locked progression. Item levels remain hidden until the completed final report.")
+                    gr.Markdown("**Full CA Simulation**\n\nBegins at medium difficulty, adapts after every passage, and preserves strict timing and locked progression.")
 
             state = gr.State(value=None)
             bundle_state = gr.State(value=None)
@@ -104,6 +104,26 @@ def build_app() -> gr.Blocks:
                     target_level = gr.Dropdown(ILR_LEVELS, value="2", label="Target ILR band")
                     length = gr.Dropdown(["Short — 8 questions", "Standard — 16 questions", "Long — 24 questions"], value="Standard — 16 questions", label="Session length")
                     timer_mode = gr.Dropdown(["Off", "Standard count-up", "Strict countdown"], value="Off", label="Timer behavior")
+                with gr.Row():
+                    adaptive_start = gr.Radio(
+                        ["Medium difficulty (recommended)", "Use selected starting ILR band"],
+                        value="Use selected starting ILR band",
+                        label="Adaptive starting policy",
+                        visible=False,
+                        info="Diagnostics normally begin near medium difficulty. A selected-band start is a targeted challenge rather than a neutral full-spectrum start.",
+                    )
+                    minimum_ilr = gr.Dropdown(
+                        ILR_LEVELS,
+                        value="0",
+                        label="Lowest ILR band allowed",
+                        info="Hard eligibility floor for Training and Adaptive Diagnostic item selection.",
+                    )
+                    maximum_ilr = gr.Dropdown(
+                        ILR_LEVELS,
+                        value="3",
+                        label="Highest ILR band allowed",
+                        info="Hard eligibility ceiling. For example, choose 2 through 3 to allow only 2, 2+, and 3 items.",
+                    )
                 with gr.Row():
                     topics = scalar_tolerant_checkbox_group(TOPICS, label="Topics (leave blank for balanced selection)")
                     competencies = scalar_tolerant_checkbox_group(QUESTION_TYPES, label="Comprehension competencies to emphasize")
@@ -197,12 +217,18 @@ def build_app() -> gr.Blocks:
             mode.change(
                 mode_controls,
                 inputs=[mode, skill],
-                outputs=[length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing],
+                outputs=[
+                    length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
+                    adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
+                ],
             )
             skill.change(
                 mode_controls,
                 inputs=[mode, skill],
-                outputs=[length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing],
+                outputs=[
+                    length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
+                    adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
+                ],
             )
 
             start_prepare = start_btn.click(
@@ -217,6 +243,7 @@ def build_app() -> gr.Blocks:
                 inputs=[
                     mode, skill, start_level, target_level, length, timer_mode, topics, competencies,
                     feedback_timing, hints_enabled, transcript_review, voice, speed, profile_id, content_source,
+                    adaptive_start, minimum_ilr, maximum_ilr,
                 ],
                 outputs=outputs,
                 show_progress="hidden",

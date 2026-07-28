@@ -42,6 +42,35 @@ def _question_level_review(records: list[ResponseRecord]) -> list[str]:
         )
     return lines
 
+
+def _adaptive_route_review(state: SessionState, skill: str) -> list[str]:
+    estimate = state.ability_for(skill)
+    lines = [
+        "### Adaptive routing review",
+        (
+            f"Eligible range: **ILR {state.minimum_ilr} through ILR {state.maximum_ilr}**. "
+            "The continuous Bayesian estimate is used for scoring; the delivery band moves conservatively "
+            "by no more than one adjacent ILR half-step after each completed passage."
+        ),
+    ]
+    if not estimate.routing_history:
+        return lines + [f"No completed routing decisions. Initial delivery band: **ILR {estimate.routing_ilr}**."]
+    route = [estimate.routing_history[0]["from_ilr"]]
+    route.extend(event["to_ilr"] for event in estimate.routing_history)
+    lines.append("**Passage routing path:** " + " → ".join(f"ILR {level}" for level in route))
+    lines.append(f"**Next/final routing band:** ILR {estimate.routing_ilr}")
+    for index, event in enumerate(estimate.routing_history, start=1):
+        movement = (
+            "held"
+            if event["from_ilr"] == event["to_ilr"]
+            else f"moved {event['from_ilr']} → {event['to_ilr']}"
+        )
+        lines.append(
+            f"- Passage {index}: {event['bundle_correct']}/{event['bundle_total']} correct; "
+            f"{movement}; {event['reason']}."
+        )
+    return lines
+
 def _recommendation(records: list[ResponseRecord], estimate_level: str | None, weaknesses: list[str]) -> str:
     level = estimate_level or "the current working band"
     weak_text = ", ".join(weaknesses) if weaknesses else "mixed comprehension skills"
@@ -65,6 +94,12 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
     if state.shortened_simulation and state.mode == "simulation":
         lines.append("**This was a shortened simulation and is not equivalent to a complete test.**")
     lines.append("All uncalibrated bank and live-generated item difficulties are provisional rather than empirical psychometric parameters.")
+    if state.minimum_ilr != "0" or state.maximum_ilr != "3":
+        lines.append(
+            "**Range-limited interpretation:** this estimate was produced only from the configured ILR band range "
+            "and should not be interpreted as a full-spectrum diagnostic outside that range."
+        )
+    lines.extend(_adaptive_route_review(state, skill))
     lines.extend(_format_group("Accuracy by ILR band", grouped_accuracy(records, "target_ilr")))
     lines.extend(_question_level_review(records))
     lines.extend(_format_group("Accuracy by question type", grouped_accuracy(records, "question_type")))

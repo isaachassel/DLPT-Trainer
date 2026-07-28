@@ -40,6 +40,35 @@
       "title": "Exposure Penalty",
       "type": "number"
     },
+    "routing_band": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Routing Band"
+    },
+    "selected_band": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Selected Band"
+    },
+    "band_distance": {
+      "default": 0,
+      "title": "Band Distance",
+      "type": "integer"
+    },
     "reasons": {
       "items": {
         "type": "string"

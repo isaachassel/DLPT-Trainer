@@ -4,7 +4,15 @@ import time
 from collections import Counter
 from dataclasses import dataclass
 
-from .adaptive import initialize_ability, should_stop_diagnostic, update_ability
+from .adaptive import (
+    clamp_ilr,
+    diagnostic_probe_band,
+    ilr_range,
+    initialize_ability,
+    should_stop_diagnostic,
+    update_ability,
+    update_routing_band,
+)
 from .constants import ILR_THETA, SIMULATION_MIN_QUESTIONS
 from .item_bank import ItemBank, shuffled_bundle
 from .models import PassageItem, QuestionItem, ResponseRecord, SessionState, UserHistory
@@ -42,17 +50,29 @@ def create_session(
     content_source: str = "bank_only",
     simulation_full: bool = False,
     shortened_simulation: bool = False,
+    adaptive_start_policy: str = "medium",
+    minimum_ilr: str = "0",
+    maximum_ilr: str = "3",
 ) -> SessionState:
     now = time.time()
     broad = mode != "training"
-    reading = initialize_ability("reading", start_level if mode == "training" else "1+", broad=broad)
-    listening = initialize_ability("listening", start_level if mode == "training" else "1+", broad=broad)
+    if mode == "training" or (mode == "diagnostic" and adaptive_start_policy == "selected"):
+        prior_level = clamp_ilr(start_level, minimum_ilr, maximum_ilr)
+        routing_level = prior_level
+    else:
+        prior_level = "1+"
+        routing_level = clamp_ilr("2", minimum_ilr, maximum_ilr)
+    reading = initialize_ability("reading", prior_level, broad=broad, routing_level=routing_level)
+    listening = initialize_ability("listening", prior_level, broad=broad, routing_level=routing_level)
     state = SessionState(
         profile_id=profile_id.strip() if profile_id and profile_id.strip() else None,
         mode=mode,
         selected_skills=selected_skills,
         start_level=start_level,
         target_level=target_level,
+        adaptive_start_policy=adaptive_start_policy,
+        minimum_ilr=minimum_ilr,
+        maximum_ilr=maximum_ilr,
         topics=topics,
         competencies=competencies,
         max_questions_per_skill=max_questions_per_skill,
@@ -98,6 +118,11 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
     history_seen_passages = set(history.seen_passage_ids) if history else set()
     history_seen_questions = set(history.seen_question_ids) if history else set()
     first_passage = state.completed_count(skill) == 0
+    if state.mode == "diagnostic" and state.adaptive_start_policy == "selected":
+        first_passage = False
+    selection_band = estimate.routing_ilr
+    if state.mode == "diagnostic" and state.completed_count(skill) >= 4:
+        selection_band = diagnostic_probe_band(estimate, state.minimum_ilr, state.maximum_ilr)
     selection = bank.select(
         skill=skill,
         estimate=estimate,
@@ -112,6 +137,9 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
         allowed_topics=set(state.topics) if state.topics else None,
         preferred_competencies=set(state.competencies) if state.competencies else None,
         first_passage=first_passage,
+        allowed_ilr_bands=set(ilr_range(state.minimum_ilr, state.maximum_ilr)),
+        routing_band=selection_band,
+        selection_seed=f"{state.session_id}:{skill}:{state.completed_count(skill)}",
     )
     passage = bank.get_passage(selection.passage_id)
     questions = shuffled_bundle(bank.get_questions(passage.id), seed=f"{state.session_id}:{passage.id}")
@@ -206,9 +234,11 @@ def submit_current_bundle(
     for question in questions:
         state.question_type_exposure[question.question_type] = state.question_type_exposure.get(question.question_type, 0) + 1
     if passage.skill == "reading":
-        state.reading_ability = update_ability(state.reading_ability, records)
+        updated = update_ability(state.reading_ability, records)
+        state.reading_ability = update_routing_band(updated, records, state.minimum_ilr, state.maximum_ilr)
     else:
-        state.listening_ability = update_ability(state.listening_ability, records)
+        updated = update_ability(state.listening_ability, records)
+        state.listening_ability = update_routing_band(updated, records, state.minimum_ilr, state.maximum_ilr)
     state.handled_nonces.append(request_nonce)
     state.handled_nonces = state.handled_nonces[-100:]
     state.current_passage_id = None
@@ -222,7 +252,13 @@ def skill_is_complete(state: SessionState, skill: str | None = None) -> bool:
     count = state.completed_count(skill)
     estimate = state.ability_for(skill)
     if state.mode == "diagnostic":
-        return should_stop_diagnostic(estimate, state.minimum_questions_per_skill, state.max_questions_per_skill)
+        return should_stop_diagnostic(
+            estimate,
+            state.minimum_questions_per_skill,
+            state.max_questions_per_skill,
+            state.minimum_ilr,
+            state.maximum_ilr,
+        )
     if state.mode == "simulation":
         required = state.max_questions_per_skill
         if state.simulation_full:

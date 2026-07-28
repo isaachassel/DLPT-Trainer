@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import gradio as gr
 
+from core.adaptive import clamp_ilr
 from core.audio import AudioError, controlled_audio_html, generate_cached_tts, resolve_audio_path
 from core.bank_persistence import GeneratedBankPersistence
 from core.config import get_settings
@@ -15,7 +16,6 @@ from core.constants import (
     DIAGNOSTIC_LENGTHS,
     DISCLAIMER,
     ILR_LEVELS,
-    ILR_THETA,
     MODE_LABELS,
     QUESTION_TYPES,
     SIMULATION_LENGTHS,
@@ -185,6 +185,11 @@ def mode_controls(mode_label: str, skill_label: str):
             gr.update(visible=listening_selected, interactive=listening_selected),
             gr.update(visible=listening_selected, interactive=listening_selected),
             gr.update(choices=["After each passage", "End of session"], value="After each passage", visible=True),
+            gr.update(value="Use selected starting ILR band", visible=False),
+            gr.update(value="0", visible=True, interactive=True),
+            gr.update(value="3", visible=True, interactive=True),
+            gr.update(visible=True, interactive=True, label="Approximate starting ILR band"),
+            gr.update(visible=True, interactive=True, label="Target ILR band"),
         )
     if mode == "diagnostic":
         return (
@@ -195,6 +200,11 @@ def mode_controls(mode_label: str, skill_label: str):
             gr.update(visible=False),
             gr.update(visible=False),
             gr.update(choices=["End of session"], value="End of session", visible=False),
+            gr.update(value="Medium difficulty (recommended)", visible=True, interactive=True),
+            gr.update(value="0", visible=True, interactive=True),
+            gr.update(value="3", visible=True, interactive=True),
+            gr.update(visible=True, interactive=True, label="Optional selected diagnostic starting band"),
+            gr.update(value="2", visible=False, interactive=False),
         )
     return (
         gr.update(choices=list(SIMULATION_LENGTHS), value="Standard — 35 questions per skill", label="Simulation length"),
@@ -204,6 +214,11 @@ def mode_controls(mode_label: str, skill_label: str):
         gr.update(visible=False),
         gr.update(visible=False),
         gr.update(choices=["End of session"], value="End of session", visible=False),
+        gr.update(value="Medium difficulty (recommended)", visible=False, interactive=False),
+        gr.update(value="0", visible=False, interactive=False),
+        gr.update(value="3", visible=False, interactive=False),
+        gr.update(value="1+", visible=False, interactive=False),
+        gr.update(value="2", visible=False, interactive=False),
     )
 
 
@@ -232,18 +247,9 @@ def _history_for(state: SessionState | None) -> UserHistory | None:
         return UserHistory(profile_id=state.profile_id)
 
 
-def _nearest_ilr(theta: float) -> str:
-    return min(ILR_THETA, key=lambda level: abs(ILR_THETA[level] - theta))
-
-
 def _desired_generation_level(state: SessionState) -> str:
     estimate = state.ability_for(state.active_skill)
-    if state.completed_count(state.active_skill) == 0 and state.mode in {"diagnostic", "simulation"}:
-        return "2"
-    if state.mode == "training":
-        target_theta = ILR_THETA.get(state.target_level, estimate.theta)
-        return _nearest_ilr(0.65 * estimate.theta + 0.35 * target_theta)
-    return _nearest_ilr(estimate.theta)
+    return clamp_ilr(estimate.routing_ilr, state.minimum_ilr, state.maximum_ilr)
 
 
 def _pause_timer_for_loading(state: SessionState, elapsed: float) -> None:
@@ -392,12 +398,18 @@ def _status_text(state: SessionState, extra: str = "") -> str:
     ]
     if state.mode == "training":
         estimate = state.ability_for(state.active_skill)
+        lines.append(
+            f"**Adaptive routing:** next passage is targeted at **ILR {estimate.routing_ilr}** "
+            f"within the configured {state.minimum_ilr}–{state.maximum_ilr} range."
+        )
         if estimate.practice_ilr:
             lines.append(f"Current provisional practice band: **ILR {estimate.practice_ilr}** ({estimate.confidence} confidence).")
     elif state.shortened_simulation:
         lines.append("**Shortened simulation:** this is not equivalent to a complete test.")
     else:
         lines.append("Adaptive calculations are hidden during strict testing conditions.")
+    if state.mode in {"training", "diagnostic"}:
+        lines.append(f"**Eligible item range:** ILR {state.minimum_ilr} through ILR {state.maximum_ilr}.")
     if state.content_source == "fresh_ai_preferred":
         health = BANK.health_summary()
         lines.append(
@@ -541,12 +553,25 @@ def start_session_callback(
     mode_label, skill_label, start_level, target_level, length_label, timer_label,
     topics, competencies, feedback_timing, hints_enabled, transcript_review,
     voice_label, speech_rate_label, profile_id, content_source_label="Validated bank only — fastest",
+    adaptive_start_label="Use selected starting ILR band", minimum_ilr="0", maximum_ilr="3",
     progress=gr.Progress(),
 ):
     try:
         _progress(progress, 0.04, "Validating session settings…")
         mode = MODE_LABELS[mode_label]
         skills = SKILL_LABELS[skill_label]
+        if mode == "simulation":
+            minimum_ilr, maximum_ilr = "0", "3"
+            adaptive_start_policy = "medium"
+        else:
+            if ILR_LEVELS.index(minimum_ilr) > ILR_LEVELS.index(maximum_ilr):
+                raise ValueError("The lowest allowed ILR band cannot be higher than the highest allowed band.")
+            adaptive_start_policy = "selected" if adaptive_start_label.startswith("Use selected") else "medium"
+        if mode == "training" or adaptive_start_policy == "selected":
+            if not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(start_level) <= ILR_LEVELS.index(maximum_ilr):
+                raise ValueError("The selected starting ILR band must fall inside the allowed adaptive range.")
+        if mode == "training" and not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(target_level) <= ILR_LEVELS.index(maximum_ilr):
+            raise ValueError("The Training target ILR band must fall inside the allowed adaptive range.")
         topics = _normalize_multiselect(topics, TOPICS, "topic")
         competencies = _normalize_multiselect(competencies, QUESTION_TYPES, "competency")
         max_q, minimum, simulation_full, shortened, simulation_seconds = _length_settings(mode, length_label)
@@ -569,6 +594,9 @@ def start_session_callback(
             voice_label=voice_label, speech_rate_label=speech_rate_label,
             content_source=("fresh_ai_preferred" if content_source_label.startswith("Fresh AI") else "bank_only"),
             simulation_full=simulation_full, shortened_simulation=shortened,
+            adaptive_start_policy=adaptive_start_policy,
+            minimum_ilr=minimum_ilr,
+            maximum_ilr=maximum_ilr,
         )
         bundle = _select_with_safe_history(state, progress)
         _progress(progress, 0.96, "Saving the initial checkpoint…")

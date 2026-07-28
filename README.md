@@ -44,6 +44,9 @@ The bank is the application’s reliability layer and accumulated content memory
 ## Main capabilities
 
 - Independent Bayesian Reading and Listening estimates.
+- Conservative adjacent-band routing: after each passage the delivery band may move up or down by at most one ILR half-level based on posterior boundary probability.
+- Hard Training/Diagnostic ILR floor and ceiling controls, including true ILR 2–3-only eligibility (2, 2+, and 3).
+- Diagnostic boundary probes and stopping rules that require evidence at the current band and at least one adjacent band.
 - Posterior uncertainty and evidence-aware practice reports.
 - Information-based selection with topic, genre, question-type, and exposure balancing.
 - Meaningful Training target-level bias.
@@ -62,6 +65,8 @@ The bank is the application’s reliability layer and accumulated content memory
 
 - Reading, Listening, or separate Reading + Listening sections.
 - Starting and target ILR bands.
+- Selectable lowest and highest eligible ILR bands.
+- Visible next-passage routing band after answers are locked.
 - Topic and comprehension-competency emphasis.
 - Optional hints and passage-level review.
 - Listening replay, optional voice/speed variants, and post-answer transcript review.
@@ -70,7 +75,10 @@ The bank is the application’s reliability layer and accumulated content memory
 ### Adaptive Diagnostic
 
 - Independent Reading and Listening posteriors.
-- Broad medium prior.
+- Broad medium prior by default, with an optional selected-band challenge start.
+- Hard ILR floor/ceiling filtering when a range-limited diagnostic is requested.
+- One-half-level-at-a-time passage routing from Bayesian posterior boundary probability.
+- Adjacent-band evidence probes before confidence-based stopping.
 - End-only feedback.
 - No learner-selected slow audio or voice changes.
 - Minimum evidence plus confidence-aware stopping.
@@ -80,12 +88,15 @@ The bank is the application’s reliability layer and accumulated content memory
 
 - Reading and Listening run as separate sections.
 - Medium-difficulty opening passage.
+- Passage difficulty adapts after every completed bundle while the active routing calculation remains hidden.
 - No skipping, back navigation, or answer changes after passage submission.
 - All questions in the bundle must be answered before advancing.
 - Strict countdown timer.
 - Shortened simulations are clearly labeled.
 - A full simulation never completes below 35 questions per selected skill.
 - One controlled Listening play, no replay, and no transcript during the active simulation.
+
+See `docs/ADAPTIVE_ROUTING.md` for the routing equations, range behavior, stopping rule, and worked ILR 3 → 2+ → 2 example.
 
 ## Starter and generated item banks
 

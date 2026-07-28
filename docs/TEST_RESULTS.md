@@ -1,11 +1,11 @@
 # Test Results
 
-Executed for the v1.3.0 durable generated-bank release on 2026-07-27.
+Executed for the v1.3.1 adaptive-routing release on 2026-07-28.
 
 ## Automated unit/integration suite
 
 ```text
-104 passed
+114 passed
 ```
 
 Core coverage includes:
@@ -107,6 +107,20 @@ Version 1.3.0 additionally verifies:
 - generated Listening audio inclusion and restoration through backup and Dataset paths;
 - controlled serving of only audio and generated-bank export directories.
 
+Version 1.3.1 additionally verifies:
+
+- sustained incorrect ILR 3 evidence routes the next passage to ILR 2+, then to ILR 2 after continued weak evidence;
+- one isolated incorrect ILR 3 response does not cause a large route jump;
+- routing never moves more than one adjacent half-level after a passage;
+- routing respects configured minimum and maximum ILR bands;
+- neutral Adaptive Diagnostic starts at medium difficulty while selected-band challenge starts remain available;
+- bank selection prefers the current routing band and honors a hard ILR 2–3 range;
+- Reading and Listening routing histories remain independent;
+- final reports include the complete adaptive routing path and movement reasons;
+- confidence-based Diagnostic stopping requires current-band and adjacent-band evidence;
+- Diagnostic boundary probing targets an under-sampled adjacent band;
+- mode controls hide the unused target band outside Training and hide start/target controls in Full Simulation.
+
 ## Hugging Face metadata and dependency validation
 
 README front matter:
@@ -151,7 +165,7 @@ Listening: 35 questions across 13 passage bundles; 13 unique passages
 ## Gradio Space smoke test
 
 ```text
-Smoke test passed: 27 passages, 88 questions, 87 UI components.
+Smoke test passed: 27 passages, 88 questions, 101 UI components.
 Live generation ready=False: no matching API key; Fresh AI falls back to bank.
 ```
 

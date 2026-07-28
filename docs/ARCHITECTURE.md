@@ -47,7 +47,7 @@ The adaptive selector chooses among all accepted active starter and generated pa
 
 ### Fresh-AI preferred
 
-The session requests a new bundle before bank selection. The requested level is derived from the active skill posterior; Training blends the current estimate with the selected target band.
+The session requests a new bundle before bank selection. The requested level is the active skill's bounded routing band. Training target level remains a selection bias inside the configured floor/ceiling rather than overriding demonstrated performance.
 
 A failed fresh request does not mutate completed responses. The callback records failed provider calls/repairs, pauses timer accounting for loading time, and selects a bank item.
 
@@ -194,6 +194,16 @@ P(correct) = 1 / (1 + exp(-a(theta - b)))
 with initial `a=1.0`. Posterior mean is the EAP estimate; posterior standard deviation and interval represent uncertainty.
 
 Generated difficulty is never accepted as calibrated truth. Initial `b` blends the requested band and documented question-type reasoning offset within bounded limits.
+
+## Adaptive delivery routing
+
+The continuous posterior and the passage-delivery band are separate. `AbilityEstimate.routing_ilr` begins at ILR 2 for neutral Diagnostic/Simulation starts or at the selected starting band for Training and targeted-start Diagnostics.
+
+After each passage, `update_routing_band()` calculates posterior mass across the adjacent ILR boundary midpoints. A 67% directional posterior probability moves the delivery band one adjacent half-level; otherwise it holds. A passage can never cause a multi-level jump, and the route is clamped to `SessionState.minimum_ilr` and `maximum_ilr`.
+
+`select_passage()` first enforces the allowed ILR range using calibrated difficulty when available and provisional authoring level otherwise. It prefers the current routing band, falls back only to the nearest eligible band, then ranks candidates using normalized information, ability distance, content balance, exposure control, Training target bias, and calibration status. A deterministic top-candidate randomization reduces systematic overexposure.
+
+Adaptive Diagnostic selection may temporarily probe an under-sampled adjacent band without changing the current routing band. Confidence-based stopping requires minimum length, standard error at or below 0.45, and evidence in the current band plus at least one adjacent band. See `docs/ADAPTIVE_ROUTING.md`.
 
 ## Estimate conversion and reporting
 

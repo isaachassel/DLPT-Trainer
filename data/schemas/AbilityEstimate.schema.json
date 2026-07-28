@@ -93,6 +93,33 @@
       "title": "Predicted Success",
       "type": "object"
     },
+    "routing_ilr": {
+      "default": "1+",
+      "title": "Routing Ilr",
+      "type": "string"
+    },
+    "routing_history": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Routing History",
+      "type": "array"
+    },
+    "evidence_by_ilr": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Evidence By Ilr",
+      "type": "object"
+    },
+    "correct_by_ilr": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Correct By Ilr",
+      "type": "object"
+    },
     "updated_at": {
       "format": "date-time",
       "title": "Updated At",

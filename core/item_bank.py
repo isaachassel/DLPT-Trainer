@@ -267,11 +267,15 @@ class ItemBank:
         allowed_topics: set[str] | None,
         preferred_competencies: set[str] | None,
         first_passage: bool,
+        allowed_ilr_bands: set[str] | None = None,
+        routing_band: str | None = None,
+        selection_seed: str | None = None,
     ) -> AdaptiveSelection:
         return select_passage(
             self.active_passages(skill), self.questions_by_passage, estimate, mode, target_level,
             seen_passages, seen_questions, topic_exposure, genre_exposure,
             question_type_exposure, item_exposure, allowed_topics, preferred_competencies, first_passage,
+            allowed_ilr_bands, routing_band, selection_seed,
         )
 
 

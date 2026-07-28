@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.3.1 — Bayesian adjacent-band adaptive routing
+
+- Audited the existing adaptive engine and confirmed that it updated a Bayesian Rasch posterior, but did not expose or enforce an intuitive passage-level ILR routing ladder.
+- Added separate Reading and Listening routing bands and routing histories.
+- Added posterior-boundary routing that moves at most one adjacent ILR half-level after each completed passage.
+- Added a 67% posterior-direction threshold so one isolated wrong answer does not trigger a large difficulty collapse.
+- Added hard minimum/maximum ILR eligibility controls for Training and Adaptive Diagnostic.
+- Added a genuine 2–3-only range that admits only ILR 2, 2+, and 3 items.
+- Added optional selected-band Diagnostic starts while retaining medium difficulty as the recommended neutral start.
+- Kept Full CA Simulation at a medium opening passage and full supported range.
+- Made fresh AI generation request the current routing band rather than an unrelated static target.
+- Added exact-band preference and nearest-adjacent fallback in bank selection.
+- Normalized bundle information so long passages do not automatically dominate shorter passages solely because they contain more questions.
+- Added deterministic randomization among near-equivalent top candidates to reduce systematic item overexposure.
+- Added diagnostic adjacent-band probes and required current/adjacent-band evidence before precision-based stopping.
+- Added final-report routing paths, movement reasons, and range-limited interpretation warnings.
+- Hid unused target controls outside Training and hid start/target controls in Full Simulation.
+- Added `docs/ADAPTIVE_ROUTING.md` and new routing/range/stopping regression tests.
+
 ## v1.3.0 — Durable generated-bank protection
 
 - Added automatic private Hugging Face Dataset provisioning for generated content.

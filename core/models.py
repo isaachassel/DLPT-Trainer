@@ -208,7 +208,18 @@ class AbilityEstimate(StrictModel):
     provisional: bool = True
     stable: bool = False
     predicted_success: dict[str, float] = Field(default_factory=dict)
+    routing_ilr: str = "1+"
+    routing_history: list[dict[str, Any]] = Field(default_factory=list)
+    evidence_by_ilr: dict[str, int] = Field(default_factory=dict)
+    correct_by_ilr: dict[str, int] = Field(default_factory=dict)
     updated_at: datetime = Field(default_factory=utc_now)
+
+    @field_validator("routing_ilr")
+    @classmethod
+    def validate_routing_ilr(cls, value: str) -> str:
+        if value not in ILR_LEVELS:
+            raise ValueError(f"routing_ilr must be one of {ILR_LEVELS}")
+        return value
 
 
 class AdaptiveSelection(StrictModel):
@@ -220,6 +231,9 @@ class AdaptiveSelection(StrictModel):
     target_bias: float = 0.0
     balance_penalty: float = 0.0
     exposure_penalty: float = 0.0
+    routing_band: str | None = None
+    selected_band: str | None = None
+    band_distance: int = 0
     reasons: list[str] = Field(default_factory=list)
 
 
@@ -274,6 +288,9 @@ class SessionState(StrictModel):
     active_skill_index: int = 0
     start_level: str = "1+"
     target_level: str = "2"
+    adaptive_start_policy: Literal["medium", "selected"] = "medium"
+    minimum_ilr: str = "0"
+    maximum_ilr: str = "3"
     topics: list[str] = Field(default_factory=list)
     competencies: list[str] = Field(default_factory=list)
     max_questions_per_skill: int = 16
@@ -321,6 +338,14 @@ class SessionState(StrictModel):
     last_content_note: str | None = None
     request_nonce: str | None = None
     handled_nonces: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_adaptive_band_range(self):
+        if self.minimum_ilr not in ILR_LEVELS or self.maximum_ilr not in ILR_LEVELS:
+            raise ValueError("minimum_ilr and maximum_ilr must be valid ILR bands")
+        if ILR_LEVELS.index(self.minimum_ilr) > ILR_LEVELS.index(self.maximum_ilr):
+            raise ValueError("minimum_ilr cannot be higher than maximum_ilr")
+        return self
 
     @property
     def active_skill(self) -> str:
