@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.3.3 — Targeted Question Repair and Listening Pipeline Diagnostics
+
+### Fresh Listening generation
+- Fixed misleading Listening fallbacks where question validation failed before TTS but the user reasonably interpreted the failure as an audio problem.
+- Generation errors now identify whether failure occurred during question validation, audio creation, or audio file/duration validation.
+- Added explicit Listening TTS start/success diagnostics without logging transcripts or secrets.
+
+### Question-quality recovery
+- Replaced whole-bundle question regeneration with targeted repair of only the failed question positions when possible.
+- Preserves the accepted passage and valid questions while replacing a failed distractor/evidence item such as `q2:no_near_duplicate_choices`.
+- Increased the default bounded repair allowance from one to two passes.
+- Improved the repair prompt with issue-specific instructions for materially distinct distractors and exact short Russian evidence.
+- Added safe evidence-span canonicalization for verbose or punctuation-normalized model quotes; blind verification remains mandatory.
+- Replaced the overly broad raw string-similarity check with a choice-specific duplicate detector that permits parallel grammar while rejecting tiny qualifier changes.
+
+### Verification
+- Added a full Listening generation integration test that begins with a defective Q2, repairs only Q2, creates a validated MP3, commits the complete bundle, and immediately reloads it from the bank.
+- Expanded the automated suite to 122 passing tests.
+
 ## 1.3.2 — Answer Radio and Durable-Bank Sync Repair
 
 ### Runtime answer selection
@@ -16,26 +35,6 @@
 - Displays the sanitized last synchronization error in the reusable-bank status instead of only saying that sync failed.
 - Adds a **Test / Retry Durable Bank Sync** control to verify write access and push the current bank without generating another item.
 - Adds `BANK_SYNC_MAX_RETRIES` configuration, defaulting to 3.
-
-### Verification
-- Added regression coverage for stale/empty Radio choices, live B-answer submission, token fallback, detailed sync errors, and manual sync behavior.
-
-## 1.3.2 — Answer Radio and Durable-Bank Sync Repair
-
-### Runtime answer selection
-- Fixed the production Gradio error `Value: 'B' is not in the list of choices: []`.
-- Answer radios now keep stable server-side A/B/C/D values while visible labels change passage-by-passage.
-- Added a strict answer-key preprocessor that accepts only A, B, C, or D even when Gradio retains stale dynamic-choice metadata.
-- Recoverable submission errors now restore both the learner's selected answer and the complete visible answer choices.
-
-### Generated-bank durability
-- Validates or creates the configured private Dataset before attempting startup restore.
-- Adds bounded retries with exponential backoff for transient Hub failures.
-- Tries `HF_BANK_TOKEN` first and then `HF_TOKEN` when they are different, allowing recovery from a stale or under-scoped dedicated token.
-- Logs sanitized HTTP status/reason information under `dlpt.persistence`; tokens are never logged.
-- Displays the sanitized last synchronization error in the reusable-bank status instead of only saying that sync failed.
-- Adds a **Test / Retry Durable Bank Sync** control to verify write access and push the current bank without generating another item.
-- Adds `BANK_SYNC_MAX_RETRIES`, defaulting to 3.
 
 ### Verification
 - Added regression coverage for stale/empty Radio choices, live B-answer submission, token fallback, detailed sync errors, and manual sync behavior.

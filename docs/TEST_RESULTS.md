@@ -1,13 +1,22 @@
 # Test Results
 
-Executed for the v1.3.2 runtime-radio and durable-bank synchronization release on 2026-07-28.
+Executed for the v1.3.3 targeted-question-repair and Listening pipeline release on 2026-07-28.
 
 ## Automated unit/integration suite
 
 ```text
-119 passed
+122 passed
 ```
 
+
+
+Version 1.3.3 additionally verifies:
+
+- a Listening candidate with one near-duplicate distractor pair repairs only the failed question rather than discarding the passage and all valid questions;
+- valid parallel answer frames such as “open” versus “close” are not falsely rejected solely because their grammar is parallel;
+- tiny qualifier-only differences remain rejected as near duplicates;
+- repaired Listening content proceeds through MP3 creation, audio validation, atomic bank persistence, and immediate in-memory reuse;
+- the app distinguishes question-validation failure before audio creation from a genuine TTS or audio-validation failure.
 
 Version 1.3.2 additionally verifies:
 

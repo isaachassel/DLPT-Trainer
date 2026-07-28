@@ -76,6 +76,92 @@ def near_duplicate(a: str, b: str, threshold: float = 0.90) -> bool:
     return SequenceMatcher(None, normalize_text(a), normalize_text(b)).ratio() >= threshold
 
 
+def choice_near_duplicate(a: str, b: str) -> bool:
+    """Detect answer choices that are effectively duplicates without punishing parallel grammar.
+
+    Multiple-choice distractors should usually share a grammatical frame. A raw string-similarity
+    threshold can therefore reject valid contrasts such as "the road will open" versus "the road
+    will close." This check removes common leading/trailing scaffolding and requires the remaining
+    distinguishing content to be substantially the same before rejecting the pair.
+    """
+    left = normalize_text(a)
+    right = normalize_text(b)
+    if not left or not right:
+        return True
+    if left == right:
+        return True
+
+    left_tokens = left.split()
+    right_tokens = right.split()
+    prefix = 0
+    while prefix < min(len(left_tokens), len(right_tokens)) and left_tokens[prefix] == right_tokens[prefix]:
+        prefix += 1
+    suffix = 0
+    while (
+        suffix < min(len(left_tokens) - prefix, len(right_tokens) - prefix)
+        and left_tokens[-(suffix + 1)] == right_tokens[-(suffix + 1)]
+    ):
+        suffix += 1
+
+    left_core = left_tokens[prefix:len(left_tokens) - suffix if suffix else None]
+    right_core = right_tokens[prefix:len(right_tokens) - suffix if suffix else None]
+    if not left_core or not right_core:
+        # One option merely adds/removes a tiny qualifier from the other.
+        return abs(len(left_tokens) - len(right_tokens)) <= 2
+
+    left_set = set(left_core)
+    right_set = set(right_core)
+    core_jaccard = len(left_set & right_set) / max(1, len(left_set | right_set))
+    core_ratio = SequenceMatcher(None, " ".join(left_core), " ".join(right_core)).ratio()
+    full_ratio = SequenceMatcher(None, left, right).ratio()
+
+    # Require both lexical overlap and sequence similarity. Shared sentence frames alone are not enough.
+    return (full_ratio >= 0.96 and core_jaccard >= 0.80) or (core_ratio >= 0.92 and core_jaccard >= 0.75)
+
+
+def canonicalize_evidence_quote(passage: str, evidence: str, max_words: int = 24) -> str:
+    """Return an exact, short passage span when the model supplied a verbose/normalized quote.
+
+    This is a formatting repair only. Semantic support is still checked independently by the blind
+    verifier. If no sufficiently traceable exact span can be found, the original evidence is returned
+    and normal validation will reject it.
+    """
+    raw = evidence.strip()
+    if not raw:
+        return raw
+    passage_norm = normalize_text(passage)
+    raw_norm = normalize_text(raw)
+    if raw_norm and raw_norm in passage_norm and len(_words(raw)) <= max_words:
+        # Preserve the provider quote when it is already a short normalized substring.
+        for candidate in re.split(r"(?<=[.!?…])\s+|[;:]\s*", passage):
+            candidate = candidate.strip()
+            if raw_norm == normalize_text(candidate) or raw_norm in normalize_text(candidate):
+                if len(_words(candidate)) <= max_words:
+                    return candidate
+        return raw
+
+    candidates: list[str] = []
+    for sentence in _sentences(passage):
+        parts = [sentence, *re.split(r"[,;:]\s*", sentence)]
+        for part in parts:
+            part = part.strip(" \t\n—–-")
+            words = _words(part)
+            if 2 <= len(words) <= max_words and part not in candidates:
+                candidates.append(part)
+
+    evidence_tokens = set(_words(raw))
+    best: tuple[float, str] | None = None
+    for candidate in candidates:
+        candidate_norm = normalize_text(candidate)
+        candidate_tokens = set(_words(candidate))
+        overlap = len(evidence_tokens & candidate_tokens) / max(1, len(candidate_tokens))
+        fuzzy = SequenceMatcher(None, raw_norm, candidate_norm).ratio()
+        score = max(overlap, fuzzy)
+        if best is None or score > best[0]:
+            best = (score, candidate)
+    return best[1] if best and best[0] >= 0.68 else raw
+
+
 def _words(text: str) -> list[str]:
     return normalize_text(text).split()
 
@@ -127,7 +213,7 @@ def validate_question(question: QuestionItem, passage: PassageItem) -> Validatio
     checks["evidence_in_passage"] = bool(normalize_text(question.evidence_ru)) and normalize_text(question.evidence_ru) in normalize_text(passage.passage_ru)
     checks["rationale_present"] = len(question.rationale_en.strip()) >= 12
     checks["no_near_duplicate_choices"] = not any(
-        near_duplicate(choices[i], choices[j], 0.84)
+        choice_near_duplicate(choices[i], choices[j])
         for i in range(4) for j in range(i + 1, 4)
     )
 

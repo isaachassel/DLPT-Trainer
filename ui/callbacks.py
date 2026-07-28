@@ -377,8 +377,19 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                     state.session_id, state.active_skill, type(exc).__name__, str(exc)[:500],
                 )
                 safe_reason = html.escape(str(exc)[:500])
+                pipeline_stage = str(getattr(exc, "pipeline_stage", "") or "").strip()
+                if pipeline_stage == "question_validation" and state.active_skill == "listening":
+                    stage_note = "Question validation failed before audio creation"
+                elif pipeline_stage == "audio_generation":
+                    stage_note = "Listening audio generation failed after the passage and questions were validated"
+                elif pipeline_stage == "audio_validation":
+                    stage_note = "Generated Listening audio failed file or duration validation"
+                elif pipeline_stage:
+                    stage_note = pipeline_stage.replace("_", " ").capitalize()
+                else:
+                    stage_note = "Fresh generation did not produce an operational item"
                 state.last_content_note = (
-                    f"Fresh generation did not produce an operational item ({type(exc).__name__}: {safe_reason}). "
+                    f"{stage_note} ({type(exc).__name__}: {safe_reason}). "
                     "Your session was preserved and a validated bank item was loaded automatically."
                 )
             finally:

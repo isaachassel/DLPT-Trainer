@@ -537,3 +537,14 @@ Uncalibrated items are labeled as an **intended provisional ILR level**. When em
 Version 1.3.2 fixes a Gradio 6 dynamic-Radio issue that could reject `A`, `B`, `C`, or `D` because the server retained an empty original choice list. Answer keys are now stable on both the browser and server.
 
 When the reusable-bank banner reports a failed Dataset synchronization, open **Generated Bank Backup & Persistence** and press **Test / Retry Durable Bank Sync**. The status and container log now show a sanitized HTTP reason. Confirm that `HF_BANK_TOKEN` is a Hugging Face user access token with repository write permission and that it can create or edit the configured private Dataset. The app tries `HF_TOKEN` as a fallback when it differs from `HF_BANK_TOKEN`.
+
+
+### Troubleshooting Fresh Listening generation
+
+Version 1.3.3 distinguishes three separate failure stages:
+
+- **Question validation failed before audio creation:** the generated passage was usable, but one or more English questions or distractors failed quality checks. The app now repairs only the failed question positions for up to two bounded passes before using the bank.
+- **Listening audio generation failed:** the passage and questions passed, but Edge TTS could not create the MP3. The session is preserved and a validated bank item is selected.
+- **Generated Listening audio failed validation:** an MP3 was created but was empty, incomplete, or outside the operational duration range.
+
+A message such as `q2:no_near_duplicate_choices` is therefore a question-quality rejection, not an audio failure. The generated bank and Dataset synchronization remain intact.

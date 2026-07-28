@@ -80,7 +80,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
     forbidden = ["q1=a", "q2=b", "q3=c", "q4=d", '"correct_key": "a"', "correct answer letter"]
     assert all(pattern not in text for pattern in forbidden)
     assert "zero-based index" in text
-    assert PROMPT_VERSION == "genai-pipeline-v7"
+    assert PROMPT_VERSION == "genai-pipeline-v8"
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):
@@ -411,3 +411,62 @@ def test_full_generation_accepts_supported_bundle_when_verifier_paraphrases_evid
     assert result.repair_count == 0
     assert all(report.status == "accepted" for report in result.question_reports)
     assert all(report.validator_scores["verifier_evidence_exact"] == 0.0 for report in result.question_reports)
+
+
+class TargetedQuestionRepairProvider(MockProvider):
+    def __init__(self):
+        super().__init__()
+        self.question_prompts: list[str] = []
+
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        if schema is CandidateQuestionSet:
+            self.question_prompts.append(prompt)
+            if "Repair only these failed questions" in prompt:
+                return CandidateQuestionSet(questions=[
+                    {
+                        "stem_en": "When must an applicant submit the registration form?",
+                        "choices": ["By Friday", "By Tuesday morning", "After the first month", "Only after receiving an email"],
+                        "proposed_correct_index": 0,
+                        "rationale_en": "The announcement explicitly requires applications to be submitted by Friday.",
+                        "evidence_ru": "Заявку необходимо отправить через сайт центра до пятницы",
+                        "question_type": "prominent detail",
+                    }
+                ])
+            base = super().generate_json(system, prompt, schema, max_tokens=max_tokens, temperature=temperature)
+            questions = list(base.questions[:2])
+            questions[1] = questions[1].model_copy(update={
+                "choices": ["By Friday", "By Friday only", "After the first month", "Only after receiving an email"],
+            })
+            return CandidateQuestionSet(questions=questions)
+        return super().generate_json(system, prompt, schema, max_tokens=max_tokens, temperature=temperature)
+
+
+def test_only_failed_question_is_repaired_before_listening_tts(project_root, tmp_path, monkeypatch):
+    generated_path = tmp_path / "generated.jsonl"
+    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    author = TargetedQuestionRepairProvider()
+    verifier = MockProvider()
+
+    def fake_tts(transcript, cache_dir, **kwargs):
+        target = Path(cache_dir) / "targeted-repair.mp3"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"ID3" + b"x" * 2048)
+        return target
+
+    monkeypatch.setattr("core.generation.generate_cached_tts", fake_tts)
+    monkeypatch.setattr("core.generation.audio_duration_seconds", lambda path: 32.0)
+    settings = _settings(tmp_path).model_copy(update={"generation_repair_attempts": 2})
+    service = LiveGenerationService(settings, bank, project_root, provider=author, verifier_provider=verifier)
+
+    result = service.generate_and_store(
+        skill="listening", level="2", mode="training", topics=["education"],
+        competencies=["main idea", "prominent detail"], maximum_questions=2,
+    )
+
+    assert result.repair_count == 1
+    assert result.audio_asset is not None
+    assert Path(result.audio_asset.path).exists()
+    assert bank.get_passage(result.passage.id).audio_asset_id == result.audio_asset.id
+    assert any("Repair only these failed questions: Q2" in prompt for prompt in author.question_prompts)
+    assert result.questions[0].stem_en == "What is the main purpose of the announcement?"
+    assert result.questions[1].stem_en == "When must an applicant submit the registration form?"

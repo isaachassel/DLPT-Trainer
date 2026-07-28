@@ -55,7 +55,7 @@ class Settings(BaseModel):
     generation_concurrency_limit: int = Field(default=1, ge=1, le=4)
     queue_concurrency_limit: int = Field(default=4, ge=1, le=16)
     max_generation_requests_per_session: int = Field(default=8, ge=0, le=40)
-    generation_repair_attempts: int = Field(default=1, ge=0, le=3)
+    generation_repair_attempts: int = Field(default=2, ge=0, le=3)
     generation_audit_mode: str = "always"
     allow_plain_json_fallback: bool = True
     generation_diagnostics: bool = True
@@ -344,7 +344,7 @@ def get_settings() -> Settings:
         generation_concurrency_limit=int(os.getenv("GENERATION_CONCURRENCY_LIMIT", "1")),
         queue_concurrency_limit=int(os.getenv("QUEUE_CONCURRENCY_LIMIT", "4")),
         max_generation_requests_per_session=int(os.getenv("MAX_GENERATION_REQUESTS_PER_SESSION", "8")),
-        generation_repair_attempts=int(os.getenv("GENERATION_REPAIR_ATTEMPTS", "1")),
+        generation_repair_attempts=int(os.getenv("GENERATION_REPAIR_ATTEMPTS", "2")),
         generation_audit_mode=os.getenv("GENERATION_AUDIT_MODE", "always"),
         allow_plain_json_fallback=_env_bool("ALLOW_PLAIN_JSON_FALLBACK", True),
         generation_diagnostics=_env_bool("GENERATION_DIAGNOSTICS", True),

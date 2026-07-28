@@ -29,3 +29,35 @@ def test_starter_bank_supports_full_simulation_counts(bank):
     reading = sum(len(bank.get_questions(p.id)) for p in bank.active_passages("reading"))
     listening = sum(len(bank.get_questions(p.id)) for p in bank.active_passages("listening"))
     assert reading >= 35 and listening >= 35
+
+
+def test_parallel_answer_frames_are_not_false_near_duplicates(bank):
+    passage = bank.get_passage("r005")
+    question = bank.get_questions(passage.id)[0]
+    parallel = question.model_copy(update={
+        "choices": {
+            "A": "The road will open on Monday",
+            "B": "The road will close on Monday",
+            "C": "The road will remain unchanged on Monday",
+            "D": "The road will be inspected on Monday",
+        },
+        "correct_key": "A",
+    })
+    report = validate_question(parallel, passage)
+    assert report.deterministic_checks["no_near_duplicate_choices"] is True
+
+
+def test_tiny_qualifier_change_is_rejected_as_near_duplicate(bank):
+    passage = bank.get_passage("r005")
+    question = bank.get_questions(passage.id)[0]
+    duplicate = question.model_copy(update={
+        "choices": {
+            "A": "The class begins on Monday",
+            "B": "The class begins on Monday only",
+            "C": "The class begins on Tuesday",
+            "D": "The class has been canceled",
+        },
+        "correct_key": "A",
+    })
+    report = validate_question(duplicate, passage)
+    assert report.deterministic_checks["no_near_duplicate_choices"] is False

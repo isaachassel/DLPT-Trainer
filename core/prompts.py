@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import Iterable
 
-PROMPT_VERSION = "genai-pipeline-v7"
+PROMPT_VERSION = "genai-pipeline-v8"
 
 
 @dataclass(frozen=True)
@@ -259,11 +259,24 @@ def question_repair_prompt(
     passage_json: str,
     questions_json: str,
     issues: list[str],
+    repair_indices: list[int] | None = None,
 ) -> str:
-    return f"""Repair this English question set for the supplied Russian {skill} passage.
+    targeted = sorted(set(repair_indices or []))
+    if targeted:
+        labels = [f"Q{index + 1}" for index in targeted]
+        scope = f"""Repair only these failed questions: {', '.join(labels)}.
+Return exactly {len(targeted)} replacement question object(s), in the same order as {', '.join(labels)}.
+Do not return the valid unchanged questions. The application will merge the replacements into their original positions."""
+        output_count = len(targeted)
+    else:
+        scope = f"Return a complete replacement set containing exactly {desired_count} questions."
+        output_count = desired_count
+    return f"""Repair English comprehension questions for the supplied Russian {skill} passage.
 Target ILR: {level}
-Required question count: exactly {desired_count}
+Original required bundle size: {desired_count}
 Validation and verifier issues: {json.dumps(issues, ensure_ascii=False)}
+
+{scope}
 
 Passage JSON:
 {passage_json}
@@ -271,11 +284,14 @@ Passage JSON:
 Current question-set JSON:
 {questions_json}
 
-Return a complete replacement question set. Use zero-based proposed_correct_index only; never prescribe answer letters.
-Return one top-level object with exactly one key: questions. Each question contains exactly stem_en, choices, proposed_correct_index, rationale_en, evidence_ru, and question_type.
+Return one top-level object with exactly one key: questions. The questions array must contain exactly {output_count} item(s).
+Each question contains exactly stem_en, choices, proposed_correct_index, rationale_en, evidence_ru, and question_type.
 question_type must use one exact allowed value: main idea; prominent detail; inference; speaker/writer intent; tone or attitude; reference; sequence; cause and effect; relationship of ideas; meaning from context.
+Use zero-based proposed_correct_index only. Never prescribe answer letters.
 Do not return target_ilr, difficulty, IDs, answer letters, or validation metadata; the application assigns those in Python.
-Every evidence_ru value must be an exact short contiguous quotation from the Russian passage.
+Every evidence_ru value must be a short exact contiguous quotation copied from the Russian passage.
+For no_near_duplicate_choices, rewrite the distractors so each option asserts a materially different proposition; parallel grammar is encouraged, but synonyms or tiny qualifier changes are not enough.
+For evidence_in_passage, copy a short exact phrase or clause from the passage character-for-character rather than paraphrasing or reproducing a whole paragraph.
 Remove ambiguity, outside knowledge, answer leakage, duplicate competencies, weak distractors, level mismatch, and unsupported rationales.
 """
 

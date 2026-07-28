@@ -37,6 +37,7 @@ from .prompts import (
 from .storage import atomic_write_text
 from .validation import (
     answer_position_balance,
+    canonicalize_evidence_quote,
     content_hash,
     evidence_traceability_score,
     near_duplicate,
@@ -1227,7 +1228,7 @@ def materialize_candidate(
             choices=choices,
             correct_key=LETTERS[raw.proposed_correct_index],
             rationale_en=raw.rationale_en.strip(),
-            evidence_ru=raw.evidence_ru.strip(),
+            evidence_ru=canonicalize_evidence_quote(candidate.passage_ru, raw.evidence_ru),
             question_type=q_type,
             target_ilr=level,
             # The LLM does not assign operational item difficulty. Difficulty is
@@ -1275,6 +1276,40 @@ def validate_candidate_questions(
         if requested_level == "3" and question.question_type == "prominent detail" and detail_count > 1:
             issues.append(f"q{index}:too_many_isolated_detail_questions_for_ilr3")
     return sorted(set(issues))
+
+
+def _question_issue_indices(issues: list[str], question_count: int) -> list[int]:
+    """Return zero-based question indices named by qN validation failures."""
+    indices: set[int] = set()
+    for issue in issues:
+        match = re.match(r"q(\d+):", issue)
+        if not match:
+            continue
+        index = int(match.group(1)) - 1
+        if 0 <= index < question_count:
+            indices.add(index)
+    return sorted(indices)
+
+
+def _merge_question_repairs(
+    original: CandidateQuestionSet,
+    replacements: CandidateQuestionSet,
+    indices: list[int],
+) -> CandidateQuestionSet:
+    if len(replacements.questions) != len(indices):
+        raise GenerationValidationError(
+            f"Targeted question repair returned {len(replacements.questions)} item(s); expected {len(indices)}."
+        )
+    merged = list(original.questions)
+    for index, replacement in zip(indices, replacements.questions):
+        merged[index] = replacement
+    return CandidateQuestionSet(questions=merged)
+
+
+def _stage_error(message: str, stage: str) -> GenerationValidationError:
+    error = GenerationValidationError(message)
+    setattr(error, "pipeline_stage", stage)
+    return error
 
 
 def _level_distance(a: str, b: str) -> int:
@@ -1563,18 +1598,35 @@ class LiveGenerationService:
 
     def _build_audio(self, passage: PassageItem) -> tuple[PassageItem, AudioAsset]:
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
-        path = generate_cached_tts(
-            passage.passage_ru,
-            cache_dir,
-            voice=self.settings.edge_tts_voice,
-            rate=self.settings.edge_tts_rate,
-            engine_version="edge-tts-7.2.8",
+        LOGGER.info(
+            "Listening TTS start passage=%s voice=%s rate=%s",
+            passage.id, self.settings.edge_tts_voice, self.settings.edge_tts_rate,
         )
+        try:
+            path = generate_cached_tts(
+                passage.passage_ru,
+                cache_dir,
+                voice=self.settings.edge_tts_voice,
+                rate=self.settings.edge_tts_rate,
+                engine_version="edge-tts-7.2.8",
+            )
+        except Exception as exc:
+            raise _stage_error(
+                f"Listening audio generation failed: {type(exc).__name__}: {_redact_error(exc, self.settings, 300)}",
+                "audio_generation",
+            ) from exc
         if not validate_audio_file(path):
-            raise GenerationValidationError("Generated listening audio was missing or incomplete.")
+            raise _stage_error("Generated listening audio was missing or incomplete.", "audio_validation")
         duration = audio_duration_seconds(path)
         if duration is not None and not 3 <= duration <= 165:
-            raise GenerationValidationError(f"Generated listening audio duration was outside the operational range: {duration:.1f}s")
+            raise _stage_error(
+                f"Generated listening audio duration was outside the operational range: {duration:.1f}s",
+                "audio_validation",
+            )
+        LOGGER.info(
+            "Listening TTS success passage=%s path=%s duration=%s",
+            passage.id, path.name, f"{duration:.1f}s" if duration is not None else "unknown",
+        )
         audio_id = f"aud_{uuid4().hex[:16]}"
         asset = AudioAsset(
             id=audio_id,
@@ -1811,8 +1863,15 @@ class LiveGenerationService:
             last_issues = sorted(set(issues))
             trace.add("question_validation", "rejected", attempt=attempt, issues=last_issues)
             if attempt >= self.settings.generation_repair_attempts:
-                raise GenerationValidationError("Generated questions failed validation: " + ", ".join(last_issues[:16]))
-            question_set = CandidateQuestionSet.model_validate(_provider_generate(
+                raise _stage_error(
+                    "Generated questions failed validation: " + ", ".join(last_issues[:16]),
+                    "question_validation",
+                )
+
+            repair_indices = _question_issue_indices(last_issues, len(question_set.questions))
+            targeted = bool(repair_indices) and len(repair_indices) < len(question_set.questions)
+            repair_count = len(repair_indices) if targeted else desired_count
+            repaired = CandidateQuestionSet.model_validate(_provider_generate(
                 self.provider,
                 AUTHORING_SYSTEM,
                 question_repair_prompt(
@@ -1822,16 +1881,30 @@ class LiveGenerationService:
                     passage_json=passage_json,
                     questions_json=_candidate_questions_json(question_set),
                     issues=last_issues,
+                    repair_indices=repair_indices if targeted else None,
                 ),
                 CandidateQuestionSet,
                 max_tokens=_stage_token_budget(
                     self.settings.repair_max_tokens, stage="repair", level=level, skill=skill,
-                    question_count=desired_count,
+                    question_count=repair_count,
                 ),
                 temperature=min(0.10, max(0.0, self.settings.authoring_temperature - 0.10)),
             ))
+            question_set = (
+                _merge_question_repairs(question_set, repaired, repair_indices)
+                if targeted
+                else repaired
+            )
+            trace.add(
+                "question_repair",
+                "targeted" if targeted else "full_set",
+                repaired_indices=[index + 1 for index in repair_indices] if targeted else list(range(1, desired_count + 1)),
+            )
             trace.repair_count += 1
-        raise GenerationValidationError("Question generation ended unexpectedly: " + ", ".join(last_issues))
+        raise _stage_error(
+            "Question generation ended unexpectedly: " + ", ".join(last_issues),
+            "question_validation",
+        )
 
     def generate_and_store(
         self,
