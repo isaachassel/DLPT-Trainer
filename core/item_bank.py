@@ -38,6 +38,9 @@ class ItemBank:
         self.audio_assets: dict[str, AudioAsset] = {}
         self.validation_reports: dict[str, dict] = {}
         self.questions_by_passage: dict[str, list[QuestionItem]] = defaultdict(list)
+        self.passage_ids_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
+        self.question_ids_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
+        self.topics_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
         self.passage_origin: dict[str, str] = {}
         self._loaded = False
         self._lock = threading.RLock()
@@ -82,8 +85,17 @@ class ItemBank:
 
     def _reindex(self) -> None:
         self.questions_by_passage = defaultdict(list)
+        self.passage_ids_by_skill = {"reading": set(), "listening": set()}
+        self.question_ids_by_skill = {"reading": set(), "listening": set()}
+        self.topics_by_skill = {"reading": set(), "listening": set()}
+        for passage in self.passages.values():
+            self.passage_ids_by_skill[passage.skill].add(passage.id)
+            self.topics_by_skill[passage.skill].add(passage.topic)
         for question in self.questions.values():
             self.questions_by_passage[question.passage_id].append(question)
+            passage = self.passages.get(question.passage_id)
+            if passage is not None:
+                self.question_ids_by_skill[passage.skill].add(question.id)
         for questions in self.questions_by_passage.values():
             questions.sort(key=lambda q: q.id)
 
@@ -110,6 +122,9 @@ class ItemBank:
             self.audio_assets.clear()
             self.validation_reports.clear()
             self.questions_by_passage = defaultdict(list)
+            self.passage_ids_by_skill = {"reading": set(), "listening": set()}
+            self.question_ids_by_skill = {"reading": set(), "listening": set()}
+            self.topics_by_skill = {"reading": set(), "listening": set()}
             self.passage_origin.clear()
             self.load_warnings.clear()
             self._loaded = False
@@ -117,7 +132,7 @@ class ItemBank:
 
     def validate_operational_bank(self) -> list[str]:
         errors: list[str] = []
-        seen_hashes: dict[str, str] = {}
+        seen_hashes: dict[str, dict[str, str]] = {"reading": {}, "listening": {}}
         for passage in self.passages.values():
             questions = self.questions_by_passage.get(passage.id, [])
             passage_report = validate_passage(passage, questions)
@@ -125,20 +140,58 @@ class ItemBank:
                 errors.append(f"{passage.id}: {', '.join(passage_report.failure_reasons)}")
             if passage.content_hash != content_hash(passage.passage_ru):
                 errors.append(f"{passage.id}: content hash mismatch")
-            for other_hash, other_id in seen_hashes.items():
+            for other_hash, other_id in seen_hashes[passage.skill].items():
                 if passage.duplicate_detection_hash == other_hash or near_duplicate(passage.passage_ru, self.passages[other_id].passage_ru):
-                    errors.append(f"{passage.id}: duplicate or near-duplicate of {other_id}")
-            seen_hashes[passage.duplicate_detection_hash] = passage.id
+                    errors.append(f"{passage.id}: duplicate or near-duplicate {passage.skill} passage {other_id}")
+            seen_hashes[passage.skill][passage.duplicate_detection_hash] = passage.id
+            audio_error = self._audio_relationship_error(passage)
+            if audio_error:
+                errors.append(f"{passage.id}: {audio_error}")
             for question in questions:
                 report = validate_question(question, passage)
                 if report.status != "accepted":
                     errors.append(f"{question.id}: {', '.join(report.failure_reasons + report.ambiguity_flags)}")
         return errors
 
+    def _resolve_audio_path(self, asset: AudioAsset) -> Path | None:
+        if not asset.path:
+            return None
+        audio_path = Path(asset.path)
+        if not audio_path.is_absolute():
+            candidates = [Path.cwd() / audio_path, self.path.parent.parent / audio_path]
+            audio_path = next((candidate for candidate in candidates if candidate.exists()), candidates[-1])
+        return audio_path
+
+    def _audio_relationship_error(self, passage: PassageItem, supplied_asset: AudioAsset | None = None) -> str | None:
+        """Enforce the skill/audio contract at the operational-bank boundary."""
+        if passage.skill == "reading":
+            if passage.audio_asset_id is not None or passage.audio_duration_seconds is not None or passage.voice_metadata:
+                return "reading passage must not reference audio metadata"
+            if supplied_asset is not None:
+                return "reading passage must not include an audio asset"
+            return None
+
+        asset = supplied_asset or self.audio_assets.get(passage.audio_asset_id or "")
+        if not passage.audio_asset_id:
+            return "listening passage is missing audio_asset_id"
+        if asset is None or asset.id != passage.audio_asset_id:
+            return "listening passage references a missing or mismatched audio asset"
+        if not asset.validated:
+            return "listening audio asset is not validated"
+        if asset.transcript_hash != content_hash(passage.passage_ru):
+            return "listening audio transcript hash does not match the passage"
+        audio_path = self._resolve_audio_path(asset)
+        if audio_path is None or not audio_path.exists() or audio_path.stat().st_size <= 0:
+            return "listening audio file is missing or empty"
+        return None
+
     def active_passages(self, skill: str) -> list[PassageItem]:
+        if skill not in {"reading", "listening"}:
+            raise ItemBankError(f"Unsupported skill: {skill}")
         active: list[PassageItem] = []
-        for passage in self.passages.values():
-            if passage.skill != skill or passage.status != "active" or passage.validation_status != "accepted":
+        for passage_id in self.passage_ids_by_skill[skill]:
+            passage = self.passages[passage_id]
+            if passage.status != "active" or passage.validation_status != "accepted":
                 continue
             questions = self.questions_by_passage.get(passage.id, [])
             if len(questions) != len(passage.question_ids):
@@ -147,20 +200,18 @@ class ItemBank:
                 continue
             if any(validate_question(question, passage).status != "accepted" for question in questions):
                 continue
-            if passage.skill == "listening":
-                if not passage.audio_asset_id or passage.audio_asset_id not in self.audio_assets:
-                    continue
-                audio_path = Path(self.audio_assets[passage.audio_asset_id].path)
-                if not audio_path.is_absolute():
-                    candidates = [Path.cwd() / audio_path, self.path.parent.parent / audio_path]
-                    audio_path = next((candidate for candidate in candidates if candidate.exists()), candidates[-1])
-                if not audio_path.exists() or audio_path.stat().st_size <= 0:
-                    continue
+            if self._audio_relationship_error(passage):
+                continue
             active.append(passage)
         return active
 
-    def health_summary(self) -> dict[str, int]:
-        return {
+    def topics_for_skill(self, skill: str) -> list[str]:
+        if skill not in self.topics_by_skill:
+            raise ItemBankError(f"Unsupported skill: {skill}")
+        return sorted(self.topics_by_skill[skill])
+
+    def health_summary(self) -> dict[str, Any]:
+        summary: dict[str, Any] = {
             "passages": len(self.passages),
             "questions": len(self.questions),
             "audio_assets": len(self.audio_assets),
@@ -172,6 +223,66 @@ class ItemBank:
             ),
             "load_warnings": len(self.load_warnings),
         }
+        for skill in ("reading", "listening"):
+            passage_ids = self.passage_ids_by_skill[skill]
+            generated_ids = {pid for pid in passage_ids if self.origin_for(pid) == "generated_bank"}
+            active = self.active_passages(skill)
+            active_ids = {passage.id for passage in active}
+            skill_data = {
+                "passages": len(passage_ids),
+                "questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in passage_ids),
+                "generated_passages": len(generated_ids),
+                "generated_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in generated_ids),
+                "operational_passages": len(active),
+                "operational_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in active_ids),
+                "topics": len(self.topics_by_skill[skill]),
+                "ilr_question_counts": {
+                    level: sum(
+                        1 for qid in self.question_ids_by_skill[skill]
+                        if self.questions[qid].target_ilr == level
+                    )
+                    for level in ("0", "0+", "1", "1+", "2", "2+", "3")
+                },
+            }
+            if skill == "listening":
+                linked_audio_ids = {
+                    self.passages[pid].audio_asset_id for pid in passage_ids
+                    if self.passages[pid].audio_asset_id
+                }
+                generated_linked_audio_ids = {
+                    self.passages[pid].audio_asset_id for pid in generated_ids
+                    if self.passages[pid].audio_asset_id
+                }
+                skill_data.update({
+                    "audio_assets": len(linked_audio_ids),
+                    "generated_audio_assets": len(generated_linked_audio_ids),
+                    "missing_or_invalid_audio": sum(
+                        1 for pid in passage_ids if self._audio_relationship_error(self.passages[pid])
+                    ),
+                    "operational_audio_assets": len({p.audio_asset_id for p in active if p.audio_asset_id}),
+                })
+            summary[skill] = skill_data
+        summary["cross_skill_related_pairs"] = self._cross_skill_related_pair_count()
+        return summary
+
+    def _cross_skill_related_pair_count(self) -> int:
+        """Count explicit/exact cross-skill relationships without an O(n²) status scan."""
+        pairs: set[tuple[str, str]] = set()
+        for passage in self.passages.values():
+            related = passage.provenance.get("cross_skill_related_passage_id")
+            if related and related in self.passages and self.passages[related].skill != passage.skill:
+                pairs.add(tuple(sorted((passage.id, related))))
+
+        reading_by_hash = {
+            self.passages[pid].duplicate_detection_hash: pid
+            for pid in self.passage_ids_by_skill["reading"]
+        }
+        for pid in self.passage_ids_by_skill["listening"]:
+            passage = self.passages[pid]
+            related = reading_by_hash.get(passage.duplicate_detection_hash)
+            if related:
+                pairs.add(tuple(sorted((pid, related))))
+        return len(pairs)
 
     def get_passage(self, passage_id: str) -> PassageItem:
         try:
@@ -190,8 +301,20 @@ class ItemBank:
     def origin_for(self, passage_id: str) -> str:
         return self.passage_origin.get(passage_id, "starter_bank")
 
-    def duplicate_of(self, passage: PassageItem) -> str | None:
+    def duplicate_of(self, passage: PassageItem, same_skill_only: bool = True) -> str | None:
         for existing in self.passages.values():
+            if same_skill_only and existing.skill != passage.skill:
+                continue
+            if existing.content_hash == passage.content_hash or existing.duplicate_detection_hash == passage.duplicate_detection_hash:
+                return existing.id
+            if near_duplicate(existing.passage_ru, passage.passage_ru):
+                return existing.id
+        return None
+
+    def cross_skill_duplicate_of(self, passage: PassageItem) -> str | None:
+        for existing in self.passages.values():
+            if existing.skill == passage.skill:
+                continue
             if existing.content_hash == passage.content_hash or existing.duplicate_detection_hash == passage.duplicate_detection_hash:
                 return existing.id
             if near_duplicate(existing.passage_ru, passage.passage_ru):
@@ -214,9 +337,16 @@ class ItemBank:
             q_checks = [validate_question(question, passage) for question in questions]
             if p_check.status != "accepted" or any(report.status != "accepted" for report in q_checks):
                 raise ItemBankError("The bundle failed deterministic validation immediately before persistence.")
-            duplicate = self.duplicate_of(passage)
+            audio_error = self._audio_relationship_error(passage, audio_asset)
+            if audio_error:
+                raise ItemBankError(audio_error)
+            duplicate = self.duplicate_of(passage, same_skill_only=True)
             if duplicate:
-                raise ItemBankError(f"Generated passage duplicates existing passage {duplicate}.")
+                raise ItemBankError(f"Generated passage duplicates existing {passage.skill} passage {duplicate}.")
+            cross_skill_duplicate = self.cross_skill_duplicate_of(passage)
+            if cross_skill_duplicate:
+                passage.provenance["cross_skill_related_passage_id"] = cross_skill_duplicate
+                passage.provenance["cross_skill_policy"] = "stored separately; repeat exposure suppressed across skills"
             if passage.id in self.passages or any(question.id in self.questions for question in questions):
                 raise ItemBankError("Generated item IDs already exist in the bank.")
 
@@ -271,8 +401,26 @@ class ItemBank:
         routing_band: str | None = None,
         selection_seed: str | None = None,
     ) -> AdaptiveSelection:
+        seen_content_hashes = {
+            self.passages[passage_id].content_hash
+            for passage_id in seen_passages
+            if passage_id in self.passages
+        }
+        seen_duplicate_hashes = {
+            self.passages[passage_id].duplicate_detection_hash
+            for passage_id in seen_passages
+            if passage_id in self.passages
+        }
+        eligible_passages = [
+            passage for passage in self.active_passages(skill)
+            if passage.id in seen_passages
+            or (
+                passage.content_hash not in seen_content_hashes
+                and passage.duplicate_detection_hash not in seen_duplicate_hashes
+            )
+        ]
         return select_passage(
-            self.active_passages(skill), self.questions_by_passage, estimate, mode, target_level,
+            eligible_passages, self.questions_by_passage, estimate, mode, target_level,
             seen_passages, seen_questions, topic_exposure, genre_exposure,
             question_type_exposure, item_exposure, allowed_topics, preferred_competencies, first_passage,
             allowed_ilr_bands, routing_band, selection_seed,

@@ -61,6 +61,31 @@ BANK = ItemBank(
 BANK_STATUS_MESSAGE = BANK_PERSISTENCE.status_text()
 
 
+def _skill_bank_line(skill: str, health: dict) -> str:
+    data = health[skill]
+    label = skill.title()
+    coverage = ", ".join(
+        f"{level}: {count}"
+        for level, count in data["ilr_question_counts"].items()
+        if count
+    )
+    if skill == "listening":
+        return (
+            f"**{label}:** {data['generated_passages']} generated passages / "
+            f"{data['generated_questions']} generated questions / "
+            f"{data['generated_audio_assets']} generated audio assets · "
+            f"{data['operational_passages']} operational passages · "
+            f"missing or invalid audio: {data['missing_or_invalid_audio']} · "
+            f"ILR question coverage: {coverage}"
+        )
+    return (
+        f"**{label}:** {data['generated_passages']} generated passages / "
+        f"{data['generated_questions']} generated questions · "
+        f"{data['operational_passages']} operational passages · "
+        f"ILR question coverage: {coverage}"
+    )
+
+
 def bank_status_markdown() -> str:
     text = BANK_PERSISTENCE.status_text()
     health = BANK.health_summary()
@@ -69,14 +94,27 @@ def bank_status_markdown() -> str:
         if health["load_warnings"]
         else ""
     )
-    return f"💾 **Reusable bank status:** {text}{warning}"
+    relation_note = (
+        f" · cross-skill related pairs tracked: {health['cross_skill_related_pairs']}"
+        if health["cross_skill_related_pairs"]
+        else ""
+    )
+    return (
+        f"💾 **Reusable bank status:** {text}{warning}{relation_note}\n\n"
+        f"{_skill_bank_line('reading', health)}  \n"
+        f"{_skill_bank_line('listening', health)}"
+    )
 SESSION_DIR = SETTINGS.session_runtime_path(ROOT)
 HISTORY_DIR = SETTINGS.history_runtime_path(ROOT)
 STORAGE = LocalStorage(SESSION_DIR, HISTORY_DIR)
 EXPORT_DIR = SETTINGS.runtime_path(Path("storage/exports"), ROOT, "exports")
 GENERATOR = LiveGenerationService(SETTINGS, BANK, ROOT)
 PROVIDER_READY, PROVIDER_MESSAGE = SETTINGS.provider_readiness()
-TOPICS = sorted({passage.topic for passage in BANK.passages.values()})
+TOPICS_BY_SKILL = {
+    "reading": BANK.topics_for_skill("reading"),
+    "listening": BANK.topics_for_skill("listening"),
+}
+TOPICS = sorted(set(TOPICS_BY_SKILL["reading"]) | set(TOPICS_BY_SKILL["listening"]))
 CONTENT_SOURCE_CHOICES = [
     "Validated bank only — fastest",
     "Fresh AI preferred — validate, save to bank, then fall back automatically",
@@ -84,6 +122,15 @@ CONTENT_SOURCE_CHOICES = [
 
 QUEUE_CONCURRENCY_LIMIT = SETTINGS.queue_concurrency_limit
 MAX_SLOTS = 5
+
+
+def topic_controls(skill_label: str, current_topics=None):
+    """Expose only topics that are currently indexed for the selected skill."""
+    skills = SKILL_LABELS.get(skill_label, ["reading"])
+    choices = sorted({topic for skill in skills for topic in BANK.topics_for_skill(skill)})
+    current = [] if current_topics in (None, "") else ([current_topics] if isinstance(current_topics, str) else list(current_topics))
+    retained = [topic for topic in current if topic in choices]
+    return gr.update(choices=choices, value=retained)
 
 
 def sync_generated_bank_callback():
@@ -451,10 +498,16 @@ def _status_text(state: SessionState, extra: str = "") -> str:
         lines.append(f"**Eligible item range:** ILR {state.minimum_ilr} through ILR {state.maximum_ilr}.")
     if state.content_source == "fresh_ai_preferred":
         health = BANK.health_summary()
+        skill_health = health[state.active_skill]
+        audio_note = (
+            f" / {skill_health['generated_audio_assets']} audio assets"
+            if state.active_skill == "listening"
+            else ""
+        )
         lines.append(
             f"**Content:** Fresh AI preferred · generated this session: {len(state.generated_passage_ids)} · "
-            f"bank fallbacks: {state.bank_fallback_count} · reusable generated bank: "
-            f"{health['generated_passages']} passages / {health['generated_questions']} questions."
+            f"bank fallbacks: {state.bank_fallback_count} · reusable generated {state.active_skill.title()} bank: "
+            f"{skill_health['generated_passages']} passages / {skill_health['generated_questions']} questions{audio_note}."
         )
     if state.last_content_source == "fresh_ai":
         lines.append("✅ **Fresh AI bundle generated, validated, saved to the reusable bank, and selected for this passage.**")
@@ -611,7 +664,8 @@ def start_session_callback(
                 raise ValueError("The selected starting ILR band must fall inside the allowed adaptive range.")
         if mode == "training" and not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(target_level) <= ILR_LEVELS.index(maximum_ilr):
             raise ValueError("The Training target ILR band must fall inside the allowed adaptive range.")
-        topics = _normalize_multiselect(topics, TOPICS, "topic")
+        allowed_topics = sorted({topic for selected_skill in skills for topic in BANK.topics_for_skill(selected_skill)})
+        topics = _normalize_multiselect(topics, allowed_topics, "topic")
         competencies = _normalize_multiselect(competencies, QUESTION_TYPES, "competency")
         max_q, minimum, simulation_full, shortened, simulation_seconds = _length_settings(mode, length_label)
         timer_mode = "off" if timer_label == "Off" else ("standard" if timer_label == "Standard count-up" else "strict")

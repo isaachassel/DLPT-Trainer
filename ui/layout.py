@@ -6,13 +6,15 @@ from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
 from ui.components import answer_radio, scalar_tolerant_checkbox_group
 from ui.callbacks import (
     BANK_BOOTSTRAP_MESSAGE,
-    BANK_STATUS_MESSAGE,
     CONTENT_SOURCE_CHOICES,
     MAX_SLOTS,
     PROVIDER_MESSAGE,
     PROVIDER_READY,
     QUEUE_CONCURRENCY_LIMIT,
     TOPICS,
+    TOPICS_BY_SKILL,
+    bank_status_markdown,
+    topic_controls,
     abandon_strict_callback,
     begin_activity,
     answer_changed_callback,
@@ -126,7 +128,7 @@ def build_app() -> gr.Blocks:
                         info="Hard eligibility ceiling. For example, choose 2 through 3 to allow only 2, 2+, and 3 items.",
                     )
                 with gr.Row():
-                    topics = scalar_tolerant_checkbox_group(TOPICS, label="Topics (leave blank for balanced selection)")
+                    topics = scalar_tolerant_checkbox_group(TOPICS_BY_SKILL["reading"], label="Topics available for selected skill (leave blank for balanced selection)")
                     competencies = scalar_tolerant_checkbox_group(QUESTION_TYPES, label="Comprehension competencies to emphasize")
                 with gr.Row():
                     feedback_timing = gr.Radio(["After each passage", "End of session"], value="After each passage", label="Feedback timing")
@@ -145,7 +147,7 @@ def build_app() -> gr.Blocks:
                     )
                 provider_icon = "✅" if PROVIDER_READY else "ℹ️"
                 gr.Markdown(f"{provider_icon} **Live generation status:** {PROVIDER_MESSAGE}")
-                bank_status = gr.Markdown(f"💾 **Reusable bank status:** {BANK_STATUS_MESSAGE}")
+                bank_status = gr.Markdown(bank_status_markdown())
                 if BANK_BOOTSTRAP_MESSAGE:
                     gr.Markdown(f"<small>{BANK_BOOTSTRAP_MESSAGE}</small>")
                 start_btn = gr.Button("Begin Session", variant="primary")
@@ -231,6 +233,13 @@ def build_app() -> gr.Blocks:
                     length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
                     adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
                 ],
+            )
+            skill.change(
+                topic_controls,
+                inputs=[skill, topics],
+                outputs=[topics],
+                queue=False,
+                show_progress="hidden",
             )
 
             start_prepare = start_btn.click(

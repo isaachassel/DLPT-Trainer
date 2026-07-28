@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.3.4 — Skill-Separated Bank Indexing and Audio Integrity
+
+### Logical Reading and Listening banks
+- Keeps one durable JSONL/Dataset repository while building separate in-memory Reading and Listening passage, question, topic, and ILR indexes.
+- Reading selection can only use Reading records; Listening selection can only use operational Listening records with validated audio.
+- Reusable-bank status now reports Reading and Listening counts separately instead of presenting one ambiguous total.
+- Active-session content status shows the generated bank for the current skill only.
+
+### Audio integrity
+- Reading bundles are rejected if they contain an audio asset, audio duration, or voice metadata.
+- Listening bundles are rejected unless the referenced audio asset exists, is validated, has a matching transcript hash, and points to a non-empty file.
+- Bank validation and operational selection enforce the same skill/audio contract for restored Dataset records.
+
+### Topics and duplicate policy
+- Topic controls now update to the selected skill and preserve only still-valid selections.
+- Same-skill exact and near duplicates are rejected.
+- Cross-skill equivalents may be stored as explicitly related transformations, but their relationship is recorded and repeat exposure is suppressed across skills within a session/history.
+- Bank health reports cross-skill related pairs rather than misclassifying them as same-skill duplicates.
+
+### Verification
+- Added regression tests for skill indexes, skill-specific topics, Reading-with-audio rejection, Listening-without-audio rejection, cross-skill relationship metadata, and separated health totals.
+- Expanded the automated suite to 130 passing tests.
+
 ## v1.3.3 — Targeted Question Repair and Listening Pipeline Diagnostics
 
 ### Fresh Listening generation

@@ -55,6 +55,7 @@ The bank is the application’s reliability layer and accumulated content memory
 - Session checkpoints, recovery, optional history, and JSON/CSV export.
 - Typed Pydantic bank, session, generation, validation, and reporting models.
 - Provider-independent starter content.
+- One durable bank repository with separate Reading/Listening indexes, skill-specific topics, and strict Listening-audio integrity.
 - Optional staged live generation with repair, quarantine, persistence, quota protection, and bank fallback.
 - Immediate visible loading feedback with an accessible spinner, busy button labels, and staged progress for slow operations.
 - Python-side answer shuffling and key remapping; prompts never prescribe answer letters.
@@ -139,9 +140,20 @@ On a Hugging Face Space, the application now attempts to create a private Datase
 
 The setup screen also provides **Download Generated Bank Backup** and **Import and Merge Backup** controls. The portable ZIP includes the JSONL records, manifest, and generated Listening MP3 files.
 
-The two files are indexed as one operational bank. Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable. Malformed generated-overlay records are excluded without disabling the immutable starter bank.
+The starter file and generated overlay form one durable physical repository, but the application builds **separate logical Reading and Listening indexes**:
 
-All starter and generated difficulty values remain **provisional** until empirical calibration exists.
+```text
+Reading index: passages + questions + Reading topics
+Listening index: passages + questions + Listening topics + validated audio assets
+```
+
+Reading records never require or receive audio. A Reading bundle is rejected if it references an audio asset, duration, or voice metadata. A Listening bundle is operational only when its referenced audio asset exists, is validated, matches the transcript hash, and points to a non-empty audio file.
+
+The setup status reports Reading and Listening counts separately, including operational Listening audio health and ILR question coverage. Topic choices update when the selected skill changes. Same-skill duplicates are rejected; a deliberate cross-skill transformation may be stored with relationship metadata, while repeat exposure to the same content is suppressed across skills.
+
+Failed candidates are written under `storage/quarantine/` or `/data/quarantine/` and never become selectable. Malformed generated-overlay records are excluded without disabling the immutable starter bank.
+
+All starter and generated difficulty values remain **provisional** until empirical calibration exists. See `docs/SKILL_SEPARATED_BANK.md` for the storage/index/audio contract.
 
 ## GenAI authoring pipeline
 

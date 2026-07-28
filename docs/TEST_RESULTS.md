@@ -1,14 +1,24 @@
 # Test Results
 
-Executed for the v1.3.3 targeted-question-repair and Listening pipeline release on 2026-07-28.
+Executed for the v1.3.4 skill-separated bank and audio-integrity release on 2026-07-28.
 
 ## Automated unit/integration suite
 
 ```text
-122 passed
+130 passed
 ```
 
 
+
+Version 1.3.4 additionally verifies:
+
+- Reading and Listening maintain disjoint passage/question indexes.
+- Skill-specific topic lists update correctly for Reading, Listening, and combined sessions.
+- Reading bundles carrying audio metadata or assets are rejected.
+- Listening bundles without validated, transcript-linked, non-empty audio are rejected.
+- Same-skill duplicates are rejected while cross-skill equivalents are stored as related content.
+- Cross-skill repeat exposure is suppressed by content hashes during selection.
+- Bank-health totals and operational audio counts reconcile by skill.
 
 Version 1.3.3 additionally verifies:
 

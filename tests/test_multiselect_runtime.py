@@ -32,7 +32,7 @@ def test_start_session_normalizes_scalar_topic_and_competency():
         "2",
         "Short — 8 questions",
         "Off",
-        "Government and politics",
+        "Culture and society",
         "main idea",
         "After each passage",
         False,
@@ -43,7 +43,7 @@ def test_start_session_normalizes_scalar_topic_and_competency():
     )
     state = result[0]
     assert state is not None
-    assert state.topics == ["Government and politics"]
+    assert state.topics == ["Culture and society"]
     assert state.competencies == ["main idea"]
 
 
