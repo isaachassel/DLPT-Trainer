@@ -86,6 +86,34 @@ QUEUE_CONCURRENCY_LIMIT = SETTINGS.queue_concurrency_limit
 MAX_SLOTS = 5
 
 
+def sync_generated_bank_callback():
+    """Retry/verify remote bank persistence and expose the real failure reason."""
+
+    try:
+        result = BANK_PERSISTENCE.sync_now()
+        return (
+            gr.update(
+                value=(
+                    f"✅ Durable bank synchronization succeeded: {result.passage_count} passages / "
+                    f"{result.question_count} questions are restart-safe in `{BANK_PERSISTENCE.resolved_repo_id}`."
+                ),
+                visible=True,
+            ),
+            bank_status_markdown(),
+        )
+    except Exception as exc:
+        return (
+            gr.update(
+                value=(
+                    "❌ Durable bank synchronization failed. The current container copy is temporary. "
+                    f"{html.escape(str(exc))}"
+                ),
+                visible=True,
+            ),
+            bank_status_markdown(),
+        )
+
+
 def export_generated_bank_callback():
     """Create a user-downloadable bank+audio backup without mutating the bank."""
 
@@ -451,7 +479,7 @@ def _question_updates(bundle: PassageBundle | None):
             outputs.append(gr.update(choices=choices, value=None, visible=True, interactive=True, label=f"Question {index + 1}"))
         else:
             outputs.append(gr.update(value="", visible=False))
-            outputs.append(gr.update(choices=[], value=None, visible=False, interactive=False))
+            outputs.append(gr.update(value=None, visible=False, interactive=False))
     return outputs
 
 
@@ -459,7 +487,7 @@ def _blank_questions():
     outputs = []
     for _ in range(MAX_SLOTS):
         outputs.append(gr.update(value="", visible=False))
-        outputs.append(gr.update(choices=[], value=None, visible=False, interactive=False))
+        outputs.append(gr.update(value=None, visible=False, interactive=False))
     return outputs
 
 
@@ -789,7 +817,11 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
         # Preserve the user's current radio values after a validation error.
         for index, question in enumerate(bundle.questions):
             radio_output_index = 11 + index * 2
-            rendered[radio_output_index] = gr.update(value=answers_values[index], visible=True, interactive=True)
+            choices = [(f"{letter}. {question.choices[letter]}", letter) for letter in ["A", "B", "C", "D"]]
+            rendered[radio_output_index] = gr.update(
+                choices=choices, value=answers_values[index], visible=True, interactive=True,
+                label=f"Question {index + 1}",
+            )
         return rendered
 
 

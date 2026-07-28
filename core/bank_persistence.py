@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import json
 import os
 import re
 import shutil
 import tempfile
+import time
 import threading
 import zipfile
 from dataclasses import dataclass
@@ -14,10 +16,13 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from huggingface_hub import HfApi, hf_hub_download
-from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError
+from huggingface_hub.utils import EntryNotFoundError, HfHubHTTPError, RepositoryNotFoundError
 
 from .config import Settings
 from .storage import atomic_write_text
+
+
+LOGGER = logging.getLogger("dlpt.persistence")
 
 
 @dataclass(frozen=True)
@@ -55,10 +60,20 @@ class GeneratedBankPersistence:
         self.last_error: str | None = None
         self.resolved_repo_id: str | None = settings.hf_dataset_repo
         self._remote_repo_confirmed = False
+        self._active_token: str | None = None
+
+    @property
+    def token_candidates(self) -> tuple[str, ...]:
+        candidates: list[str] = []
+        for token in (self._active_token, self.settings.hf_bank_token, self.settings.hf_token):
+            if token and token not in candidates:
+                candidates.append(token)
+        return tuple(candidates)
 
     @property
     def bank_token(self) -> str | None:
-        return self.settings.bank_token
+        candidates = self.token_candidates
+        return candidates[0] if candidates else None
 
     @property
     def remote_enabled(self) -> bool:
@@ -78,10 +93,54 @@ class GeneratedBankPersistence:
 
     def _safe_error(self, exc: BaseException) -> str:
         text = str(exc)
+        response = getattr(exc, "response", None)
+        status = getattr(response, "status_code", None)
+        request_id = None
+        headers = getattr(response, "headers", None)
+        if headers:
+            request_id = headers.get("x-request-id") or headers.get("X-Request-Id")
+        prefix = f"HTTP {status}: " if status else ""
+        suffix = f" (request {request_id})" if request_id else ""
         for secret in (self.settings.hf_token, self.settings.hf_bank_token, self.settings.groq_api_key):
             if secret:
                 text = text.replace(secret, "[REDACTED]")
-        return text[:500]
+        compact = " ".join(text.split())
+        return f"{prefix}{compact}{suffix}"[:700]
+
+    def _remote_call(self, action: str, operation):
+        """Run a Hub operation with bounded retries and token fallback."""
+
+        errors: list[str] = []
+        candidates = self.token_candidates
+        if not candidates:
+            raise RuntimeError("No HF_BANK_TOKEN or HF_TOKEN is configured for generated-bank persistence.")
+        for token_index, token in enumerate(candidates, start=1):
+            for attempt in range(1, self.settings.bank_sync_max_retries + 1):
+                try:
+                    result = operation(token)
+                    self._active_token = token
+                    if token_index > 1:
+                        LOGGER.info("Generated-bank %s succeeded with fallback token candidate %s", action, token_index)
+                    return result
+                except EntryNotFoundError:
+                    # The repository is reachable; only the requested file is absent.
+                    raise
+                except RepositoryNotFoundError as exc:
+                    errors.append(f"token {token_index}: {self._safe_error(exc)}")
+                    break
+                except HfHubHTTPError as exc:
+                    errors.append(f"token {token_index} attempt {attempt}: {self._safe_error(exc)}")
+                    status = getattr(getattr(exc, "response", None), "status_code", None)
+                    if status in {401, 403, 404}:
+                        break
+                    if attempt < self.settings.bank_sync_max_retries:
+                        time.sleep(min(2 ** (attempt - 1), 4))
+                except Exception as exc:
+                    errors.append(f"token {token_index} attempt {attempt}: {self._safe_error(exc)}")
+                    if attempt < self.settings.bank_sync_max_retries:
+                        time.sleep(min(2 ** (attempt - 1), 4))
+        detail = " | ".join(errors[-4:])
+        raise RuntimeError(f"HF Dataset {action} failed for all configured bank tokens. {detail}")
 
     @staticmethod
     def _safe_slug(value: str, *, fallback: str = "dlpt-trainer") -> str:
@@ -104,7 +163,7 @@ class GeneratedBankPersistence:
             owner, app_name = space_id.split("/", 1)
         else:
             try:
-                identity = HfApi(token=self.bank_token).whoami(token=self.bank_token)
+                identity = self._remote_call("identity check", lambda token: HfApi(token=token).whoami(token=token))
                 owner = str(identity.get("name") or identity.get("fullname") or "").strip() or None
                 if space_host:
                     app_name = space_host.removesuffix(".hf.space")
@@ -130,14 +189,18 @@ class GeneratedBankPersistence:
         repo_id = self._resolve_repo_id()
         if not repo_id or not self.bank_token:
             raise RuntimeError("No Dataset repository or write-capable bank token is available.")
-        HfApi(token=self.bank_token).create_repo(
-            repo_id=repo_id,
-            repo_type="dataset",
-            private=self.settings.hf_dataset_private,
-            exist_ok=True,
-            token=self.bank_token,
+        self._remote_call(
+            "repository create/access check",
+            lambda token: HfApi(token=token).create_repo(
+                repo_id=repo_id,
+                repo_type="dataset",
+                private=self.settings.hf_dataset_private,
+                exist_ok=True,
+                token=token,
+            ),
         )
         self._remote_repo_confirmed = True
+        LOGGER.info("Generated-bank Dataset repository ready repo=%s", repo_id)
 
     @staticmethod
     def _record_key(record: dict[str, Any], fallback: str) -> tuple[str, str]:
@@ -184,6 +247,22 @@ class GeneratedBankPersistence:
     def _cache_dir(self) -> Path:
         return self.settings.runtime_path(Path("storage/cache/hf"), self.project_root, "cache/hf")
 
+    def _download_remote(self, filename: str) -> Path:
+        repo_id = self.resolved_repo_id or ""
+        return Path(
+            self._remote_call(
+                f"download {filename}",
+                lambda token: hf_hub_download(
+                    repo_id=repo_id,
+                    filename=filename,
+                    repo_type="dataset",
+                    token=token,
+                    cache_dir=str(self._cache_dir()),
+                    force_download=True,
+                ),
+            )
+        )
+
     def _restore_remote_audio(self, records: list[dict[str, Any]]) -> list[str]:
         warnings: list[str] = []
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
@@ -196,15 +275,7 @@ class GeneratedBankPersistence:
             source_name = Path(str(data.get("path") or "")).name or f"{data.get('id', 'audio')}.mp3"
             target = cache_dir / source_name
             try:
-                downloaded = Path(
-                    hf_hub_download(
-                        repo_id=repo_id,
-                        filename=f"audio/{source_name}",
-                        repo_type="dataset",
-                        token=self.bank_token,
-                        cache_dir=str(self._cache_dir()),
-                    )
-                )
+                downloaded = self._download_remote(f"audio/{source_name}")
                 fd, tmp_name = tempfile.mkstemp(prefix=target.name, suffix=".tmp", dir=str(target.parent))
                 os.close(fd)
                 shutil.copyfile(downloaded, tmp_name)
@@ -236,35 +307,13 @@ class GeneratedBankPersistence:
             return self.last_note
 
         try:
-            # Auto-derived repositories must be created on first startup. An
-            # explicitly configured repository is downloaded first so existing
-            # deployments do not require a create-repo API call on every boot.
-            if not self.settings.hf_dataset_repo:
-                self._ensure_remote_repo()
+            # Validate access and create the configured/derived Dataset before
+            # attempting to restore its bank file. This avoids ambiguous 404s
+            # where a missing private repo and an unreadable repo look identical.
+            self._ensure_remote_repo()
             try:
-                remote_file = Path(
-                    hf_hub_download(
-                        repo_id=self.resolved_repo_id or "",
-                        filename=self.settings.hf_dataset_bank_filename,
-                        repo_type="dataset",
-                        token=self.bank_token,
-                        cache_dir=str(self._cache_dir()),
-                    )
-                )
+                remote_file = self._download_remote(self.settings.hf_dataset_bank_filename)
                 self._remote_repo_confirmed = True
-            except RepositoryNotFoundError:
-                self._ensure_remote_repo()
-                self.refresh_manifest(remote_synced=False)
-                self._upload_snapshot()
-                result = self.refresh_manifest(remote_synced=True)
-                self._upload_manifest()
-                self.last_remote_synced = True
-                self.last_error = None
-                self.last_note = (
-                    f"Private HF Dataset bank created at `{self.resolved_repo_id}`: "
-                    f"{result.passage_count} passages / {result.question_count} questions."
-                )
-                return self.last_note
             except EntryNotFoundError:
                 # First run: initialize the private Dataset with the current local
                 # snapshot (which may be empty) so future restarts are durable.
@@ -292,6 +341,7 @@ class GeneratedBankPersistence:
             )
             self.last_remote_synced = True
             self.last_error = None
+            LOGGER.info("Generated-bank restore synchronized repo=%s passages=%s questions=%s", self.resolved_repo_id, result.passage_count, result.question_count)
         except (RepositoryNotFoundError, PermissionError) as exc:
             self.last_remote_synced = False
             self.last_error = self._safe_error(exc)
@@ -299,30 +349,34 @@ class GeneratedBankPersistence:
             self.last_note = (
                 "Automatic private Dataset persistence could not be enabled. The current bank is temporary. "
                 "Use a write-capable HF_BANK_TOKEN or explicitly set HF_DATASET_REPO. "
-                f"Reason: {type(exc).__name__}."
+                f"Reason: {type(exc).__name__}: {self.last_error}."
             )
+            LOGGER.error("Generated-bank startup sync failed repo=%s error=%s", self.resolved_repo_id, self.last_error)
         except Exception as exc:
             self.last_remote_synced = False
             self.last_error = self._safe_error(exc)
             self.refresh_manifest(remote_synced=False)
             self.last_note = (
                 "Remote generated-bank restore was unavailable; the validated local bank remains active for this runtime only. "
-                f"Reason: {type(exc).__name__}."
+                f"Reason: {type(exc).__name__}: {self.last_error}."
             )
+            LOGGER.error("Generated-bank startup sync failed repo=%s error=%s", self.resolved_repo_id, self.last_error)
         return self.last_note
 
     def _upload_snapshot(self) -> None:
         self._ensure_local_bank_file()
         self._ensure_remote_repo()
-        api = HfApi(token=self.bank_token)
         repo_id = self.resolved_repo_id or ""
-        api.upload_file(
-            path_or_fileobj=self.bank_path,
-            path_in_repo=self.settings.hf_dataset_bank_filename,
-            repo_id=repo_id,
-            repo_type="dataset",
-            token=self.bank_token,
-            commit_message="Update validated Russian practice generated-item bank",
+        self._remote_call(
+            "upload generated bank",
+            lambda token: HfApi(token=token).upload_file(
+                path_or_fileobj=self.bank_path,
+                path_in_repo=self.settings.hf_dataset_bank_filename,
+                repo_id=repo_id,
+                repo_type="dataset",
+                token=token,
+                commit_message="Update validated Russian practice generated-item bank",
+            ),
         )
         records, _ = self._read_valid_records(self.bank_path)
         uploaded_audio: set[str] = set()
@@ -333,13 +387,16 @@ class GeneratedBankPersistence:
             audio_path = Path(str(data.get("path") or ""))
             if not audio_path.exists() or audio_path.stat().st_size <= 0 or audio_path.name in uploaded_audio:
                 continue
-            api.upload_file(
-                path_or_fileobj=audio_path,
-                path_in_repo=f"audio/{audio_path.name}",
-                repo_id=repo_id,
-                repo_type="dataset",
-                token=self.bank_token,
-                commit_message=f"Store generated listening audio {audio_path.name}",
+            self._remote_call(
+                f"upload audio {audio_path.name}",
+                lambda token, path=audio_path: HfApi(token=token).upload_file(
+                    path_or_fileobj=path,
+                    path_in_repo=f"audio/{path.name}",
+                    repo_id=repo_id,
+                    repo_type="dataset",
+                    token=token,
+                    commit_message=f"Store generated listening audio {path.name}",
+                ),
             )
             uploaded_audio.add(audio_path.name)
 
@@ -347,13 +404,16 @@ class GeneratedBankPersistence:
         if not self.manifest_path.exists():
             return
         self._ensure_remote_repo()
-        HfApi(token=self.bank_token).upload_file(
-            path_or_fileobj=self.manifest_path,
-            path_in_repo=self.settings.hf_dataset_manifest_filename,
-            repo_id=self.resolved_repo_id or "",
-            repo_type="dataset",
-            token=self.bank_token,
-            commit_message="Update generated-item bank manifest",
+        self._remote_call(
+            "upload bank manifest",
+            lambda token: HfApi(token=token).upload_file(
+                path_or_fileobj=self.manifest_path,
+                path_in_repo=self.settings.hf_dataset_manifest_filename,
+                repo_id=self.resolved_repo_id or "",
+                repo_type="dataset",
+                token=token,
+                commit_message="Update generated-item bank manifest",
+            ),
         )
 
     def after_local_commit(self, _: Path | None = None) -> BankPersistenceResult:
@@ -394,10 +454,45 @@ class GeneratedBankPersistence:
                 note = (
                     "Committed locally and indexed immediately, but durable synchronization failed. "
                     "The item is usable only until the next restart unless you export it. "
-                    f"Reason: {type(exc).__name__}."
+                    f"Reason: {type(exc).__name__}: {self.last_error}."
                 )
+                LOGGER.error("Generated-bank write sync failed repo=%s error=%s", self.resolved_repo_id, self.last_error)
             self.last_note = note
             return BankPersistenceResult(**{**result.__dict__, "remote_synced": self.last_remote_synced, "note": note})
+
+    def sync_now(self) -> BankPersistenceResult:
+        """Explicitly test access and push the current bank to durable storage."""
+
+        with self._lock:
+            self._resolve_repo_id()
+            if not self.remote_enabled:
+                raise RuntimeError(
+                    "Dataset synchronization is not configured. Add HF_BANK_TOKEN and HF_DATASET_REPO, "
+                    "or enable automatic Dataset provisioning."
+                )
+            try:
+                self._ensure_remote_repo()
+                self.refresh_manifest(remote_synced=False)
+                self._upload_snapshot()
+                result = self.refresh_manifest(remote_synced=True)
+                self._upload_manifest()
+                self.last_remote_synced = True
+                self.last_error = None
+                self.last_note = (
+                    f"Manual synchronization succeeded for `{self.resolved_repo_id}`: "
+                    f"{result.passage_count} passages / {result.question_count} questions."
+                )
+                LOGGER.info("Generated-bank manual sync succeeded repo=%s", self.resolved_repo_id)
+                return BankPersistenceResult(**{**result.__dict__, "remote_synced": True, "note": self.last_note})
+            except Exception as exc:
+                self.last_remote_synced = False
+                self.last_error = self._safe_error(exc)
+                self.refresh_manifest(remote_synced=False)
+                LOGGER.error("Generated-bank manual sync failed repo=%s error=%s", self.resolved_repo_id, self.last_error)
+                raise RuntimeError(
+                    "Generated-bank synchronization failed. Confirm HF_BANK_TOKEN has write access to the Dataset. "
+                    f"Details: {self.last_error}"
+                ) from exc
 
     def export_backup(self, destination_dir: str | Path) -> Path:
         """Create a portable ZIP containing generated JSONL, manifest, and audio."""
@@ -554,7 +649,8 @@ class GeneratedBankPersistence:
             durability = "restart-safe mounted persistent storage"
             icon = "✅"
         elif self.remote_enabled:
-            durability = f"private HF Dataset configured but last sync failed: `{self.resolved_repo_id}`"
+            detail = f" · last error: {self.last_error[:240]}" if self.last_error else ""
+            durability = f"private HF Dataset configured but last sync failed: `{self.resolved_repo_id}`{detail}"
             icon = "⚠️"
         else:
             durability = "NOT restart-safe — ephemeral local Space storage"

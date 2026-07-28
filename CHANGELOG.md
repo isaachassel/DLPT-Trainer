@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.3.2 — Answer Radio and Durable-Bank Sync Repair
+
+### Runtime answer selection
+- Fixed the production Gradio error `Value: 'B' is not in the list of choices: []`.
+- Answer radios now keep stable server-side A/B/C/D values while visible labels change passage-by-passage.
+- Added a strict answer-key preprocessor that accepts only A, B, C, or D even when Gradio retains stale dynamic-choice metadata.
+- Recoverable submission errors now restore both the learner's selected answer and the complete visible answer choices.
+
+### Generated-bank durability
+- Validates or creates the configured private Dataset before attempting startup restore.
+- Adds bounded retries with exponential backoff for transient Hub failures.
+- Tries `HF_BANK_TOKEN` first and then `HF_TOKEN` when they are different, allowing recovery from a stale or under-scoped dedicated token.
+- Logs sanitized HTTP status/reason information under `dlpt.persistence`; tokens are never logged.
+- Displays the sanitized last synchronization error in the reusable-bank status instead of only saying that sync failed.
+- Adds a **Test / Retry Durable Bank Sync** control to verify write access and push the current bank without generating another item.
+- Adds `BANK_SYNC_MAX_RETRIES` configuration, defaulting to 3.
+
+### Verification
+- Added regression coverage for stale/empty Radio choices, live B-answer submission, token fallback, detailed sync errors, and manual sync behavior.
+
+## 1.3.2 — Answer Radio and Durable-Bank Sync Repair
+
+### Runtime answer selection
+- Fixed the production Gradio error `Value: 'B' is not in the list of choices: []`.
+- Answer radios now keep stable server-side A/B/C/D values while visible labels change passage-by-passage.
+- Added a strict answer-key preprocessor that accepts only A, B, C, or D even when Gradio retains stale dynamic-choice metadata.
+- Recoverable submission errors now restore both the learner's selected answer and the complete visible answer choices.
+
+### Generated-bank durability
+- Validates or creates the configured private Dataset before attempting startup restore.
+- Adds bounded retries with exponential backoff for transient Hub failures.
+- Tries `HF_BANK_TOKEN` first and then `HF_TOKEN` when they are different, allowing recovery from a stale or under-scoped dedicated token.
+- Logs sanitized HTTP status/reason information under `dlpt.persistence`; tokens are never logged.
+- Displays the sanitized last synchronization error in the reusable-bank status instead of only saying that sync failed.
+- Adds a **Test / Retry Durable Bank Sync** control to verify write access and push the current bank without generating another item.
+- Adds `BANK_SYNC_MAX_RETRIES`, defaulting to 3.
+
+### Verification
+- Added regression coverage for stale/empty Radio choices, live B-answer submission, token fallback, detailed sync errors, and manual sync behavior.
+
 ## v1.3.1 — Bayesian adjacent-band adaptive routing
 
 - Audited the existing adaptive engine and confirmed that it updated a Bayesian Rasch posterior, but did not expose or enforce an intuitive passage-level ILR routing ladder.

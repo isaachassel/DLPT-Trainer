@@ -177,6 +177,14 @@ def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monk
     def fake_download(**kwargs):
         return str(remote_audio if kwargs["filename"].startswith("audio/") else remote_bank)
 
+    class FakeApi:
+        def __init__(self, token=None):
+            self.token = token
+
+        def create_repo(self, **kwargs):
+            return None
+
+    monkeypatch.setattr("core.bank_persistence.HfApi", FakeApi)
     monkeypatch.setattr("core.bank_persistence.hf_hub_download", fake_download)
     settings = _settings(
         tmp_path,
@@ -275,3 +283,62 @@ def test_generated_bank_backup_zip_round_trip(project_root, tmp_path):
     assert result.question_count == 2
     assert generated.passage.id in destination_bank.passages
     assert destination_bank.origin_for(generated.passage.id) == "generated_bank"
+
+
+def test_dataset_sync_uses_fallback_hf_token_when_bank_token_fails(monkeypatch, project_root, tmp_path):
+    calls: list[str] = []
+
+    class FakeApi:
+        def __init__(self, token=None):
+            self.token = token
+
+        def create_repo(self, **kwargs):
+            calls.append(kwargs["token"])
+            if kwargs["token"] == "bad-bank-token":
+                raise RuntimeError("permission denied")
+            return None
+
+        def upload_file(self, **kwargs):
+            return None
+
+    def missing_remote(**kwargs):
+        from huggingface_hub.utils import EntryNotFoundError
+        raise EntryNotFoundError("bank file not initialized")
+
+    monkeypatch.setattr("core.bank_persistence.HfApi", FakeApi)
+    monkeypatch.setattr("core.bank_persistence.hf_hub_download", missing_remote)
+    settings = _settings(
+        tmp_path,
+        storage_backend="hybrid",
+        hf_dataset_repo="example/russian-practice-bank",
+        hf_bank_token="bad-bank-token",
+        hf_token="working-hf-token",
+        bank_sync_max_retries=1,
+    )
+    persistence = GeneratedBankPersistence(settings, project_root)
+    persistence.bootstrap()
+
+    assert calls == ["bad-bank-token", "working-hf-token"]
+    assert persistence.last_remote_synced is True
+    assert "restart-safe" in persistence.status_text()
+
+
+def test_failed_dataset_sync_exposes_sanitized_reason(project_root, tmp_path):
+    settings = _settings(
+        tmp_path,
+        storage_backend="hybrid",
+        hf_dataset_repo="example/russian-practice-bank",
+        hf_bank_token="hf_secret_value",
+        bank_sync_max_retries=1,
+    )
+    persistence = GeneratedBankPersistence(settings, project_root)
+    persistence.last_error = "HTTP 403: token hf_secret_value lacks write permission"
+    persistence.last_remote_synced = False
+
+    status = persistence.status_text()
+    # status_text receives an already-sanitized last_error during normal calls;
+    # explicitly verify the helper used to create it never leaks the token.
+    safe = persistence._safe_error(RuntimeError("token hf_secret_value lacks write permission"))
+    assert "hf_secret_value" not in safe
+    assert "[REDACTED]" in safe
+    assert "last sync failed" in status

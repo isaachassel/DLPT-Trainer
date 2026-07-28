@@ -313,6 +313,7 @@ STORAGE_BACKEND=hybrid
 HF_DATASET_PRIVATE=true
 SYNC_GENERATED_BANK_ON_STARTUP=true
 SYNC_GENERATED_BANK_ON_WRITE=true
+BANK_SYNC_MAX_RETRIES=3
 ```
 
 When `HF_DATASET_REPO` is set, the app selects `hybrid` automatically unless another backend is explicitly requested. On Spaces, `AUTO_PROVISION_DATASET_BANK=true` also selects hybrid persistence when `HF_BANK_TOKEN` or `HF_TOKEN` is present. `HF_BANK_TOKEN` is preferred so bank-write permission remains separate from inference access. Accepted Listening MP3s are mirrored under `audio/` together with the JSONL bank and health manifest.
@@ -402,6 +403,7 @@ Keep these variables:
 AUTO_PROVISION_DATASET_BANK=true
 SYNC_GENERATED_BANK_ON_STARTUP=true
 SYNC_GENERATED_BANK_ON_WRITE=true
+BANK_SYNC_MAX_RETRIES=3
 ```
 
 The next startup creates or restores a private Dataset automatically. An explicit repository remains supported:
@@ -418,6 +420,7 @@ STORAGE_BACKEND=hybrid
 HF_BANK_TOKEN=<write-capable Space secret>
 SYNC_GENERATED_BANK_ON_STARTUP=true
 SYNC_GENERATED_BANK_ON_WRITE=true
+BANK_SYNC_MAX_RETRIES=3
 ```
 
 The setup banner identifies whether the current bank is ephemeral, mounted, or Dataset-synchronized. Use **Download Generated Bank Backup** before any update whenever the banner is not restart-safe.
@@ -528,3 +531,9 @@ The application reveals item levels only at feedback-safe points:
 - Adaptive Diagnostic and Full CA Simulation: levels remain hidden during the active test and appear only after completion.
 
 Uncalibrated items are labeled as an **intended provisional ILR level**. When empirical calibration exists, the report shows the approximate calibrated operational band and separately preserves the original authoring target. These are practice metadata, not official DLPT item classifications.
+
+### Troubleshooting answer selection and bank synchronization
+
+Version 1.3.2 fixes a Gradio 6 dynamic-Radio issue that could reject `A`, `B`, `C`, or `D` because the server retained an empty original choice list. Answer keys are now stable on both the browser and server.
+
+When the reusable-bank banner reports a failed Dataset synchronization, open **Generated Bank Backup & Persistence** and press **Test / Retry Durable Bank Sync**. The status and container log now show a sanitized HTTP reason. Confirm that `HF_BANK_TOKEN` is a Hugging Face user access token with repository write permission and that it can create or edit the configured private Dataset. The app tries `HF_TOKEN` as a fallback when it differs from `HF_BANK_TOKEN`.

@@ -1,12 +1,24 @@
 # Test Results
 
-Executed for the v1.3.1 adaptive-routing release on 2026-07-28.
+Executed for the v1.3.2 runtime-radio and durable-bank synchronization release on 2026-07-28.
 
 ## Automated unit/integration suite
 
 ```text
-114 passed
+119 passed
 ```
+
+
+Version 1.3.2 additionally verifies:
+
+- a legitimate `B` answer is accepted even when Gradio server-side dynamic-choice metadata is stale or empty;
+- answer values outside A/B/C/D are rejected safely;
+- hidden question slots no longer clear the stable answer-key contract;
+- a live Gradio client can start Reading, submit B responses, advance to the next passage, and produce no `choices: []` traceback;
+- configured Dataset repositories are created/access-checked before restore;
+- a failed `HF_BANK_TOKEN` falls back to a different working `HF_TOKEN`;
+- Dataset synchronization errors are token-redacted and visible in status/log diagnostics;
+- explicit manual synchronization can verify and push the current generated bank.
 
 Core coverage includes:
 

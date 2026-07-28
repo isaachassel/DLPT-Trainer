@@ -32,6 +32,7 @@ class Settings(BaseModel):
     hf_dataset_private: bool = True
     sync_generated_bank_on_startup: bool = True
     sync_generated_bank_on_write: bool = True
+    bank_sync_max_retries: int = Field(default=3, ge=1, le=6)
 
     # Secrets are read only from environment/Space secrets. They are never serialized into app data.
     hf_token: str | None = Field(default=None, exclude=True, repr=False)
@@ -324,6 +325,7 @@ def get_settings() -> Settings:
         hf_dataset_private=_env_bool("HF_DATASET_PRIVATE", True),
         sync_generated_bank_on_startup=_env_bool("SYNC_GENERATED_BANK_ON_STARTUP", True),
         sync_generated_bank_on_write=_env_bool("SYNC_GENERATED_BANK_ON_WRITE", True),
+        bank_sync_max_retries=int(os.getenv("BANK_SYNC_MAX_RETRIES", "3")),
         hf_token=hf_token,
         hf_bank_token=hf_bank_token,
         groq_api_key=os.getenv("GROQ_API_KEY") or None,

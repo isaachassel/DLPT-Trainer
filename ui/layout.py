@@ -3,7 +3,7 @@ from __future__ import annotations
 import gradio as gr
 
 from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
-from ui.components import scalar_tolerant_checkbox_group
+from ui.components import answer_radio, scalar_tolerant_checkbox_group
 from ui.callbacks import (
     BANK_BOOTSTRAP_MESSAGE,
     BANK_STATUS_MESSAGE,
@@ -26,6 +26,7 @@ from ui.callbacks import (
     show_hints_callback,
     start_session_callback,
     stop_training_callback,
+    sync_generated_bank_callback,
     submit_passage_callback,
 )
 
@@ -161,6 +162,7 @@ def build_app() -> gr.Blocks:
                     "The manual ZIP backup remains available as an additional safety copy."
                 )
                 with gr.Row():
+                    sync_bank_btn = gr.Button("Test / Retry Durable Bank Sync", variant="secondary")
                     export_bank_btn = gr.Button("Download Generated Bank Backup")
                     bank_backup_file = gr.File(label="Generated bank backup", visible=False)
                 with gr.Row():
@@ -185,7 +187,7 @@ def build_app() -> gr.Blocks:
             answer_radios = []
             for index in range(MAX_SLOTS):
                 question_markdowns.append(gr.Markdown(visible=False))
-                answer_radios.append(gr.Radio(choices=[], visible=False, label=f"Question {index + 1}"))
+                answer_radios.append(answer_radio(visible=False, label=f"Question {index + 1}"))
 
             with gr.Row():
                 hint_btn = gr.Button("Show Strategy Hints", visible=False)
@@ -283,6 +285,13 @@ def build_app() -> gr.Blocks:
             resume_run.failure(
                 lambda: restore_activity_button("Resume Session"),
                 outputs=[activity, resume_btn], queue=False, show_progress="hidden",
+            )
+
+            sync_bank_btn.click(
+                sync_generated_bank_callback,
+                outputs=[bank_backup_status, bank_status],
+                show_progress="minimal",
+                trigger_mode="once",
             )
 
             export_bank_btn.click(
