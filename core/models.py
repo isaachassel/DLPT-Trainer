@@ -6,6 +6,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 
 from .constants import ILR_LEVELS, LETTERS, QUESTION_TYPES
+from .languages import SUPPORTED_LANGUAGE_CODES
 
 
 def utc_now() -> datetime:
@@ -177,6 +178,13 @@ class PassageItem(StrictModel):
             raise ValueError(f"target_ilr must be one of {ILR_LEVELS}")
         return value
 
+    @field_validator("language")
+    @classmethod
+    def valid_language(cls, value: str) -> str:
+        if value not in SUPPORTED_LANGUAGE_CODES:
+            raise ValueError(f"language must be one of {SUPPORTED_LANGUAGE_CODES}")
+        return value
+
     @model_validator(mode="after")
     def validate_bundle_size(self):
         count = len(self.question_ids)
@@ -243,6 +251,7 @@ class ResponseRecord(StrictModel):
     question_id: str
     skill: Literal["reading", "listening"]
     mode: Literal["training", "diagnostic", "simulation"]
+    language: str = "ru"
     target_ilr: str
     item_difficulty: float
     question_type: str
@@ -272,6 +281,7 @@ class SessionCheckpoint(StrictModel):
 
 class UserHistory(StrictModel):
     profile_id: str
+    language: str = "ru"
     seen_passage_ids: list[str] = Field(default_factory=list)
     seen_question_ids: list[str] = Field(default_factory=list)
     reading_estimates: list[dict[str, Any]] = Field(default_factory=list)
@@ -283,6 +293,7 @@ class UserHistory(StrictModel):
 class SessionState(StrictModel):
     session_id: str = Field(default_factory=lambda: uuid4().hex[:12])
     profile_id: str | None = None
+    language: str = "ru"
     mode: Literal["training", "diagnostic", "simulation"]
     selected_skills: list[Literal["reading", "listening"]]
     active_skill_index: int = 0
@@ -325,7 +336,7 @@ class SessionState(StrictModel):
     transcript_review_enabled: bool = False
     replay_allowed: bool = False
     slow_audio_allowed: bool = False
-    voice_label: str = "Russian Female — Svetlana"
+    voice_label: str = "Starter-bank Russian voice"
     speech_rate_label: str = "Normal"
     content_source: Literal["bank_only", "fresh_ai_preferred"] = "bank_only"
     generation_requests: int = 0
@@ -341,6 +352,8 @@ class SessionState(StrictModel):
 
     @model_validator(mode="after")
     def validate_adaptive_band_range(self):
+        if self.language not in SUPPORTED_LANGUAGE_CODES:
+            raise ValueError(f"language must be one of {SUPPORTED_LANGUAGE_CODES}")
         if self.minimum_ilr not in ILR_LEVELS or self.maximum_ilr not in ILR_LEVELS:
             raise ValueError("minimum_ilr and maximum_ilr must be valid ILR bands")
         if ILR_LEVELS.index(self.minimum_ilr) > ILR_LEVELS.index(self.maximum_ilr):

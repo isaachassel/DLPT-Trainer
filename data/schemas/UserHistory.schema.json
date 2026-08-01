@@ -32,6 +32,11 @@
           "title": "Mode",
           "type": "string"
         },
+        "language": {
+          "default": "ru",
+          "title": "Language",
+          "type": "string"
+        },
         "target_ilr": {
           "title": "Target Ilr",
           "type": "string"
@@ -143,6 +148,11 @@
   "properties": {
     "profile_id": {
       "title": "Profile Id",
+      "type": "string"
+    },
+    "language": {
+      "default": "ru",
+      "title": "Language",
       "type": "string"
     },
     "seen_passage_ids": {

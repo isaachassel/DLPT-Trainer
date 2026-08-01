@@ -20,12 +20,14 @@ from .audio import audio_duration_seconds, generate_cached_tts, validate_audio_f
 from .config import Settings
 from .constants import ILR_LEVELS, ILR_THETA, LETTERS, QUESTION_TYPES
 from .item_bank import ItemBank, shuffle_question, shuffle_question_to_key
+from .languages import language_profile
 from .models import AudioAsset, GenerationMetadata, PassageItem, QuestionItem, ValidationReport, utc_now
 from .prompts import (
     AUTHORING_SYSTEM,
     LEVEL_PROFILES,
     PROMPT_VERSION,
     VERIFIER_SYSTEM,
+    authoring_system,
     blind_verification_prompt,
     blind_verification_batch_prompt,
     passage_audit_prompt,
@@ -33,6 +35,7 @@ from .prompts import (
     passage_repair_prompt,
     question_authoring_prompt,
     question_repair_prompt,
+    verifier_system,
 )
 from .storage import atomic_write_text
 from .validation import (
@@ -42,6 +45,8 @@ from .validation import (
     evidence_traceability_score,
     near_duplicate,
     normalize_text,
+    target_language_ratio,
+    target_unit_count,
     validate_passage,
     validate_question,
 )
@@ -434,9 +439,15 @@ class MockProvider(AuthoringProvider):
     ) -> BaseModel:
         self.usage.add(120, 80)
         level = self._level(prompt)
+        mandarin = "Mandarin Chinese" in system or "Mandarin Chinese" in prompt
         if schema is CandidatePassageDraft or schema is CandidatePassage:
             skill = "listening" if "spoken transcript" in prompt or "Skill: listening" in prompt else "reading"
             passage = (
+                "市文化中心为成年人开设了普通话晚间课程。课程面向已经掌握基础知识、但希望在工作和日常生活中更自信交流的居民。"
+                "上课时间是每周二和周四晚上七点到八点半。主办方表示，每班不超过十二人，这样教师可以关注每位学员。"
+                "提前报名的人第一个月可以享受优惠。申请必须在星期五以前通过中心网站提交，确认信息会用电子邮件发送。"
+                "如果报名人数超过现有名额，中心将增加一个星期六的班。"
+                if mandarin else
                 "В городском культурном центре открылись вечерние курсы русского языка для взрослых. "
                 "Программа рассчитана на жителей, которые уже знают основы языка, но хотят увереннее говорить на работе и в повседневной жизни. "
                 "Занятия будут проходить по вторникам и четвергам с семи до восьми тридцати вечера. "
@@ -450,7 +461,7 @@ class MockProvider(AuthoringProvider):
                 passage_ru=passage,
                 genre="announcement",
                 topic="education",
-                subtopic="evening language courses",
+                subtopic="evening Mandarin courses" if mandarin else "evening language courses",
                 target_ilr=level,
                 register_name="neutral public information",
                 text_mode="spoken announcement" if skill == "listening" else "public announcement",
@@ -476,7 +487,38 @@ class MockProvider(AuthoringProvider):
         if schema is CandidateQuestionSet:
             count_match = re.search(r"Create exactly (\d+)", prompt)
             count = int(count_match.group(1)) if count_match else 2
-            candidates = [
+            candidates = ([
+                CandidateQuestion(
+                    stem_en="What is the main purpose of the announcement?",
+                    choices=["To announce evening Mandarin courses for adults", "To close the cultural center", "To advertise a restaurant", "To change public transportation"],
+                    proposed_correct_index=0, rationale_en="The announcement gives the schedule, size, price, and registration process for a new course.",
+                    evidence_ru="开设了普通话晚间课程", question_type="main idea", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
+                ),
+                CandidateQuestion(
+                    stem_en="When must an applicant submit the form?",
+                    choices=["By Friday", "By Tuesday morning", "After the first month", "After receiving an email"],
+                    proposed_correct_index=0, rationale_en="The source explicitly gives Friday as the deadline.",
+                    evidence_ru="星期五以前", question_type="prominent detail", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
+                ),
+                CandidateQuestion(
+                    stem_en="What will the center do if demand exceeds available places?",
+                    choices=["Add a Saturday class", "Raise every class to twenty students", "Cancel the discount", "Move the course online"],
+                    proposed_correct_index=0, rationale_en="The final sentence says an additional Saturday class will be added.",
+                    evidence_ru="增加一个星期六的班", question_type="cause and effect", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
+                ),
+                CandidateQuestion(
+                    stem_en="Why is each class limited to twelve people?",
+                    choices=["So the teacher can attend to each student", "So every student receives a job", "So lessons can be canceled", "So registration is unnecessary"],
+                    proposed_correct_index=0, rationale_en="The class-size limit is tied to individual teacher attention.",
+                    evidence_ru="关注每位学员", question_type="cause and effect", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
+                ),
+                CandidateQuestion(
+                    stem_en="Who receives the first-month discount?",
+                    choices=["People who register early", "Saturday-only students", "Center employees", "Groups of twelve friends"],
+                    proposed_correct_index=0, rationale_en="The source applies the discount to early registrants.",
+                    evidence_ru="提前报名的人", question_type="reference", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
+                ),
+            ] if mandarin else [
                 CandidateQuestion(
                     stem_en="What is the main purpose of the announcement?",
                     choices=[
@@ -532,16 +574,22 @@ class MockProvider(AuthoringProvider):
                     target_ilr=level,
                     provisional_difficulty=ILR_THETA.get(level, 0.5),
                 ),
-            ]
+            ])
             return CandidateQuestionSet(questions=candidates[:count])
         if schema in {BlindVerification, BlindVerificationBatch}:
-            evidence_map = {
+            evidence_map = ({
+                "evening Mandarin courses": "开设了普通话晚间课程",
+                "By Friday": "星期五以前",
+                "Saturday class": "增加一个星期六的班",
+                "attend to each student": "关注每位学员",
+                "register early": "提前报名的人",
+            } if mandarin else {
                 "evening Russian courses": "открылись вечерние курсы русского языка для взрослых",
                 "By Friday": "до пятницы",
                 "additional Saturday group": "дополнительную субботнюю группу",
                 "attention to each participant": "уделять внимание каждому участнику",
                 "registers early": "зарегистрируется заранее",
-            }
+            })
 
             def verify_choices(choices: list[str], question_index: int | None = None):
                 selected = 0
@@ -563,7 +611,7 @@ class MockProvider(AuthoringProvider):
                     reasoning_match=True,
                     answer_leakage=False,
                     evidence_quote_ru=quote,
-                    explanation="One choice is directly supported by the Russian source and the alternatives contradict or are absent from it.",
+                    explanation="One choice is directly supported by the source and the alternatives contradict or are absent from it.",
                 )
                 if question_index is None:
                     return BlindVerification(**payload)
@@ -1032,12 +1080,12 @@ def _provisional_passage_difficulty(level: str, model_value: float) -> float:
     return max(-3.5, min(3.5, 0.8 * base + 0.2 * bounded_model))
 
 
-def _word_count(text: str) -> int:
-    return len(re.findall(r"[A-Za-zА-Яа-яЁё0-9]+(?:[-'][A-Za-zА-Яа-яЁё0-9]+)?", text))
+def _word_count(text: str, language: str = "ru") -> int:
+    return target_unit_count(text, language)
 
 
 def _sentences(text: str) -> list[str]:
-    return [item.strip() for item in re.split(r"(?<=[.!?…])\s+", text.strip()) if item.strip()]
+    return [item.strip() for item in re.split(r"(?<=[.!?…。！？])\s*", text.strip()) if item.strip()]
 
 
 def _cyrillic_ratio(text: str) -> float:
@@ -1055,26 +1103,29 @@ def _repeated_ngram(text: str, n: int = 9) -> bool:
     return len(set(grams)) < len(grams)
 
 
-def _soft_range(level: str, skill: str) -> tuple[int, int]:
+def _soft_range(level: str, skill: str, language: str = "ru") -> tuple[int, int]:
     raw = LEVEL_PROFILES[level].soft_reading_words if skill == "reading" else LEVEL_PROFILES[level].soft_listening_words
     low, high = raw.split("-")
-    return int(low), int(high)
+    low_value, high_value = int(low), int(high)
+    if language == "zh-CN":
+        return max(4, round(low_value * 1.55)), round(high_value * 1.55)
+    return low_value, high_value
 
 
-def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, requested_level: str) -> list[str]:
+def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, requested_level: str, language: str = "ru") -> list[str]:
     issues: list[str] = []
     text = candidate.passage_ru.strip()
-    words = _word_count(text)
+    words = _word_count(text, language)
     sentences = _sentences(text)
-    low, high = _soft_range(requested_level, skill)
+    low, high = _soft_range(requested_level, skill, language)
     if candidate.target_ilr != requested_level:
         issues.append("candidate_target_level_does_not_match_request")
-    if _cyrillic_ratio(text) < 0.72:
-        issues.append("passage_is_not_predominantly_russian")
+    if target_language_ratio(text, language) < 0.72:
+        issues.append("passage_is_not_predominantly_target_language")
     if words < max(3, math.floor(low * 0.55)):
         issues.append("passage_is_far_below_level_appropriate_discourse_length")
-    if skill == "reading" and words > 500:
-        issues.append("reading_passage_exceeds_500_word_hard_limit")
+    if skill == "reading" and words > (1000 if language == "zh-CN" else 500):
+        issues.append("reading_passage_exceeds_language_hard_limit")
     if skill == "listening" and words > max(360, math.ceil(high * 1.15)):
         issues.append("listening_transcript_likely_exceeds_2_5_minute_limit")
     normalized_sentences = [normalize_text(item) for item in sentences if len(normalize_text(item).split()) >= 5]
@@ -1110,10 +1161,10 @@ def _desired_question_count(skill: str, maximum: int, word_count: int, mode: str
     return max(1, min(maximum, suggested))
 
 
-def _novelty_context(bank: ItemBank, skill: str, limit: int = 12) -> list[str]:
+def _novelty_context(bank: ItemBank, skill: str, language: str = "ru", limit: int = 12) -> list[str]:
     items = [
         f"{passage.genre}: {passage.topic} / {passage.subtopic}"
-        for passage in bank.active_passages(skill)
+        for passage in bank.active_passages(skill, language)
     ]
     return items[-limit:]
 
@@ -1158,6 +1209,7 @@ def materialize_candidate(
     requested_level: str | None = None,
     generation_metadata: GenerationMetadata | None = None,
     shuffle: bool = False,
+    language: str = "ru",
 ) -> tuple[PassageItem, list[QuestionItem]]:
     """Convert typed candidates into bank models.
 
@@ -1186,6 +1238,7 @@ def materialize_candidate(
     )
     passage = PassageItem(
         id=passage_id,
+        language=language,
         skill=skill,
         target_ilr=level,
         provisional_difficulty=_provisional_passage_difficulty(level, candidate.provisional_difficulty),
@@ -1195,8 +1248,8 @@ def materialize_candidate(
         orientation_en=candidate.orientation_en.strip(),
         passage_ru=candidate.passage_ru.strip(),
         source_type="synthetic",
-        word_count=_word_count(candidate.passage_ru),
-        segment_count=max(1, len([part for part in re.split(r"\n\s*\n|(?<=[.!?…])\s+", candidate.passage_ru) if part.strip()])),
+        word_count=_word_count(candidate.passage_ru, language),
+        segment_count=max(1, len([part for part in re.split(r"\n\s*\n|(?<=[.!?…。！？])\s*", candidate.passage_ru) if part.strip()])),
         vocabulary_metadata={
             "features": candidate.vocabulary_features,
             "provisional_ilr": level,
@@ -1357,13 +1410,14 @@ def validate_with_blind_verifier(
     choices = [text for _, text in shuffled]
     verification = _provider_generate(
         provider,
-        VERIFIER_SYSTEM,
+        verifier_system(passage.language),
         blind_verification_prompt(
             passage_ru=passage.passage_ru,
             stem_en=question.stem_en,
             choices=choices,
             target_level=question.target_ilr,
             question_type=question.question_type,
+            language=passage.language,
         ),
         BlindVerification,
         max_tokens=max_tokens,
@@ -1449,8 +1503,12 @@ def validate_with_blind_verifier_batch(
     try:
         raw = _provider_generate(
             provider,
-            VERIFIER_SYSTEM,
-            blind_verification_batch_prompt(passage_ru=passage.passage_ru, items=items),
+            verifier_system(passage.language),
+            blind_verification_batch_prompt(
+                passage_ru=passage.passage_ru,
+                items=items,
+                language=passage.language,
+            ),
             BlindVerificationBatch,
             max_tokens=max_tokens,
             temperature=temperature,
@@ -1598,15 +1656,16 @@ class LiveGenerationService:
 
     def _build_audio(self, passage: PassageItem) -> tuple[PassageItem, AudioAsset]:
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
+        voice = self.settings.tts_voice_for(passage.language)
         LOGGER.info(
             "Listening TTS start passage=%s voice=%s rate=%s",
-            passage.id, self.settings.edge_tts_voice, self.settings.edge_tts_rate,
+            passage.id, voice, self.settings.edge_tts_rate,
         )
         try:
             path = generate_cached_tts(
                 passage.passage_ru,
                 cache_dir,
-                voice=self.settings.edge_tts_voice,
+                voice=voice,
                 rate=self.settings.edge_tts_rate,
                 engine_version="edge-tts-7.2.8",
             )
@@ -1632,7 +1691,7 @@ class LiveGenerationService:
             id=audio_id,
             path=str(path),
             content_hash=content_hash(passage.passage_ru),
-            voice=self.settings.edge_tts_voice,
+            voice=voice,
             rate=self.settings.edge_tts_rate,
             engine="edge-tts",
             engine_version="7.2.8",
@@ -1645,7 +1704,7 @@ class LiveGenerationService:
             "audio_asset_id": audio_id,
             "audio_duration_seconds": duration,
             "voice_metadata": {
-                "voice": self.settings.edge_tts_voice,
+                "voice": voice,
                 "rate": self.settings.edge_tts_rate,
                 "engine": "edge-tts",
                 "engine_version": "7.2.8",
@@ -1681,6 +1740,7 @@ class LiveGenerationService:
         topics: list[str],
         competencies: list[str],
         trace: PipelineTrace,
+        language: str,
     ) -> tuple[CandidatePassageDraft, PassageAudit | None]:
         nonce = uuid4().hex[:12]
         prompt = passage_authoring_prompt(
@@ -1689,12 +1749,13 @@ class LiveGenerationService:
             level=level,
             topics=topics,
             competencies=competencies,
-            novelty_context=_novelty_context(self.bank, skill),
+            novelty_context=_novelty_context(self.bank, skill, language),
             generation_nonce=nonce,
+            language=language,
         )
         candidate = CandidatePassageDraft.model_validate(_provider_generate(
             self.provider,
-            AUTHORING_SYSTEM,
+            authoring_system(language),
             prompt,
             CandidatePassageDraft,
             max_tokens=_stage_token_budget(
@@ -1702,19 +1763,19 @@ class LiveGenerationService:
             ),
             temperature=self.settings.authoring_temperature,
         ))
-        trace.add("passage_generation", "received", word_count=_word_count(candidate.passage_ru))
+        trace.add("passage_generation", "received", unit_count=_word_count(candidate.passage_ru, language))
 
         audit: PassageAudit | None = None
         for attempt in range(self.settings.generation_repair_attempts + 1):
-            issues = validate_candidate_passage(candidate, skill=skill, requested_level=level)
+            issues = validate_candidate_passage(candidate, skill=skill, requested_level=level, language=language)
             audit_required = _should_audit_passage(
                 self.settings, mode=mode, skill=skill, level=level
             )
             if not issues and audit_required:
                 audit = PassageAudit.model_validate(_provider_generate(
                     self.verifier_provider,
-                    VERIFIER_SYSTEM,
-                    passage_audit_prompt(skill=skill, requested_level=level, candidate_json=_candidate_passage_json(candidate)),
+                    verifier_system(language),
+                    passage_audit_prompt(skill=skill, requested_level=level, candidate_json=_candidate_passage_json(candidate), language=language),
                     PassageAudit,
                     max_tokens=_stage_token_budget(
                         self.settings.audit_max_tokens, stage="audit", level=level, skill=skill
@@ -1732,12 +1793,13 @@ class LiveGenerationService:
                 raise GenerationValidationError("Generated passage failed validation: " + ", ".join(issues[:12]))
             candidate = CandidatePassageDraft.model_validate(_provider_generate(
                 self.provider,
-                AUTHORING_SYSTEM,
+                authoring_system(language),
                 passage_repair_prompt(
                     skill=skill,
                     level=level,
                     issues=issues + (audit.repair_notes if audit else []),
                     candidate_json=_candidate_passage_json(candidate),
+                    language=language,
                 ),
                 CandidatePassageDraft,
                 max_tokens=_stage_token_budget(
@@ -1761,12 +1823,13 @@ class LiveGenerationService:
         maximum_questions: int,
         metadata: GenerationMetadata,
         trace: PipelineTrace,
+        language: str,
     ) -> tuple[PassageItem, list[QuestionItem], ValidationReport, list[ValidationReport]]:
-        desired_count = _desired_question_count(skill, maximum_questions, _word_count(candidate_passage.passage_ru), mode)
+        desired_count = _desired_question_count(skill, maximum_questions, _word_count(candidate_passage.passage_ru, language), mode)
         passage_json = _candidate_passage_json(candidate_passage)
         question_set = CandidateQuestionSet.model_validate(_provider_generate(
             self.provider,
-            AUTHORING_SYSTEM,
+            authoring_system(language),
             question_authoring_prompt(
                 skill=skill,
                 mode=mode,
@@ -1774,6 +1837,7 @@ class LiveGenerationService:
                 desired_count=desired_count,
                 competencies=competencies,
                 passage_json=passage_json,
+                language=language,
             ),
             CandidateQuestionSet,
             max_tokens=_stage_token_budget(
@@ -1794,6 +1858,7 @@ class LiveGenerationService:
                 requested_level=level,
                 generation_metadata=metadata,
                 shuffle=False,
+                language=language,
             )
             issues = validate_candidate_questions(
                 question_set,
@@ -1873,7 +1938,7 @@ class LiveGenerationService:
             repair_count = len(repair_indices) if targeted else desired_count
             repaired = CandidateQuestionSet.model_validate(_provider_generate(
                 self.provider,
-                AUTHORING_SYSTEM,
+                authoring_system(language),
                 question_repair_prompt(
                     skill=skill,
                     level=level,
@@ -1882,6 +1947,7 @@ class LiveGenerationService:
                     questions_json=_candidate_questions_json(question_set),
                     issues=last_issues,
                     repair_indices=repair_indices if targeted else None,
+                    language=language,
                 ),
                 CandidateQuestionSet,
                 max_tokens=_stage_token_budget(
@@ -1915,12 +1981,14 @@ class LiveGenerationService:
         topics: list[str] | None,
         competencies: list[str] | None,
         maximum_questions: int,
+        language: str = "ru",
     ) -> GeneratedBundle:
         ready, message = self.settings.provider_readiness()
         if not ready:
             raise ProviderError(message)
         if skill not in {"reading", "listening"}:
             raise ValueError("skill must be reading or listening")
+        language_profile(language)
         if level not in ILR_LEVELS:
             raise ValueError(f"level must be one of {ILR_LEVELS}")
         maximum = max(1, min(maximum_questions, 5 if skill == "reading" else 3))
@@ -1942,6 +2010,7 @@ class LiveGenerationService:
                 topics=clean_topics,
                 competencies=clean_competencies,
                 trace=trace,
+                language=language,
             )
             passage_id = f"gen_{uuid4().hex[:16]}"
             # Metadata is finalized after all calls; initial object is copied into items and replaced before persistence.
@@ -1952,7 +2021,7 @@ class LiveGenerationService:
                 pipeline_version=PROMPT_VERSION,
                 verifier_provider=getattr(self.verifier_provider, "last_provider", None),
                 verifier_model=getattr(self.verifier_provider, "last_model", None),
-                authoring_notes=f"Requested skill={skill}, mode={mode}, ILR={level}. Difficulty remains provisional.",
+                authoring_notes=f"Requested language={language}, skill={skill}, mode={mode}, ILR={level}. Difficulty remains provisional.",
             )
             passage, unshuffled_questions, passage_report, blind_reports = self._generate_questions(
                 candidate_passage=candidate,
@@ -1964,6 +2033,7 @@ class LiveGenerationService:
                 maximum_questions=maximum,
                 metadata=metadata,
                 trace=trace,
+                language=language,
             )
             duplicate = self.bank.duplicate_of(passage)
             if duplicate:
@@ -2016,7 +2086,7 @@ class LiveGenerationService:
                 "input_tokens": input_tokens or None,
                 "output_tokens": output_tokens or None,
                 "authoring_notes": (
-                    f"Requested skill={skill}, mode={mode}, ILR={level}; "
+                    f"Requested language={language}, skill={skill}, mode={mode}, ILR={level}; "
                     f"audit_estimate={audit.estimated_ilr if audit else 'not_run'}; difficulty remains provisional."
                 ),
             })
@@ -2073,6 +2143,7 @@ class LiveGenerationService:
             try:
                 self._quarantine({
                     "skill": skill,
+                    "language": language,
                     "level": level,
                     "mode": mode,
                     "provider": getattr(self.provider, "last_provider", "unknown"),

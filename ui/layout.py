@@ -3,6 +3,7 @@ from __future__ import annotations
 import gradio as gr
 
 from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
+from core.languages import LANGUAGES, language_profile, voice_choices
 from ui.components import answer_radio, scalar_tolerant_checkbox_group
 from ui.callbacks import (
     BANK_BOOTSTRAP_MESSAGE,
@@ -82,9 +83,9 @@ CUSTOM_CSS = """
 
 
 def build_app() -> gr.Blocks:
-    with gr.Blocks(title="Russian Adaptive Proficiency Practice") as demo:
+    with gr.Blocks(title="Russian & Mandarin Adaptive Proficiency Practice") as demo:
         with gr.Column(elem_classes=["app-shell"]):
-            gr.Markdown("# Russian Adaptive Proficiency Practice")
+            gr.Markdown("# Russian & Mandarin Adaptive Proficiency Practice")
             gr.Markdown(DISCLAIMER, elem_classes=["disclaimer"])
             with gr.Row():
                 with gr.Column(elem_classes=["mode-card"]):
@@ -100,6 +101,11 @@ def build_app() -> gr.Blocks:
 
             with gr.Accordion("Session Setup", open=True):
                 with gr.Row():
+                    language = gr.Dropdown(
+                        [profile.label for profile in LANGUAGES.values()],
+                        value=LANGUAGES["ru"].label,
+                        label="Test language",
+                    )
                     mode = gr.Radio(["Training Mode", "Adaptive Diagnostic", "Full CA Simulation"], value="Training Mode", label="Mode")
                     skill = gr.Radio(["Reading", "Listening", "Reading + Listening (separate sections)"], value="Reading", label="Skill selection")
                 with gr.Row():
@@ -135,7 +141,11 @@ def build_app() -> gr.Blocks:
                     hints_enabled = gr.Checkbox(value=False, label="Enable strategy hints")
                     transcript_review = gr.Checkbox(value=True, label="Show listening transcript after answers are locked")
                 with gr.Row():
-                    voice = gr.Dropdown(["Russian Female — Svetlana", "Russian Male — Dmitry", "Starter-bank eSpeak voice"], value="Starter-bank eSpeak voice", label="Training voice preference")
+                    voice = gr.Dropdown(
+                        voice_choices("ru"),
+                        value=language_profile("ru").starter_voice_label,
+                        label="Training voice preference",
+                    )
                     speed = gr.Dropdown(["Very slow", "Slow", "Normal", "Fast"], value="Normal", label="Training audio speed")
                     profile_id = gr.Textbox(label="Optional local profile ID", placeholder="Used only for history and repeat-exposure control")
                 with gr.Row():
@@ -149,7 +159,7 @@ def build_app() -> gr.Blocks:
                 gr.Markdown(f"{provider_icon} **Live generation status:** {PROVIDER_MESSAGE}")
                 bank_status = gr.Markdown(bank_status_markdown())
                 if BANK_BOOTSTRAP_MESSAGE:
-                    gr.Markdown(f"<small>{BANK_BOOTSTRAP_MESSAGE}</small>")
+                    gr.Markdown(f"<small>**Startup persistence event:** {BANK_BOOTSTRAP_MESSAGE}</small>")
                 start_btn = gr.Button("Begin Session", variant="primary")
 
             with gr.Accordion("Recover a Checkpoint", open=False):
@@ -159,7 +169,8 @@ def build_app() -> gr.Blocks:
 
             with gr.Accordion("Generated Bank Backup & Persistence", open=False):
                 gr.Markdown(
-                    "Generated content must live outside the disposable Space container to survive restarts. "
+                    "Only accepted Fresh-AI content and explicit imports are stored here. Bank-only practice never writes to this bank. "
+                    "Saved AI-generated content must live outside the disposable Space container to survive restarts. "
                     "When private Dataset synchronization is active, the bank restores automatically. "
                     "The manual ZIP backup remains available as an additional safety copy."
                 )
@@ -220,7 +231,7 @@ def build_app() -> gr.Blocks:
 
             mode.change(
                 mode_controls,
-                inputs=[mode, skill],
+                inputs=[mode, skill, language],
                 outputs=[
                     length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
                     adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
@@ -228,7 +239,7 @@ def build_app() -> gr.Blocks:
             )
             skill.change(
                 mode_controls,
-                inputs=[mode, skill],
+                inputs=[mode, skill, language],
                 outputs=[
                     length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
                     adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
@@ -236,7 +247,22 @@ def build_app() -> gr.Blocks:
             )
             skill.change(
                 topic_controls,
-                inputs=[skill, topics],
+                inputs=[skill, language, topics],
+                outputs=[topics],
+                queue=False,
+                show_progress="hidden",
+            )
+            language.change(
+                mode_controls,
+                inputs=[mode, skill, language],
+                outputs=[
+                    length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
+                    adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
+                ],
+            )
+            language.change(
+                topic_controls,
+                inputs=[skill, language, topics],
                 outputs=[topics],
                 queue=False,
                 show_progress="hidden",
@@ -254,7 +280,7 @@ def build_app() -> gr.Blocks:
                 inputs=[
                     mode, skill, start_level, target_level, length, timer_mode, topics, competencies,
                     feedback_timing, hints_enabled, transcript_review, voice, speed, profile_id, content_source,
-                    adaptive_start, minimum_ilr, maximum_ilr,
+                    adaptive_start, minimum_ilr, maximum_ilr, language,
                 ],
                 outputs=outputs,
                 show_progress="hidden",

@@ -166,6 +166,11 @@
           "title": "Mode",
           "type": "string"
         },
+        "language": {
+          "default": "ru",
+          "title": "Language",
+          "type": "string"
+        },
         "target_ilr": {
           "title": "Target Ilr",
           "type": "string"
@@ -290,6 +295,11 @@
       ],
       "default": null,
       "title": "Profile Id"
+    },
+    "language": {
+      "default": "ru",
+      "title": "Language",
+      "type": "string"
     },
     "mode": {
       "enum": [
@@ -601,7 +611,7 @@
       "type": "boolean"
     },
     "voice_label": {
-      "default": "Russian Female — Svetlana",
+      "default": "Starter-bank Russian voice",
       "title": "Voice Label",
       "type": "string"
     },

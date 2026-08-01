@@ -20,8 +20,11 @@ OUTSIDE_KNOWLEDGE_MARKERS = {
 
 def normalize_text(text: str) -> str:
     text = text.casefold().replace("ё", "е")
-    text = re.sub(r"[^a-zа-я0-9\s]", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
+    # Tokenize Han characters individually so hashes, evidence matching, and
+    # near-duplicate checks work for unsegmented Mandarin text as well as for
+    # space-delimited Russian/English.
+    tokens = re.findall(r"[a-zа-я0-9]+|[\u3400-\u9fff]", text)
+    return " ".join(tokens)
 
 
 
@@ -173,8 +176,25 @@ def _cyrillic_ratio(text: str) -> float:
     return sum(bool(re.fullmatch(r"[А-Яа-яЁё]", char)) for char in letters) / len(letters)
 
 
+def _han_ratio(text: str) -> float:
+    relevant = re.findall(r"[A-Za-zА-Яа-яЁё\u3400-\u9fff]", text)
+    if not relevant:
+        return 0.0
+    return sum(bool(re.fullmatch(r"[\u3400-\u9fff]", char)) for char in relevant) / len(relevant)
+
+
+def target_language_ratio(text: str, language: str) -> float:
+    return _han_ratio(text) if language == "zh-CN" else _cyrillic_ratio(text)
+
+
+def target_unit_count(text: str, language: str) -> int:
+    if language == "zh-CN":
+        return len(re.findall(r"[\u3400-\u9fff]", text))
+    return len(re.findall(r"[A-Za-zА-Яа-яЁё0-9]+(?:[-'][A-Za-zА-Яа-яЁё0-9]+)?", text))
+
+
 def _sentences(text: str) -> list[str]:
-    return [part.strip() for part in re.split(r"(?<=[.!?…])\s+", text.strip()) if part.strip()]
+    return [part.strip() for part in re.split(r"(?<=[.!?…。！？])\s*", text.strip()) if part.strip()]
 
 
 def _has_repeated_ngram(text: str, n: int = 9) -> bool:
@@ -248,15 +268,24 @@ def validate_question(question: QuestionItem, passage: PassageItem) -> Validatio
 def validate_passage(passage: PassageItem, questions: list[QuestionItem]) -> ValidationReport:
     sentence_norms = [normalize_text(sentence) for sentence in _sentences(passage.passage_ru) if len(_words(sentence)) >= 5]
     question_stems = [normalize_text(question.stem_en) for question in questions]
-    exact_word_count = len(re.findall(r"[A-Za-zА-Яа-яЁё0-9]+(?:[-'][A-Za-zА-Яа-яЁё0-9]+)?", passage.passage_ru))
-    reading_limit_ok = passage.skill != "reading" or exact_word_count <= 500
-    listening_limit_ok = passage.skill != "listening" or exact_word_count <= 390
+    exact_word_count = target_unit_count(passage.passage_ru, passage.language)
+    reading_limit = 1000 if passage.language == "zh-CN" else 500
+    listening_limit = 750 if passage.language == "zh-CN" else 390
+    reading_limit_ok = passage.skill != "reading" or exact_word_count <= reading_limit
+    listening_limit_ok = passage.skill != "listening" or exact_word_count <= listening_limit
+    target_ratio_ok = target_language_ratio(passage.passage_ru, passage.language) >= 0.65
 
     checks = {
         "passage_present": bool(passage.passage_ru.strip()),
-        "passage_is_predominantly_russian": _cyrillic_ratio(passage.passage_ru) >= 0.65,
+        # Retained for backward compatibility with existing reports/tests; the
+        # check now means "predominantly the passage's declared language."
+        "passage_is_predominantly_russian": target_ratio_ok,
+        "passage_is_predominantly_target_language": target_ratio_ok,
         "orientation_present": len(passage.orientation_en.strip()) >= 10,
-        "orientation_is_primarily_english": _cyrillic_ratio(passage.orientation_en) < 0.25,
+        "orientation_is_primarily_english": (
+            _cyrillic_ratio(passage.orientation_en) < 0.25
+            and _han_ratio(passage.orientation_en) < 0.25
+        ),
         "word_count_matches": abs(passage.word_count - exact_word_count) <= 3,
         "reading_word_limit": reading_limit_ok,
         "listening_duration_proxy_limit": listening_limit_ok,

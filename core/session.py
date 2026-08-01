@@ -53,6 +53,7 @@ def create_session(
     adaptive_start_policy: str = "medium",
     minimum_ilr: str = "0",
     maximum_ilr: str = "3",
+    language: str = "ru",
 ) -> SessionState:
     now = time.time()
     broad = mode != "training"
@@ -66,6 +67,7 @@ def create_session(
     listening = initialize_ability("listening", prior_level, broad=broad, routing_level=routing_level)
     state = SessionState(
         profile_id=profile_id.strip() if profile_id and profile_id.strip() else None,
+        language=language,
         mode=mode,
         selected_skills=selected_skills,
         start_level=start_level,
@@ -124,6 +126,7 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
     if state.mode == "diagnostic" and state.completed_count(skill) >= 4:
         selection_band = diagnostic_probe_band(estimate, state.minimum_ilr, state.maximum_ilr)
     selection = bank.select(
+        language=state.language,
         skill=skill,
         estimate=estimate,
         mode=state.mode,
@@ -151,6 +154,10 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
     skill = state.active_skill
     if passage.skill != skill:
         raise SessionFlowError(f"Cannot activate a {passage.skill} passage in the {skill} section.")
+    if passage.language != state.language:
+        raise SessionFlowError(
+            f"Cannot activate a {passage.language} passage in a {state.language} session."
+        )
     remaining_target = state.max_questions_per_skill - state.completed_count(skill)
     if remaining_target > 0 and len(questions) > remaining_target:
         questions = questions[:remaining_target]
@@ -207,6 +214,7 @@ def submit_current_bundle(
             question_id=question.id,
             skill=passage.skill,
             mode=state.mode,
+            language=passage.language,
             target_ilr=question.target_ilr,
             item_difficulty=question.operational_difficulty,
             question_type=question.question_type,
@@ -285,6 +293,8 @@ def advance_skill_or_finish(state: SessionState, now: float | None = None, force
 
 
 def update_history(history: UserHistory, state: SessionState) -> UserHistory:
+    if history.language != state.language:
+        raise SessionFlowError("Profile history language does not match the active session language.")
     history.seen_passage_ids = sorted(set(history.seen_passage_ids) | set(state.completed_passage_ids))
     history.seen_question_ids = sorted(set(history.seen_question_ids) | set(state.completed_question_ids))
     history.response_records.extend(state.responses)

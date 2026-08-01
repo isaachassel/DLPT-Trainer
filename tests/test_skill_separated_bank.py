@@ -190,3 +190,57 @@ def test_cross_skill_seen_content_is_filtered_before_selection(project_root, tmp
         first_passage=False,
     )
     assert passage_id not in captured
+
+
+def test_health_summary_distinguishes_starter_saved_ai_and_ready(project_root, tmp_path):
+    bank = _overlay_bank(project_root, tmp_path)
+    health = bank.health_summary()
+    for skill in ("reading", "listening"):
+        data = health[skill]
+        assert data["starter_passages"] + data["saved_ai_passages"] == data["passages"]
+        assert data["ready_passages"] == data["operational_passages"]
+        assert data["ready_starter_passages"] + data["ready_ai_passages"] == data["ready_passages"]
+    assert health["generated_passages"] == 0
+
+
+def test_bank_only_selection_does_not_write_generated_overlay(project_root, tmp_path, monkeypatch):
+    import ui.callbacks as callbacks
+    from core.session import create_session
+
+    overlay = tmp_path / "generated_items.jsonl"
+    overlay.write_text("", encoding="utf-8")
+    bank = ItemBank(
+        [project_root / "data/starter_items.jsonl", overlay],
+        writable_path=overlay,
+    ).load()
+    monkeypatch.setattr(callbacks, "BANK", bank)
+
+    state = create_session(
+        mode="training",
+        selected_skills=["reading"],
+        start_level="1+",
+        target_level="2",
+        topics=[],
+        competencies=[],
+        max_questions_per_skill=8,
+        minimum_questions_per_skill=8,
+        timer_mode="off",
+        time_limit_seconds_per_skill=None,
+        profile_id=None,
+        feedback_mode="end_of_passage",
+        hints_enabled=False,
+        transcript_review_enabled=True,
+        replay_allowed=True,
+        slow_audio_allowed=True,
+        voice_label="Starter-bank eSpeak voice",
+        speech_rate_label="Normal",
+        content_source="bank_only",
+    )
+    before = overlay.read_bytes()
+    bundle = callbacks._bank_bundle(state)
+    after = overlay.read_bytes()
+
+    assert bundle.passage.id in bank.passages
+    assert before == after
+    assert bank.health_summary()["generated_passages"] == 0
+    assert "does not write" in (state.last_content_note or "").lower() or "no record was written" in (state.last_content_note or "").lower()

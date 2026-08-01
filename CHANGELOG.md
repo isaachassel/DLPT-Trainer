@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.4.1 — Hugging Face root-package repair
+
+- Rebuilt the distribution as a root-flat Space package so `README.md`, `app.py`, and `requirements.txt` are placed at the repository root instead of under an extra enclosing directory.
+- Quoted the Space title in the YAML front matter for unambiguous metadata parsing.
+- Added explicit deployment checks that prevent uploading only the ZIP or nesting the extracted project folder inside the Space.
+
+## v1.4.0 — Mandarin Reading and Listening
+
+- Added a Russian/Mandarin language selector while retaining every existing Russian workflow.
+- Added language + skill bank isolation so Russian and Mandarin passages, questions, topics, exposure history, and adaptive selection cannot mix.
+- Added 12 Mandarin Reading and 12 Mandarin Listening starter passages, with 36 questions per skill and full ILR 0–3 coverage.
+- Bundled validated Mandarin neural audio for every starter Listening passage.
+- Added Mandarin-specific generation, repair, audit, blind-verification, script validation, character counting, hashing, duplicate detection, evidence tracing, and TTS voice routing.
+- Added Xiaoxiao/Yunxi training voices and language-specific generated-listening defaults.
+- Added multilingual reporting and language-tagged response exports.
+- Expanded regression coverage to 139 passing tests, including cross-language bank isolation, Mandarin audio integrity, and Mandarin live-generation materialization.
+
+## v1.3.5 — Bank terminology and no-write guarantee
+
+- Replaced ambiguous “operational” UI wording with **Ready to use now (starter + saved AI)**.
+- Split every skill summary into built-in starter, saved AI-generated, and ready-to-use totals.
+- Clarified that ILR coverage is for the ready-to-use pool.
+- Added explicit bank-only session messaging that no content is generated or written.
+- Relabeled startup restoration as a launch-time snapshot so later Fresh-AI growth is not mistaken for a bank-only write.
+- Added source-aware bank health metrics and regression coverage proving bank-only selection leaves the generated JSONL byte-for-byte unchanged.
+
 ## v1.3.4 — Skill-Separated Bank Indexing and Audio Integrity
 
 ### Logical Reading and Listening banks

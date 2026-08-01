@@ -1,5 +1,5 @@
 ---
-title: Russian Adaptive Proficiency Practice
+title: Russian Mandarin Adaptive Proficiency Practice
 emoji: 🎧
 colorFrom: red
 colorTo: blue
@@ -8,12 +8,13 @@ sdk_version: "6.5.1"
 python_version: "3.11"
 app_file: app.py
 pinned: false
-license: mit
 ---
 
-# Russian Adaptive Proficiency Practice
+# Russian & Mandarin Adaptive Proficiency Practice
 
-An independent Russian Reading and Listening practice platform with Training, Adaptive Diagnostic, and strict computer-adaptive Simulation modes.
+An independent Russian and Mandarin Chinese Reading/Listening practice platform with Training, Adaptive Diagnostic, and strict computer-adaptive Simulation modes.
+
+Choose **Russian** or **Mandarin Chinese (Simplified)** before starting. Every language has separate Reading/Listening indexes, exposure history, adaptive selection, generated-bank filtering, and TTS voice routing. Changing languages never mixes source passages, questions, audio, or ability evidence.
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score. Every estimate is for practice guidance only.
 
@@ -39,10 +40,21 @@ The learner chooses one of two content policies:
 1. **Validated bank only — fastest:** selects from the bundled starter bank and every previously accepted generated item.
 2. **Fresh AI preferred:** attempts to author a new passage bundle near the active skill estimate. The new bundle must pass typed schema validation, deterministic gates, independent passage audit, blind answer verification, Python answer shuffling, duplicate checks, and Listening audio validation before it is shown. Accepted content is stored and becomes reusable. Any provider, quota, schema, validation, duplicate, timeout, persistence, or TTS failure falls back to an accepted bank item without clearing progress.
 
+### Bank terminology and write behavior
+
+- **Built-in validated starter** is immutable content shipped with the app.
+- **Saved AI-generated** contains only accepted Fresh-AI bundles and explicit imports.
+- **Ready to use now** is the validated selectable total from both sources; it is not a third bank.
+- A **Validated bank only** session never writes a content record. Selecting, answering, replaying, or checkpointing an existing item leaves `generated_items.jsonl` unchanged.
+
+See `docs/BANK_COUNTS_AND_WRITE_RULES.md`.
+
 The bank is the application’s reliability layer and accumulated content memory—not a replacement for live generation.
 
 ## Main capabilities
 
+- Russian and Simplified-Chinese Mandarin practice from one language selector.
+- Bundled Mandarin starter bank: 12 Reading passages / 36 questions and 12 Listening passages / 36 questions / 12 neural-audio files across ILR 0–3.
 - Independent Bayesian Reading and Listening estimates.
 - Conservative adjacent-band routing: after each passage the delivery band may move up or down by at most one ILR half-level based on posterior boundary probability.
 - Hard Training/Diagnostic ILR floor and ceiling controls, including true ILR 2–3-only eligibility (2, 2+, and 3).
@@ -55,7 +67,7 @@ The bank is the application’s reliability layer and accumulated content memory
 - Session checkpoints, recovery, optional history, and JSON/CSV export.
 - Typed Pydantic bank, session, generation, validation, and reporting models.
 - Provider-independent starter content.
-- One durable bank repository with separate Reading/Listening indexes, skill-specific topics, and strict Listening-audio integrity.
+- One durable generated repository with separate language + skill indexes, language-specific topics, and strict Listening-audio integrity.
 - Optional staged live generation with repair, quarantine, persistence, quota protection, and bank fallback.
 - Immediate visible loading feedback with an accessible spinner, busy button labels, and staged progress for slow operations.
 - Python-side answer shuffling and key remapping; prompts never prescribe answer letters.
@@ -273,11 +285,12 @@ Configured token values are hard caps. The application applies smaller stage-, l
 ## Hugging Face Spaces deployment
 
 1. Create a **Gradio** Space.
-2. Upload all repository contents to the Space root.
-3. The starter bank launches without secrets.
-4. Add provider secrets in **Settings → Variables and secrets** to enable Fresh AI.
-5. Attach persistent storage and set `PERSISTENT_STORAGE_PATH=/data` to retain generated items across rebuilds.
-6. Run a short Training session and the smoke test after deployment.
+2. Extract the release ZIP on your computer. Open the extracted folder, select **all files and folders inside it**, and upload those contents to the Space root. Do not upload only the ZIP file, and do not upload the enclosing folder as a nested directory.
+3. In the Space **Files** tab, confirm that `README.md`, `app.py`, and `requirements.txt` appear at the top level. The app will not configure or start if they appear inside another folder.
+4. The starter bank launches without secrets.
+5. Add provider secrets in **Settings → Variables and secrets** to enable Fresh AI.
+6. Attach persistent storage and set `PERSISTENT_STORAGE_PATH=/data` to retain generated items across rebuilds.
+7. Run a short Training session and the smoke test after deployment.
 
 ### Required Space secrets
 

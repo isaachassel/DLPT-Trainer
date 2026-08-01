@@ -11,11 +11,12 @@ load_dotenv()
 
 
 class Settings(BaseModel):
-    app_name: str = "Russian Adaptive Proficiency Practice"
+    app_name: str = "Russian & Mandarin Adaptive Proficiency Practice"
     environment: str = "production"
     data_dir: Path = Path("data")
     storage_dir: Path = Path("storage")
     item_bank_path: Path = Path("data/starter_items.jsonl")
+    mandarin_item_bank_path: Path = Path("data/mandarin_starter_items.jsonl")
     generated_item_bank_path: Path = Path("storage/item_bank/generated_items.jsonl")
     audio_cache_dir: Path = Path("storage/cache/audio")
     session_dir: Path = Path("storage/sessions")
@@ -74,6 +75,7 @@ class Settings(BaseModel):
     audio_cache_max_age_days: int = Field(default=30, ge=1, le=365)
     orphan_temp_max_age_hours: int = Field(default=12, ge=1, le=168)
     edge_tts_voice: str = "ru-RU-SvetlanaNeural"
+    mandarin_edge_tts_voice: str = "zh-CN-XiaoxiaoNeural"
     edge_tts_rate: str = "+0%"
     tts_timeout_seconds: int = Field(default=60, ge=10, le=180)
     app_host: str = "0.0.0.0"
@@ -154,6 +156,10 @@ class Settings(BaseModel):
     def starter_bank_runtime_path(self, project_root: Path) -> Path:
         return self.item_bank_path if self.item_bank_path.is_absolute() else project_root / self.item_bank_path
 
+    def mandarin_starter_bank_runtime_path(self, project_root: Path) -> Path:
+        path = self.mandarin_item_bank_path
+        return path if path.is_absolute() else project_root / path
+
     def generated_bank_runtime_path(self, project_root: Path) -> Path:
         return self.runtime_path(self.generated_item_bank_path, project_root, "item_bank/generated_items.jsonl")
 
@@ -183,6 +189,9 @@ class Settings(BaseModel):
             self.quarantine_runtime_path(root),
         ):
             path.mkdir(parents=True, exist_ok=True)
+
+    def tts_voice_for(self, language: str) -> str:
+        return self.mandarin_edge_tts_voice if language == "zh-CN" else self.edge_tts_voice
 
     def _author_provider_order(self) -> list[str]:
         return {
@@ -309,6 +318,7 @@ def get_settings() -> Settings:
         data_dir=Path(os.getenv("DATA_DIR", "data")),
         storage_dir=Path(os.getenv("STORAGE_DIR", "storage")),
         item_bank_path=Path(os.getenv("ITEM_BANK_PATH", "data/starter_items.jsonl")),
+        mandarin_item_bank_path=Path(os.getenv("MANDARIN_ITEM_BANK_PATH", "data/mandarin_starter_items.jsonl")),
         generated_item_bank_path=Path(os.getenv("GENERATED_ITEM_BANK_PATH", "storage/item_bank/generated_items.jsonl")),
         audio_cache_dir=Path(os.getenv("AUDIO_CACHE_DIR", "storage/cache/audio")),
         session_dir=Path(os.getenv("SESSION_DIR", "storage/sessions")),
@@ -362,6 +372,7 @@ def get_settings() -> Settings:
         audio_cache_max_age_days=int(os.getenv("AUDIO_CACHE_MAX_AGE_DAYS", "30")),
         orphan_temp_max_age_hours=int(os.getenv("ORPHAN_TEMP_MAX_AGE_HOURS", "12")),
         edge_tts_voice=os.getenv("EDGE_TTS_VOICE", "ru-RU-SvetlanaNeural"),
+        mandarin_edge_tts_voice=os.getenv("MANDARIN_EDGE_TTS_VOICE", "zh-CN-XiaoxiaoNeural"),
         edge_tts_rate=os.getenv("EDGE_TTS_RATE", "+0%"),
         tts_timeout_seconds=int(os.getenv("TTS_TIMEOUT_SECONDS", "60")),
         app_host=os.getenv("GRADIO_SERVER_NAME", "0.0.0.0"),

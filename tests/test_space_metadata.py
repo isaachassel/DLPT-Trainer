@@ -25,3 +25,12 @@ def test_space_uses_gradio_entrypoint() -> None:
     _, metadata = _front_matter()
     assert metadata["sdk"] == "gradio"
     assert metadata["app_file"] == "app.py"
+
+
+def test_space_metadata_has_required_hugging_face_fields() -> None:
+    _, metadata = _front_matter()
+    assert metadata["title"] == "Russian & Mandarin Adaptive Proficiency Practice"
+    assert metadata["emoji"] == "🎧"
+    assert metadata["colorFrom"] in {"red", "yellow", "green", "blue", "indigo", "purple", "pink", "gray"}
+    assert metadata["colorTo"] in {"red", "yellow", "green", "blue", "indigo", "purple", "pink", "gray"}
+    assert metadata["pinned"] is False

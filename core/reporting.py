@@ -4,6 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .item_bank import ItemBank
+from .languages import language_profile
 from .models import ResponseRecord, SessionState
 from .scoring import accuracy, estimate_label, grouped_accuracy, item_level_label, response_time_summary, strengths_and_weaknesses
 from .storage import export_responses_csv, export_session_json
@@ -128,7 +129,7 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
                 lines.append(f"- Your answer: {record.selected_key or 'No answer'}")
                 lines.append(f"- Correct answer: {record.correct_key}. {record.choices_snapshot[record.correct_key]}")
                 lines.append(f"- Explanation: {record.rationale_en}")
-                lines.append(f"- Russian evidence: `{record.evidence_ru}`")
+                lines.append(f"- {language_profile(record.language).short_label} evidence: `{record.evidence_ru}`")
                 if skill == "listening" and state.transcript_review_enabled and passage:
                     lines.append(f"- Transcript: {passage.passage_ru}")
     return "\n\n".join(lines)
@@ -137,6 +138,7 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
 def build_full_report(state: SessionState, bank: ItemBank) -> str:
     lines = [
         "# Session Report",
+        f"Language: {language_profile(state.language).label}",
         "This is an independent practice report, not an official DLPT score or government assessment.",
         f"Session code: `{state.session_id}`",
         (

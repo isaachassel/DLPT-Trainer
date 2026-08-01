@@ -1,14 +1,35 @@
 # Test Results
 
-Executed for the v1.3.4 skill-separated bank and audio-integrity release on 2026-07-28.
+Executed for the v1.4.1 Hugging Face root-package repair on 2026-08-01.
 
 ## Automated unit/integration suite
 
 ```text
-130 passed
+140 passed
 ```
 
+Version 1.4.1 additionally verifies:
 
+- the root `README.md` begins with parseable Hugging Face Space YAML;
+- all required Space fields, pinned versions, colors, title, and Gradio entrypoint are valid;
+- the release archive is root-flat, with `README.md`, `app.py`, and `requirements.txt` at archive root and no enclosing project directory.
+
+Version 1.4.0 additionally verifies:
+
+- Mandarin has 12 operational Reading passages / 36 questions and 12 operational Listening passages / 36 questions / 12 playable audio assets;
+- Mandarin coverage is nonzero at every supported ILR band from 0 through 3;
+- selection and passage activation never cross Russian/Mandarin bank boundaries;
+- Han-script normalization, hashing, character counting, evidence matching, and duplicate detection remain non-empty and language-aware;
+- Mandarin authoring/question prompts and Xiaoxiao/Yunxi TTS routing are selected from the session language;
+- a real Mandarin Reading and Listening session starts successfully and the complete Gradio layout builds.
+
+Version 1.3.5 additionally verifies:
+
+- bank health distinguishes immutable starter content, saved AI-generated content, and the total ready-to-use pool;
+- Reading and Listening source counts reconcile independently;
+- starting a **Validated bank only** session leaves the generated overlay byte-for-byte unchanged;
+- bank-only selection clearly states that no new item was generated or written;
+- startup restore wording is labeled as a launch-time snapshot rather than a current write event.
 
 Version 1.3.4 additionally verifies:
 
@@ -196,7 +217,7 @@ Listening: 35 questions across 13 passage bundles; 13 unique passages
 ## Gradio Space smoke test
 
 ```text
-Smoke test passed: 27 passages, 88 questions, 101 UI components.
+Smoke test passed: 27 passages, 88 questions, 102 UI components.
 Live generation ready=False: no matching API key; Fresh AI falls back to bank.
 ```
 

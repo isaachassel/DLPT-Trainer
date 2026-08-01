@@ -336,8 +336,9 @@ class GeneratedBankPersistence:
             result = self.refresh_manifest(remote_synced=True)
             warning_note = f" Ignored malformed records: {', '.join(warnings[:4])}." if warnings else ""
             self.last_note = (
-                f"Generated bank restored and merged from private HF Dataset `{self.resolved_repo_id}`: "
-                f"{result.passage_count} passages / {result.question_count} questions.{warning_note}"
+                f"Startup restore snapshot from private HF Dataset `{self.resolved_repo_id}`: "
+                f"{result.passage_count} saved AI-generated passages / {result.question_count} questions at launch. "
+                f"Current totals appear above and may be higher after later accepted Fresh-AI generations.{warning_note}"
             )
             self.last_remote_synced = True
             self.last_error = None
@@ -375,7 +376,7 @@ class GeneratedBankPersistence:
                 repo_id=repo_id,
                 repo_type="dataset",
                 token=token,
-                commit_message="Update validated Russian practice generated-item bank",
+                commit_message="Update validated multilingual practice generated-item bank",
             ),
         )
         records, _ = self._read_valid_records(self.bank_path)
@@ -656,6 +657,6 @@ class GeneratedBankPersistence:
             durability = "NOT restart-safe — ephemeral local Space storage"
             icon = "⚠️"
         return (
-            f"{icon} Generated bank: **{result.passage_count} passages / {result.question_count} questions** · "
+            f"{icon} Saved AI-generated content: **{result.passage_count} passages / {result.question_count} questions** · "
             f"{durability} · checksum `{result.checksum[:10]}`"
         )

@@ -39,8 +39,10 @@ class ItemBank:
         self.validation_reports: dict[str, dict] = {}
         self.questions_by_passage: dict[str, list[QuestionItem]] = defaultdict(list)
         self.passage_ids_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
+        self.passage_ids_by_language_skill: dict[tuple[str, str], set[str]] = defaultdict(set)
         self.question_ids_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
         self.topics_by_skill: dict[str, set[str]] = {"reading": set(), "listening": set()}
+        self.topics_by_language_skill: dict[tuple[str, str], set[str]] = defaultdict(set)
         self.passage_origin: dict[str, str] = {}
         self._loaded = False
         self._lock = threading.RLock()
@@ -65,7 +67,7 @@ class ItemBank:
                     if kind == "passage":
                         item = PassageItem.model_validate(data)
                         self.passages[item.id] = item
-                        self.passage_origin[item.id] = "starter_bank" if source == self.paths[0] else "generated_bank"
+                        self.passage_origin[item.id] = "generated_bank" if source == self.writable_path else "starter_bank"
                     elif kind == "question":
                         item = QuestionItem.model_validate(data)
                         self.questions[item.id] = item
@@ -86,11 +88,15 @@ class ItemBank:
     def _reindex(self) -> None:
         self.questions_by_passage = defaultdict(list)
         self.passage_ids_by_skill = {"reading": set(), "listening": set()}
+        self.passage_ids_by_language_skill = defaultdict(set)
         self.question_ids_by_skill = {"reading": set(), "listening": set()}
         self.topics_by_skill = {"reading": set(), "listening": set()}
+        self.topics_by_language_skill = defaultdict(set)
         for passage in self.passages.values():
             self.passage_ids_by_skill[passage.skill].add(passage.id)
+            self.passage_ids_by_language_skill[(passage.language, passage.skill)].add(passage.id)
             self.topics_by_skill[passage.skill].add(passage.topic)
+            self.topics_by_language_skill[(passage.language, passage.skill)].add(passage.topic)
         for question in self.questions.values():
             self.questions_by_passage[question.passage_id].append(question)
             passage = self.passages.get(question.passage_id)
@@ -123,8 +129,10 @@ class ItemBank:
             self.validation_reports.clear()
             self.questions_by_passage = defaultdict(list)
             self.passage_ids_by_skill = {"reading": set(), "listening": set()}
+            self.passage_ids_by_language_skill = defaultdict(set)
             self.question_ids_by_skill = {"reading": set(), "listening": set()}
             self.topics_by_skill = {"reading": set(), "listening": set()}
+            self.topics_by_language_skill = defaultdict(set)
             self.passage_origin.clear()
             self.load_warnings.clear()
             self._loaded = False
@@ -132,7 +140,7 @@ class ItemBank:
 
     def validate_operational_bank(self) -> list[str]:
         errors: list[str] = []
-        seen_hashes: dict[str, dict[str, str]] = {"reading": {}, "listening": {}}
+        seen_hashes: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
         for passage in self.passages.values():
             questions = self.questions_by_passage.get(passage.id, [])
             passage_report = validate_passage(passage, questions)
@@ -140,10 +148,11 @@ class ItemBank:
                 errors.append(f"{passage.id}: {', '.join(passage_report.failure_reasons)}")
             if passage.content_hash != content_hash(passage.passage_ru):
                 errors.append(f"{passage.id}: content hash mismatch")
-            for other_hash, other_id in seen_hashes[passage.skill].items():
+            bank_key = (passage.language, passage.skill)
+            for other_hash, other_id in seen_hashes[bank_key].items():
                 if passage.duplicate_detection_hash == other_hash or near_duplicate(passage.passage_ru, self.passages[other_id].passage_ru):
                     errors.append(f"{passage.id}: duplicate or near-duplicate {passage.skill} passage {other_id}")
-            seen_hashes[passage.skill][passage.duplicate_detection_hash] = passage.id
+            seen_hashes[bank_key][passage.duplicate_detection_hash] = passage.id
             audio_error = self._audio_relationship_error(passage)
             if audio_error:
                 errors.append(f"{passage.id}: {audio_error}")
@@ -185,11 +194,16 @@ class ItemBank:
             return "listening audio file is missing or empty"
         return None
 
-    def active_passages(self, skill: str) -> list[PassageItem]:
+    def active_passages(self, skill: str, language: str | None = None) -> list[PassageItem]:
         if skill not in {"reading", "listening"}:
             raise ItemBankError(f"Unsupported skill: {skill}")
         active: list[PassageItem] = []
-        for passage_id in self.passage_ids_by_skill[skill]:
+        passage_ids = (
+            self.passage_ids_by_language_skill[(language, skill)]
+            if language is not None
+            else self.passage_ids_by_skill[skill]
+        )
+        for passage_id in passage_ids:
             passage = self.passages[passage_id]
             if passage.status != "active" or passage.validation_status != "accepted":
                 continue
@@ -205,44 +219,95 @@ class ItemBank:
             active.append(passage)
         return active
 
-    def topics_for_skill(self, skill: str) -> list[str]:
+    def topics_for_skill(self, skill: str, language: str | None = None) -> list[str]:
         if skill not in self.topics_by_skill:
             raise ItemBankError(f"Unsupported skill: {skill}")
+        if language is not None:
+            return sorted(self.topics_by_language_skill[(language, skill)])
         return sorted(self.topics_by_skill[skill])
 
-    def health_summary(self) -> dict[str, Any]:
+    def health_summary(self, language: str | None = None) -> dict[str, Any]:
+        """Return source-aware and skill-aware bank health metrics.
+
+        Terminology:
+        - starter: immutable validated content bundled with the application;
+        - generated: accepted AI-authored/imported content in the writable overlay;
+        - ready/operational: content from either source that currently passes every
+          validation and, for Listening, has a usable validated audio asset.
+
+        Selecting or answering an item never changes these counts. Only an
+        accepted fresh-generation commit or an explicit import/merge can add to
+        the generated overlay.
+        """
+        included_ids = {
+            pid for pid, passage in self.passages.items()
+            if language is None or passage.language == language
+        }
+        starter_ids = {pid for pid in included_ids if self.origin_for(pid) == "starter_bank"}
+        generated_ids = {pid for pid in included_ids if self.origin_for(pid) == "generated_bank"}
         summary: dict[str, Any] = {
-            "passages": len(self.passages),
-            "questions": len(self.questions),
-            "audio_assets": len(self.audio_assets),
-            "generated_passages": sum(1 for passage_id in self.passages if self.origin_for(passage_id) == "generated_bank"),
-            "generated_questions": sum(
-                len(self.questions_by_passage.get(passage_id, []))
-                for passage_id in self.passages
-                if self.origin_for(passage_id) == "generated_bank"
-            ),
+            "passages": len(included_ids),
+            "questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in included_ids),
+            "audio_assets": len({
+                self.passages[pid].audio_asset_id for pid in included_ids
+                if self.passages[pid].audio_asset_id in self.audio_assets
+            }),
+            "starter_passages": len(starter_ids),
+            "starter_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in starter_ids),
+            "generated_passages": len(generated_ids),
+            "generated_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in generated_ids),
             "load_warnings": len(self.load_warnings),
         }
         for skill in ("reading", "listening"):
-            passage_ids = self.passage_ids_by_skill[skill]
-            generated_ids = {pid for pid in passage_ids if self.origin_for(pid) == "generated_bank"}
-            active = self.active_passages(skill)
-            active_ids = {passage.id for passage in active}
-            skill_data = {
-                "passages": len(passage_ids),
-                "questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in passage_ids),
-                "generated_passages": len(generated_ids),
-                "generated_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in generated_ids),
-                "operational_passages": len(active),
-                "operational_questions": sum(len(self.questions_by_passage.get(pid, [])) for pid in active_ids),
-                "topics": len(self.topics_by_skill[skill]),
-                "ilr_question_counts": {
-                    level: sum(
-                        1 for qid in self.question_ids_by_skill[skill]
-                        if self.questions[qid].target_ilr == level
-                    )
+            passage_ids = (
+                self.passage_ids_by_language_skill[(language, skill)]
+                if language is not None
+                else self.passage_ids_by_skill[skill]
+            )
+            starter_skill_ids = {pid for pid in passage_ids if self.origin_for(pid) == "starter_bank"}
+            generated_skill_ids = {pid for pid in passage_ids if self.origin_for(pid) == "generated_bank"}
+            ready = self.active_passages(skill, language)
+            ready_ids = {passage.id for passage in ready}
+            ready_starter_ids = ready_ids & starter_skill_ids
+            ready_generated_ids = ready_ids & generated_skill_ids
+
+            def question_count(ids: set[str]) -> int:
+                return sum(len(self.questions_by_passage.get(pid, [])) for pid in ids)
+
+            def ilr_counts(ids: set[str]) -> dict[str, int]:
+                question_ids = {
+                    question.id
+                    for pid in ids
+                    for question in self.questions_by_passage.get(pid, [])
+                }
+                return {
+                    level: sum(1 for qid in question_ids if self.questions[qid].target_ilr == level)
                     for level in ("0", "0+", "1", "1+", "2", "2+", "3")
-                },
+                }
+
+            skill_data = {
+                # Backward-compatible total/index fields.
+                "passages": len(passage_ids),
+                "questions": question_count(set(passage_ids)),
+                "generated_passages": len(generated_skill_ids),
+                "generated_questions": question_count(generated_skill_ids),
+                "operational_passages": len(ready_ids),
+                "operational_questions": question_count(ready_ids),
+                "topics": len(self.topics_for_skill(skill, language)),
+                "ilr_question_counts": ilr_counts(ready_ids),
+                # Explicit source-aware fields used by the UI.
+                "starter_passages": len(starter_skill_ids),
+                "starter_questions": question_count(starter_skill_ids),
+                "saved_ai_passages": len(generated_skill_ids),
+                "saved_ai_questions": question_count(generated_skill_ids),
+                "ready_passages": len(ready_ids),
+                "ready_questions": question_count(ready_ids),
+                "ready_starter_passages": len(ready_starter_ids),
+                "ready_starter_questions": question_count(ready_starter_ids),
+                "ready_ai_passages": len(ready_generated_ids),
+                "ready_ai_questions": question_count(ready_generated_ids),
+                "ready_ilr_question_counts": ilr_counts(ready_ids),
+                "saved_ai_ilr_question_counts": ilr_counts(generated_skill_ids),
             }
             if skill == "listening":
                 linked_audio_ids = {
@@ -250,34 +315,38 @@ class ItemBank:
                     if self.passages[pid].audio_asset_id
                 }
                 generated_linked_audio_ids = {
-                    self.passages[pid].audio_asset_id for pid in generated_ids
+                    self.passages[pid].audio_asset_id for pid in generated_skill_ids
                     if self.passages[pid].audio_asset_id
                 }
+                ready_audio_ids = {p.audio_asset_id for p in ready if p.audio_asset_id}
                 skill_data.update({
                     "audio_assets": len(linked_audio_ids),
                     "generated_audio_assets": len(generated_linked_audio_ids),
+                    "saved_ai_audio_assets": len(generated_linked_audio_ids),
                     "missing_or_invalid_audio": sum(
                         1 for pid in passage_ids if self._audio_relationship_error(self.passages[pid])
                     ),
-                    "operational_audio_assets": len({p.audio_asset_id for p in active if p.audio_asset_id}),
+                    "operational_audio_assets": len(ready_audio_ids),
+                    "ready_audio_assets": len(ready_audio_ids),
                 })
             summary[skill] = skill_data
-        summary["cross_skill_related_pairs"] = self._cross_skill_related_pair_count()
+        summary["cross_skill_related_pairs"] = self._cross_skill_related_pair_count(language)
         return summary
 
-    def _cross_skill_related_pair_count(self) -> int:
+    def _cross_skill_related_pair_count(self, language: str | None = None) -> int:
         """Count explicit/exact cross-skill relationships without an O(n²) status scan."""
         pairs: set[tuple[str, str]] = set()
         for passage in self.passages.values():
+            if language is not None and passage.language != language:
+                continue
             related = passage.provenance.get("cross_skill_related_passage_id")
             if related and related in self.passages and self.passages[related].skill != passage.skill:
                 pairs.add(tuple(sorted((passage.id, related))))
 
-        reading_by_hash = {
-            self.passages[pid].duplicate_detection_hash: pid
-            for pid in self.passage_ids_by_skill["reading"]
-        }
-        for pid in self.passage_ids_by_skill["listening"]:
+        reading_ids = self.passage_ids_by_language_skill[(language, "reading")] if language else self.passage_ids_by_skill["reading"]
+        listening_ids = self.passage_ids_by_language_skill[(language, "listening")] if language else self.passage_ids_by_skill["listening"]
+        reading_by_hash = {self.passages[pid].duplicate_detection_hash: pid for pid in reading_ids}
+        for pid in listening_ids:
             passage = self.passages[pid]
             related = reading_by_hash.get(passage.duplicate_detection_hash)
             if related:
@@ -303,6 +372,8 @@ class ItemBank:
 
     def duplicate_of(self, passage: PassageItem, same_skill_only: bool = True) -> str | None:
         for existing in self.passages.values():
+            if existing.language != passage.language:
+                continue
             if same_skill_only and existing.skill != passage.skill:
                 continue
             if existing.content_hash == passage.content_hash or existing.duplicate_detection_hash == passage.duplicate_detection_hash:
@@ -313,6 +384,8 @@ class ItemBank:
 
     def cross_skill_duplicate_of(self, passage: PassageItem) -> str | None:
         for existing in self.passages.values():
+            if existing.language != passage.language:
+                continue
             if existing.skill == passage.skill:
                 continue
             if existing.content_hash == passage.content_hash or existing.duplicate_detection_hash == passage.duplicate_detection_hash:
@@ -400,6 +473,7 @@ class ItemBank:
         allowed_ilr_bands: set[str] | None = None,
         routing_band: str | None = None,
         selection_seed: str | None = None,
+        language: str = "ru",
     ) -> AdaptiveSelection:
         seen_content_hashes = {
             self.passages[passage_id].content_hash
@@ -412,7 +486,7 @@ class ItemBank:
             if passage_id in self.passages
         }
         eligible_passages = [
-            passage for passage in self.active_passages(skill)
+            passage for passage in self.active_passages(skill, language)
             if passage.id in seen_passages
             or (
                 passage.content_hash not in seen_content_hashes

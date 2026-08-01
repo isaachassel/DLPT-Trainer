@@ -24,6 +24,13 @@ from core.constants import (
 )
 from core.generation import LiveGenerationService, ProviderError
 from core.item_bank import ItemBank, shuffled_bundle
+from core.languages import (
+    LANGUAGE_LABEL_TO_CODE,
+    LANGUAGES,
+    language_profile,
+    voice_choices,
+    voice_for_label,
+)
 from core.models import PassageItem, QuestionItem, SessionState, UserHistory
 from core.reporting import build_exports, build_full_report
 from core.scoring import item_level_label
@@ -50,59 +57,73 @@ ROOT = Path(__file__).resolve().parents[1]
 SETTINGS = get_settings()
 SETTINGS.ensure_directories(ROOT)
 STARTER_BANK_PATH = SETTINGS.starter_bank_runtime_path(ROOT)
+MANDARIN_STARTER_BANK_PATH = SETTINGS.mandarin_starter_bank_runtime_path(ROOT)
 GENERATED_BANK_PATH = SETTINGS.generated_bank_runtime_path(ROOT)
 BANK_PERSISTENCE = GeneratedBankPersistence(SETTINGS, ROOT)
 BANK_BOOTSTRAP_MESSAGE = BANK_PERSISTENCE.bootstrap()
 BANK = ItemBank(
-    [STARTER_BANK_PATH, GENERATED_BANK_PATH],
+    [STARTER_BANK_PATH, MANDARIN_STARTER_BANK_PATH, GENERATED_BANK_PATH],
     writable_path=GENERATED_BANK_PATH,
     on_commit=BANK_PERSISTENCE.after_local_commit,
 ).load()
 BANK_STATUS_MESSAGE = BANK_PERSISTENCE.status_text()
 
 
+def _coverage_text(counts: dict[str, int]) -> str:
+    return ", ".join(f"{level}: {count}" for level, count in counts.items() if count) or "none"
+
+
 def _skill_bank_line(skill: str, health: dict) -> str:
     data = health[skill]
     label = skill.title()
-    coverage = ", ".join(
-        f"{level}: {count}"
-        for level, count in data["ilr_question_counts"].items()
-        if count
-    )
+    coverage = _coverage_text(data["ready_ilr_question_counts"])
     if skill == "listening":
         return (
-            f"**{label}:** {data['generated_passages']} generated passages / "
-            f"{data['generated_questions']} generated questions / "
-            f"{data['generated_audio_assets']} generated audio assets · "
-            f"{data['operational_passages']} operational passages · "
-            f"missing or invalid audio: {data['missing_or_invalid_audio']} · "
-            f"ILR question coverage: {coverage}"
+            f"### {label} bank\n"
+            f"- **Built-in validated starter:** {data['starter_passages']} passages / "
+            f"{data['starter_questions']} questions.\n"
+            f"- **Saved AI-generated:** {data['saved_ai_passages']} passages / "
+            f"{data['saved_ai_questions']} questions / {data['saved_ai_audio_assets']} audio files.\n"
+            f"- **Ready to use now (starter + saved AI):** {data['ready_passages']} passages / "
+            f"{data['ready_questions']} questions / {data['ready_audio_assets']} playable audio files.\n"
+            f"- **Unavailable because audio is missing or invalid:** {data['missing_or_invalid_audio']} passages.\n"
+            f"- **Ready-to-use ILR coverage:** {coverage}."
         )
     return (
-        f"**{label}:** {data['generated_passages']} generated passages / "
-        f"{data['generated_questions']} generated questions · "
-        f"{data['operational_passages']} operational passages · "
-        f"ILR question coverage: {coverage}"
+        f"### {label} bank\n"
+        f"- **Built-in validated starter:** {data['starter_passages']} passages / "
+        f"{data['starter_questions']} questions.\n"
+        f"- **Saved AI-generated:** {data['saved_ai_passages']} passages / "
+        f"{data['saved_ai_questions']} questions.\n"
+        f"- **Ready to use now (starter + saved AI):** {data['ready_passages']} passages / "
+        f"{data['ready_questions']} questions.\n"
+        f"- **Ready-to-use ILR coverage:** {coverage}."
     )
 
 
 def bank_status_markdown() -> str:
     text = BANK_PERSISTENCE.status_text()
-    health = BANK.health_summary()
+    all_health = BANK.health_summary()
     warning = (
-        f" · overlay warnings: {health['load_warnings']}"
-        if health["load_warnings"]
+        f" · overlay warnings: {all_health['load_warnings']}"
+        if all_health["load_warnings"]
         else ""
     )
     relation_note = (
-        f" · cross-skill related pairs tracked: {health['cross_skill_related_pairs']}"
-        if health["cross_skill_related_pairs"]
+        f" · cross-skill related pairs tracked: {all_health['cross_skill_related_pairs']}"
+        if all_health["cross_skill_related_pairs"]
         else ""
     )
     return (
-        f"💾 **Reusable bank status:** {text}{warning}{relation_note}\n\n"
-        f"{_skill_bank_line('reading', health)}  \n"
-        f"{_skill_bank_line('listening', health)}"
+        f"💾 **Saved AI-generated bank status:** {text}{warning}{relation_note}\n\n"
+        "**Bank-write rule:** choosing **Validated bank only**, opening a passage, answering it, or "
+        "replaying audio does **not** add anything to the saved AI bank. Only an accepted Fresh-AI "
+        "bundle or an explicit backup import/merge can add records.\n\n"
+        + "\n\n".join(
+            f"## {profile.label}\n\n{_skill_bank_line('reading', BANK.health_summary(code))}\n\n"
+            f"{_skill_bank_line('listening', BANK.health_summary(code))}"
+            for code, profile in LANGUAGES.items()
+        )
     )
 SESSION_DIR = SETTINGS.session_runtime_path(ROOT)
 HISTORY_DIR = SETTINGS.history_runtime_path(ROOT)
@@ -124,10 +145,17 @@ QUEUE_CONCURRENCY_LIMIT = SETTINGS.queue_concurrency_limit
 MAX_SLOTS = 5
 
 
-def topic_controls(skill_label: str, current_topics=None):
+def topic_controls(skill_label: str, language_label: str = "Russian", current_topics=None):
     """Expose only topics that are currently indexed for the selected skill."""
+    language: str | None
+    if not isinstance(language_label, str):
+        # Backward compatibility with the prior two-argument callback.
+        current_topics = language_label
+        language = None
+    else:
+        language = LANGUAGE_LABEL_TO_CODE.get(language_label, "ru")
     skills = SKILL_LABELS.get(skill_label, ["reading"])
-    choices = sorted({topic for skill in skills for topic in BANK.topics_for_skill(skill)})
+    choices = sorted({topic for skill in skills for topic in BANK.topics_for_skill(skill, language)})
     current = [] if current_topics in (None, "") else ([current_topics] if isinstance(current_topics, str) else list(current_topics))
     retained = [topic for topic in current if topic in choices]
     return gr.update(choices=choices, value=retained)
@@ -248,8 +276,10 @@ def restore_activity_button(label: str):
     return gr.update(value="", visible=False), gr.update(value=label, interactive=True)
 
 
-def mode_controls(mode_label: str, skill_label: str):
+def mode_controls(mode_label: str, skill_label: str, language_label: str = "Russian"):
     mode = MODE_LABELS[mode_label]
+    language = LANGUAGE_LABEL_TO_CODE.get(language_label, "ru")
+    voices = voice_choices(language)
     listening_selected = skill_label != "Reading"
     if mode == "training":
         return (
@@ -257,7 +287,7 @@ def mode_controls(mode_label: str, skill_label: str):
             gr.update(choices=["Off", "Standard count-up", "Strict countdown"], value="Off", interactive=True),
             gr.update(visible=True, interactive=True),
             gr.update(visible=listening_selected, interactive=listening_selected),
-            gr.update(visible=listening_selected, interactive=listening_selected),
+            gr.update(choices=voices, value=language_profile(language).starter_voice_label, visible=listening_selected, interactive=listening_selected),
             gr.update(visible=listening_selected, interactive=listening_selected),
             gr.update(choices=["After each passage", "End of session"], value="After each passage", visible=True),
             gr.update(value="Use selected starting ILR band", visible=False),
@@ -272,7 +302,7 @@ def mode_controls(mode_label: str, skill_label: str):
             gr.update(choices=["Off", "Standard count-up", "Strict countdown"], value="Standard count-up", interactive=True),
             gr.update(visible=False, value=False),
             gr.update(visible=False, value=True),
-            gr.update(visible=False),
+            gr.update(choices=voices, value=language_profile(language).starter_voice_label, visible=False),
             gr.update(visible=False),
             gr.update(choices=["End of session"], value="End of session", visible=False),
             gr.update(value="Medium difficulty (recommended)", visible=True, interactive=True),
@@ -286,7 +316,7 @@ def mode_controls(mode_label: str, skill_label: str):
         gr.update(choices=["Strict countdown"], value="Strict countdown", interactive=False),
         gr.update(visible=False, value=False),
         gr.update(visible=False, value=True),
-        gr.update(visible=False),
+        gr.update(choices=voices, value=language_profile(language).starter_voice_label, visible=False),
         gr.update(visible=False),
         gr.update(choices=["End of session"], value="End of session", visible=False),
         gr.update(value="Medium difficulty (recommended)", visible=False, interactive=False),
@@ -317,9 +347,9 @@ def _history_for(state: SessionState | None) -> UserHistory | None:
     if not state or not state.profile_id or not SETTINGS.enable_history:
         return None
     try:
-        return STORAGE.load_history(state.profile_id)
+        return STORAGE.load_history(f"{state.profile_id}__{state.language}")
     except StorageError:
-        return UserHistory(profile_id=state.profile_id)
+        return UserHistory(profile_id=f"{state.profile_id}__{state.language}", language=state.language)
 
 
 def _desired_generation_level(state: SessionState) -> str:
@@ -346,11 +376,18 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
     origin = BANK.origin_for(bundle.passage.id)
     state.last_content_source = "generated_bank" if origin == "generated_bank" else "starter_bank"
     if not state.last_content_note:
-        state.last_content_note = (
-            "Loaded a previously validated AI-generated bank item."
+        source_label = (
+            "a previously saved and validated AI-generated item"
             if state.last_content_source == "generated_bank"
-            else "Loaded a validated starter-bank item."
+            else "a built-in validated starter item"
         )
+        if state.content_source == "bank_only":
+            state.last_content_note = (
+                f"Bank-only selection loaded {source_label}. No new passage was generated and no record "
+                "was written to the saved AI-generated bank."
+            )
+        else:
+            state.last_content_note = f"Loaded {source_label}."
     return bundle
 
 
@@ -372,7 +409,7 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
             state.generation_requests += 1
             started = time.time()
             try:
-                _progress(progress, 0.28, "Authoring a new Russian passage…")
+                _progress(progress, 0.28, f"Authoring a new {language_profile(state.language).short_label} passage…")
                 remaining = max(1, state.max_questions_per_skill - state.completed_count(state.active_skill))
                 generated = GENERATOR.generate_and_store(
                     skill=state.active_skill,
@@ -381,6 +418,7 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                     topics=state.topics,
                     competencies=state.competencies,
                     maximum_questions=min(remaining, 5 if state.active_skill == "reading" else 3),
+                    language=state.language,
                 )
                 _progress(progress, 0.82, "Accepted item validated; updating the reusable bank…")
                 questions = shuffled_bundle(
@@ -496,18 +534,24 @@ def _status_text(state: SessionState, extra: str = "") -> str:
         lines.append("Adaptive calculations are hidden during strict testing conditions.")
     if state.mode in {"training", "diagnostic"}:
         lines.append(f"**Eligible item range:** ILR {state.minimum_ilr} through ILR {state.maximum_ilr}.")
+    health = BANK.health_summary(state.language)
+    skill_health = health[state.active_skill]
     if state.content_source == "fresh_ai_preferred":
-        health = BANK.health_summary()
-        skill_health = health[state.active_skill]
         audio_note = (
-            f" / {skill_health['generated_audio_assets']} audio assets"
+            f" / {skill_health['saved_ai_audio_assets']} audio assets"
             if state.active_skill == "listening"
             else ""
         )
         lines.append(
             f"**Content:** Fresh AI preferred · generated this session: {len(state.generated_passage_ids)} · "
-            f"bank fallbacks: {state.bank_fallback_count} · reusable generated {state.active_skill.title()} bank: "
-            f"{skill_health['generated_passages']} passages / {skill_health['generated_questions']} questions{audio_note}."
+            f"bank fallbacks: {state.bank_fallback_count} · saved AI-generated {state.active_skill.title()} bank: "
+            f"{skill_health['saved_ai_passages']} passages / {skill_health['saved_ai_questions']} questions{audio_note}."
+        )
+    else:
+        lines.append(
+            f"**Content:** Validated bank only · selected from {skill_health['ready_passages']} ready-to-use "
+            f"{state.active_skill.title()} passages ({skill_health['starter_passages']} built-in starter + "
+            f"{skill_health['saved_ai_passages']} saved AI-generated). **This session does not write new bank records.**"
         )
     if state.last_content_source == "fresh_ai":
         lines.append("✅ **Fresh AI bundle generated, validated, saved to the reusable bank, and selected for this passage.**")
@@ -523,7 +567,7 @@ def _status_text(state: SessionState, extra: str = "") -> str:
 def _passage_markdown(bundle: PassageBundle, state: SessionState) -> str:
     passage = bundle.passage
     if passage.skill == "reading":
-        return f"### Russian Passage\n\n{passage.passage_ru}"
+        return f"### {language_profile(passage.language).short_label} Passage\n\n{passage.passage_ru}"
     source = "Synthetic TTS audio" if passage.source_type == "synthetic" else passage.source_type
     return (
         "### Listening Passage\n\n"
@@ -646,11 +690,13 @@ def start_session_callback(
     topics, competencies, feedback_timing, hints_enabled, transcript_review,
     voice_label, speech_rate_label, profile_id, content_source_label="Validated bank only — fastest",
     adaptive_start_label="Use selected starting ILR band", minimum_ilr="0", maximum_ilr="3",
+    language_label="Russian",
     progress=gr.Progress(),
 ):
     try:
         _progress(progress, 0.04, "Validating session settings…")
         mode = MODE_LABELS[mode_label]
+        language = LANGUAGE_LABEL_TO_CODE[language_label]
         skills = SKILL_LABELS[skill_label]
         if mode == "simulation":
             minimum_ilr, maximum_ilr = "0", "3"
@@ -664,7 +710,7 @@ def start_session_callback(
                 raise ValueError("The selected starting ILR band must fall inside the allowed adaptive range.")
         if mode == "training" and not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(target_level) <= ILR_LEVELS.index(maximum_ilr):
             raise ValueError("The Training target ILR band must fall inside the allowed adaptive range.")
-        allowed_topics = sorted({topic for selected_skill in skills for topic in BANK.topics_for_skill(selected_skill)})
+        allowed_topics = sorted({topic for selected_skill in skills for topic in BANK.topics_for_skill(selected_skill, language)})
         topics = _normalize_multiselect(topics, allowed_topics, "topic")
         competencies = _normalize_multiselect(competencies, QUESTION_TYPES, "competency")
         max_q, minimum, simulation_full, shortened, simulation_seconds = _length_settings(mode, length_label)
@@ -677,6 +723,7 @@ def start_session_callback(
         feedback_mode = "end_of_passage" if mode == "training" and feedback_timing == "After each passage" else "end_only"
         _progress(progress, 0.10, "Creating independent adaptive skill state…")
         state = create_session(
+            language=language,
             mode=mode, selected_skills=skills, start_level=start_level, target_level=target_level,
             topics=topics or [], competencies=competencies or [], max_questions_per_skill=max_q,
             minimum_questions_per_skill=minimum, timer_mode=timer_mode,
@@ -743,13 +790,13 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         _progress(progress, 0.30, "Loading validated audio…")
         path = resolve_audio_path(asset, ROOT)
         audio_note = ""
-        if state.mode == "training" and (state.voice_label != "Starter-bank eSpeak voice" or state.speech_rate_label != "Normal"):
-            voice_map = {"Russian Female — Svetlana": "ru-RU-SvetlanaNeural", "Russian Male — Dmitry": "ru-RU-DmitryNeural"}
+        starter_label = language_profile(state.language).starter_voice_label
+        if state.mode == "training" and (state.voice_label != starter_label or state.speech_rate_label != "Normal"):
             rate_map = {"Very slow": "-25%", "Slow": "-15%", "Normal": "+0%", "Fast": "+10%"}
             try:
                 _progress(progress, 0.48, "Preparing the selected training voice and speed…")
                 cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
-                path = generate_cached_tts(bundle.passage.passage_ru, cache_dir, voice_map.get(state.voice_label, SETTINGS.edge_tts_voice), rate_map.get(state.speech_rate_label, "+0%"), timeout_seconds=SETTINGS.tts_timeout_seconds)
+                path = generate_cached_tts(bundle.passage.passage_ru, cache_dir, voice_for_label(state.language, state.voice_label), rate_map.get(state.speech_rate_label, "+0%"), timeout_seconds=SETTINGS.tts_timeout_seconds)
                 audio_note = " Requested training voice/speed loaded from the deterministic TTS cache."
             except Exception as tts_exc:
                 audio_note = f" Requested training voice/speed was unavailable; cached starter audio was used ({type(tts_exc).__name__})."
@@ -809,7 +856,7 @@ def _passage_feedback(records, passage: PassageItem, state: SessionState) -> str
         lines.append(f"- Item level: **{item_level_label(record)}**")
         lines.append(f"- Correct answer: {record.correct_key}. {record.choices_snapshot[record.correct_key]}")
         lines.append(f"- Explanation: {record.rationale_en}")
-        lines.append(f"- Russian evidence: `{record.evidence_ru}`")
+        lines.append(f"- {language_profile(record.language).short_label} evidence: `{record.evidence_ru}`")
     if passage.skill == "listening" and records and records[0].mode == "training" and state.transcript_review_enabled:
         lines.append(f"**Transcript review:** {passage.passage_ru}")
     return "\n\n".join(lines)

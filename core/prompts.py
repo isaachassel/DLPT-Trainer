@@ -4,6 +4,10 @@ import json
 from dataclasses import dataclass
 from typing import Iterable
 
+from .languages import language_profile
+
+# Preserve the persisted pipeline identifier used by existing generated-bank
+# records; language is now carried explicitly in item/session metadata.
 PROMPT_VERSION = "genai-pipeline-v8"
 
 
@@ -66,7 +70,7 @@ LEVEL_PROFILES: dict[str, LevelProfile] = {
         "news brief, report, social notice, general-reader professional information, routine correspondence",
         "news report, briefing, interview, public-information segment, workplace discussion",
         "main idea, prominent detail, sequence, cause/effect, reference, concrete meaning from context; avoid subtle implication",
-        "authentic-like adult Russian with mostly transparent syntax",
+        "authentic-like adult language with mostly transparent syntax",
         "170-360",
         "120-230",
     ),
@@ -86,7 +90,7 @@ LEVEL_PROFILES: dict[str, LevelProfile] = {
         "analysis, editorial commentary, professional report, essay, policy discussion, complex news feature",
         "analytical interview, commentary, professional briefing, debate excerpt, complex report",
         "main argument, relationship of ideas, supported inference, intent, tone, conclusion, evolution of explanation; at most one isolated-detail item",
-        "natural professional Russian with abstraction and embedded clauses, but not obscurity for its own sake",
+        "natural professional language with abstraction and embedded clauses, but not obscurity for its own sake",
         "330-500",
         "210-330",
     ),
@@ -119,6 +123,16 @@ Reject ambiguity, unsupported answers, outside knowledge, level mismatch, transl
 Return only the requested structured response. Do not reveal private reasoning; provide only concise audit conclusions."""
 
 
+def authoring_system(language: str) -> str:
+    source = language_profile(language).source_name
+    return AUTHORING_SYSTEM.replace("Russian", source).replace("in Russian", f"in {source}")
+
+
+def verifier_system(language: str) -> str:
+    source = language_profile(language).source_name
+    return VERIFIER_SYSTEM.replace("Russian", source)
+
+
 def _csv(values: Iterable[str] | None, fallback: str) -> str:
     cleaned = [str(value).strip() for value in (values or []) if str(value).strip()]
     return ", ".join(cleaned) if cleaned else fallback
@@ -133,17 +147,23 @@ def passage_authoring_prompt(
     competencies: list[str] | None,
     novelty_context: list[str] | None,
     generation_nonce: str,
+    language: str = "ru",
 ) -> str:
+    source = language_profile(language).source_name
     profile = LEVEL_PROFILES[level]
     genre = profile.reading_genres if skill == "reading" else profile.listening_genres
     soft_length = profile.soft_reading_words if skill == "reading" else profile.soft_listening_words
+    if language == "zh-CN":
+        low, high = (int(value) for value in soft_length.split("-"))
+        soft_length = f"{max(4, round(low * 1.55))}-{round(high * 1.55)}"
     medium = "written passage" if skill == "reading" else "spoken transcript"
     strict_rules = (
-        "Reading hard limit: no more than 500 Russian words; preserve paragraph structure."
+        f"Reading hard limit: no more than {'1,000 Chinese characters' if language == 'zh-CN' else '500 Russian words'}; preserve paragraph structure."
         if skill == "reading"
-        else "Listening hard limit: write natural spoken Russian that can be rendered in no more than about 2.5 minutes; avoid long unbroken sentences and TTS-breaking punctuation."
+        else f"Listening hard limit: write natural spoken {source} that can be rendered in no more than about 2.5 minutes; avoid long unbroken sentences and TTS-breaking punctuation."
     )
-    return f"""Create one original Russian {medium} for a proficiency-practice passage bundle.
+    unit = "Chinese characters" if language == "zh-CN" else "Russian words"
+    return f"""Create one original {source} {medium} for a proficiency-practice passage bundle.
 
 REQUEST
 - Skill: {skill}
@@ -158,16 +178,16 @@ LEVEL PROFILE
 - Suitable genres: {genre}
 - Expected reasoning: {profile.reasoning}
 - Language profile: {profile.language}
-- Soft length guidance only: approximately {soft_length} Russian words. Do not pad to hit a number.
+- Soft length guidance only: approximately {soft_length} {unit}. Do not pad to hit a number.
 - {strict_rules}
 
 CONTENT RULES
 - Use a realistic communicative situation and a clear source type.
 - The English orientation identifies context/source type without revealing the main idea or any answer.
-- The Russian must sound native and internally coherent, with no repeated sentences, contradictions, dangling pronouns, fabricated quotations attributed to real people, or obvious translationese.
+- The {source} must sound native and internally coherent, with no repeated sentences, contradictions, dangling pronouns, fabricated quotations attributed to real people, or obvious translationese.
 - Keep the content safe for a general educational audience and avoid personally identifying information.
 - Source type must be synthetic unless verifiable provenance and license are supplied by an administrator; live user generation is synthetic.
-- Do not mention DLPT, the app, ILR rules, generation, questions, or answer choices inside the Russian text.
+- Do not mention DLPT, the app, ILR rules, generation, questions, or answer choices inside the {source} text.
 - Avoid close similarity to these existing bank themes/subtopics: {_csv(novelty_context, 'none supplied')}.
 
 METADATA RULES
@@ -177,9 +197,10 @@ METADATA RULES
 """
 
 
-def passage_repair_prompt(*, skill: str, level: str, issues: list[str], candidate_json: str) -> str:
+def passage_repair_prompt(*, skill: str, level: str, issues: list[str], candidate_json: str, language: str = "ru") -> str:
     profile = LEVEL_PROFILES[level]
-    return f"""Repair the candidate Russian {skill} passage so it becomes operationally usable.
+    source = language_profile(language).source_name
+    return f"""Repair the candidate {source} {skill} passage so it becomes operationally usable.
 Target ILR: {level}
 Expected discourse: {profile.discourse}
 Validation issues: {json.dumps(issues, ensure_ascii=False)}
@@ -192,14 +213,15 @@ Do not add questions. Do not explain the repair outside the schema.
 """
 
 
-def passage_audit_prompt(*, skill: str, requested_level: str, candidate_json: str) -> str:
-    return f"""Audit this independently generated Russian {skill} passage.
+def passage_audit_prompt(*, skill: str, requested_level: str, candidate_json: str, language: str = "ru") -> str:
+    source = language_profile(language).source_name
+    return f"""Audit this independently generated {source} {skill} passage.
 Requested provisional ILR target: {requested_level}
 
 Candidate JSON:
 {candidate_json}
 
-Judge whether the Russian is natural, coherent, non-repetitive, level-appropriate, and suitable for comprehension questions.
+Judge whether the {source} is natural, coherent, non-repetitive, level-appropriate, and suitable for comprehension questions.
 Check whether the orientation leaks the central answer, whether discourse complexity matches the target, and whether the text appears padded or translated unnaturally.
 Choose one estimated ILR band from 0, 0+, 1, 1+, 2, 2+, 3. The estimate is provisional.
 Use concise flags and repair notes. Mark acceptable=false for contradictions, incoherent references, severe translation artifacts, answer-revealing orientation, protected-test imitation, or a level mismatch greater than one adjacent half-level.
@@ -214,10 +236,12 @@ def question_authoring_prompt(
     desired_count: int,
     competencies: list[str] | None,
     passage_json: str,
+    language: str = "ru",
 ) -> str:
+    source = language_profile(language).source_name
     profile = LEVEL_PROFILES[level]
     competency_details = [QUESTION_TYPE_GUIDANCE[c] for c in (competencies or []) if c in QUESTION_TYPE_GUIDANCE]
-    return f"""Create exactly {desired_count} English multiple-choice comprehension questions for the Russian {skill} passage below.
+    return f"""Create exactly {desired_count} English multiple-choice comprehension questions for the {source} {skill} passage below.
 
 REQUEST
 - Product mode: {mode}
@@ -237,7 +261,7 @@ QUESTION RULES
 - Each stem and all four choices are in English.
 - proposed_correct_index is zero-based (0-3). Never use answer letters.
 - Every correct answer must be supported by the passage alone.
-- evidence_ru must be a short exact contiguous Russian quotation from the passage, normally a phrase or clause rather than the whole passage.
+- evidence_ru is a legacy schema name; its value must be a short exact contiguous {source} quotation from the passage, normally a phrase or clause rather than the whole passage.
 - rationale_en explains why the answer is correct and, when useful, why the strongest distractor is wrong.
 - Distractors must be plausible misunderstandings yet clearly wrong from the source text.
 - Keep answer choices parallel in grammar, comparable in length and specificity, and free of unique wording clues.
@@ -260,7 +284,9 @@ def question_repair_prompt(
     questions_json: str,
     issues: list[str],
     repair_indices: list[int] | None = None,
+    language: str = "ru",
 ) -> str:
+    source = language_profile(language).source_name
     targeted = sorted(set(repair_indices or []))
     if targeted:
         labels = [f"Q{index + 1}" for index in targeted]
@@ -271,7 +297,7 @@ Do not return the valid unchanged questions. The application will merge the repl
     else:
         scope = f"Return a complete replacement set containing exactly {desired_count} questions."
         output_count = desired_count
-    return f"""Repair English comprehension questions for the supplied Russian {skill} passage.
+    return f"""Repair English comprehension questions for the supplied {source} {skill} passage.
 Target ILR: {level}
 Original required bundle size: {desired_count}
 Validation and verifier issues: {json.dumps(issues, ensure_ascii=False)}
@@ -289,21 +315,22 @@ Each question contains exactly stem_en, choices, proposed_correct_index, rationa
 question_type must use one exact allowed value: main idea; prominent detail; inference; speaker/writer intent; tone or attitude; reference; sequence; cause and effect; relationship of ideas; meaning from context.
 Use zero-based proposed_correct_index only. Never prescribe answer letters.
 Do not return target_ilr, difficulty, IDs, answer letters, or validation metadata; the application assigns those in Python.
-Every evidence_ru value must be a short exact contiguous quotation copied from the Russian passage.
+Every evidence_ru value must be a short exact contiguous quotation copied from the {source} passage.
 For no_near_duplicate_choices, rewrite the distractors so each option asserts a materially different proposition; parallel grammar is encouraged, but synonyms or tiny qualifier changes are not enough.
 For evidence_in_passage, copy a short exact phrase or clause from the passage character-for-character rather than paraphrasing or reproducing a whole paragraph.
 Remove ambiguity, outside knowledge, answer leakage, duplicate competencies, weak distractors, level mismatch, and unsupported rationales.
 """
 
 
-def blind_verification_prompt(*, passage_ru: str, stem_en: str, choices: list[str], target_level: str, question_type: str) -> str:
+def blind_verification_prompt(*, passage_ru: str, stem_en: str, choices: list[str], target_level: str, question_type: str, language: str = "ru") -> str:
+    source = language_profile(language).source_name.upper().replace(" ", "_")
     return f"""Blindly verify one comprehension item. The proposed answer is intentionally hidden.
 Target ILR: {target_level}
 Question type: {question_type}
 
-<RUSSIAN_SOURCE>
+<{source}_SOURCE>
 {passage_ru}
-</RUSSIAN_SOURCE>
+</{source}_SOURCE>
 
 <ENGLISH_STEM>
 {stem_en}
@@ -315,23 +342,25 @@ Question type: {question_type}
 
 Select the single best zero-based index from the source alone.
 Identify whether a second option is plausibly defensible, whether outside knowledge is required, whether evidence is sufficient, whether the reasoning demand matches the target, and whether any choice leaks the answer through wording/length/specificity.
-Copy a short exact contiguous Russian evidence span. Do not paraphrase it. If no
+Copy a short exact contiguous target-language evidence span. Do not paraphrase it. If no
 exact span supports the selected choice, return an empty evidence_quote_ru and
 set evidence_sufficient=false. Keep the explanation concise.
 """
 
-def blind_verification_batch_prompt(*, passage_ru: str, items: list[dict]) -> str:
+def blind_verification_batch_prompt(*, passage_ru: str, items: list[dict], language: str = "ru") -> str:
     """Blindly verify multiple questions in one independent provider call.
 
     Each question is evaluated separately. Proposed answer keys are intentionally
     excluded, and each item carries its own independently shuffled choice order.
     """
+    source = language_profile(language).source_name
+    tag = source.upper().replace(" ", "_")
     return f"""Blindly verify every comprehension item below. The proposed answers are intentionally hidden.
-Evaluate each item independently from the Russian source alone. Return exactly one verification object for every question_index.
+Evaluate each item independently from the {source} source alone. Return exactly one verification object for every question_index.
 
-<RUSSIAN_SOURCE>
+<{tag}_SOURCE>
 {passage_ru}
-</RUSSIAN_SOURCE>
+</{tag}_SOURCE>
 
 <ITEMS_JSON>
 {json.dumps(items, ensure_ascii=False)}
@@ -341,9 +370,8 @@ For each item:
 - select the single best zero-based choice index;
 - identify whether a second choice is plausibly defensible;
 - reject outside knowledge, insufficient evidence, reasoning-level mismatch, or answer leakage;
-- copy only a short exact contiguous Russian evidence span; do not paraphrase it;
+- copy only a short exact contiguous {source} evidence span; do not paraphrase it;
 - if no exact span supports the answer, return an empty evidence_quote_ru and set evidence_sufficient=false;
 - keep the explanation concise.
 Do not infer or reconstruct any hidden proposed answer.
 """
-

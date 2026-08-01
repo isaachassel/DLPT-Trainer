@@ -30,6 +30,11 @@
       "title": "Mode",
       "type": "string"
     },
+    "language": {
+      "default": "ru",
+      "title": "Language",
+      "type": "string"
+    },
     "target_ilr": {
       "title": "Target Ilr",
       "type": "string"

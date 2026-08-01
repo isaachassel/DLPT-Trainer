@@ -44,3 +44,11 @@ data/audio/l012.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/l013.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/l014.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/l015.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l005.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l006.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l007.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l008.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l009.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l010.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l011.mp3 filter=lfs diff=lfs merge=lfs -text
+data/audio/zh_l012.mp3 filter=lfs diff=lfs merge=lfs -text

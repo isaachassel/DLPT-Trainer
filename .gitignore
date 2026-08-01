@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+storage/sessions/*.json
+storage/history/*.json
+storage/exports/*
+storage/cache/audio/*
+storage/quarantine/*
+!storage/**/.gitkeep
+
+storage/item_bank/*.jsonl
+
+storage/item_bank/*.json

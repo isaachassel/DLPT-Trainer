@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "updated_at": "2026-08-01T20:30:46.228976+00:00",
+  "bank_path": "/tmp/dlpt_simple_package.i7PqHr/russian-dlpt-practice/storage/item_bank/generated_items.jsonl",
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "record_count": 0,
+  "passage_count": 0,
+  "question_count": 0,
+  "audio_count": 0,
+  "validation_count": 0,
+  "malformed_record_warnings": [],
+  "storage_backend": "local",
+  "persistent_volume": false,
+  "hf_dataset_repo": null,
+  "remote_synced": false,
+  "restart_durable": false,
+  "last_error": null
+}
