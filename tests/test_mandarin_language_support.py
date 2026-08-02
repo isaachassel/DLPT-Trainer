@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from core.config import Settings
 from core.item_bank import ItemBank
-from core.generation import LiveGenerationService
+from core.generation import LiveGenerationService, PassageAudit, _audit_issues
 from core.languages import language_profile, voice_choices, voice_for_label
 from core.prompts import passage_authoring_prompt, question_authoring_prompt
 from core.session import create_session, select_next_bundle
@@ -123,3 +123,23 @@ def test_mock_live_generation_materializes_mandarin(project_root, tmp_path):
     assert result.passage.language == "zh-CN"
     assert target_language_ratio(result.passage.passage_ru, "zh-CN") > 0.9
     assert all(question.evidence_ru in result.passage.passage_ru for question in result.questions)
+
+
+def test_mandarin_audit_uses_mandarin_specific_naturalness_flag():
+    audit = PassageAudit(
+        acceptable=True,
+        estimated_ilr="3",
+        confidence=0.9,
+        natural_target_language=False,
+        coherent=True,
+        orientation_safe=True,
+        level_match=True,
+        protected_content_risk=False,
+        translation_artifacts=[],
+        contradiction_flags=[],
+        repetition_flags=[],
+        repair_notes=[],
+    )
+    issues = _audit_issues(audit, "3", language="zh-CN")
+    assert "independent_audit_detected_unnatural_mandarin" in issues
+    assert not any("russian" in issue for issue in issues)

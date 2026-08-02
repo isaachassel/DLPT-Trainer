@@ -1,0 +1,29 @@
+HUGGING FACE REPAIR - START HERE
+================================
+
+The earlier browser upload flattened the app's folders and paired several
+filenames with the wrong contents. This package includes a safe uploader that
+preserves the exact repository structure.
+
+1. Extract the entire ZIP. Do not run anything from inside the ZIP preview.
+2. Open the extracted folder.
+3. Double-click UPLOAD_TO_HUGGINGFACE.bat.
+4. When asked, type REPLACE.
+5. Paste a Hugging Face WRITE token. The token is hidden, used only for this
+   upload process, and not saved by the script.
+
+Create or inspect tokens here:
+https://huggingface.co/settings/tokens
+
+Target Space:
+https://huggingface.co/spaces/alsubij/Multi-Language-DLPT
+
+The uploader verifies the local Space metadata and required folder structure
+before uploading. It then replaces the corrupted remote file tree in one
+versioned commit. Hugging Face automatically starts a new build afterward.
+
+If Windows says Python is missing, install Python 3.11 or newer from:
+https://www.python.org/downloads/windows/
+
+During Python installation, select "Add Python to PATH", then run the BAT file
+again.

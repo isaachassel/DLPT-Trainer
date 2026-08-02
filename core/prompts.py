@@ -8,7 +8,7 @@ from .languages import language_profile
 
 # Preserve the persisted pipeline identifier used by existing generated-bank
 # records; language is now carried explicitly in item/session metadata.
-PROMPT_VERSION = "genai-pipeline-v8"
+PROMPT_VERSION = "genai-pipeline-v9"
 
 
 @dataclass(frozen=True)
@@ -200,9 +200,16 @@ METADATA RULES
 def passage_repair_prompt(*, skill: str, level: str, issues: list[str], candidate_json: str, language: str = "ru") -> str:
     profile = LEVEL_PROFILES[level]
     source = language_profile(language).source_name
+    raw_range = profile.soft_reading_words if skill == "reading" else profile.soft_listening_words
+    if language == "zh-CN":
+        low, high = (int(value) for value in raw_range.split("-"))
+        length_guidance = f"approximately {max(4, round(low * 1.55))}-{round(high * 1.55)} Chinese characters"
+    else:
+        length_guidance = f"approximately {raw_range} Russian words"
     return f"""Repair the candidate {source} {skill} passage so it becomes operationally usable.
 Target ILR: {level}
 Expected discourse: {profile.discourse}
+Length guidance: {length_guidance}. Do not merely append filler; add coherent, level-appropriate development when length is deficient.
 Validation issues: {json.dumps(issues, ensure_ascii=False)}
 
 Candidate JSON:
@@ -222,6 +229,7 @@ Candidate JSON:
 {candidate_json}
 
 Judge whether the {source} is natural, coherent, non-repetitive, level-appropriate, and suitable for comprehension questions.
+For the natural_target_language field, judge naturalness in {source} specifically; do not apply Russian spelling, grammar, or style criteria to another language.
 Check whether the orientation leaks the central answer, whether discourse complexity matches the target, and whether the text appears padded or translated unnaturally.
 Choose one estimated ILR band from 0, 0+, 1, 1+, 2, 2+, 3. The estimate is provisional.
 Use concise flags and repair notes. Mark acceptable=false for contradictions, incoherent references, severe translation artifacts, answer-revealing orientation, protected-test imitation, or a level mismatch greater than one adjacent half-level.

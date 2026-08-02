@@ -327,7 +327,10 @@ class PassageAudit(CandidateModel):
     acceptable: bool
     estimated_ilr: str
     confidence: float = Field(ge=0.0, le=1.0)
-    natural_russian: bool
+    # This is deliberately language-neutral.  The old ``natural_russian``
+    # field leaked Russian-only wording into the schema supplied to the
+    # verifier, which could make a Mandarin audit apply the wrong criterion.
+    natural_target_language: bool
     coherent: bool
     orientation_safe: bool
     level_match: bool
@@ -474,7 +477,7 @@ class MockProvider(AuthoringProvider):
                 acceptable=True,
                 estimated_ilr=level,
                 confidence=0.88,
-                natural_russian=True,
+                natural_target_language=True,
                 coherent=True,
                 orientation_safe=True,
                 level_match=True,
@@ -1374,12 +1377,13 @@ def _meaningful_audit_flags(values: list[str]) -> list[str]:
     return [value.strip() for value in values if value.strip().casefold() not in benign]
 
 
-def _audit_issues(audit: PassageAudit, requested_level: str) -> list[str]:
+def _audit_issues(audit: PassageAudit, requested_level: str, *, language: str = "ru") -> list[str]:
     issues: list[str] = []
     if not audit.acceptable:
         issues.append("independent_passage_audit_rejected")
-    if not audit.natural_russian:
-        issues.append("independent_audit_detected_unnatural_russian")
+    if not audit.natural_target_language:
+        source_slug = language_profile(language).short_label.casefold().replace(" ", "_")
+        issues.append(f"independent_audit_detected_unnatural_{source_slug}")
     if not audit.coherent:
         issues.append("independent_audit_detected_incoherence")
     if not audit.orientation_safe:
@@ -1782,7 +1786,7 @@ class LiveGenerationService:
                     ),
                     temperature=self.settings.verification_temperature,
                 ))
-                issues.extend(_audit_issues(audit, level))
+                issues.extend(_audit_issues(audit, level, language=language))
             elif not issues:
                 trace.add("passage_audit", "skipped", policy=self.settings.generation_audit_mode)
             if not issues:

@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4.2 — Mandarin Level 3 generation audit repair
+
+- Replaced the Russian-only passage-audit contract field `natural_russian` with the language-neutral `natural_target_language`.
+- Made audit rejection diagnostics language-specific, so Mandarin candidates can report `unnatural_mandarin` rather than the misleading Russian-only failure.
+- Clarified the independent verifier prompt to evaluate Mandarin as Mandarin rather than against Russian language criteria.
+- Strengthened Mandarin repair instructions with a level- and skill-specific Chinese-character range, requiring coherent discourse development rather than filler when a Level 3 passage is too short.
+- Added a regression test to prevent Mandarin audits from emitting Russian-specific diagnostics.
+
 ## v1.4.1 — Hugging Face root-package repair
 
 - Rebuilt the distribution as a root-flat Space package so `README.md`, `app.py`, and `requirements.txt` are placed at the repository root instead of under an extra enclosing directory.
