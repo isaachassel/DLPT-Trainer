@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.3 — Mandarin Level 3 sustained-listening duration repair
+
+- Measures Mandarin sentence length in Chinese characters instead of whitespace-oriented tokens.
+- Targets 520-650 Chinese characters for Level 3 Mandarin listening and natural sentence boundaries.
+- Synthesizes a cached audio preview before question authoring, measures its real duration, and automatically repairs passages outside the 120-150 second target.
+- Reuses the accepted cached preview for the final listening asset so the duration check does not create duplicate TTS work.
+
 ## v1.4.2 — Mandarin Level 3 generation audit repair
 
 - Replaced the Russian-only passage-audit contract field `natural_russian` with the language-neutral `natural_target_language`.

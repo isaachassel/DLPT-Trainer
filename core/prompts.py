@@ -155,7 +155,10 @@ def passage_authoring_prompt(
     soft_length = profile.soft_reading_words if skill == "reading" else profile.soft_listening_words
     if language == "zh-CN":
         low, high = (int(value) for value in soft_length.split("-"))
-        soft_length = f"{max(4, round(low * 1.55))}-{round(high * 1.55)}"
+        if skill == "listening" and level == "3":
+            soft_length = "520-650"
+        else:
+            soft_length = f"{max(4, round(low * 1.55))}-{round(high * 1.55)}"
     medium = "written passage" if skill == "reading" else "spoken transcript"
     strict_rules = (
         f"Reading hard limit: no more than {'1,000 Chinese characters' if language == 'zh-CN' else '500 Russian words'}; preserve paragraph structure."
@@ -180,6 +183,7 @@ LEVEL PROFILE
 - Language profile: {profile.language}
 - Soft length guidance only: approximately {soft_length} {unit}. Do not pad to hit a number.
 - {strict_rules}
+{('- For Level 3 Listening, develop sustained connected discourse intended to render between 2:00 and 2:30 at the configured normal voice rate. Use natural sentence and clause boundaries; no single Chinese sentence should exceed about 85 characters.' if language == 'zh-CN' and skill == 'listening' and level == '3' else '')}
 
 CONTENT RULES
 - Use a realistic communicative situation and a clear source type.
@@ -203,7 +207,10 @@ def passage_repair_prompt(*, skill: str, level: str, issues: list[str], candidat
     raw_range = profile.soft_reading_words if skill == "reading" else profile.soft_listening_words
     if language == "zh-CN":
         low, high = (int(value) for value in raw_range.split("-"))
-        length_guidance = f"approximately {max(4, round(low * 1.55))}-{round(high * 1.55)} Chinese characters"
+        if skill == "listening" and level == "3":
+            length_guidance = "approximately 520-650 Chinese characters, with an actual rendered-audio target of 120-150 seconds"
+        else:
+            length_guidance = f"approximately {max(4, round(low * 1.55))}-{round(high * 1.55)} Chinese characters"
     else:
         length_guidance = f"approximately {raw_range} Russian words"
     return f"""Repair the candidate {source} {skill} passage so it becomes operationally usable.
@@ -216,6 +223,7 @@ Candidate JSON:
 {candidate_json}
 
 Return a complete replacement object, not a patch. Preserve the broad topic when possible, but rewrite any defective content.
+If a Level 3 listening duration issue is listed, expand or tighten meaningful discourse as needed and split long Mandarin sentences at natural clause boundaries. Never add filler or merely change punctuation to evade validation.
 Do not add questions. Do not explain the repair outside the schema.
 """
 

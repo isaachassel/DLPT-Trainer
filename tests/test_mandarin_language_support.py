@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from core.config import Settings
 from core.item_bank import ItemBank
-from core.generation import LiveGenerationService, PassageAudit, _audit_issues
+from core.generation import (
+    CandidatePassageDraft,
+    LiveGenerationService,
+    PassageAudit,
+    _audit_issues,
+    _level3_listening_duration_issue,
+    validate_candidate_passage,
+)
 from core.languages import language_profile, voice_choices, voice_for_label
 from core.prompts import passage_authoring_prompt, question_authoring_prompt
 from core.session import create_session, select_next_bundle
@@ -143,3 +150,30 @@ def test_mandarin_audit_uses_mandarin_specific_naturalness_flag():
     issues = _audit_issues(audit, "3", language="zh-CN")
     assert "independent_audit_detected_unnatural_mandarin" in issues
     assert not any("russian" in issue for issue in issues)
+
+
+def test_mandarin_level3_sentence_limits_use_characters_not_spaces():
+    natural_sentences = "。".join(["这段评论分析政策变化对地方企业和普通家庭可能产生的长期影响" for _ in range(9)]) + "。"
+    candidate = CandidatePassageDraft(
+        passage_ru=natural_sentences,
+        orientation_en="A policy commentary",
+        topic="public policy",
+        subtopic="local effects",
+        genre="commentary",
+        register_name="formal",
+        text_mode="spoken",
+        target_ilr="3",
+        provisional_difficulty=2.4,
+        discourse_features=["connected argument"],
+        vocabulary_features=["policy vocabulary"],
+    )
+    issues = validate_candidate_passage(candidate, skill="listening", requested_level="3", language="zh-CN")
+    assert "listening_sentence_too_long_for_natural_tts" not in issues
+    assert "unreasonably_long_sentence_detected" not in issues
+
+
+def test_level3_listening_duration_target_is_two_to_two_and_a_half_minutes():
+    assert _level3_listening_duration_issue(119.9) == "level3_listening_audio_below_2_minute_target"
+    assert _level3_listening_duration_issue(120.0) is None
+    assert _level3_listening_duration_issue(150.0) is None
+    assert _level3_listening_duration_issue(150.1) == "level3_listening_audio_exceeds_2_5_minute_limit"

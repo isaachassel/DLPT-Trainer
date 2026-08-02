@@ -571,5 +571,6 @@ Version 1.3.3 distinguishes three separate failure stages:
 - **Question validation failed before audio creation:** the generated passage was usable, but one or more English questions or distractors failed quality checks. The app now repairs only the failed question positions for up to two bounded passes before using the bank.
 - **Listening audio generation failed:** the passage and questions passed, but Edge TTS could not create the MP3. The session is preserved and a validated bank item is selected.
 - **Generated Listening audio failed validation:** an MP3 was created but was empty, incomplete, or outside the operational duration range.
+- **Level 3 Listening requested a duration repair:** the first transcript rendered below 2:00 or above 2:30. The app now measures the real cached MP3 before writing questions and asks the authoring model to repair the transcript while preserving natural sentence boundaries. Mandarin Level 3 targets 520-650 Chinese characters as guidance, but the measured audio duration is authoritative.
 
 A message such as `q2:no_near_duplicate_choices` is therefore a question-quality rejection, not an audio failure. The generated bank and Dataset synchronization remain intact.

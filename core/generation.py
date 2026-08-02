@@ -1111,8 +1111,30 @@ def _soft_range(level: str, skill: str, language: str = "ru") -> tuple[int, int]
     low, high = raw.split("-")
     low_value, high_value = int(low), int(high)
     if language == "zh-CN":
+        if skill == "listening" and level == "3":
+            # Xiaoxiao's normal speaking rate generally needs roughly this much
+            # connected Mandarin discourse to produce sustained two-minute audio.
+            return 520, 650
         return max(4, round(low_value * 1.55)), round(high_value * 1.55)
     return low_value, high_value
+
+
+def _sentence_unit_count(sentence: str, language: str) -> int:
+    """Measure sentence length in units that are meaningful for the language."""
+    if language == "zh-CN":
+        return target_unit_count(sentence, language)
+    return len(normalize_text(sentence).split())
+
+
+def _level3_listening_duration_issue(duration: float | None) -> str | None:
+    """Return a repairable issue for Level 3 audio outside the 2–2.5 minute target."""
+    if duration is None:
+        return None
+    if duration < 120:
+        return "level3_listening_audio_below_2_minute_target"
+    if duration > 150:
+        return "level3_listening_audio_exceeds_2_5_minute_limit"
+    return None
 
 
 def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, requested_level: str, language: str = "ru") -> list[str]:
@@ -1136,9 +1158,12 @@ def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, 
         issues.append("repeated_sentence_detected")
     if _repeated_ngram(text):
         issues.append("repeated_phrase_or_padding_detected")
-    if any(len(normalize_text(sentence).split()) > 55 for sentence in sentences):
+    sentence_units = [_sentence_unit_count(sentence, language) for sentence in sentences]
+    unreasonable_limit = 120 if language == "zh-CN" else 55
+    listening_limit = 85 if language == "zh-CN" else 42
+    if any(units > unreasonable_limit for units in sentence_units):
         issues.append("unreasonably_long_sentence_detected")
-    if skill == "listening" and any(len(normalize_text(sentence).split()) > 42 for sentence in sentences):
+    if skill == "listening" and any(units > listening_limit for units in sentence_units):
         issues.append("listening_sentence_too_long_for_natural_tts")
     if re.search(r"[<>{}\[\]|]", text):
         issues.append("tts_or_markup_breaking_characters_detected")
@@ -1789,6 +1814,31 @@ class LiveGenerationService:
                 issues.extend(_audit_issues(audit, level, language=language))
             elif not issues:
                 trace.add("passage_audit", "skipped", policy=self.settings.generation_audit_mode)
+            if not issues and skill == "listening" and level == "3":
+                try:
+                    preview_path = generate_cached_tts(
+                        candidate.passage_ru,
+                        self.settings.audio_cache_runtime_path(self.project_root),
+                        voice=self.settings.tts_voice_for(language),
+                        rate=self.settings.edge_tts_rate,
+                        engine_version="edge-tts-7.2.8",
+                    )
+                except Exception as exc:
+                    raise _stage_error(
+                        f"Listening audio generation failed during duration check: {type(exc).__name__}: "
+                        f"{_redact_error(exc, self.settings, 300)}",
+                        "audio_generation",
+                    ) from exc
+                preview_duration = audio_duration_seconds(preview_path)
+                duration_issue = _level3_listening_duration_issue(preview_duration)
+                trace.add(
+                    "level3_audio_duration_check",
+                    "accepted" if duration_issue is None else "repair_required",
+                    duration_seconds=preview_duration,
+                    target_seconds="120-150",
+                )
+                if duration_issue:
+                    issues.append(duration_issue)
             if not issues:
                 trace.add("passage_validation", "accepted", audit=audit.model_dump(mode="json") if audit else None)
                 return candidate, audit
