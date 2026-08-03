@@ -461,12 +461,14 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                 state.generation_api_calls += int(getattr(exc, "request_count", 0) or 0)
                 state.generation_repair_count += int(getattr(exc, "repair_count", 0) or 0)
                 state.bank_fallback_count += 1
-                state.last_error = str(exc)
+                # Keep diagnostic detail in server logs/quarantine, not in the
+                # learner UI. A rejected AI draft is a recovered content event,
+                # not a learner/session error.
+                state.last_error = None
                 LOGGER.warning(
                     "Fresh generation failed; using bank fallback session=%s skill=%s error_type=%s reason=%s",
                     state.session_id, state.active_skill, type(exc).__name__, str(exc)[:500],
                 )
-                safe_reason = html.escape(str(exc)[:500])
                 pipeline_stage = str(getattr(exc, "pipeline_stage", "") or "").strip()
                 if pipeline_stage == "question_validation" and state.active_skill == "listening":
                     stage_note = "Question validation failed before audio creation"
@@ -479,8 +481,8 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                 else:
                     stage_note = "Fresh generation did not produce an operational item"
                 state.last_content_note = (
-                    f"{stage_note} ({type(exc).__name__}: {safe_reason}). "
-                    "Your session was preserved and a validated bank item was loaded automatically."
+                    f"{stage_note}. The rejected draft was not used; your session continued "
+                    "automatically with a validated saved item."
                 )
             finally:
                 _pause_timer_for_loading(state, time.time() - started)

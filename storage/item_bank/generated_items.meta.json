@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-08-03T00:50:40.334577+00:00",
-  "bank_path": "/workspace/scratch/4b5c9c874134/work/v1_4_3_upgrade/storage/item_bank/generated_items.jsonl",
+  "updated_at": "2026-08-03T16:45:17.197947+00:00",
+  "bank_path": "/workspace/scratch/4b5c9c874134/work/v1.5.1/storage/item_bank/generated_items.jsonl",
   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "record_count": 0,
   "passage_count": 0,

@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.1 — Never-stop generated-question recovery
+
+- When targeted question repair is exhausted, discards the flawed set and authors a completely fresh question set for the already-validated passage.
+- Keeps the answer-length anti-clue guard; it no longer interrupts the learner merely because one AI draft fails that guard.
+- Preserves the active session and selects a validated saved item if both fresh question sets fail or the provider is unavailable.
+- Keeps internal validator codes in server logs/quarantine instead of exposing them as learner-facing errors.
+- Adds regression coverage for full question-set regeneration and sanitized recovery messaging.
+
 ## v1.5.0 — Measurement, content, timing, and bilingual release hardening
 
 - Keeps Fresh AI available in Training, Diagnostic, and Simulation without adding a human-vetting gate.

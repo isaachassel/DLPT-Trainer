@@ -1,12 +1,14 @@
 # Test Results
 
-Executed for the v1.5.0 bilingual reliability release on 2026-08-03.
+Executed for the v1.5.1 generated-content recovery release on 2026-08-03.
 
 ## Automated unit/integration suite
 
 ```text
-156 passed
+158 passed
 ```
+
+Version 1.5.1 additionally verifies that an exhausted targeted repair triggers a wholly fresh AI question set and that recovered validation failures never expose internal validator codes to learners.
 
 Version 1.5.0 additionally verifies:
 

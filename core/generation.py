@@ -2097,18 +2097,48 @@ class LiveGenerationService:
                 verifier_model=getattr(self.verifier_provider, "last_model", None),
                 authoring_notes=f"Requested language={language}, skill={skill}, mode={mode}, ILR={level}. Difficulty remains provisional.",
             )
-            passage, unshuffled_questions, passage_report, blind_reports = self._generate_questions(
-                candidate_passage=candidate,
-                passage_id=passage_id,
-                skill=skill,
-                level=level,
-                mode=mode,
-                competencies=clean_competencies,
-                maximum_questions=maximum,
-                metadata=metadata,
-                trace=trace,
-                language=language,
-            )
+            # A structurally valid passage should not be discarded merely because
+            # one authored question set retained a detectable clue after its
+            # targeted repair passes. Start over with a wholly new question set.
+            # This is deliberately outside _generate_questions: its inner loop
+            # repairs a candidate, while this loop requests a genuinely fresh
+            # candidate from the provider.
+            question_bundle = None
+            last_question_error: GenerationValidationError | None = None
+            for fresh_question_attempt in range(2):
+                try:
+                    question_bundle = self._generate_questions(
+                        candidate_passage=candidate,
+                        passage_id=passage_id,
+                        skill=skill,
+                        level=level,
+                        mode=mode,
+                        competencies=clean_competencies,
+                        maximum_questions=maximum,
+                        metadata=metadata,
+                        trace=trace,
+                        language=language,
+                    )
+                    if fresh_question_attempt:
+                        trace.add(
+                            "question_regeneration",
+                            "accepted",
+                            fresh_attempt=fresh_question_attempt + 1,
+                        )
+                    break
+                except GenerationValidationError as exc:
+                    if getattr(exc, "pipeline_stage", "") != "question_validation":
+                        raise
+                    last_question_error = exc
+                    trace.add(
+                        "question_regeneration",
+                        "retrying" if fresh_question_attempt == 0 else "exhausted",
+                        fresh_attempt=fresh_question_attempt + 1,
+                    )
+            if question_bundle is None:
+                assert last_question_error is not None
+                raise last_question_error
+            passage, unshuffled_questions, passage_report, blind_reports = question_bundle
             duplicate = self.bank.duplicate_of(passage)
             if duplicate:
                 raise GenerationValidationError(f"Generated passage duplicated existing bank item {duplicate}.")

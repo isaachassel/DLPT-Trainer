@@ -51,6 +51,63 @@ def test_live_generated_bundle_is_validated_stored_and_reloadable(project_root, 
     assert len(reloaded.get_questions(result.passage.id)) == 2
 
 
+def test_fresh_question_set_is_regenerated_after_repair_exhaustion(project_root, tmp_path, monkeypatch):
+    generated_path = tmp_path / "generated.jsonl"
+    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    service = LiveGenerationService(_settings(tmp_path), bank, project_root, provider=MockProvider())
+    original = service._generate_questions
+    calls = 0
+
+    def fail_first_question_set(**kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            error = GenerationValidationError(
+                "Generated questions failed validation: q1:correct_choice_materially_longer_than_every_distractor"
+            )
+            setattr(error, "pipeline_stage", "question_validation")
+            raise error
+        return original(**kwargs)
+
+    monkeypatch.setattr(service, "_generate_questions", fail_first_question_set)
+    result = service.generate_and_store(
+        skill="reading", level="2", mode="training", topics=[], competencies=[], maximum_questions=2
+    )
+
+    assert calls == 2
+    assert result.passage.id in bank.passages
+    assert all(question.validation_status == "accepted" for question in result.questions)
+
+
+def test_recovered_generation_failure_does_not_expose_internal_validator(monkeypatch):
+    import ui.callbacks as callbacks
+
+    state = create_session(
+        mode="training", selected_skills=["reading"], start_level="1+", target_level="2",
+        topics=[], competencies=[], max_questions_per_skill=8, minimum_questions_per_skill=8,
+        timer_mode="off", time_limit_seconds_per_skill=None, profile_id=None,
+        feedback_mode="end_of_passage", hints_enabled=False, transcript_review_enabled=True,
+        replay_allowed=True, slow_audio_allowed=True, voice_label="Starter-bank Russian voice",
+        speech_rate_label="Normal", content_source="fresh_ai_preferred",
+    )
+    monkeypatch.setattr(callbacks.SETTINGS, "generation_provider", "mock")
+
+    def reject_draft(**_kwargs):
+        error = GenerationValidationError(
+            "q1:correct_choice_materially_longer_than_every_distractor"
+        )
+        setattr(error, "pipeline_stage", "question_validation")
+        raise error
+
+    monkeypatch.setattr(callbacks.GENERATOR, "generate_and_store", reject_draft)
+    bundle = callbacks._select_with_safe_history(state)
+
+    assert bundle.passage.id in callbacks.BANK.passages
+    assert state.last_error is None
+    assert "correct_choice_materially" not in (state.last_content_note or "")
+    assert "continued automatically" in (state.last_content_note or "")
+
+
 def test_duplicate_live_content_is_quarantined_without_polluting_bank(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
     bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
