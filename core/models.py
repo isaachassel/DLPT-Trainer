@@ -254,6 +254,7 @@ class ResponseRecord(StrictModel):
     language: str = "ru"
     target_ilr: str
     item_difficulty: float
+    item_discrimination: float = Field(default=1.0, gt=0.0, le=3.0)
     question_type: str
     topic: str
     genre: str
@@ -318,6 +319,9 @@ class SessionState(StrictModel):
     current_started_at_epoch: float | None = None
     current_answers: dict[str, str] = Field(default_factory=dict)
     current_answer_changes: dict[str, int] = Field(default_factory=dict)
+    # Final-selection timestamps are captured independently for each visible
+    # question. Older checkpoints load safely because this field has a default.
+    current_answer_timestamps: dict[str, float] = Field(default_factory=dict)
     current_listening_plays: int = 0
     completed_passage_ids: list[str] = Field(default_factory=list)
     completed_question_ids: list[str] = Field(default_factory=list)

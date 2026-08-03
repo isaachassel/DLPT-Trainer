@@ -1,12 +1,30 @@
 # Test Results
 
-Executed for the v1.4.1 Hugging Face root-package repair on 2026-08-01.
+Executed for the v1.5.0 bilingual reliability release on 2026-08-03.
 
 ## Automated unit/integration suite
 
 ```text
-140 passed
+156 passed
 ```
+
+Version 1.5.0 additionally verifies:
+
+- the complete bilingual bank loads and validates: 51 passages, 160 questions, and 27 playable Listening audio assets;
+- all 86 targeted starter answer-set rewrites preserve bank relationships, evidence traceability, unique choices, and balanced answer positions;
+- no starter question has a materially keyed correct-answer length outlier under the new diagnostic;
+- future generated bundles detect both individual correct-choice length outliers and repeated answer-length patterns across the bundle;
+- four-choice chance correction and passage/testlet dependence preserve more honest uncertainty;
+- final-selection timestamps produce real per-question response times;
+- sparse reports defer specific strength/weakness recommendations until at least eight skill questions are complete;
+- strict Listening play count remains zero until a browser `playing` event is confirmed;
+- a strict timer automatically closes the section, scores only a fully answered pre-deadline passage, and advances or completes safely;
+- generated overlay IDs cannot overwrite or extend immutable starter objects;
+- hostile high-ratio ZIP imports are rejected before decompression or merge;
+- production launch configuration suppresses framework tracebacks;
+- high-level generated Mandarin Reading prompts cover both Simplified and Traditional character systems;
+- the bundled ILR 2+/3 Mandarin Reading pool is split evenly between Simplified and Traditional character systems;
+- all 72 Mandarin starter rationales are evidence- and distractor-specific.
 
 Version 1.4.1 additionally verifies:
 
@@ -171,7 +189,7 @@ Version 1.3.1 additionally verifies:
 - final reports include the complete adaptive routing path and movement reasons;
 - confidence-based Diagnostic stopping requires current-band and adjacent-band evidence;
 - Diagnostic boundary probing targets an under-sampled adjacent band;
-- mode controls hide the unused target band outside Training and hide start/target controls in Full Simulation.
+- mode controls hide the unused target band outside Training and hide start/target controls in the DLPT-style Simulation.
 
 ## Hugging Face metadata and dependency validation
 
@@ -217,7 +235,7 @@ Listening: 35 questions across 13 passage bundles; 13 unique passages
 ## Gradio Space smoke test
 
 ```text
-Smoke test passed: 27 passages, 88 questions, 102 UI components.
+Smoke test passed: 51 passages, 160 questions, 105 UI components.
 Live generation ready=False: no matching API key; Fresh AI falls back to bank.
 ```
 

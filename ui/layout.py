@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import gradio as gr
 
-from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES
+from core.constants import DISCLAIMER, ILR_LEVELS, QUESTION_TYPES, SIMULATION_MODE_LABEL
 from core.languages import LANGUAGES, language_profile, voice_choices
 from ui.components import answer_radio, scalar_tolerant_checkbox_group
 from ui.callbacks import (
@@ -19,7 +19,9 @@ from ui.callbacks import (
     abandon_strict_callback,
     begin_activity,
     answer_changed_callback,
+    confirm_audio_playback_callback,
     end_activity,
+    expire_section_callback,
     export_generated_bank_callback,
     import_generated_bank_callback,
     mode_controls,
@@ -43,7 +45,15 @@ const bindAudio = () => {
   audio.controls = false;
 
   const setStatus = (message) => { status.textContent = message; };
-  audio.addEventListener('playing', () => setStatus('Playing audio…'), { once: true });
+  const confirmPlayback = () => {
+    const host = document.getElementById('audio-playback-confirm');
+    const button = host && (host.querySelector('button') || (host.tagName === 'BUTTON' ? host : null));
+    if (button) button.click();
+  };
+  audio.addEventListener('playing', () => {
+    setStatus('Playing audio…');
+    confirmPlayback();
+  }, { once: true });
   audio.addEventListener('ended', () => {
     setStatus(audio.dataset.completion || 'Playback completed.');
     if (audio.dataset.strict === 'true') {
@@ -77,7 +87,10 @@ CUSTOM_CSS = """
 .controlled-audio-wrap { padding: 12px; border: 1px solid var(--card-border); border-radius: 12px; }
 .operation-activity { display:flex; align-items:center; gap:12px; padding:13px 15px; margin:10px 0; border:1px solid #345995; border-radius:12px; background:rgba(52,89,149,.09); }
 .operation-spinner { width:22px; height:22px; flex:0 0 22px; border:3px solid rgba(52,89,149,.22); border-top-color:#345995; border-radius:50%; animation:operation-spin .8s linear infinite; }
+.event-bridge { display:none !important; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, [role='radio']:focus-visible { outline:3px solid #2f6feb !important; outline-offset:2px; }
 @keyframes operation-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .operation-spinner { animation:none; } }
 @media (max-width: 760px) { .passage-card { padding: 12px; font-size: 1rem; } }
 """
 
@@ -93,7 +106,7 @@ def build_app() -> gr.Blocks:
                 with gr.Column(elem_classes=["mode-card"]):
                     gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Bayesian Reading and Listening routing. Passages move up or down one adjacent ILR half-step as evidence accumulates.")
                 with gr.Column(elem_classes=["mode-card"]):
-                    gr.Markdown("**Full CA Simulation**\n\nBegins at medium difficulty, adapts after every passage, and preserves strict timing and locked progression.")
+                    gr.Markdown(f"**{SIMULATION_MODE_LABEL}**\n\nBegins at medium difficulty, adapts after every passage, and preserves strict timing and locked progression without claiming to be the official test.")
 
             state = gr.State(value=None)
             bundle_state = gr.State(value=None)
@@ -106,7 +119,7 @@ def build_app() -> gr.Blocks:
                         value=LANGUAGES["ru"].label,
                         label="Test language",
                     )
-                    mode = gr.Radio(["Training Mode", "Adaptive Diagnostic", "Full CA Simulation"], value="Training Mode", label="Mode")
+                    mode = gr.Radio(["Training Mode", "Adaptive Diagnostic", SIMULATION_MODE_LABEL], value="Training Mode", label="Mode")
                     skill = gr.Radio(["Reading", "Listening", "Reading + Listening (separate sections)"], value="Reading", label="Skill selection")
                 with gr.Row():
                     start_level = gr.Dropdown(ILR_LEVELS, value="1+", label="Approximate starting ILR band")
@@ -195,6 +208,16 @@ def build_app() -> gr.Blocks:
             audio_error = gr.Markdown(visible=False)
             play_btn = gr.Button("Play / Replay Audio", visible=False)
             audio_html = gr.HTML(visible=False, js_on_load=AUDIO_HTML_JS, elem_id="controlled-listening-audio")
+            audio_playback_confirm = gr.Button(
+                "Confirm browser playback",
+                elem_id="audio-playback-confirm",
+                elem_classes=["event-bridge"],
+            )
+            timer_expired_trigger = gr.Button(
+                "End expired section",
+                elem_id="timer-expired-trigger",
+                elem_classes=["event-bridge"],
+            )
 
             question_markdowns = []
             answer_radios = []
@@ -375,6 +398,22 @@ def build_app() -> gr.Blocks:
             play_run.failure(
                 lambda: restore_activity_button("Play / Replay Audio"),
                 outputs=[activity, play_btn], queue=False, show_progress="hidden",
+            )
+
+            audio_playback_confirm.click(
+                confirm_audio_playback_callback,
+                inputs=[state, bundle_state],
+                outputs=[state, play_btn, status],
+                show_progress="hidden",
+                trigger_mode="once",
+            )
+
+            timer_expired_trigger.click(
+                expire_section_callback,
+                inputs=[state, bundle_state, nonce_state],
+                outputs=outputs,
+                show_progress="hidden",
+                trigger_mode="once",
             )
 
             hint_prepare = hint_btn.click(

@@ -185,13 +185,13 @@ Stage/level/bundle-aware token budgets are bounded by administrator-configured c
 
 Each skill maintains a separate posterior over a fixed theta grid. Diagnostic/Simulation use a broad medium prior; Training centers the prior on the selected starting band.
 
-Item likelihood uses the provisional Rasch/1PL form:
+Item likelihood uses a provisional chance-aware form for four-choice items:
 
 ```text
-P(correct) = 1 / (1 + exp(-a(theta - b)))
+P(correct) = c + (1 - c) / (1 + exp(-a(theta - b)))
 ```
 
-with initial `a=1.0`. Posterior mean is the EAP estimate; posterior standard deviation and interval represent uncertainty.
+with initial `a=1.0` and `c=0.25`. Questions from the same passage are testlet-dependent, so their likelihood contribution is discounted by `1/sqrt(k)` for a `k`-question passage. Posterior mean is the EAP estimate; posterior standard deviation and interval represent uncertainty.
 
 Generated difficulty is never accepted as calibrated truth. Initial `b` blends the requested band and documented question-type reasoning offset within bounded limits.
 
@@ -199,7 +199,7 @@ Generated difficulty is never accepted as calibrated truth. Initial `b` blends t
 
 The continuous posterior and the passage-delivery band are separate. `AbilityEstimate.routing_ilr` begins at ILR 2 for neutral Diagnostic/Simulation starts or at the selected starting band for Training and targeted-start Diagnostics.
 
-After each passage, `update_routing_band()` calculates posterior mass across the adjacent ILR boundary midpoints. A 67% directional posterior probability moves the delivery band one adjacent half-level; otherwise it holds. A passage can never cause a multi-level jump, and the route is clamped to `SessionState.minimum_ilr` and `maximum_ilr`.
+After each passage, `update_routing_band()` calculates posterior mass across the adjacent ILR boundary midpoints. A 56% directional posterior probability plus at least two scored questions moves the delivery band one adjacent half-level; otherwise it holds. A passage can never cause a multi-level jump, and the route is clamped to `SessionState.minimum_ilr` and `maximum_ilr`.
 
 `select_passage()` first enforces the allowed ILR range using calibrated difficulty when available and provisional authoring level otherwise. It prefers the current routing band, falls back only to the nearest eligible band, then ranks candidates using normalized information, ability distance, content balance, exposure control, Training target bias, and calibration status. A deterministic top-candidate randomization reduces systematic overexposure.
 
@@ -207,6 +207,6 @@ Adaptive Diagnostic selection may temporarily probe an under-sampled adjacent ba
 
 ## Estimate conversion and reporting
 
-The continuous estimate is converted only after minimum evidence. Predicted success across ILR reference difficulties, uncertainty, adjacent-band evidence, and question count constrain the reported practice band.
+The continuous estimate is converted to the nearest provisional ILR anchor only after minimum evidence. Uncertainty, adjacent-band evidence, and question count constrain whether a working band is reported and whether it is considered stable.
 
-The report always distinguishes provisional practice guidance from official DLPT scoring and can return “Insufficient evidence for a stable estimate.”
+The report always distinguishes provisional practice guidance from official DLPT scoring and can return “Insufficient evidence for a stable provisional working band.”

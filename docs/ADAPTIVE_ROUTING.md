@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The application uses a continuous Bayesian Rasch/1PL estimate for each skill and a separate conservative ILR delivery band for passage routing. Reading and Listening never share ability, routing, uncertainty, evidence counts, or history.
+The application uses a continuous chance-aware Bayesian estimate for each skill and a separate conservative ILR delivery band for passage routing. Reading and Listening never share ability, routing, uncertainty, evidence counts, or history.
 
 The delivery band is not the score. It is the level of the next passage bundle the selector should prefer.
 
@@ -15,8 +15,10 @@ The public DLPT5-CA familiarization description says Reading and Listening begin
 For every answered question:
 
 ```text
-P(correct) = 1 / (1 + exp(-(theta - b)))
+P(correct) = c + (1 - c) / (1 + exp(-a(theta - b)))
 ```
+
+For the current four-choice uncalibrated bank, `c=0.25` and provisional `a=1.0`. These are transparent structural assumptions, not fitted parameters. Questions attached to one passage share comprehension evidence, so each item likelihood is weighted by `1/sqrt(k)` for a `k`-question passage instead of being treated as fully independent.
 
 The posterior is updated over a fixed theta grid. The application records:
 
@@ -36,8 +38,8 @@ After each completed passage:
 
 1. Compute posterior probability below the boundary between the current band and the adjacent lower band.
 2. Compute posterior probability above the boundary between the current band and the adjacent higher band.
-3. Move down one half-level when lower-boundary probability reaches 67% and is stronger than the upward probability.
-4. Move up one half-level when upper-boundary probability reaches 67%.
+3. Move down one half-level when lower-boundary probability reaches 56%, is stronger than the upward probability, and the passage contained at least two scored questions.
+4. Move up one half-level when upper-boundary probability reaches 56% and the passage contained at least two scored questions.
 5. Otherwise remain at the current band.
 6. Never move more than one adjacent half-level after a passage.
 7. Never move outside the configured ILR floor and ceiling.
@@ -111,7 +113,7 @@ The diagnostic stops when:
 - Current route is hidden during testing and disclosed in the final report.
 - Range-limited diagnostics are labeled as such and are not presented as full-spectrum estimates.
 
-### Full CA Simulation
+### DLPT-style Adaptive Practice Simulation
 
 - Begins at medium difficulty.
 - Uses the full supported 0–3 range.
@@ -120,4 +122,4 @@ The diagnostic stops when:
 
 ## Important limitation
 
-The starter and generated-bank ILR values are authoring/validation targets until sufficient response data support empirical calibration. The application therefore reports provisional practice estimates, not official DLPT scores or official item classifications.
+The starter and generated-bank ILR values are authoring/validation targets until sufficient response data support empirical calibration. The application therefore reports provisional working bands, not official DLPT scores, predictions, or official item classifications.

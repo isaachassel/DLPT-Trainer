@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.5.0 — Measurement, content, timing, and bilingual release hardening
+
+- Keeps Fresh AI available in Training, Diagnostic, and Simulation without adding a human-vetting gate.
+- Rewrites 86 built-in answer sets for more parallel length and specificity; the former longest-choice strategy drops from roughly 55–71% to 14–19%, with zero materially keyed length outliers under the new audit.
+- Adds within-item and bundle-level answer-length cue detection and targeted repair for future generated items.
+- Replaces the provisional 1PL likelihood with a transparent four-choice chance floor and discounts same-passage testlet dependence so uncertainty does not shrink unrealistically.
+- Reports a provisional working band rather than implying an official score or DLPT prediction.
+- Records actual final-selection latency per question instead of dividing passage time equally.
+- Withholds topic/genre/competency-specific recommendations until a skill has at least eight completed questions.
+- Counts strict Listening playback only after the browser confirms audio started, so blocked autoplay no longer consumes the learner's one play.
+- Automatically closes strict sections at zero and scores a fully answered passage only when every final selection occurred before the deadline.
+- Renames the strict mode to **DLPT-style Adaptive Practice Simulation**, replaces the unsupported 60-question option with a documented 35-question standard practice option, and uses up to three hours per selected skill.
+- Uses Traditional characters in half of the bundled ILR 2+/3 Mandarin Reading passages and alternates Simplified/Traditional instructions for future high-level generated Reading.
+- Replaces all 72 generic Mandarin rationales with evidence-, competency-, and distractor-specific explanations.
+- Prevents generated overlays from overwriting or attaching questions to built-in IDs.
+- Adds compressed size, expanded size, member count, per-file size, encryption, and compression-ratio limits to bank imports, followed by complete deterministic bank validation before commit.
+- Makes the release validator and smoke test cover both languages: 51 passages, 160 questions, and 27 audio assets.
+- Hides raw Gradio tracebacks in production and expands regression coverage to 156 passing tests.
+
 ## v1.4.3 — Mandarin Level 3 sustained-listening duration repair
 
 - Measures Mandarin sentence length in Chinese characters instead of whitespace-oriented tokens.

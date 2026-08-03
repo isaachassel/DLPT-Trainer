@@ -32,10 +32,10 @@ LANGUAGES: dict[str, LanguageProfile] = {
     ),
     "zh-CN": LanguageProfile(
         code="zh-CN",
-        label="Mandarin Chinese (Simplified)",
+        label="Mandarin Chinese",
         short_label="Mandarin",
         source_name="Mandarin Chinese",
-        native_name="普通话（简体中文）",
+        native_name="普通话（简体/繁體中文）",
         female_voice="zh-CN-XiaoxiaoNeural",
         male_voice="zh-CN-YunxiNeural",
         female_voice_label="Mandarin Female — Xiaoxiao",
@@ -45,6 +45,9 @@ LANGUAGES: dict[str, LanguageProfile] = {
 }
 
 LANGUAGE_LABEL_TO_CODE = {profile.label: code for code, profile in LANGUAGES.items()}
+# Preserve old UI/bookmark payloads created before high-level generated Reading
+# began alternating between Simplified and Traditional characters.
+LANGUAGE_LABEL_TO_CODE["Mandarin Chinese (Simplified)"] = "zh-CN"
 LANGUAGE_CODE_TO_LABEL = {code: profile.label for code, profile in LANGUAGES.items()}
 SUPPORTED_LANGUAGE_CODES = tuple(LANGUAGES)
 

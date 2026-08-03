@@ -2,6 +2,7 @@ from __future__ import annotations
 import importlib
 
 from ui.callbacks import _passage_markdown, _test_render, start_session_callback
+from core.constants import SIMULATION_MODE_LABEL
 from core.models import PassageItem
 
 
@@ -24,7 +25,7 @@ def test_variable_question_bundles_render(bank):
 
 
 def test_strict_mode_does_not_expose_listening_transcript():
-    result = start_session_callback("Full CA Simulation", "Listening", "1+", "2", "Shortened — 12 questions per skill (not a full simulation)", "Strict countdown", [], [], "End of session", False, True, "Starter-bank eSpeak voice", "Normal", "")
+    result = start_session_callback(SIMULATION_MODE_LABEL, "Listening", "1+", "2", "Shortened practice — 12 questions per skill / 30 minutes", "Strict countdown", [], [], "End of session", False, True, "Starter-bank eSpeak voice", "Normal", "")
     state, bundle_data = result[0], result[1]
     from ui.callbacks import _bundle_from_dict
     bundle = _bundle_from_dict(bundle_data)

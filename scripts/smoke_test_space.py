@@ -14,7 +14,13 @@ from ui.layout import build_app
 def main() -> int:
     settings = get_settings()
     bank = ItemBank(
-        [settings.starter_bank_runtime_path(ROOT), settings.generated_bank_runtime_path(ROOT)],
+        [
+            settings.starter_bank_runtime_path(ROOT),
+            settings.mandarin_starter_bank_runtime_path(ROOT),
+            settings.generated_bank_runtime_path(ROOT),
+        ],
+        # Both language banks are release-critical; the generated overlay is
+        # loaded last and remains the only writable source.
         writable_path=settings.generated_bank_runtime_path(ROOT),
     ).load()
     errors = bank.validate_operational_bank()

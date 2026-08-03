@@ -1,5 +1,5 @@
 ---
-title: Russian Mandarin Adaptive Proficiency Practice
+title: "Russian & Mandarin Adaptive Proficiency Practice"
 emoji: 🎧
 colorFrom: red
 colorTo: blue
@@ -12,11 +12,11 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
-An independent Russian and Mandarin Chinese Reading/Listening practice platform with Training, Adaptive Diagnostic, and strict computer-adaptive Simulation modes.
+An independent Russian and Mandarin Chinese Reading/Listening practice platform with Training, Adaptive Diagnostic, and a strict DLPT-style adaptive practice simulation.
 
-Choose **Russian** or **Mandarin Chinese (Simplified)** before starting. Every language has separate Reading/Listening indexes, exposure history, adaptive selection, generated-bank filtering, and TTS voice routing. Changing languages never mixes source passages, questions, audio, or ability evidence.
+Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled ILR 2+/3 Mandarin Reading passages use Traditional characters, and high-level Fresh-AI Reading requests deliberately cover both Simplified and Traditional characters. Every language has separate Reading/Listening indexes, exposure history, adaptive selection, generated-bank filtering, and TTS voice routing. Changing languages never mixes source passages, questions, audio, or ability evidence.
 
-> **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score. Every estimate is for practice guidance only.
+> **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
 ## What happened to the original GenAI code
 
@@ -38,7 +38,7 @@ The original prompt file was not preserved line-for-line. Valuable level-specifi
 The learner chooses one of two content policies:
 
 1. **Validated bank only — fastest:** selects from the bundled starter bank and every previously accepted generated item.
-2. **Fresh AI preferred:** attempts to author a new passage bundle near the active skill estimate. The new bundle must pass typed schema validation, deterministic gates, independent passage audit, blind answer verification, Python answer shuffling, duplicate checks, and Listening audio validation before it is shown. Accepted content is stored and becomes reusable. Any provider, quota, schema, validation, duplicate, timeout, persistence, or TTS failure falls back to an accepted bank item without clearing progress.
+2. **Fresh AI preferred:** available in Training, Diagnostic, and Simulation. It attempts to author a new passage bundle near the active skill estimate. The new bundle must pass typed schema validation, deterministic gates, automated passage audit, blind answer verification, Python answer shuffling, duplicate checks, and Listening audio validation before it is shown. No human-vetting gate is required. Accepted content is stored and becomes reusable. Any provider, quota, schema, validation, duplicate, timeout, persistence, or TTS failure falls back to an accepted bank item without clearing progress.
 
 ### Bank terminology and write behavior
 
@@ -53,9 +53,9 @@ The bank is the application’s reliability layer and accumulated content memory
 
 ## Main capabilities
 
-- Russian and Simplified-Chinese Mandarin practice from one language selector.
+- Russian and Mandarin practice from one language selector, including Simplified/Traditional coverage in high-level starter and generated Reading.
 - Bundled Mandarin starter bank: 12 Reading passages / 36 questions and 12 Listening passages / 36 questions / 12 neural-audio files across ILR 0–3.
-- Independent Bayesian Reading and Listening estimates.
+- Independent chance-aware Bayesian Reading and Listening working-band estimates with passage/testlet dependence discounted.
 - Conservative adjacent-band routing: after each passage the delivery band may move up or down by at most one ILR half-level based on posterior boundary probability.
 - Hard Training/Diagnostic ILR floor and ceiling controls, including true ILR 2–3-only eligibility (2, 2+, and 3).
 - Diagnostic boundary probes and stopping rules that require evidence at the current band and at least one adjacent band.
@@ -63,7 +63,7 @@ The bank is the application’s reliability layer and accumulated content memory
 - Information-based selection with topic, genre, question-type, and exposure balancing.
 - Meaningful Training target-level bias.
 - Variable bundles: Reading 1–5 questions and Listening 1–3 questions.
-- Strict Simulation timing, locked navigation, and controlled one-play Listening.
+- Strict Simulation timing, automatic section expiry, locked navigation, and browser-confirmed one-play Listening.
 - Session checkpoints, recovery, optional history, and JSON/CSV export.
 - Typed Pydantic bank, session, generation, validation, and reporting models.
 - Provider-independent starter content.
@@ -71,6 +71,7 @@ The bank is the application’s reliability layer and accumulated content memory
 - Optional staged live generation with repair, quarantine, persistence, quota protection, and bank fallback.
 - Immediate visible loading feedback with an accessible spinner, busy button labels, and staged progress for slow operations.
 - Python-side answer shuffling and key remapping; prompts never prescribe answer letters.
+- Starter answer sets rebalanced for comparable length/specificity, with automated length-pattern repair for newly generated bundles.
 
 ## Modes
 
@@ -97,17 +98,16 @@ The bank is the application’s reliability layer and accumulated content memory
 - Minimum evidence plus confidence-aware stopping.
 - Provider/loading time is excluded from the assessment timer.
 
-### Full CA Simulation
+### DLPT-style Adaptive Practice Simulation
 
 - Reading and Listening run as separate sections.
 - Medium-difficulty opening passage.
 - Passage difficulty adapts after every completed bundle while the active routing calculation remains hidden.
 - No skipping, back navigation, or answer changes after passage submission.
 - All questions in the bundle must be answered before advancing.
-- Strict countdown timer.
-- Shortened simulations are clearly labeled.
-- A full simulation never completes below 35 questions per selected skill.
-- One controlled Listening play, no replay, and no transcript during the active simulation.
+- Strict 30-minute shortened or up-to-three-hour standard countdown timer that ends the section automatically at zero.
+- Shortened practice is clearly labeled; standard practice targets 35 questions per selected skill without an unsupported 60-question promise.
+- One controlled Listening play, counted only after the browser confirms that sound actually started; no replay and no transcript during the active simulation.
 
 See `docs/ADAPTIVE_ROUTING.md` for the routing equations, range behavior, stopping rule, and worked ILR 3 → 2+ → 2 example.
 
@@ -115,16 +115,18 @@ See `docs/ADAPTIVE_ROUTING.md` for the routing equations, range behavior, stoppi
 
 The repository ships with:
 
-- 27 starter passages;
-- 88 starter questions;
-- 48 Reading questions and 40 Listening questions;
-- 15 bundled Listening audio assets;
-- balanced starter keys: A=22, B=22, C=22, D=22 before session shuffling.
+- 51 starter passages: 24 Reading and 27 Listening;
+- 160 starter questions: 84 Reading and 76 Listening;
+- 27 bundled Listening audio assets;
+- Russian: 27 passages / 88 questions / 15 audio assets;
+- Mandarin: 24 passages / 72 questions / 12 audio assets;
+- balanced starter keys: A=40, B=40, C=40, D=40 before session shuffling.
 
 Immutable starter bank:
 
 ```text
 data/starter_items.jsonl
+data/mandarin_starter_items.jsonl
 ```
 
 Runtime generated overlay (created automatically; it is intentionally not shipped as a blank release file):
@@ -146,7 +148,7 @@ With `PERSISTENT_STORAGE_PATH=/data`:
 /data/item_bank/generated_items.meta.json
 ```
 
-Every accepted bundle is atomically committed with its passage, questions, shuffled/remapped answer keys, rationales, Russian evidence, validation reports, generation metadata, and Listening audio metadata. The same objects are inserted into the in-memory indexes immediately, so they are eligible for later fallback selection without restarting the app. The manifest records checksum and counts after every write.
+Every accepted bundle is atomically committed with its passage, questions, shuffled/remapped answer keys, rationales, target-language evidence, validation reports, generation metadata, and Listening audio metadata. The same objects are inserted into the in-memory indexes immediately, so they are eligible for later fallback selection without restarting the app. The manifest records checksum and counts after every write.
 
 On a Hugging Face Space, the application now attempts to create a private Dataset bank automatically when `HF_BANK_TOKEN` or `HF_TOKEN` has repository write permission. The default derived name is based on the Space identity, for example `alsubij/DLPT-Trainer-dlpt-generated-bank`. Accepted items are uploaded after every successful bundle and restored before the operational bank loads on the next startup.
 
@@ -171,12 +173,12 @@ All starter and generated difficulty values remain **provisional** until empiric
 
 A fresh bundle uses separate controlled stages:
 
-1. Russian passage/transcript authoring.
+1. Target-language passage/transcript authoring.
 2. Deterministic passage checks.
 3. Independent passage naturalness/level audit.
 4. Bounded passage repair when needed.
 5. Separate English question/choice authoring.
-6. Deterministic question and distractor checks.
+6. Deterministic question and distractor checks, including within-item and bundle-level answer-length cue detection.
 7. Blind verification with choices reordered and the proposed answer hidden.
 8. Optional second verifier for higher-risk ILR 2+/3 items.
 9. Bounded question-set repair when needed.
@@ -486,7 +488,7 @@ This specifically fixes the runtime fallback reason `q1:verifier_evidence_not_in
 
 The container log can show successful passage authoring and auditing followed by repeated `CandidateQuestionSet: ValidationError` failures. That was a local schema-contract bug, not an invalid API key and not a provider outage. The older provider schema advertised `question_type` and `target_ilr` as arbitrary strings while Python later required exact values, and it unnecessarily required the model to reproduce internal difficulty metadata.
 
-Version 1.2.7 uses a smaller provider-facing question contract with an explicit question-type enum. The provider returns only the English stem, four English choices, zero-based proposed answer index, English rationale, short Russian evidence, and one supported question type. Python assigns the requested ILR, derives provisional difficulty, shuffles choices, remaps the answer key, validates the bundle, and saves accepted content to the reusable bank.
+Version 1.2.7 introduced a smaller provider-facing question contract with an explicit question-type enum. The provider returns only the English stem, four English choices, zero-based proposed answer index, English rationale, short target-language evidence, and one supported question type. Python assigns the requested ILR, derives provisional difficulty, shuffles choices, remaps the answer key, validates the bundle, and saves accepted content to the reusable bank.
 
 The parser also accepts safe common variants such as `items` instead of `questions`, A/B/C/D choice dictionaries, `correct_answer: "A"`, `detail` instead of `prominent detail`, and extra provider metadata. It does not silently accept unsupported or incomplete questions: those proceed to deterministic validation and targeted repair, or are quarantined.
 
@@ -553,7 +555,7 @@ The application reveals item levels only at feedback-safe points:
 
 - Training with passage feedback: each completed question shows its intended ILR band.
 - Training with end-only feedback: levels appear in the final report.
-- Adaptive Diagnostic and Full CA Simulation: levels remain hidden during the active test and appear only after completion.
+- Adaptive Diagnostic and DLPT-style Adaptive Practice Simulation: levels remain hidden during the active test and appear only after completion.
 
 Uncalibrated items are labeled as an **intended provisional ILR level**. When empirical calibration exists, the report shows the approximate calibrated operational band and separately preserves the original authoring target. These are practice metadata, not official DLPT item classifications.
 

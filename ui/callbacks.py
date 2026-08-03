@@ -18,6 +18,7 @@ from core.constants import (
     ILR_LEVELS,
     MODE_LABELS,
     QUESTION_TYPES,
+    SIMULATION_MODE_LABEL,
     SIMULATION_LENGTHS,
     SKILL_LABELS,
     TRAINING_LENGTHS,
@@ -312,7 +313,11 @@ def mode_controls(mode_label: str, skill_label: str, language_label: str = "Russ
             gr.update(value="2", visible=False, interactive=False),
         )
     return (
-        gr.update(choices=list(SIMULATION_LENGTHS), value="Standard — 35 questions per skill", label="Simulation length"),
+        gr.update(
+            choices=list(SIMULATION_LENGTHS),
+            value="Standard practice — 35 questions per skill / up to 3 hours",
+            label="Simulation length",
+        ),
         gr.update(choices=["Strict countdown"], value="Strict countdown", interactive=False),
         gr.update(visible=False, value=False),
         gr.update(visible=False, value=True),
@@ -506,16 +511,24 @@ const draw=()=>{{const s=Math.max(0,Math.floor((Date.now()-start)/1000));const h
 </script>"""
     deadline_ms = int((state.skill_deadline_epoch or time.time()) * 1000)
     return f"""
-<div class='timer-card strict' id='{element_id}' aria-live='assertive'>Remaining: --:--:--</div>
+<div class='timer-card strict' id='{element_id}' role='status' aria-live='off'>Remaining: --:--:--</div>
 <script>
 (() => {{ const el=document.getElementById('{element_id}'); const deadline={deadline_ms};
-const draw=()=>{{const s=Math.max(0,Math.floor((deadline-Date.now())/1000));const h=String(Math.floor(s/3600)).padStart(2,'0');const m=String(Math.floor((s%3600)/60)).padStart(2,'0');const x=String(s%60).padStart(2,'0');if(el)el.textContent=`Remaining: ${{h}}:${{m}}:${{x}}`;}};draw();setInterval(draw,1000); }})();
+let timerId=null;
+const expire=()=>{{
+  if(!el || el.dataset.expirySent==='true') return;
+  el.dataset.expirySent='true';
+  const host=document.getElementById('timer-expired-trigger');
+  const button=host && (host.querySelector('button') || (host.tagName==='BUTTON' ? host : null));
+  if(button) button.click();
+}};
+const draw=()=>{{const s=Math.max(0,Math.floor((deadline-Date.now())/1000));const h=String(Math.floor(s/3600)).padStart(2,'0');const m=String(Math.floor((s%3600)/60)).padStart(2,'0');const x=String(s%60).padStart(2,'0');if(el)el.textContent=`Remaining: ${{h}}:${{m}}:${{x}}`;if(s<=0){{if(timerId)clearInterval(timerId);expire();}}}};draw();if(deadline>Date.now())timerId=setInterval(draw,1000); }})();
 </script>"""
 
 
 def _status_text(state: SessionState, extra: str = "") -> str:
     completed = state.completed_count(state.active_skill)
-    mode_name = {"training": "Training Mode", "diagnostic": "Adaptive Diagnostic", "simulation": "Full CA Simulation"}[state.mode]
+    mode_name = {"training": "Training Mode", "diagnostic": "Adaptive Diagnostic", "simulation": SIMULATION_MODE_LABEL}[state.mode]
     lines = [
         f"### {mode_name} — {state.active_skill.title()}",
         f"**Progress:** {completed}/{state.max_questions_per_skill} questions in this skill  |  **Session code:** `{state.session_id}`",
@@ -665,11 +678,97 @@ def _length_settings(mode: str, label: str) -> tuple[int, int, bool, bool, int |
         max_q = DIAGNOSTIC_LENGTHS[label]
         minimum = 12 if label.startswith("Efficient") else 16
         return max_q, minimum, False, False, None
-    max_q = SIMULATION_LENGTHS[label]
+    legacy_lengths = {
+        "Shortened — 12 questions per skill (not a full simulation)": 12,
+        "Standard — 35 questions per skill": 35,
+        # Old clients may still post this retired label; normalize it to the
+        # supported 35-question standard rather than preserving the old promise.
+        "Full-length — minimum 35, up to 60 questions / 3 hours per skill": 35,
+    }
+    max_q = SIMULATION_LENGTHS.get(label, legacy_lengths.get(label))
+    if max_q is None:
+        raise ValueError(f"Unknown simulation length: {label}")
     shortened = max_q < 35
-    full = label.startswith("Full-length") or max_q >= 35
-    seconds = 1800 if shortened else (10800 if label.startswith("Full-length") else 5400)
+    full = max_q >= 35
+    seconds = 1800 if shortened else 10800
     return max_q, max_q, full, shortened, seconds
+
+
+def expire_section_callback(
+    state: SessionState | None,
+    bundle_data: dict | None,
+    nonce: str | None,
+):
+    """End an expired section without waiting for another learner action."""
+
+    if not state or state.status not in {"active", "expired"} or state.skill_deadline_epoch is None:
+        return _inactive_render(state, "### No active strict timer")
+    # Older checkpoints may carry the former section-level ``expired`` status.
+    # Expiry is now handled as a section transition, so recover that state and
+    # continue into the next selected skill when applicable.
+    state.status = "active"
+    now = time.time()
+    if remaining_seconds(state, now) > 0:
+        bundle = _bundle_from_dict(bundle_data)
+        if bundle:
+            return _test_render(state, bundle, "An early timer event was ignored; the section remains active.")
+        return _inactive_render(state, "### Timer event ignored safely")
+
+    bundle = _bundle_from_dict(bundle_data)
+    auto_submitted = False
+    if bundle and bundle.passage.id == state.current_passage_id:
+        all_answered = all(state.current_answers.get(question.id) for question in bundle.questions)
+        all_before_deadline = all(
+            state.current_answer_timestamps.get(question.id, float("inf")) <= state.skill_deadline_epoch
+            for question in bundle.questions
+        )
+        if all_answered and all_before_deadline:
+            records = submit_current_bundle(
+                state,
+                bundle.passage,
+                bundle.questions,
+                dict(state.current_answers),
+                nonce or f"expiry-{uuid4().hex}",
+                now=state.skill_deadline_epoch,
+                enforce_deadline=False,
+            )
+            auto_submitted = bool(records)
+        else:
+            state.current_passage_id = None
+            state.current_question_ids = []
+            state.current_answers = {}
+            state.current_answer_changes = {}
+            state.current_answer_timestamps = {}
+            state.current_listening_plays = 0
+
+    finished = advance_skill_or_finish(state, now=now, force=True)
+    note = (
+        "The fully answered active passage was submitted before the section closed."
+        if auto_submitted
+        else "The incomplete active passage was not scored."
+    )
+    if finished:
+        history = _history_for(state)
+        if history and state.profile_id:
+            STORAGE.save_history(update_history(history, state))
+        STORAGE.save_checkpoint(state)
+        report = build_full_report(state, BANK)
+        json_path, csv_path = build_exports(state, EXPORT_DIR)
+        return _inactive_render(
+            state,
+            f"### Time expired — session complete\n\n{note}\n\nCompleted passages remain saved.",
+            report,
+            json_path,
+            csv_path,
+        )
+
+    next_bundle = _select_with_safe_history(state)
+    STORAGE.save_checkpoint(state)
+    return _test_render(
+        state,
+        next_bundle,
+        f"The prior skill section ended automatically when time expired. {note}",
+    )
 
 
 def _normalize_multiselect(value, allowed_values: list[str], field_name: str) -> list[str]:
@@ -782,8 +881,10 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
     if not bundle or bundle.passage.skill != "listening":
         return state, gr.update(value="", visible=False), gr.update(visible=False), gr.update()
     try:
-        _progress(progress, 0.10, "Authorizing playback and preserving strict-mode state…")
-        mark_listening_play(state)
+        strict = state.mode in {"diagnostic", "simulation"}
+        if strict and state.current_listening_plays >= 1:
+            raise SessionFlowError("Replay is disabled in strict listening conditions.")
+        _progress(progress, 0.10, "Authorizing browser playback…")
         asset = BANK.get_audio(bundle.passage.audio_asset_id)
         if not asset:
             raise AudioError("No validated audio asset is linked to this passage.")
@@ -801,21 +902,67 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             except Exception as tts_exc:
                 audio_note = f" Requested training voice/speed was unavailable; cached starter audio was used ({type(tts_exc).__name__})."
         _progress(progress, 0.82, "Preparing browser playback…")
-        strict = state.mode in {"diagnostic", "simulation"}
-        audio_html = controlled_audio_html(str(path), f"audio_{state.session_id}_{bundle.passage.id}_{state.current_listening_plays}", strict)
-        STORAGE.save_checkpoint(state)
+        audio_html = controlled_audio_html(
+            str(path),
+            f"audio_{state.session_id}_{bundle.passage.id}_{state.current_listening_plays + 1}",
+            strict,
+        )
         _progress(progress, 1.0, "Audio ready")
-        status = _status_text(state, f"Listening playback count for this passage: {state.current_listening_plays}.{audio_note}")
+        status = _status_text(
+            state,
+            "Audio is prepared. The play is recorded only after the browser confirms that sound started."
+            f"{audio_note}",
+        )
         return (
             state,
             gr.update(value=audio_html, visible=True),
-            gr.update(interactive=not strict, visible=True),
+            # Keep retry available when autoplay is blocked. Browser-confirmed
+            # playback disables this button in strict modes.
+            gr.update(interactive=True, visible=True),
             gr.update(value=status),
         )
     except Exception as exc:
         state.last_error = str(exc)
         STORAGE.save_checkpoint(state)
         return state, gr.update(value="", visible=False), gr.update(interactive=False), gr.update(value=_status_text(state, f"Recoverable audio error: {html.escape(str(exc))}"))
+
+
+def confirm_audio_playback_callback(state: SessionState | None, bundle_data: dict | None):
+    """Count a Listening play only after the browser emits ``playing``."""
+
+    if not state or not bundle_data:
+        return state, gr.update(), gr.update()
+    bundle = _bundle_from_dict(bundle_data)
+    if (
+        not bundle
+        or bundle.passage.skill != "listening"
+        or bundle.passage.id != state.current_passage_id
+    ):
+        return state, gr.update(), gr.update(value=_status_text(state, "A stale playback event was ignored."))
+    try:
+        mark_listening_play(state)
+        STORAGE.save_checkpoint(state)
+        strict = state.mode in {"diagnostic", "simulation"}
+        label = "Audio Started — Replay Disabled" if strict else "Play / Replay Audio"
+        return (
+            state,
+            gr.update(value=label, visible=True, interactive=not strict),
+            gr.update(
+                value=_status_text(
+                    state,
+                    f"Browser-confirmed Listening playback count for this passage: {state.current_listening_plays}.",
+                ),
+                visible=True,
+            ),
+        )
+    except Exception as exc:
+        state.last_error = str(exc)
+        STORAGE.save_checkpoint(state)
+        return (
+            state,
+            gr.update(value="Audio Started — Replay Disabled", visible=True, interactive=False),
+            gr.update(value=_status_text(state, html.escape(str(exc))), visible=True),
+        )
 
 
 HINTS = {

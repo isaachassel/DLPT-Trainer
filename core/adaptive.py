@@ -9,12 +9,33 @@ from .constants import ILR_LEVELS, ILR_THETA
 from .models import AbilityEstimate, AdaptiveSelection, PassageItem, QuestionItem, ResponseRecord
 
 GRID = [round(-3.5 + i * 0.05, 2) for i in range(141)]
-ROUTING_POSTERIOR_THRESHOLD = 0.67
+# The passage-level likelihood discount below intentionally preserves more
+# uncertainty than an item-independent model. A 0.56 routing boundary still
+# requires sustained posterior evidence, while allowing an entirely missed
+# multi-question passage to move delivery down one adjacent half-level.
+ROUTING_POSTERIOR_THRESHOLD = 0.56
+MULTIPLE_CHOICE_GUESSING = 0.25
 
 
 def logistic(theta: float, b: float, a: float = 1.0) -> float:
     z = max(-35.0, min(35.0, a * (theta - b)))
     return 1.0 / (1.0 + math.exp(-z))
+
+
+def response_probability(
+    theta: float,
+    b: float,
+    a: float = 1.0,
+    guessing: float = MULTIPLE_CHOICE_GUESSING,
+) -> float:
+    """Chance-aware response probability for four-option practice items.
+
+    The bank is not empirically calibrated, so the 0.25 lower asymptote is a
+    transparent structural correction rather than a fitted item parameter.
+    """
+
+    guessing = max(0.0, min(0.45, guessing))
+    return guessing + (1.0 - guessing) * logistic(theta, b, a)
 
 
 def normal_density(x: float, mean: float, sd: float) -> float:
@@ -86,11 +107,11 @@ def _weighted_quantile(grid: list[float], weights: list[float], q: float) -> flo
 def theta_to_practice_ilr(theta: float, predicted_success: dict[str, float], items_answered: int, se: float) -> str | None:
     if items_answered < 8 or se > 0.85:
         return None
-    supported = "0"
-    for level in ILR_LEVELS:
-        if predicted_success.get(level, 0.0) >= 0.67:
-            supported = level
-    return supported
+    # A 67%-at-anchor rule systematically reports a learner about one full
+    # theta unit below the posterior center. A nearest-anchor classification is
+    # symmetric around the provisional ILR anchors and is therefore the more
+    # honest display for an explicitly provisional working band.
+    return nearest_ilr(theta)
 
 
 def summarize_posterior(estimate: AbilityEstimate) -> AbilityEstimate:
@@ -103,7 +124,7 @@ def summarize_posterior(estimate: AbilityEstimate) -> AbilityEstimate:
     mean = sum(theta * weight for theta, weight in zip(grid, weights))
     variance = sum(((theta - mean) ** 2) * weight for theta, weight in zip(grid, weights))
     se = math.sqrt(max(variance, 1e-9))
-    predicted = {level: logistic(mean, difficulty) for level, difficulty in ILR_THETA.items()}
+    predicted = {level: response_probability(mean, difficulty) for level, difficulty in ILR_THETA.items()}
     practice_ilr = theta_to_practice_ilr(mean, predicted, estimate.items_answered, se)
     if estimate.items_answered < 8:
         confidence = "insufficient"
@@ -129,13 +150,15 @@ def summarize_posterior(estimate: AbilityEstimate) -> AbilityEstimate:
 
 
 def update_ability(estimate: AbilityEstimate, responses: Iterable[ResponseRecord]) -> AbilityEstimate:
+    records = list(responses)
     grid = estimate.posterior_grid or GRID.copy()
     weights = estimate.posterior_weights or [1 / len(grid)] * len(grid)
     correct_added = 0
     count_added = 0
     evidence_by_ilr = dict(estimate.evidence_by_ilr)
     correct_by_ilr = dict(estimate.correct_by_ilr)
-    for response in responses:
+    passage_counts = Counter(record.passage_id for record in records)
+    for response in records:
         count_added += 1
         correct_added += int(response.is_correct)
         evidence_by_ilr[response.target_ilr] = evidence_by_ilr.get(response.target_ilr, 0) + 1
@@ -143,9 +166,14 @@ def update_ability(estimate: AbilityEstimate, responses: Iterable[ResponseRecord
             correct_by_ilr[response.target_ilr] = correct_by_ilr.get(response.target_ilr, 0) + 1
         new_weights = []
         for theta, prior in zip(grid, weights):
-            p = logistic(theta, response.item_difficulty, 1.0)
+            p = response_probability(theta, response.item_difficulty, response.item_discrimination)
             likelihood = p if response.is_correct else (1.0 - p)
-            new_weights.append(prior * max(likelihood, 1e-12))
+            # Questions attached to one passage share source comprehension and
+            # are not fully independent. Discount each likelihood by the square
+            # root of its passage testlet size so confidence does not collapse
+            # unrealistically after one multi-question passage.
+            testlet_weight = 1.0 / math.sqrt(max(1, passage_counts[response.passage_id]))
+            new_weights.append(prior * max(likelihood, 1e-12) ** testlet_weight)
         total = sum(new_weights)
         weights = [w / total for w in new_weights] if total else [1 / len(grid)] * len(grid)
     updated = estimate.model_copy(update={
@@ -207,12 +235,19 @@ def update_routing_band(
     else:
         probability_above = 0.0
 
-    # Only one adjacent half-level move is allowed per completed passage.
-    if probability_below >= threshold and probability_below > probability_above and current_index > low_index:
+    # Only one adjacent half-level move is allowed per completed passage. A
+    # single question is not enough evidence for a routing transition.
+    bundle_has_multiple_items = len(records) >= 2
+    if (
+        bundle_has_multiple_items
+        and probability_below >= threshold
+        and probability_below > probability_above
+        and current_index > low_index
+    ):
         next_band = ILR_LEVELS[current_index - 1]
         direction_probability = probability_below
         reason = f"{probability_below:.0%} posterior probability below the {next_band}/{current} boundary"
-    elif probability_above >= threshold and current_index < high_index:
+    elif bundle_has_multiple_items and probability_above >= threshold and current_index < high_index:
         next_band = ILR_LEVELS[current_index + 1]
         direction_probability = probability_above
         reason = f"{probability_above:.0%} posterior probability above the {current}/{next_band} boundary"
@@ -235,9 +270,16 @@ def update_routing_band(
     return estimate.model_copy(update={"routing_ilr": next_band, "routing_history": history})
 
 
-def item_information(theta: float, difficulty: float, discrimination: float = 1.0) -> float:
-    p = logistic(theta, difficulty, discrimination)
-    return discrimination * discrimination * p * (1.0 - p)
+def item_information(
+    theta: float,
+    difficulty: float,
+    discrimination: float = 1.0,
+    guessing: float = MULTIPLE_CHOICE_GUESSING,
+) -> float:
+    logistic_part = logistic(theta, difficulty, discrimination)
+    p = guessing + (1.0 - guessing) * logistic_part
+    derivative = discrimination * (1.0 - guessing) * logistic_part * (1.0 - logistic_part)
+    return (derivative * derivative) / max(1e-9, p * (1.0 - p))
 
 
 def adjacent_evidence_ready(

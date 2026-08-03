@@ -26,8 +26,8 @@ def item_level_label(record: ResponseRecord) -> str:
 
 def estimate_label(estimate: AbilityEstimate) -> str:
     if estimate.practice_ilr is None or not estimate.stable:
-        return "Insufficient evidence for a stable estimate."
-    qualifier = "Provisional practice estimate" if estimate.provisional else "Practice estimate"
+        return "Insufficient evidence for a stable provisional working band."
+    qualifier = "Provisional working band" if estimate.provisional else "Working band"
     return f"{qualifier}: ILR {estimate.practice_ilr}, with {estimate.confidence} confidence."
 
 
@@ -58,7 +58,11 @@ def response_time_summary(records: list[ResponseRecord]) -> dict[str, float]:
 
 def strengths_and_weaknesses(records: list[ResponseRecord]) -> tuple[list[str], list[str]]:
     grouped = grouped_accuracy(records, "question_type")
-    qualified = [(name, values) for name, values in grouped.items() if values[1] >= 2]
+    qualified = [(name, values) for name, values in grouped.items() if values[1] >= 3]
+    # A single qualified category cannot meaningfully be both the strongest and
+    # weakest competency. Require comparative evidence before ranking either.
+    if len(qualified) < 2:
+        return [], []
     strongest = [name for name, _ in sorted(qualified, key=lambda x: (x[1][2], x[1][1]), reverse=True)[:3]]
     weakest = [name for name, _ in sorted(qualified, key=lambda x: (x[1][2], -x[1][1]))[:3]]
     return strongest, weakest

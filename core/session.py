@@ -103,13 +103,13 @@ def create_session(
 def remaining_seconds(state: SessionState, now: float | None = None) -> int | None:
     if state.skill_deadline_epoch is None:
         return None
-    return max(0, int(state.skill_deadline_epoch - (now or time.time())))
+    current = time.time() if now is None else now
+    return max(0, int(state.skill_deadline_epoch - current))
 
 
 def ensure_not_expired(state: SessionState, now: float | None = None) -> None:
     remaining = remaining_seconds(state, now)
     if remaining is not None and remaining <= 0:
-        state.status = "expired"
         raise SessionFlowError("Time expired for this skill section. Completed passages remain saved.")
 
 
@@ -167,16 +167,23 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
     state.current_question_ids = [q.id for q in questions]
     state.current_answers = {}
     state.current_answer_changes = {q.id: 0 for q in questions}
+    state.current_answer_timestamps = {}
     state.current_listening_plays = 0
     state.current_started_at_epoch = time.time()
     return PassageBundle(passage=passage, questions=questions)
 
 
-def record_answer_change(state: SessionState, question_id: str, new_key: str) -> None:
+def record_answer_change(
+    state: SessionState,
+    question_id: str,
+    new_key: str,
+    now: float | None = None,
+) -> None:
     old = state.current_answers.get(question_id)
     if old and old != new_key:
         state.current_answer_changes[question_id] = state.current_answer_changes.get(question_id, 0) + 1
     state.current_answers[question_id] = new_key
+    state.current_answer_timestamps[question_id] = time.time() if now is None else now
 
 
 def mark_listening_play(state: SessionState) -> None:
@@ -194,8 +201,10 @@ def submit_current_bundle(
     answers: dict[str, str],
     request_nonce: str,
     now: float | None = None,
+    enforce_deadline: bool = True,
 ) -> list[ResponseRecord]:
-    ensure_not_expired(state, now)
+    if enforce_deadline:
+        ensure_not_expired(state, now)
     if request_nonce in state.handled_nonces:
         return []
     if passage.id != state.current_passage_id:
@@ -203,8 +212,8 @@ def submit_current_bundle(
     missing = [q.id for q in questions if not answers.get(q.id)]
     if missing:
         raise SessionFlowError("Answer every question on the current passage before advancing.")
-    elapsed = max(0.0, (now or time.time()) - (state.current_started_at_epoch or (now or time.time())))
-    per_question_time = elapsed / max(1, len(questions))
+    submitted_at = time.time() if now is None else now
+    started_at = state.current_started_at_epoch if state.current_started_at_epoch is not None else submitted_at
     records: list[ResponseRecord] = []
     for question in questions:
         selected = answers[question.id]
@@ -217,6 +226,7 @@ def submit_current_bundle(
             language=passage.language,
             target_ilr=question.target_ilr,
             item_difficulty=question.operational_difficulty,
+            item_discrimination=question.discrimination,
             question_type=question.question_type,
             topic=passage.topic,
             genre=passage.genre,
@@ -227,7 +237,13 @@ def submit_current_bundle(
             selected_key=selected,
             correct_key=question.correct_key,
             is_correct=selected == question.correct_key,
-            response_time_seconds=per_question_time,
+            # This is the observed latency from passage display to the learner's
+            # final selection for this question. It is not an artificial equal
+            # division of total passage time.
+            response_time_seconds=max(
+                0.0,
+                min(state.current_answer_timestamps.get(question.id, submitted_at), submitted_at) - started_at,
+            ),
             listening_play_count=state.current_listening_plays,
             answer_change_count=state.current_answer_changes.get(question.id, 0),
             provisional_item=question.calibrated_difficulty is None,
@@ -252,6 +268,8 @@ def submit_current_bundle(
     state.current_passage_id = None
     state.current_question_ids = []
     state.current_answers = {}
+    state.current_answer_changes = {}
+    state.current_answer_timestamps = {}
     return records
 
 
@@ -280,12 +298,14 @@ def advance_skill_or_finish(state: SessionState, now: float | None = None, force
         return False
     if state.active_skill_index + 1 < len(state.selected_skills):
         state.active_skill_index += 1
-        current = now or time.time()
+        current = time.time() if now is None else now
         state.skill_started_at_epoch = current
         state.skill_deadline_epoch = current + state.time_limit_seconds_per_skill if state.time_limit_seconds_per_skill else None
         state.current_passage_id = None
         state.current_question_ids = []
         state.current_answers = {}
+        state.current_answer_changes = {}
+        state.current_answer_timestamps = {}
         state.current_listening_plays = 0
         return False
     state.status = "completed"

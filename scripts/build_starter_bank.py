@@ -14,6 +14,7 @@ from core.item_bank import shuffle_question
 from core.models import AudioAsset, GenerationMetadata, PassageItem, QuestionItem, ValidationReport
 from core.validation import content_hash, validate_passage, validate_question
 from core.audio import audio_duration_seconds
+from scripts.starter_choice_rewrites import CHOICE_REWRITES
 
 
 def q(stem, correct, distractors, rationale, evidence, qtype, level, b):
@@ -260,6 +261,8 @@ def make_records():
                 target = LETTERS[position_index % 4]
                 position_index += 1
                 model = place_correct(base, target, base.id)
+                if model.id in CHOICE_REWRITES:
+                    model = model.model_copy(update={"choices": CHOICE_REWRITES[model.id]})
                 question_models.append(model)
             p_report = validate_passage(p, question_models)
             p.validation_report_id = p_report.id

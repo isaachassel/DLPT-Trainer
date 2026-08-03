@@ -169,6 +169,64 @@ def _words(text: str) -> list[str]:
     return normalize_text(text).split()
 
 
+def choice_length_leakage_flags(question: QuestionItem) -> list[str]:
+    """Return material answer-length cues without invalidating legacy banks.
+
+    Starter content predates this diagnostic, so the operational validator keeps
+    its broad hard limit for backward compatibility. Freshly generated items use
+    these stricter flags as repair instructions before they can be stored.
+    """
+
+    lengths = {letter: max(1, len(_words(question.choices.get(letter, "")))) for letter in LETTERS}
+    correct_length = lengths.get(question.correct_key, 1)
+    distractor_lengths = [length for letter, length in lengths.items() if letter != question.correct_key]
+    flags: list[str] = []
+    longest_distractor = max(distractor_lengths, default=correct_length)
+    shortest_distractor = min(distractor_lengths, default=correct_length)
+    if (
+        correct_length > longest_distractor
+        and correct_length - longest_distractor >= 2
+        and correct_length / max(1, longest_distractor) >= 1.25
+    ):
+        flags.append("correct_choice_materially_longer_than_every_distractor")
+    if (
+        correct_length < shortest_distractor
+        and shortest_distractor - correct_length >= 2
+        and shortest_distractor / max(1, correct_length) >= 1.50
+    ):
+        flags.append("correct_choice_materially_shorter_than_every_distractor")
+    return flags
+
+
+def answer_length_leakage_summary(questions: Iterable[QuestionItem]) -> dict[str, float | int]:
+    """Summarize how well a longest-choice guessing strategy would perform."""
+
+    items = list(questions)
+    among_longest = 0
+    unique_longest = 0
+    expected_score = 0.0
+    materially_flagged = 0
+    for question in items:
+        lengths = {letter: max(1, len(_words(question.choices.get(letter, "")))) for letter in LETTERS}
+        maximum = max(lengths.values(), default=0)
+        winners = [letter for letter, length in lengths.items() if length == maximum]
+        if question.correct_key in winners:
+            among_longest += 1
+            expected_score += 1.0 / max(1, len(winners))
+            if len(winners) == 1:
+                unique_longest += 1
+        if choice_length_leakage_flags(question):
+            materially_flagged += 1
+    total = len(items)
+    return {
+        "questions": total,
+        "correct_among_longest": among_longest,
+        "correct_unique_longest": unique_longest,
+        "materially_flagged": materially_flagged,
+        "longest_strategy_expected_rate": expected_score / total if total else 0.0,
+    }
+
+
 def _cyrillic_ratio(text: str) -> float:
     letters = re.findall(r"[A-Za-zА-Яа-яЁё]", text)
     if not letters:

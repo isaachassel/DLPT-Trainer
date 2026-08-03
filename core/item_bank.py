@@ -66,15 +66,27 @@ class ItemBank:
                     data = record["data"]
                     if kind == "passage":
                         item = PassageItem.model_validate(data)
+                        if item.id in self.passages:
+                            raise ValueError(f"duplicate passage id {item.id}; existing item was preserved")
                         self.passages[item.id] = item
                         self.passage_origin[item.id] = "generated_bank" if source == self.writable_path else "starter_bank"
                     elif kind == "question":
                         item = QuestionItem.model_validate(data)
+                        if item.id in self.questions:
+                            raise ValueError(f"duplicate question id {item.id}; existing item was preserved")
+                        if source == self.writable_path and self.passage_origin.get(item.passage_id) != "generated_bank":
+                            raise ValueError(
+                                f"generated question {item.id} cannot attach to non-generated passage {item.passage_id}"
+                            )
                         self.questions[item.id] = item
                     elif kind == "audio":
                         item = AudioAsset.model_validate(data)
+                        if item.id in self.audio_assets:
+                            raise ValueError(f"duplicate audio id {item.id}; existing item was preserved")
                         self.audio_assets[item.id] = item
                     elif kind == "validation":
+                        if data["id"] in self.validation_reports:
+                            raise ValueError(f"duplicate validation id {data['id']}; existing report was preserved")
                         self.validation_reports[data["id"]] = data
                 except Exception as exc:
                     message = f"Invalid item-bank record in {source} at line {line_number}: {exc}"
@@ -109,8 +121,11 @@ class ItemBank:
         with self._lock:
             if self._loaded:
                 return self
-            for index, source in enumerate(self.paths):
-                self._load_path(source, required=index == 0)
+            for source in self.paths:
+                # Every immutable starter source is required. Only the writable
+                # generated overlay is optional on a clean first launch.
+                required = len(self.paths) == 1 or source != self.writable_path
+                self._load_path(source, required=required)
             self._reindex()
             self._loaded = True
         return self

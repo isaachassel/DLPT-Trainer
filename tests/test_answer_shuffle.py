@@ -18,7 +18,7 @@ def test_correct_key_is_remapped_after_shuffle(bank):
 
 
 def test_answer_positions_are_balanced_not_fixed(bank):
-    assert answer_position_balance(bank.questions.values()) == {"A": 22, "B": 22, "C": 22, "D": 22}
+    assert answer_position_balance(bank.questions.values()) == {"A": 40, "B": 40, "C": 40, "D": 40}
     assert bank_balance_passes(bank.questions.values())
 
 

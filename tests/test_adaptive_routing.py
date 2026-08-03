@@ -11,6 +11,7 @@ from core.adaptive import (
 from core.models import ResponseRecord
 from core.reporting import build_skill_report
 from core.session import create_session, select_next_bundle, submit_current_bundle
+from core.constants import SIMULATION_MODE_LABEL
 from ui.callbacks import mode_controls
 
 
@@ -227,7 +228,7 @@ def test_diagnostic_probe_targets_under_sampled_adjacent_boundary():
 def test_mode_controls_hide_unused_start_and_target_fields():
     training = mode_controls("Training Mode", "Reading")
     diagnostic = mode_controls("Adaptive Diagnostic", "Reading")
-    simulation = mode_controls("Full CA Simulation", "Reading")
+    simulation = mode_controls(SIMULATION_MODE_LABEL, "Reading")
     assert training[-2]["visible"] is True and training[-1]["visible"] is True
     assert diagnostic[-2]["visible"] is True and diagnostic[-1]["visible"] is False
     assert simulation[-2]["visible"] is False and simulation[-1]["visible"] is False

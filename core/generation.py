@@ -39,8 +39,10 @@ from .prompts import (
 )
 from .storage import atomic_write_text
 from .validation import (
+    answer_length_leakage_summary,
     answer_position_balance,
     canonicalize_evidence_quote,
+    choice_length_leakage_flags,
     content_hash,
     evidence_traceability_score,
     near_duplicate,
@@ -493,7 +495,7 @@ class MockProvider(AuthoringProvider):
             candidates = ([
                 CandidateQuestion(
                     stem_en="What is the main purpose of the announcement?",
-                    choices=["To announce evening Mandarin courses for adults", "To close the cultural center", "To advertise a restaurant", "To change public transportation"],
+                    choices=["To announce adult evening Mandarin courses", "To close the cultural center", "To advertise a restaurant", "To change public transportation"],
                     proposed_correct_index=0, rationale_en="The announcement gives the schedule, size, price, and registration process for a new course.",
                     evidence_ru="开设了普通话晚间课程", question_type="main idea", target_ilr=level, provisional_difficulty=ILR_THETA.get(level, 0.5),
                 ),
@@ -1335,9 +1337,16 @@ def validate_candidate_questions(
     seen_stems: list[str] = []
     seen_evidence: list[str] = []
     detail_count = 0
+    length_pattern_indices: list[int] = []
     for index, question in enumerate(questions, start=1):
         report = validate_question(question, passage)
         issues.extend(f"q{index}:{reason}" for reason in report.failure_reasons + report.ambiguity_flags)
+        issues.extend(f"q{index}:{reason}" for reason in choice_length_leakage_flags(question))
+        lengths = {letter: max(1, len(normalize_text(value).split())) for letter, value in question.choices.items()}
+        longest = max(lengths.values(), default=0)
+        winners = [letter for letter, length in lengths.items() if length == longest]
+        if question.correct_key in winners and len(winners) < len(LETTERS):
+            length_pattern_indices.append(index)
         if question.target_ilr != requested_level:
             issues.append(f"q{index}:target_level_mismatch")
         if question.question_type == "prominent detail":
@@ -1356,6 +1365,12 @@ def validate_candidate_questions(
             issues.append(f"q{index}:question_type_too_complex_for_low_level")
         if requested_level == "3" and question.question_type == "prominent detail" and detail_count > 1:
             issues.append(f"q{index}:too_many_isolated_detail_questions_for_ilr3")
+    length_summary = answer_length_leakage_summary(questions)
+    if (
+        len(length_pattern_indices) >= 2
+        and float(length_summary["longest_strategy_expected_rate"]) > 0.45
+    ):
+        issues.extend(f"q{index}:correct_answer_length_pattern_across_bundle" for index in length_pattern_indices)
     return sorted(set(issues))
 
 
@@ -2010,11 +2025,16 @@ class LiveGenerationService:
                 ),
                 temperature=min(0.10, max(0.0, self.settings.authoring_temperature - 0.10)),
             ))
-            question_set = (
-                _merge_question_repairs(question_set, repaired, repair_indices)
-                if targeted
-                else repaired
-            )
+            # Some otherwise usable hosted routes ignore a targeted-repair
+            # count and return a complete replacement set. Accept that complete
+            # set safely instead of failing on a harmless contract overshoot.
+            if targeted and len(repaired.questions) == len(question_set.questions):
+                question_set = repaired
+                targeted = False
+            elif targeted:
+                question_set = _merge_question_repairs(question_set, repaired, repair_indices)
+            else:
+                question_set = repaired
             trace.add(
                 "question_repair",
                 "targeted" if targeted else "full_set",

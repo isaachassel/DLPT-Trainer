@@ -48,6 +48,12 @@ class GeneratedBankPersistence:
     """
 
     BACKUP_SCHEMA_VERSION = 1
+    MAX_BACKUP_COMPRESSED_BYTES = 100 * 1024 * 1024
+    MAX_BACKUP_FILES = 512
+    MAX_BACKUP_UNCOMPRESSED_BYTES = 300 * 1024 * 1024
+    MAX_BACKUP_MEMBER_BYTES = 100 * 1024 * 1024
+    MAX_JSONL_BYTES = 100 * 1024 * 1024
+    MAX_COMPRESSION_RATIO = 200.0
 
     def __init__(self, settings: Settings, project_root: str | Path):
         self.settings = settings
@@ -538,6 +544,30 @@ class GeneratedBankPersistence:
         path = PurePosixPath(name)
         return not path.is_absolute() and ".." not in path.parts
 
+    @classmethod
+    def _validate_zip_limits(cls, source_path: Path, archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
+        if source_path.stat().st_size > cls.MAX_BACKUP_COMPRESSED_BYTES:
+            raise ValueError("Backup ZIP exceeds the 100 MB compressed-size limit.")
+        members = [member for member in archive.infolist() if not member.is_dir()]
+        if len(members) > cls.MAX_BACKUP_FILES:
+            raise ValueError(f"Backup ZIP contains more than {cls.MAX_BACKUP_FILES} files.")
+        total_size = 0
+        for member in members:
+            if not cls._safe_zip_member(member.filename):
+                raise ValueError("Backup contains an unsafe path.")
+            if member.flag_bits & 0x1:
+                raise ValueError("Encrypted backup members are not supported.")
+            if member.file_size > cls.MAX_BACKUP_MEMBER_BYTES:
+                raise ValueError(f"Backup member is too large: {member.filename}")
+            total_size += member.file_size
+            if total_size > cls.MAX_BACKUP_UNCOMPRESSED_BYTES:
+                raise ValueError("Backup exceeds the 300 MB total uncompressed-size limit.")
+            if member.file_size >= 1024 * 1024:
+                ratio = member.file_size / max(1, member.compress_size)
+                if ratio > cls.MAX_COMPRESSION_RATIO:
+                    raise ValueError(f"Backup member has an unsafe compression ratio: {member.filename}")
+        return members
+
     def import_backup(self, source: str | Path) -> BankPersistenceResult:
         """Merge a portable backup into the live generated overlay safely."""
         with self._lock:
@@ -549,15 +579,19 @@ class GeneratedBankPersistence:
             try:
                 incoming_path = work_dir / "incoming.jsonl"
                 if source_path.suffix.lower() == ".jsonl":
+                    if source_path.stat().st_size > self.MAX_JSONL_BYTES:
+                        raise ValueError("Generated-bank JSONL exceeds the 100 MB import limit.")
                     shutil.copyfile(source_path, incoming_path)
                 elif source_path.suffix.lower() == ".zip":
                     with zipfile.ZipFile(source_path, "r") as archive:
-                        names = archive.namelist()
-                        if any(not self._safe_zip_member(name) for name in names):
-                            raise ValueError("Backup contains an unsafe path.")
+                        members = self._validate_zip_limits(source_path, archive)
+                        names = [member.filename for member in members]
                         bank_name = next((name for name in names if PurePosixPath(name).name == "generated_items.jsonl"), None)
                         if not bank_name:
                             raise ValueError("Backup does not contain generated_items.jsonl.")
+                        bank_info = archive.getinfo(bank_name)
+                        if bank_info.file_size > self.MAX_JSONL_BYTES:
+                            raise ValueError("Generated-bank JSONL exceeds the 100 MB import limit.")
                         incoming_path.write_bytes(archive.read(bank_name))
                         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
                         cache_dir.mkdir(parents=True, exist_ok=True)
@@ -589,6 +623,27 @@ class GeneratedBankPersistence:
                     normalized_incoming,
                     "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in incoming_records),
                 )
+                # Schema, relationship, audio, and duplicate-ID checks run before
+                # the import can touch the live overlay. This is deterministic
+                # integrity validation, not a human-authenticity gate.
+                from .item_bank import ItemBank
+
+                validation_bank = ItemBank(
+                    [
+                        self.settings.starter_bank_runtime_path(self.project_root),
+                        self.settings.mandarin_starter_bank_runtime_path(self.project_root),
+                        normalized_incoming,
+                    ],
+                    writable_path=normalized_incoming,
+                ).load()
+                validation_errors = validation_bank.validate_operational_bank()
+                if validation_bank.load_warnings:
+                    validation_errors.extend(validation_bank.load_warnings)
+                if validation_errors:
+                    raise ValueError(
+                        "Imported bank failed deterministic integrity checks: "
+                        + "; ".join(validation_errors[:8])
+                    )
                 records, merge_warnings = self._merge_records(normalized_incoming, self.bank_path)
                 if merge_warnings:
                     raise ValueError(f"Could not safely merge backup: {', '.join(merge_warnings[:4])}")

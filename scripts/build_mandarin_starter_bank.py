@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 from core.constants import ILR_THETA, LETTERS
 from core.models import AudioAsset, GenerationMetadata, PassageItem, QuestionItem, ValidationReport
 from core.validation import content_hash, target_unit_count, validate_passage, validate_question
+from scripts.starter_choice_rewrites import CHOICE_REWRITES
 
 
 def q(stem, correct, wrong, evidence, qtype):
@@ -135,6 +136,21 @@ LISTENING = [
 ]
 
 
+# Half of the bundled ILR 2+/3 Reading passages use Traditional characters.
+# These static overrides avoid adding an OpenCC runtime dependency to the CPU
+# Space while keeping the starter-bank build reproducible.
+TRADITIONAL_READING_OVERRIDES = {
+    10: {
+        "text": "一些博物館把參觀人數增長當作開放程度提高的證據，但總人數並不能說明誰真正獲得了文化資源。免費日可能帶來大量遊客，卻未必能吸引平時因交通、時間或語言障礙而不來的人。某市博物館調查後發現，週末延長開放時間對上班族最有效，多語種講解則明顯增加了新移民家庭的停留時間。這說明，降低票價只是第一步。博物館如果希望服務更廣泛的公眾，就必須先理解不同群體不來的具體原因，再設計有針對性的措施。",
+        "evidence": ["不能說明誰真正獲得", "週末延長開放時間", "理解不同群體不來的具體原因"],
+    },
+    11: {
+        "text": "區域合作常以簽署協議的數量來展示成果，但檔案增加並不必然意味著合作更牢固。各方在利益一致時容易發表共同宣告，真正的考驗出現在經濟放緩、國內政治變化或安全危機迫使成員承擔成本的時候。此時，如果合作機制只能依靠領導人之間的私人關係，它往往會隨著人事變化而失去作用。相反，能夠公開處理分歧、允許成員調整部分承諾、同時維護核心規則的制度，看似不夠整齊，卻可能更有韌性。由此看來，聯盟的穩定不應以沒有爭議來判斷，而應看爭議是否能夠在不破壞長期合作的情況下得到管理。",
+        "evidence": ["迫使成員承擔成本的時候", "隨著人事變化而失去作用", "不破壞長期合作"],
+    },
+}
+
+
 def duration_seconds(path: Path) -> float:
     output = subprocess.check_output([
         "ffprobe", "-v", "error", "-show_entries", "format=duration",
@@ -143,28 +159,56 @@ def duration_seconds(path: Path) -> float:
     return float(output)
 
 
+def rationale_for(correct: str, strongest_distractor: str, evidence: str, question_type: str) -> str:
+    reasoning = {
+        "main idea": "states the passage's central communicative point",
+        "prominent detail": "explicitly identifies the requested consequential detail",
+        "inference": "supports this conclusion without requiring outside information",
+        "speaker/writer intent": "shows what the speaker or writer is trying to accomplish",
+        "tone or attitude": "reveals the stated evaluation or attitude",
+        "reference": "resolves the reference to its supported antecedent",
+        "sequence": "places the event or instruction in the stated order",
+        "cause and effect": "establishes the stated cause-and-effect relationship",
+        "relationship of ideas": "shows how the passage connects, contrasts, or qualifies its ideas",
+        "meaning from context": "provides the surrounding context needed for this meaning",
+    }.get(question_type, "directly supports the answer")
+    return (
+        f'The source phrase “{evidence}” {reasoning}, supporting “{correct}.” '
+        f'By contrast, “{strongest_distractor}” is not established by that evidence or the surrounding passage.'
+    )
+
+
 def build_records(audio_dir: Path) -> list[dict]:
     records: list[dict] = []
-    metadata = GenerationMetadata(provider="manual", model="human-authored", prompt_version="mandarin-starter-bank-v1")
+    metadata = GenerationMetadata(provider="manual", model="human-authored", prompt_version="mandarin-starter-bank-v2")
     for skill, specs in (("reading", READING), ("listening", LISTENING)):
         for p_index, spec in enumerate(specs, start=1):
             prefix = "zh_r" if skill == "reading" else "zh_l"
             pid = f"{prefix}{p_index:03d}"
             qids = [f"{pid}_q{i}" for i in range(1, 4)]
+            traditional_override = TRADITIONAL_READING_OVERRIDES.get(p_index) if skill == "reading" else None
             questions: list[QuestionItem] = []
             for q_index, raw in enumerate(spec["questions"]):
                 stem, correct, wrong, evidence, qtype = raw
+                if traditional_override:
+                    evidence = traditional_override["evidence"][q_index]
                 correct_key = LETTERS[(p_index + q_index) % 4]
                 values = iter(wrong)
                 choices = {letter: (correct if letter == correct_key else next(values)) for letter in LETTERS}
+                choices = CHOICE_REWRITES.get(qids[q_index], choices)
+                final_correct = choices[correct_key]
+                strongest_distractor = max(
+                    (value for letter, value in choices.items() if letter != correct_key),
+                    key=lambda value: len(value.split()),
+                )
                 questions.append(QuestionItem(
                     id=qids[q_index], passage_id=pid, stem_en=stem, choices=choices,
                     correct_key=correct_key,
-                    rationale_en="The cited source phrase directly supports this answer.",
+                    rationale_en=rationale_for(final_correct, strongest_distractor, evidence, qtype),
                     evidence_ru=evidence, question_type=qtype, target_ilr=spec["level"],
                     provisional_difficulty=ILR_THETA[spec["level"]], generation=metadata,
                 ))
-            text = spec["text"]
+            text = traditional_override["text"] if traditional_override else spec["text"]
             audio_asset = None
             audio_path = audio_dir / f"{pid}.mp3"
             duration = None
@@ -193,7 +237,10 @@ def build_records(audio_dir: Path) -> list[dict]:
                 question_ids=qids, audio_asset_id=audio_id, voice_metadata=voice_metadata,
                 generation=metadata, provenance={"author": "project starter-bank team", "method": "human-authored synthetic Mandarin practice content"},
                 license="Project-authored synthetic content; MIT repository license",
-                vocabulary_metadata={"provisional_ilr": spec["level"], "writing_system": "simplified Chinese"},
+                vocabulary_metadata={
+                    "provisional_ilr": spec["level"],
+                    "writing_system": "traditional Chinese" if traditional_override else "simplified Chinese",
+                },
                 discourse_metadata={"complexity_basis": "discourse and reasoning demand, not length alone"},
                 content_hash=content_hash(text), duplicate_detection_hash=content_hash(text),
             )

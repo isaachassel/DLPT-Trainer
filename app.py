@@ -30,7 +30,10 @@ def launch_kwargs() -> dict:
     return {
         "server_name": settings.app_host,
         "server_port": settings.app_port,
-        "show_error": True,
+        # Production users receive sanitized callback messages rather than raw
+        # framework tracebacks. Local development can opt back in with
+        # APP_ENV=development.
+        "show_error": settings.environment.lower() != "production",
         "css": CUSTOM_CSS,
         # HF Spaces enables experimental SSR by default for Gradio 6. The Node
         # proxy can emit /graphql 405s and event-loop finalizer noise. This app

@@ -24,7 +24,7 @@ def _question_level_review(records: list[ResponseRecord]) -> list[str]:
     lines = [
         "### Question-level ILR review",
         (
-            "Item levels were hidden during active Diagnostic and Full Simulation sections. "
+            "Item levels were hidden during active Diagnostic and DLPT-style Simulation sections. "
             "A provisional level is an authoring and validation target, not an empirically calibrated fact."
         ),
     ]
@@ -73,6 +73,11 @@ def _adaptive_route_review(state: SessionState, skill: str) -> list[str]:
     return lines
 
 def _recommendation(records: list[ResponseRecord], estimate_level: str | None, weaknesses: list[str]) -> str:
+    if len(records) < 8:
+        return (
+            "Complete at least eight balanced questions in this skill before treating any topic, genre, or "
+            "competency as a personal strength or weakness. Continue near the current routing band."
+        )
     level = estimate_level or "the current working band"
     weak_text = ", ".join(weaknesses) if weaknesses else "mixed comprehension skills"
     genres = grouped_accuracy(records, "genre")

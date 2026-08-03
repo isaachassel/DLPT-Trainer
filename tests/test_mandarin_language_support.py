@@ -20,7 +20,7 @@ def multilingual_bank(project_root) -> ItemBank:
     return ItemBank([
         project_root / "data" / "starter_items.jsonl",
         project_root / "data" / "mandarin_starter_items.jsonl",
-    ]).load()
+    ], writable_path=project_root / "storage/item_bank/generated_items.jsonl").load()
 
 
 def session(language: str, skill: str):
@@ -56,6 +56,18 @@ def test_mandarin_bank_has_full_skill_and_ilr_coverage(project_root):
     assert health["listening"]["ready_questions"] == 36
     assert health["listening"]["ready_audio_assets"] == 12
     assert all(health[skill]["ready_ilr_question_counts"][level] > 0 for skill in ("reading", "listening") for level in ("0", "0+", "1", "1+", "2", "2+", "3"))
+
+
+def test_high_level_mandarin_starter_reading_balances_character_systems(project_root):
+    bank = multilingual_bank(project_root)
+    high_level = [
+        passage
+        for passage in bank.active_passages("reading", "zh-CN")
+        if passage.target_ilr in {"2+", "3"}
+    ]
+    writing_systems = [passage.vocabulary_metadata.get("writing_system") for passage in high_level]
+    assert writing_systems.count("traditional Chinese") == 2
+    assert writing_systems.count("simplified Chinese") == 2
 
 
 def test_language_selection_never_crosses_banks(project_root):

@@ -179,6 +179,13 @@
           "title": "Item Difficulty",
           "type": "number"
         },
+        "item_discrimination": {
+          "default": 1.0,
+          "exclusiveMinimum": 0.0,
+          "maximum": 3.0,
+          "title": "Item Discrimination",
+          "type": "number"
+        },
         "question_type": {
           "title": "Question Type",
           "type": "string"
@@ -482,6 +489,13 @@
         "type": "integer"
       },
       "title": "Current Answer Changes",
+      "type": "object"
+    },
+    "current_answer_timestamps": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Current Answer Timestamps",
       "type": "object"
     },
     "current_listening_plays": {

@@ -34,6 +34,11 @@ def test_report_uses_provisional_language(bank):
     assert "official DLPT score" in report
 
 
+def test_sparse_report_does_not_invent_skill_specific_recommendations(bank):
+    report = build_full_report(make_completed_piece(bank), bank)
+    assert "Complete at least eight balanced questions" in report
+
+
 def test_short_simulation_report_is_labeled(bank):
     report = build_full_report(make_completed_piece(bank, mode="simulation"), bank)
     assert "shortened simulation" in report.lower()

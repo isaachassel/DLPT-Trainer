@@ -30,9 +30,14 @@ SOURCE_TYPES = ["authentic/open-licensed", "transformed/adapted", "synthetic"]
 VALIDATION_STATUSES = ["accepted", "rejected", "needs_review"]
 LETTERS = ["A", "B", "C", "D"]
 
+SIMULATION_MODE_LABEL = "DLPT-style Adaptive Practice Simulation"
+
 MODE_LABELS = {
     "Training Mode": "training",
     "Adaptive Diagnostic": "diagnostic",
+    SIMULATION_MODE_LABEL: "simulation",
+    # Backward-compatible alias for checkpoints, tests, and bookmarked clients
+    # created before the learner-facing name was made more precise.
     "Full CA Simulation": "simulation",
 }
 SKILL_LABELS = {
@@ -51,14 +56,14 @@ DIAGNOSTIC_LENGTHS = {
     "Extended — 16 to 28 questions per skill": 28,
 }
 SIMULATION_LENGTHS = {
-    "Shortened — 12 questions per skill (not a full simulation)": 12,
-    "Standard — 35 questions per skill": 35,
-    "Full-length — minimum 35, up to 60 questions / 3 hours per skill": 60,
+    "Shortened practice — 12 questions per skill / 30 minutes": 12,
+    "Standard practice — 35 questions per skill / up to 3 hours": 35,
 }
 SIMULATION_MIN_QUESTIONS = 35
 MAX_READING_QUESTIONS_PER_PASSAGE = 5
 MAX_LISTENING_QUESTIONS_PER_PASSAGE = 3
 DISCLAIMER = (
     "Independent practice product. Not official DLPT material. Not affiliated with DLIFLC, DoD, "
-    "or any government testing authority. No official score is generated; estimates are for practice guidance only."
+    "or any government testing authority. No official score or DLPT prediction is generated; "
+    "provisional working bands are for practice guidance only."
 )

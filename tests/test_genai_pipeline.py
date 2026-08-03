@@ -80,7 +80,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
     forbidden = ["q1=a", "q2=b", "q3=c", "q4=d", '"correct_key": "a"', "correct answer letter"]
     assert all(pattern not in text for pattern in forbidden)
     assert "zero-based index" in text
-    assert PROMPT_VERSION == "genai-pipeline-v9"
+    assert PROMPT_VERSION == "genai-pipeline-v10"
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):

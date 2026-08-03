@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from typing import Iterable
 
 from .languages import language_profile
 
-# Preserve the persisted pipeline identifier used by existing generated-bank
-# records; language is now carried explicitly in item/session metadata.
-PROMPT_VERSION = "genai-pipeline-v9"
+# Persisted with every newly generated bundle so prompt-policy cohorts remain
+# distinguishable from earlier generated-bank records.
+PROMPT_VERSION = "genai-pipeline-v10"
 
 
 @dataclass(frozen=True)
@@ -159,6 +160,18 @@ def passage_authoring_prompt(
             soft_length = "520-650"
         else:
             soft_length = f"{max(4, round(low * 1.55))}-{round(high * 1.55)}"
+    script_guidance = ""
+    if language == "zh-CN" and skill == "reading":
+        use_traditional = level in {"2+", "3"} and int(
+            hashlib.sha256(generation_nonce.encode("utf-8")).hexdigest(), 16
+        ) % 2 == 0
+        if use_traditional:
+            script_guidance = (
+                "- Writing system for this passage: Traditional Chinese. Use Traditional characters "
+                "consistently and natural usage appropriate to the selected context."
+            )
+        else:
+            script_guidance = "- Writing system for this passage: Simplified Chinese. Use it consistently."
     medium = "written passage" if skill == "reading" else "spoken transcript"
     strict_rules = (
         f"Reading hard limit: no more than {'1,000 Chinese characters' if language == 'zh-CN' else '500 Russian words'}; preserve paragraph structure."
@@ -184,6 +197,7 @@ LEVEL PROFILE
 - Soft length guidance only: approximately {soft_length} {unit}. Do not pad to hit a number.
 - {strict_rules}
 {('- For Level 3 Listening, develop sustained connected discourse intended to render between 2:00 and 2:30 at the configured normal voice rate. Use natural sentence and clause boundaries; no single Chinese sentence should exceed about 85 characters.' if language == 'zh-CN' and skill == 'listening' and level == '3' else '')}
+{script_guidance}
 
 CONTENT RULES
 - Use a realistic communicative situation and a clear source type.
@@ -333,6 +347,7 @@ Use zero-based proposed_correct_index only. Never prescribe answer letters.
 Do not return target_ilr, difficulty, IDs, answer letters, or validation metadata; the application assigns those in Python.
 Every evidence_ru value must be a short exact contiguous quotation copied from the {source} passage.
 For no_near_duplicate_choices, rewrite the distractors so each option asserts a materially different proposition; parallel grammar is encouraged, but synonyms or tiny qualifier changes are not enough.
+For any correct-choice length issue, rewrite the entire option set so all four choices have comparable length, grammatical structure, detail, and specificity. Do not merely lengthen distractors with filler.
 For evidence_in_passage, copy a short exact phrase or clause from the passage character-for-character rather than paraphrasing or reproducing a whole paragraph.
 Remove ambiguity, outside knowledge, answer leakage, duplicate competencies, weak distractors, level mismatch, and unsupported rationales.
 """
