@@ -40,5 +40,6 @@ def test_gradio_audio_url_is_absolute_and_encoded(tmp_path: Path) -> None:
 def test_audio_component_registers_reactive_browser_handler() -> None:
     source = (ROOT / "ui" / "layout.py").read_text(encoding="utf-8")
     assert "watch('value', bindAudio)" in source
-    assert "Browser autoplay was blocked" in source
+    assert "Press the play button in the player" in source
+    assert "audio.controls = false" in source
     assert "audio.dataset.strict === 'true'" in source

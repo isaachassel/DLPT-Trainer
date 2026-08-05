@@ -219,8 +219,8 @@ def controlled_audio_html(audio_path: str, element_id: str, strict: bool) -> str
     strict_value = "true" if strict else "false"
     return f"""
 <div class="controlled-audio-wrap" aria-live="polite" data-audio-wrapper="true">
-  <audio id="{safe_id}" data-controlled-audio="true" data-strict="{strict_value}" data-completion="{html.escape(completion, quote=True)}" src="{source}" autoplay preload="auto"></audio>
-  <div data-audio-status="true">Loading audio…</div>
+  <audio id="{safe_id}" data-controlled-audio="true" data-strict="{strict_value}" data-completion="{html.escape(completion, quote=True)}" src="{source}" controls playsinline preload="metadata"></audio>
+  <div data-audio-status="true">Audio ready. Press the play button in the player.</div>
 </div>
 """
 

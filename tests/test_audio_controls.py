@@ -30,10 +30,21 @@ def test_starter_audio_exists_and_is_nonempty(bank, project_root):
     assert validate_audio_file(path)
 
 
-def test_strict_audio_html_exposes_no_controls(bank, project_root):
+def test_strict_audio_html_exposes_initial_play_control(bank, project_root):
     asset = next(iter(bank.audio_assets.values()))
     path = resolve_audio_path(asset, project_root)
     rendered = controlled_audio_html(str(path), "x", strict=True)
-    assert " controls" not in rendered
+    assert " controls" in rendered
+    assert "autoplay" not in rendered
     assert "data:audio" not in rendered
     assert "Replay is disabled" in rendered
+
+
+def test_controlled_audio_exposes_first_play_control(tmp_path: Path) -> None:
+    path = tmp_path / "sample.mp3"
+    path.write_bytes(b"x" * 1024)
+    rendered = controlled_audio_html(str(path), "first-play", strict=True)
+    assert " controls" in rendered
+    assert "autoplay" not in rendered
+    assert 'preload="metadata"' in rendered
+    assert "Press the play button" in rendered

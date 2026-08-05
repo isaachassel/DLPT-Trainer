@@ -912,7 +912,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         _progress(progress, 1.0, "Audio ready")
         status = _status_text(
             state,
-            "Audio is prepared. The play is recorded only after the browser confirms that sound started."
+            "Audio is ready. Press the play button inside the audio player. The play is recorded only after the browser confirms that sound started."
             f"{audio_note}",
         )
         return (

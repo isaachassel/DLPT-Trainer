@@ -264,7 +264,7 @@ class GeneratedBankPersistence:
                     repo_type="dataset",
                     token=token,
                     cache_dir=str(self._cache_dir()),
-                    force_download=True,
+                    force_download=False,
                 ),
             )
         )

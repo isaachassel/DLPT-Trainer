@@ -42,7 +42,6 @@ const bindAudio = () => {
   const status = element.querySelector('[data-audio-status="true"]');
   if (!audio || !status || audio.dataset.bound === 'true') return;
   audio.dataset.bound = 'true';
-  audio.controls = false;
 
   const setStatus = (message) => { status.textContent = message; };
   const confirmPlayback = () => {
@@ -50,10 +49,17 @@ const bindAudio = () => {
     const button = host && (host.querySelector('button') || (host.tagName === 'BUTTON' ? host : null));
     if (button) button.click();
   };
+
   audio.addEventListener('playing', () => {
     setStatus('Playing audio…');
+    if (audio.dataset.strict === 'true') {
+      // The learner must have a real browser play control for the first start.
+      // Once sound begins, hide controls so strict modes cannot seek or replay.
+      audio.controls = false;
+    }
     confirmPlayback();
   }, { once: true });
+
   audio.addEventListener('ended', () => {
     setStatus(audio.dataset.completion || 'Playback completed.');
     if (audio.dataset.strict === 'true') {
@@ -61,14 +67,14 @@ const bindAudio = () => {
       audio.load();
     }
   }, { once: true });
-  audio.addEventListener('error', () => {
-    setStatus('Audio could not play. Your completed work remains saved. Press Play Audio once more or continue after the app recovers.');
-  }, { once: true });
 
-  const playResult = audio.play();
-  if (playResult && typeof playResult.catch === 'function') {
-    playResult.catch(() => setStatus('Browser autoplay was blocked. Press Play / Replay Audio again.'));
-  }
+  audio.addEventListener('error', () => {
+    setStatus('Audio could not load. Press Play / Replay Audio once more. Your completed work remains saved.');
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    setStatus('Audio ready. Press the play button in the player.');
+  }, { once: true });
 };
 watch('value', bindAudio);
 bindAudio();

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.2 — Reliable Listening Playback and Faster Restarts
+
+- Replaced blocked autoplay-only Listening behavior with an explicit browser audio play control.
+- Strict modes hide controls immediately after browser-confirmed playback begins, preserving one-play behavior without making first playback impossible.
+- Changed audio preloading from full-file autoplay to metadata-only loading, reducing delay and bandwidth.
+- Reused Hugging Face Hub cache entries during generated-bank restoration instead of forcing every audio file to download again.
+- Kept browser-confirmed play counting and checkpoint safety intact.
+
 ## v1.5.1 — Never-stop generated-question recovery
 
 - When targeted question repair is exhausted, discards the flawed set and authors a completely fresh question set for the already-validated passage.
