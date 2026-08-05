@@ -52,3 +52,4 @@ data/audio/zh_l009.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/zh_l010.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/zh_l011.mp3 filter=lfs diff=lfs merge=lfs -text
 data/audio/zh_l012.mp3 filter=lfs diff=lfs merge=lfs -text
+core/__pycache__/generation.cpython-313.pyc filter=lfs diff=lfs merge=lfs -text

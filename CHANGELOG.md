@@ -533,3 +533,11 @@
 - Added tests for fixed-answer-pattern absence, hidden proposed keys, separate author/verifier stages, strict schema-first calls, legacy environment compatibility, repair persistence, smart audit behavior, provider-attempt caps, failed-call analytics, quarantine redaction, and secret-excluding settings serialization.
 - Added `docs/GENAI_AUDIT.md` and rewrote provider/prompt setup documentation.
 - Regenerated all Pydantic JSON schemas.
+
+## 1.6.3 — Reliable dialogue voices and label-free speech
+- Parse both line-separated and inline speaker labels before synthesis.
+- Recognize common Russian, Mandarin, and English role labels, including malformed `Гост:` starter/generated content.
+- Never send speaker labels to TTS, even when a script cannot safely be classified as dialogue.
+- Assign and preserve separate voices for alternating speakers.
+- Force a new dialogue cache version so older one-voice or label-spoken files are not reused.
+- Keep dash-dialogue support and remove dash markers from spoken segments.

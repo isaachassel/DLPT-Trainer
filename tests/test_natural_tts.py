@@ -78,3 +78,17 @@ def test_naturalize_removes_pause_heavy_typography():
     assert "…" not in result
     assert " — " not in result
     assert "  " not in result
+
+
+def test_inline_speaker_labels_are_split_and_never_spoken():
+    from core.audio import split_speaker_turns
+    script = "Ведущий: Добрый вечер. Гость: Спасибо за приглашение. Ведущий: Что изменилось?"
+    turns = split_speaker_turns(script)
+    assert [label.casefold() for label, _ in turns] == ["ведущий", "гость", "ведущий"]
+    assert [text for _, text in turns] == ["Добрый вечер.", "Спасибо за приглашение.", "Что изменилось?"]
+    assert all("гость" not in text.casefold() and "ведущий" not in text.casefold() for _, text in turns)
+
+
+def test_malformed_guest_label_is_removed_from_fallback_audio():
+    from core.audio import strip_speaker_labels
+    assert strip_speaker_labels("Гост: Спасибо за приглашение.") == "Спасибо за приглашение."

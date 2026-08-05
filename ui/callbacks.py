@@ -907,7 +907,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                 path = generate_dialogue_cached_tts(
                     bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
                     pitch=pitch, volume=volume, language=bundle.passage.language,
-                    engine_version="edge-tts-7.2.8-dialogue-v1",
+                    engine_version="edge-tts-7.2.8-dialogue-v2",
                     timeout_seconds=SETTINGS.tts_timeout_seconds,
                     synthesizer=generate_cached_tts,
                 )
@@ -925,7 +925,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                     voice=voice_for_label(state.language, state.voice_label),
                     rate=rate_map.get(state.speech_rate_label, "+0%"),
                     pitch="+0Hz", volume="+0%", language=bundle.passage.language,
-                    engine_version="edge-tts-7.2.8-dialogue-v1-training",
+                    engine_version="edge-tts-7.2.8-dialogue-v2-training",
                     timeout_seconds=SETTINGS.tts_timeout_seconds,
                     synthesizer=generate_cached_tts,
                 )

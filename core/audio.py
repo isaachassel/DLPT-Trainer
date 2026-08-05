@@ -169,7 +169,7 @@ _SPEAKER_LINE = re.compile(
 _KNOWN_SPEAKER_LABELS = {
     "ведущий", "ведущая", "журналист", "журналистка", "корреспондент",
     "корреспондентка", "интервьюер", "интервьюируемый", "респондент",
-    "гость", "гостья", "эксперт", "экспертка", "мужчина", "женщина",
+    "гость", "гост", "гостья", "эксперт", "экспертка", "мужчина", "женщина",
     "диктор", "дикторша", "репортёр", "репортер", "сотрудник", "сотрудница",
     "клиент", "клиентка", "врач", "пациент", "пациентка", "учитель",
     "учительница", "студент", "студентка", "speaker 1", "speaker 2",
@@ -182,42 +182,69 @@ _FEMALE_LABEL_CUES = (
     "студентка", "woman", "female", "女",
 )
 _MALE_LABEL_CUES = (
-    "мужчин", "ведущий", "журналист", "корреспондент", "гость", "эксперт",
+    "мужчин", "ведущий", "журналист", "корреспондент", "гость", "гост", "эксперт",
     "сотрудник", "клиент", "пациент", "учитель", "студент", "man", "male", "男",
 )
 
 
-def split_speaker_turns(text: str) -> list[tuple[str, str]]:
-    """Return explicit dialogue turns, or an empty list for a single narrator.
+def _speaker_marker_pattern() -> re.Pattern[str]:
+    labels = sorted(_KNOWN_SPEAKER_LABELS, key=len, reverse=True)
+    alternatives = "|".join(re.escape(label) for label in labels)
+    generic = r"(?:speaker|говорящий|собеседник)\s*[12абab]"
+    return re.compile(
+        rf"(?<![\wА-Яа-яЁё])(?P<label>{alternatives}|{generic})\s*[:：]\s*",
+        re.IGNORECASE,
+    )
 
-    Supported forms include ``Ведущий: ...`` and multi-line dash dialogue. We
-    deliberately require at least two turns so ordinary colons or quoted dashes
-    are not misclassified as a conversation.
+
+_SPEAKER_MARKER = _speaker_marker_pattern()
+
+
+def strip_speaker_labels(text: str) -> str:
+    """Remove role labels from the synthesis copy under all circumstances.
+
+    This is intentionally independent from dialogue detection. Even malformed or
+    one-speaker scripts must never cause Edge TTS to say words such as ``Гость``.
+    """
+
+    value = str(text or "")
+    value = _SPEAKER_MARKER.sub("", value)
+    return re.sub(r"(?m)^\s*[—–-]\s*", "", value).strip()
+
+
+def split_speaker_turns(text: str) -> list[tuple[str, str]]:
+    """Extract dialogue turns without ever including labels in spoken text.
+
+    Handles labels on separate lines and labels embedded in a single line. The
+    parser only treats a script as multi-speaker when at least two distinct role
+    labels are present. Otherwise callers receive an empty list and use clean,
+    label-free narration.
     """
 
     raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
-    lines = [line.strip() for line in raw.split("\n") if line.strip()]
+    matches = list(_SPEAKER_MARKER.finditer(raw))
     labelled: list[tuple[str, str]] = []
-    for line in lines:
-        match = _SPEAKER_LINE.match(line)
-        if not match:
-            continue
-        label = match.group("label").strip()
-        normalized = label.casefold().rstrip(".")
-        if normalized in _KNOWN_SPEAKER_LABELS or re.fullmatch(r"(?:speaker|говорящий|собеседник)\s*[12абab]", normalized):
-            labelled.append((label, match.group("text").strip()))
+    for index, match in enumerate(matches):
+        start = match.end()
+        stop = matches[index + 1].start() if index + 1 < len(matches) else len(raw)
+        turn = raw[start:stop].strip(" \t\n—–-")
+        turn = strip_speaker_labels(turn)
+        if turn:
+            labelled.append((match.group("label").strip(), turn))
     if len(labelled) >= 2 and len({label.casefold() for label, _ in labelled}) >= 2:
         return labelled
 
+    lines = [line.strip() for line in raw.split("\n") if line.strip()]
     dashed = []
     for line in lines:
         match = re.match(r"^[—–-]\s*(.+?)\s*$", line)
         if match:
-            dashed.append(match.group(1).strip())
+            cleaned = strip_speaker_labels(match.group(1).strip())
+            if cleaned:
+                dashed.append(cleaned)
     if len(dashed) >= 2:
         return [(f"speaker_{index % 2}", turn) for index, turn in enumerate(dashed)]
     return []
-
 
 def _voice_for_turn(label: str, index: int, primary_voice: str, secondary_voice: str) -> str:
     normalized = label.casefold()
@@ -292,7 +319,7 @@ def generate_dialogue_cached_tts(
     pitch: str = "+0Hz",
     volume: str = "+0%",
     language: str = "ru",
-    engine_version: str = "edge-tts-7.2.8-dialogue-v1",
+    engine_version: str = "edge-tts-7.2.8-dialogue-v2",
     timeout_seconds: float = 60.0,
     synthesizer=None,
 ) -> Path:
@@ -307,7 +334,7 @@ def generate_dialogue_cached_tts(
     turns = split_speaker_turns(transcript)
     if not turns:
         return synth(
-            transcript, cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+            strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
             language=language, naturalize=True, engine_version=engine_version,
             timeout_seconds=timeout_seconds,
         )
@@ -319,7 +346,7 @@ def generate_dialogue_cached_tts(
     ]
     if len(plan) < 2:
         return synth(
-            transcript, cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+            strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
             language=language, naturalize=True, engine_version=engine_version,
             timeout_seconds=timeout_seconds,
         )
