@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.6.2 — Multi-Speaker Dialogue and Pause Cleanup
+
+- Added true turn-by-turn male/female synthesis for labelled Russian and Mandarin interviews, conversations, discussions, debates, calls, and dash-form dialogue.
+- Preserved speaker identity across repeated turns and stopped speaker labels from being read aloud.
+- Added ffmpeg-based boundary-silence trimming and seamless dialogue assembly.
+- Removed pause-heavy synthesis typography including nonbreaking spaces, ellipses, repeated punctuation, and spaced em dashes while leaving the learner-visible transcript unchanged.
+- Updated generation prompts to require explicit line-by-line speaker labels for multi-speaker Listening scripts.
+- Invalidated older one-voice dialogue caches so affected passages upgrade lazily on first playback.
+- Added parser, voice-assignment, typography-cleanup, and dialogue-regression tests.
+
+## 1.6.1 — Fluent neural audio correction
+
+- Fixed Training mode defaulting to legacy eSpeak starter-bank recordings.
+- All starter and generated listening passages now lazily receive Edge neural audio when selected.
+- Removed artificial paragraph breaks and discourse-marker punctuation that caused long pauses.
+- Removed random pitch modulation; native voice pitch is preserved.
+- Uses restrained +1% to +5% pacing based on passage genre.
+- Renamed the default selector to Automatic natural voice.
+- Keeps lazy caching so startup remains fast.
+
+# Changelog
+
 ## 1.6.0 — Natural Listening Prosody
 
 - Kept the free Microsoft Edge TTS engine while replacing flat one-profile synthesis with restrained passage-aware prosody.

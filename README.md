@@ -18,6 +18,16 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
+### Audio behavior in v1.6.1
+
+The default **Automatic natural voice** setting now generates a native Microsoft Edge neural recording lazily when each listening passage is selected. Legacy bundled eSpeak MP3s remain only as an offline fallback. The app no longer injects artificial paragraph pauses or random pitch changes into Russian speech.
+
+## Natural multi-speaker listening audio
+
+Version 1.6.2 detects explicitly labelled interviews, conversations, debates, calls, and dash-form dialogue. Each speaker is synthesized separately with a consistent male or female neural voice, speaker labels are omitted from the recording, and turn-boundary dead air is trimmed before the turns are joined. Single-speaker passages remain single-voice. The synthesis-only text cleaner also removes pause-heavy typography such as nonbreaking spaces, ellipses, and spaced em dashes without changing the transcript shown to learners. Previously cached one-voice recordings are upgraded lazily when selected.
+
+Fresh AI-generated multi-speaker scripts are required to put each turn on its own line with an explicit speaker label so the renderer can distinguish speakers reliably.
+
 ## What happened to the original GenAI code
 
 The original Hugging Face/Groq capability was **not removed**. The current release supports both providers, ordered fallback, user-requested fresh content, validation, TTS, and generated-bank storage.

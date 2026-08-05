@@ -28,7 +28,7 @@ LANGUAGES: dict[str, LanguageProfile] = {
         male_voice="ru-RU-DmitryNeural",
         female_voice_label="Russian Female — Svetlana",
         male_voice_label="Russian Male — Dmitry",
-        starter_voice_label="Starter-bank Russian voice",
+        starter_voice_label="Automatic natural Russian voice",
     ),
     "zh-CN": LanguageProfile(
         code="zh-CN",
@@ -40,7 +40,7 @@ LANGUAGES: dict[str, LanguageProfile] = {
         male_voice="zh-CN-YunxiNeural",
         female_voice_label="Mandarin Female — Xiaoxiao",
         male_voice_label="Mandarin Male — Yunxi",
-        starter_voice_label="Starter-bank Mandarin voice",
+        starter_voice_label="Automatic natural Mandarin voice",
     ),
 }
 

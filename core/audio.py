@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import threading
 import time
+import tempfile
 from pathlib import Path
 from typing import Coroutine, Iterable, TypeVar
 from urllib.parse import quote
@@ -141,48 +142,100 @@ def resolve_audio_path(asset: AudioAsset, project_root: str | Path) -> Path:
     return path
 
 
-_SPOKEN_MARKERS_RU = (
-    "однако", "кроме того", "тем не менее",
-    "таким образом", "в результате", "например", "во-первых", "во-вторых",
-    "с другой стороны", "между тем", "в частности",
-)
-
-
 def naturalize_spoken_text(text: str, language: str = "ru") -> str:
-    """Prepare authored prose for speech without changing its words or meaning.
+    """Prepare authored text for fluent TTS without changing its words.
 
-    Edge voices react strongly to punctuation and sentence boundaries.  Generated
-    passages often arrive as visually valid prose but with weak spoken phrasing.
-    This conservative pass only repairs whitespace, punctuation spacing, paragraph
-    boundaries, and missing commas after common Russian discourse markers.
+    Edge can turn typography intended for reading—nonbreaking spaces, spaced
+    dashes, ellipses, and repeated punctuation—into conspicuous silence. The
+    display transcript remains untouched; only the synthesis copy is normalized.
     """
 
     value = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
+    value = value.replace("\u00a0", " ").replace("\u202f", " ").replace("\u2009", " ")
     value = re.sub(r"[ \t]+", " ", value)
-    value = re.sub(r" *\n *", "\n", value)
-    value = re.sub(r"\n{3,}", "\n\n", value)
+    value = re.sub(r" *\n+ *", " ", value)
+    value = re.sub(r"\.{3,}|…+", ", ", value)
+    value = re.sub(r"\s+[—–-]\s+", ", ", value)
+    value = re.sub(r"([!?.,;:])\1+", r"\1", value)
     value = re.sub(r"\s+([,.;:!?])", r"\1", value)
-    value = re.sub(r"([,;:!?])(?=[^\s\n])", r"\1 ", value)
-    value = re.sub(r"(?<!\.)\.{3,}", "…", value)
-    value = re.sub(r"([!?]){2,}", r"\1", value)
-
-    if language == "ru":
-        marker_pattern = "|".join(re.escape(marker) for marker in _SPOKEN_MARKERS_RU)
-        value = re.sub(
-            rf"(?im)(^|[.!?]\s+|\n)({marker_pattern})(?!\s*[,—-])\s+",
-            lambda match: f"{match.group(1)}{match.group(2)}, ",
-            value,
-        )
-
-    # A paragraph boundary gives Edge a more natural reset than one uninterrupted
-    # wall of text. Preserve authored paragraphs and add one after full stops only
-    # when the passage otherwise contains none and is long enough to benefit.
-    if "\n" not in value and len(value) > 250:
-        sentences = re.split(r"(?<=[.!?])\s+", value)
-        if len(sentences) >= 5:
-            groups = [" ".join(sentences[i:i + 3]) for i in range(0, len(sentences), 3)]
-            value = "\n\n".join(groups)
+    value = re.sub(r"([,;:!?])(?=[^\s])", r"\1 ", value)
+    value = re.sub(r"\s{2,}", " ", value)
     return value.strip()
+
+
+_SPEAKER_LINE = re.compile(
+    r"^\s*(?P<label>[А-ЯЁA-Z][А-Яа-яЁёA-Za-z0-9 ._-]{0,30})\s*[:：]\s*(?P<text>.+?)\s*$"
+)
+_KNOWN_SPEAKER_LABELS = {
+    "ведущий", "ведущая", "журналист", "журналистка", "корреспондент",
+    "корреспондентка", "интервьюер", "интервьюируемый", "респондент",
+    "гость", "гостья", "эксперт", "экспертка", "мужчина", "женщина",
+    "диктор", "дикторша", "репортёр", "репортер", "сотрудник", "сотрудница",
+    "клиент", "клиентка", "врач", "пациент", "пациентка", "учитель",
+    "учительница", "студент", "студентка", "speaker 1", "speaker 2",
+    "host", "guest", "interviewer", "reporter", "expert", "man", "woman",
+    "主持人", "记者", "嘉宾", "专家", "男", "女", "顾客", "工作人员",
+}
+_FEMALE_LABEL_CUES = (
+    "женщ", "ведущая", "журналистка", "корреспондентка", "гостья",
+    "экспертка", "сотрудница", "клиентка", "пациентка", "учительница",
+    "студентка", "woman", "female", "女",
+)
+_MALE_LABEL_CUES = (
+    "мужчин", "ведущий", "журналист", "корреспондент", "гость", "эксперт",
+    "сотрудник", "клиент", "пациент", "учитель", "студент", "man", "male", "男",
+)
+
+
+def split_speaker_turns(text: str) -> list[tuple[str, str]]:
+    """Return explicit dialogue turns, or an empty list for a single narrator.
+
+    Supported forms include ``Ведущий: ...`` and multi-line dash dialogue. We
+    deliberately require at least two turns so ordinary colons or quoted dashes
+    are not misclassified as a conversation.
+    """
+
+    raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
+    lines = [line.strip() for line in raw.split("\n") if line.strip()]
+    labelled: list[tuple[str, str]] = []
+    for line in lines:
+        match = _SPEAKER_LINE.match(line)
+        if not match:
+            continue
+        label = match.group("label").strip()
+        normalized = label.casefold().rstrip(".")
+        if normalized in _KNOWN_SPEAKER_LABELS or re.fullmatch(r"(?:speaker|говорящий|собеседник)\s*[12абab]", normalized):
+            labelled.append((label, match.group("text").strip()))
+    if len(labelled) >= 2 and len({label.casefold() for label, _ in labelled}) >= 2:
+        return labelled
+
+    dashed = []
+    for line in lines:
+        match = re.match(r"^[—–-]\s*(.+?)\s*$", line)
+        if match:
+            dashed.append(match.group(1).strip())
+    if len(dashed) >= 2:
+        return [(f"speaker_{index % 2}", turn) for index, turn in enumerate(dashed)]
+    return []
+
+
+def _voice_for_turn(label: str, index: int, primary_voice: str, secondary_voice: str) -> str:
+    normalized = label.casefold()
+    if any(cue in normalized for cue in _FEMALE_LABEL_CUES):
+        candidates = [voice for voice in (primary_voice, secondary_voice) if "Svetlana" in voice or "Xiaoxiao" in voice]
+        if candidates:
+            return candidates[0]
+    if any(cue in normalized for cue in _MALE_LABEL_CUES):
+        candidates = [voice for voice in (primary_voice, secondary_voice) if "Dmitry" in voice or "Yunxi" in voice]
+        if candidates:
+            return candidates[0]
+    return primary_voice if index % 2 == 0 else secondary_voice
+
+
+def _opposite_voice(language: str, voice: str) -> str:
+    if language == "zh-CN":
+        return "zh-CN-XiaoxiaoNeural" if "Yunxi" in voice else "zh-CN-YunxiNeural"
+    return "ru-RU-SvetlanaNeural" if "Dmitry" in voice else "ru-RU-DmitryNeural"
 
 
 async def _edge_tts_save(
@@ -229,6 +282,102 @@ def generate_cached_tts(
     finally:
         if temp.exists():
             temp.unlink(missing_ok=True)
+
+
+def generate_dialogue_cached_tts(
+    transcript: str,
+    cache_dir: str | Path,
+    voice: str = "ru-RU-SvetlanaNeural",
+    rate: str = "+0%",
+    pitch: str = "+0Hz",
+    volume: str = "+0%",
+    language: str = "ru",
+    engine_version: str = "edge-tts-7.2.8-dialogue-v1",
+    timeout_seconds: float = 60.0,
+    synthesizer=None,
+) -> Path:
+    """Generate one narrator or a genuine alternating-voice dialogue.
+
+    Explicit speaker labels are not spoken. Each turn is synthesized independently
+    and silence-trimmed before concatenation. This prevents one voice from reading
+    both sides and removes the dead air commonly introduced at MP3 boundaries.
+    """
+
+    synth = synthesizer or generate_cached_tts
+    turns = split_speaker_turns(transcript)
+    if not turns:
+        return synth(
+            transcript, cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+            language=language, naturalize=True, engine_version=engine_version,
+            timeout_seconds=timeout_seconds,
+        )
+
+    secondary_voice = _opposite_voice(language, voice)
+    plan = [
+        (label, naturalize_spoken_text(turn, language), _voice_for_turn(label, index, voice, secondary_voice))
+        for index, (label, turn) in enumerate(turns) if turn.strip()
+    ]
+    if len(plan) < 2:
+        return synth(
+            transcript, cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+            language=language, naturalize=True, engine_version=engine_version,
+            timeout_seconds=timeout_seconds,
+        )
+
+    cache_root = Path(cache_dir).resolve()
+    cache_root.mkdir(parents=True, exist_ok=True)
+    signature = "\n".join(f"{label}|{speaker}|{spoken}" for label, spoken, speaker in plan)
+    key = audio_cache_key(signature, f"{voice}+{secondary_voice}", rate, engine_version, pitch, volume)
+    output = cache_root / f"{key}.mp3"
+    if validate_audio_file(output):
+        return output
+
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise AudioError("Multi-speaker audio requires ffmpeg, which is missing from this runtime.")
+
+    temp_output = output.with_suffix(".tmp.mp3")
+    with tempfile.TemporaryDirectory(prefix="dlpt_dialogue_", dir=cache_root) as work_dir:
+        work = Path(work_dir)
+        segment_paths: list[Path] = []
+        for index, (_label, spoken, speaker_voice) in enumerate(plan):
+            segment = synth(
+                spoken, work, voice=speaker_voice, rate=rate, pitch=pitch, volume=volume,
+                language=language, naturalize=False, engine_version=f"{engine_version}-segment",
+                timeout_seconds=timeout_seconds,
+            )
+            segment_paths.append(segment)
+
+        command = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
+        for segment in segment_paths:
+            command.extend(["-i", str(segment)])
+        filters = []
+        labels = []
+        for index in range(len(segment_paths)):
+            # Trim only boundary silence; do not compress pauses within a speaker's turn.
+            out_label = f"a{index}"
+            filters.append(
+                f"[{index}:a]silenceremove=start_periods=1:start_duration=0.03:start_threshold=-48dB:"
+                f"stop_periods=1:stop_duration=0.10:stop_threshold=-48dB[{out_label}]"
+            )
+            labels.append(f"[{out_label}]")
+        filters.append("".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]")
+        command.extend([
+            "-filter_complex", ";".join(filters), "-map", "[outa]",
+            "-codec:a", "libmp3lame", "-q:a", "3", str(temp_output),
+        ])
+        try:
+            subprocess.run(command, check=True, capture_output=True, text=True, timeout=max(30, int(timeout_seconds)))
+        except subprocess.CalledProcessError as exc:
+            raise AudioError(f"Multi-speaker audio assembly failed: {exc.stderr[-240:]}") from exc
+        except subprocess.TimeoutExpired as exc:
+            raise AudioError("Multi-speaker audio assembly timed out.") from exc
+
+    if not validate_audio_file(temp_output):
+        temp_output.unlink(missing_ok=True)
+        raise AudioError("Multi-speaker audio assembly produced an incomplete file.")
+    os.replace(temp_output, output)
+    return output
 
 
 def cleanup_audio_files(
