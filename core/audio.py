@@ -4,6 +4,7 @@ import asyncio
 import atexit
 import hashlib
 import html
+import logging
 import os
 import re
 import shutil
@@ -11,11 +12,18 @@ import subprocess
 import threading
 import time
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Coroutine, Iterable, TypeVar
 from urllib.parse import quote
 
 from .models import AudioAsset
+
+
+LOGGER = logging.getLogger("dlpt.audio")
+
+DIALOGUE_TTS_CACHE_VERSION = "edge-tts-7.2.8-dialogue-v5-three-native-voices"
+DIALOGUE_TTS_ASSET_VERSION = "7.2.8-dialogue-v5-three-native-voices"
 
 
 class AudioError(RuntimeError):
@@ -170,21 +178,12 @@ _KNOWN_SPEAKER_LABELS = {
     "ведущий", "ведущая", "журналист", "журналистка", "корреспондент",
     "корреспондентка", "интервьюер", "интервьюируемый", "респондент",
     "гость", "гост", "гостья", "эксперт", "экспертка", "мужчина", "женщина",
-    "диктор", "дикторша", "репортёр", "репортер", "сотрудник", "сотрудница",
+    "диктор", "дикторша", "сотрудник", "сотрудница", "репортёр", "репортер",
     "клиент", "клиентка", "врач", "пациент", "пациентка", "учитель",
     "учительница", "студент", "студентка", "speaker 1", "speaker 2",
     "host", "guest", "interviewer", "reporter", "expert", "man", "woman",
     "主持人", "记者", "嘉宾", "专家", "男", "女", "顾客", "工作人员",
 }
-_FEMALE_LABEL_CUES = (
-    "женщ", "ведущая", "журналистка", "корреспондентка", "гостья",
-    "экспертка", "сотрудница", "клиентка", "пациентка", "учительница",
-    "студентка", "woman", "female", "女",
-)
-_MALE_LABEL_CUES = (
-    "мужчин", "ведущий", "журналист", "корреспондент", "гость", "гост", "эксперт",
-    "сотрудник", "клиент", "пациент", "учитель", "студент", "man", "male", "男",
-)
 
 
 def _speaker_marker_pattern() -> re.Pattern[str]:
@@ -201,11 +200,7 @@ _SPEAKER_MARKER = _speaker_marker_pattern()
 
 
 def strip_speaker_labels(text: str) -> str:
-    """Remove role labels from the synthesis copy under all circumstances.
-
-    This is intentionally independent from dialogue detection. Even malformed or
-    one-speaker scripts must never cause Edge TTS to say words such as ``Гость``.
-    """
+    """Remove role labels from the synthesis copy under all circumstances."""
 
     value = str(text or "")
     value = _SPEAKER_MARKER.sub("", value)
@@ -213,13 +208,7 @@ def strip_speaker_labels(text: str) -> str:
 
 
 def split_speaker_turns(text: str) -> list[tuple[str, str]]:
-    """Extract dialogue turns without ever including labels in spoken text.
-
-    Handles labels on separate lines and labels embedded in a single line. The
-    parser only treats a script as multi-speaker when at least two distinct role
-    labels are present. Otherwise callers receive an empty list and use clean,
-    label-free narration.
-    """
+    """Extract dialogue turns while keeping all labels out of spoken text."""
 
     raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
     matches = list(_SPEAKER_MARKER.finditer(raw))
@@ -235,7 +224,7 @@ def split_speaker_turns(text: str) -> list[tuple[str, str]]:
         return labelled
 
     lines = [line.strip() for line in raw.split("\n") if line.strip()]
-    dashed = []
+    dashed: list[str] = []
     for line in lines:
         match = re.match(r"^[—–-]\s*(.+?)\s*$", line)
         if match:
@@ -245,24 +234,169 @@ def split_speaker_turns(text: str) -> list[tuple[str, str]]:
     if len(dashed) >= 2:
         return [(f"speaker_{index % 2}", turn) for index, turn in enumerate(dashed)]
     return []
+_FEMALE_LABEL_CUES = (
+    "женщина", "ведущая", "журналистка", "корреспондентка", "гостья",
+    "экспертка", "сотрудница", "клиентка", "пациентка", "учительница",
+    "студентка", "woman", "female", "女",
+)
+# Only explicit male cues are treated as hard gender information. Generic Russian
+# role nouns such as ``ведущий``, ``гость``, and ``эксперт`` are deliberately not
+# hard-coded to Dmitry.
+_MALE_LABEL_CUES = ("мужчина", "man", "male", "男")
+
+_RUSSIAN_NATIVE_VOICES = (
+    "ru-RU-DmitryNeural",
+    "ru-RU-SvetlanaNeural",
+    "ru-RU-DariyaNeural",
+)
+_MANDARIN_NATIVE_VOICES = (
+    "zh-CN-YunxiNeural",
+    "zh-CN-XiaoxiaoNeural",
+)
+
+
+@dataclass(frozen=True)
+class SpeakerVoiceProfile:
+    voice: str
+    rate: str
+
+
+def _speaker_gender_preference(label: str) -> str | None:
+    normalized = label.casefold().strip()
+    if any(cue in normalized for cue in _FEMALE_LABEL_CUES):
+        return "female"
+    if any(cue in normalized for cue in _MALE_LABEL_CUES):
+        return "male"
+    return None
+
+
+def _voice_gender(voice: str) -> str | None:
+    if any(name in voice for name in ("Svetlana", "Dariya", "Xiaoxiao")):
+        return "female"
+    if any(name in voice for name in ("Dmitry", "Yunxi")):
+        return "male"
+    return None
+
+
+def _native_voice_pool(language: str, primary_voice: str) -> list[str]:
+    configured = _MANDARIN_NATIVE_VOICES if language == "zh-CN" else _RUSSIAN_NATIVE_VOICES
+    ordered = [primary_voice, *configured]
+    pool: list[str] = []
+    for candidate in ordered:
+        if candidate and candidate not in pool:
+            pool.append(candidate)
+    return pool
+
+
+def _parse_rate_percent(rate: str) -> int:
+    match = re.fullmatch(r"([+-]?)(\d+)%", str(rate).strip())
+    if not match:
+        return 0
+    value = int(match.group(2))
+    return -value if match.group(1) == "-" else value
+
+
+def _rate_with_delta(rate: str, delta: int) -> str:
+    value = max(-35, min(35, _parse_rate_percent(rate) + delta))
+    return f"{value:+d}%"
+
+
+def _dialogue_speaker_profiles(
+    turns: list[tuple[str, str]],
+    primary_voice: str,
+    language: str,
+    base_rate: str = "+0%",
+    voice_pool: Iterable[str] | None = None,
+) -> dict[str, SpeakerVoiceProfile]:
+    """Assign stable voices to speaker identities.
+
+    Russian gets three distinct native neural voices: Dmitry, Svetlana, and
+    Dariya. A fourth distinct speaker reuses a native voice with a restrained
+    rate difference so the role remains distinguishable without artificial pitch
+    manipulation. Repeated turns always retain the same profile.
+    """
+
+    unique_labels: list[str] = []
+    original_labels: dict[str, str] = {}
+    for label, _text in turns:
+        key = label.casefold().strip()
+        if key and key not in original_labels:
+            original_labels[key] = label
+            unique_labels.append(key)
+    if not unique_labels:
+        return {}
+
+    pool = []
+    for candidate in (list(voice_pool) if voice_pool is not None else _native_voice_pool(language, primary_voice)):
+        if candidate and candidate not in pool:
+            pool.append(candidate)
+    if not pool:
+        pool = [primary_voice]
+
+    mapping: dict[str, SpeakerVoiceProfile] = {}
+    unused = list(pool)
+    voice_use_count: dict[str, int] = {voice: 0 for voice in pool}
+
+    for index, key in enumerate(unique_labels):
+        preference = _speaker_gender_preference(original_labels[key])
+        chosen: str | None = None
+
+        # The user's selected/default primary voice owns the first generic role.
+        if index == 0 and primary_voice in unused and (
+            preference is None or _voice_gender(primary_voice) == preference
+        ):
+            chosen = primary_voice
+
+        if chosen is None and preference is not None:
+            chosen = next((voice for voice in unused if _voice_gender(voice) == preference), None)
+        if chosen is None and unused:
+            chosen = unused[0]
+        if chosen is None:
+            matching = [voice for voice in pool if preference is None or _voice_gender(voice) == preference]
+            candidates = matching or pool
+            chosen = candidates[index % len(candidates)]
+
+        if chosen in unused:
+            unused.remove(chosen)
+
+        reuse_index = voice_use_count.get(chosen, 0)
+        voice_use_count[chosen] = reuse_index + 1
+        # First use keeps the requested rate. Reused voices receive small,
+        # bounded timing differences; pitch remains untouched.
+        reuse_deltas = (0, -4, +4, -7, +7)
+        delta = reuse_deltas[min(reuse_index, len(reuse_deltas) - 1)]
+        mapping[key] = SpeakerVoiceProfile(chosen, _rate_with_delta(base_rate, delta))
+
+    return mapping
+
+
+def _dialogue_voice_map(
+    turns: list[tuple[str, str]], primary_voice: str, secondary_voice: str
+) -> dict[str, str]:
+    """Backward-compatible voice-only map used by tests and extensions."""
+
+    language = "zh-CN" if primary_voice.startswith("zh-") else "ru"
+    pool = [primary_voice, secondary_voice, *_native_voice_pool(language, primary_voice)]
+    profiles = _dialogue_speaker_profiles(
+        turns, primary_voice, language, voice_pool=pool
+    )
+    return {key: profile.voice for key, profile in profiles.items()}
+
 
 def _voice_for_turn(label: str, index: int, primary_voice: str, secondary_voice: str) -> str:
-    normalized = label.casefold()
-    if any(cue in normalized for cue in _FEMALE_LABEL_CUES):
-        candidates = [voice for voice in (primary_voice, secondary_voice) if "Svetlana" in voice or "Xiaoxiao" in voice]
-        if candidates:
-            return candidates[0]
-    if any(cue in normalized for cue in _MALE_LABEL_CUES):
-        candidates = [voice for voice in (primary_voice, secondary_voice) if "Dmitry" in voice or "Yunxi" in voice]
-        if candidates:
-            return candidates[0]
+    """Compatibility helper for isolated turn tests."""
+
+    preference = _speaker_gender_preference(label)
+    if preference is not None:
+        for candidate in (primary_voice, secondary_voice):
+            if _voice_gender(candidate) == preference:
+                return candidate
     return primary_voice if index % 2 == 0 else secondary_voice
 
 
 def _opposite_voice(language: str, voice: str) -> str:
-    if language == "zh-CN":
-        return "zh-CN-XiaoxiaoNeural" if "Yunxi" in voice else "zh-CN-YunxiNeural"
-    return "ru-RU-SvetlanaNeural" if "Dmitry" in voice else "ru-RU-DmitryNeural"
+    pool = _native_voice_pool(language, voice)
+    return next((candidate for candidate in pool if candidate != voice), voice)
 
 
 async def _edge_tts_save(
@@ -319,15 +453,16 @@ def generate_dialogue_cached_tts(
     pitch: str = "+0Hz",
     volume: str = "+0%",
     language: str = "ru",
-    engine_version: str = "edge-tts-7.2.8-dialogue-v3",
+    engine_version: str = DIALOGUE_TTS_CACHE_VERSION,
     timeout_seconds: float = 60.0,
     synthesizer=None,
 ) -> Path:
-    """Generate one narrator or a genuine alternating-voice dialogue.
+    """Generate one narrator or a real multi-speaker recording.
 
-    Explicit speaker labels are not spoken. Each turn is synthesized independently
-    and silence-trimmed before concatenation. This prevents one voice from reading
-    both sides and removes the dead air commonly introduced at MP3 boundaries.
+    Only detected dialogue is segmented. Each distinct Russian speaker receives
+    an unused native voice first (Dmitry, Svetlana, Dariya). Speaker labels never
+    reach TTS. Four-plus speaker scripts reuse voices with restrained rate
+    differences rather than fake pitch shifts.
     """
 
     synth = synthesizer or generate_cached_tts
@@ -339,11 +474,22 @@ def generate_dialogue_cached_tts(
             timeout_seconds=timeout_seconds,
         )
 
-    secondary_voice = _opposite_voice(language, voice)
+    profiles = _dialogue_speaker_profiles(turns, voice, language, base_rate=rate)
     plan = [
-        (label, naturalize_spoken_text(turn, language), _voice_for_turn(label, index, voice, secondary_voice))
-        for index, (label, turn) in enumerate(turns) if turn.strip()
+        (
+            label,
+            naturalize_spoken_text(turn, language),
+            profiles[label.casefold().strip()].voice,
+            profiles[label.casefold().strip()].rate,
+        )
+        for label, turn in turns if turn.strip()
     ]
+    LOGGER.info(
+        "Dialogue TTS plan speakers=%s profiles=%s turns=%s",
+        list(dict.fromkeys(label for label, _spoken, _voice, _rate in plan)),
+        list(dict.fromkeys(f"{speaker_voice}@{speaker_rate}" for _label, _spoken, speaker_voice, speaker_rate in plan)),
+        len(plan),
+    )
     if len(plan) < 2:
         return synth(
             strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
@@ -353,8 +499,12 @@ def generate_dialogue_cached_tts(
 
     cache_root = Path(cache_dir).resolve()
     cache_root.mkdir(parents=True, exist_ok=True)
-    signature = "\n".join(f"{label}|{speaker}|{spoken}" for label, spoken, speaker in plan)
-    key = audio_cache_key(signature, f"{voice}+{secondary_voice}", rate, engine_version, pitch, volume)
+    signature = "\n".join(
+        f"{label}|{speaker_voice}|{speaker_rate}|{spoken}"
+        for label, spoken, speaker_voice, speaker_rate in plan
+    )
+    voice_signature = "+".join(dict.fromkeys(speaker_voice for _label, _spoken, speaker_voice, _rate in plan))
+    key = audio_cache_key(signature, voice_signature, rate, engine_version, pitch, volume)
     output = cache_root / f"{key}.mp3"
     if validate_audio_file(output):
         return output
@@ -367,22 +517,36 @@ def generate_dialogue_cached_tts(
     with tempfile.TemporaryDirectory(prefix="dlpt_dialogue_", dir=cache_root) as work_dir:
         work = Path(work_dir)
         segment_paths: list[Path] = []
-        for index, (_label, spoken, speaker_voice) in enumerate(plan):
-            segment = synth(
-                spoken, work, voice=speaker_voice, rate=rate, pitch=pitch, volume=volume,
-                language=language, naturalize=False, engine_version=f"{engine_version}-segment",
-                timeout_seconds=timeout_seconds,
-            )
+        for index, (_label, spoken, speaker_voice, speaker_rate) in enumerate(plan):
+            try:
+                segment = synth(
+                    spoken, work, voice=speaker_voice, rate=speaker_rate, pitch=pitch, volume=volume,
+                    language=language, naturalize=False, engine_version=f"{engine_version}-segment",
+                    timeout_seconds=timeout_seconds,
+                )
+            except Exception as exc:
+                # Dariya is in the current Microsoft/Edge catalog, but the live
+                # service can change independently. Fail gracefully to another
+                # native voice instead of losing the entire listening item.
+                fallback_pool = [candidate for candidate in _native_voice_pool(language, voice) if candidate != speaker_voice]
+                if not fallback_pool:
+                    raise
+                fallback_voice = fallback_pool[index % len(fallback_pool)]
+                fallback_rate = _rate_with_delta(speaker_rate, -4 if index % 2 == 0 else +4)
+                LOGGER.warning(
+                    "Dialogue voice unavailable voice=%s; retrying voice=%s rate=%s reason=%s",
+                    speaker_voice, fallback_voice, fallback_rate, type(exc).__name__,
+                )
+                segment = synth(
+                    spoken, work, voice=fallback_voice, rate=fallback_rate, pitch=pitch, volume=volume,
+                    language=language, naturalize=False, engine_version=f"{engine_version}-segment-fallback",
+                    timeout_seconds=timeout_seconds,
+                )
             segment_paths.append(segment)
 
         command = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
         for segment in segment_paths:
             command.extend(["-i", str(segment)])
-        # Do not use ``silenceremove`` here. Edge speech naturally contains
-        # short internal pauses, and FFmpeg's stop-period behavior can treat the
-        # first pause as end-of-turn and truncate an entire segment. Concatenate
-        # the complete turns instead; the small native boundary pause is safer
-        # and sounds more natural than damaged dialogue.
         labels = [f"[{index}:a]" for index in range(len(segment_paths))]
         filters = ["".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]"]
         command.extend([
@@ -398,7 +562,7 @@ def generate_dialogue_cached_tts(
 
     if not validate_audio_file(temp_output):
         temp_output.unlink(missing_ok=True)
-        raise AudioError("Multi-speaker audio assembly produced an incomplete file.")
+        raise AudioError("Multi-speaker audio assembly returned an empty or incomplete file.")
     os.replace(temp_output, output)
     return output
 

@@ -15,6 +15,7 @@ class LanguageProfile:
     female_voice_label: str
     male_voice_label: str
     starter_voice_label: str
+    additional_voices: tuple[tuple[str, str], ...] = ()
 
 
 LANGUAGES: dict[str, LanguageProfile] = {
@@ -29,6 +30,7 @@ LANGUAGES: dict[str, LanguageProfile] = {
         female_voice_label="Russian Female — Svetlana",
         male_voice_label="Russian Male — Dmitry",
         starter_voice_label="Automatic natural Russian voice",
+        additional_voices=(("Russian Female — Dariya", "ru-RU-DariyaNeural"),),
     ),
     "zh-CN": LanguageProfile(
         code="zh-CN",
@@ -59,13 +61,43 @@ def language_profile(code: str) -> LanguageProfile:
         raise ValueError(f"Unsupported language: {code}") from exc
 
 
-def voice_choices(code: str) -> list[str]:
+def voice_entries(code: str) -> list[tuple[str, str]]:
+    """Return stable user-facing labels and native voice IDs for a language."""
+
     profile = language_profile(code)
-    return [profile.female_voice_label, profile.male_voice_label, profile.starter_voice_label]
+    entries = [
+        (profile.female_voice_label, profile.female_voice),
+        *profile.additional_voices,
+        (profile.male_voice_label, profile.male_voice),
+    ]
+    # Keep the automatic option last for compatibility with existing saved UI
+    # payloads while the layout explicitly selects it as the default value.
+    entries.append((profile.starter_voice_label, profile.female_voice))
+    return entries
+
+
+def voice_choices(code: str) -> list[str]:
+    return [label for label, _voice in voice_entries(code)]
 
 
 def voice_for_label(code: str, label: str) -> str:
+    entries = dict(voice_entries(code))
     profile = language_profile(code)
-    if label == profile.male_voice_label:
-        return profile.male_voice
-    return profile.female_voice
+    return entries.get(label, profile.female_voice)
+
+
+def native_voice_pool(code: str, preferred_voice: str | None = None) -> tuple[str, ...]:
+    """Return a de-duplicated native voice pool with the preferred voice first."""
+
+    profile = language_profile(code)
+    configured = [
+        profile.male_voice,
+        profile.female_voice,
+        *(voice for _label, voice in profile.additional_voices),
+    ]
+    ordered = ([preferred_voice] if preferred_voice else []) + configured
+    result: list[str] = []
+    for voice in ordered:
+        if voice and voice not in result:
+            result.append(voice)
+    return tuple(result)

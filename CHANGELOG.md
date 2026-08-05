@@ -549,3 +549,24 @@
 - Bumped the dialogue audio cache generation so damaged 1.6.3 files are not reused.
 - Generated-bank synchronization now checks the remote file index once and uploads only new audio instead of retrying every historical MP3.
 - Corrected dialogue audio asset engine-version metadata.
+
+## 1.6.5 — Guaranteed distinct dialogue voices
+
+- Fixed the live voice router that classified common Russian role labels such as `Ведущий`, `Гость`, `Интервьюер`, and `Эксперт` as male and therefore sent every turn to Dmitry.
+- Assigns voices by stable speaker identity rather than independently per turn.
+- Guarantees the first two distinct dialogue speakers use opposite voices while keeping each speaker consistent across the full recording.
+- Honors explicit female/male labels when possible and still preserves audible contrast when two labels indicate the same gender.
+- Added runtime dialogue-plan logging and a single shared cache/asset version so old one-voice files are regenerated instead of reused.
+- Added regression tests for host/guest, interviewer/expert, explicit-gender roles, manual voice selection, and actual per-segment TTS voice arguments.
+## 1.6.6 — Three-voice Russian dialogue pool
+
+- Added `ru-RU-DariyaNeural` to the Russian Training voice selector and automatic single-speaker rotation.
+- Expanded Russian dialogue rendering from two to three distinct native voices: Dmitry, Svetlana, and Dariya.
+- Added stable speaker profiles so the first three distinct speakers receive separate voices and repeated turns retain the same voice and rate.
+- Added controlled four-plus-speaker handling: native voices are reused only after the pool is exhausted, with small rate differences and no artificial pitch shifts.
+- Added graceful per-segment fallback if a live Edge voice becomes temporarily unavailable.
+- Updated Fresh-AI prompts to require stable labels and limit multi-speaker scripts to two through four speakers.
+- Preserved automatic voice selection when a learner changes only Training playback speed.
+- Bumped dialogue cache and audio-asset versions so older two-voice recordings are regenerated lazily.
+- Expanded regression coverage to 180 tests, including three-voice segment calls and four-speaker reuse.
+

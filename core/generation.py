@@ -16,7 +16,14 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
-from .audio import audio_duration_seconds, generate_cached_tts, generate_dialogue_cached_tts, validate_audio_file
+from .audio import (
+    DIALOGUE_TTS_ASSET_VERSION,
+    DIALOGUE_TTS_CACHE_VERSION,
+    audio_duration_seconds,
+    generate_cached_tts,
+    generate_dialogue_cached_tts,
+    validate_audio_file,
+)
 from .config import Settings
 from .constants import ILR_LEVELS, ILR_THETA, LETTERS, QUESTION_TYPES
 from .item_bank import ItemBank, shuffle_question, shuffle_question_to_key
@@ -1650,9 +1657,9 @@ def _natural_voice_profile(passage: PassageItem, settings: Settings) -> tuple[st
         if any(cue in genre for cue in male_cues):
             voice = "ru-RU-DmitryNeural"
         elif any(cue in genre for cue in female_cues):
-            voice = "ru-RU-SvetlanaNeural"
+            voice = ("ru-RU-SvetlanaNeural", "ru-RU-DariyaNeural")[seed % 2]
         else:
-            voice = ("ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural")[seed % 2]
+            voice = ("ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural", "ru-RU-DariyaNeural")[seed % 3]
     else:
         voice = (settings.mandarin_edge_tts_voice, "zh-CN-YunxiNeural")[seed % 2]
 
@@ -1747,7 +1754,7 @@ class LiveGenerationService:
                 pitch=pitch,
                 volume=volume,
                 language=passage.language,
-                engine_version="edge-tts-7.2.8-dialogue-v3",
+                engine_version=DIALOGUE_TTS_CACHE_VERSION,
                 timeout_seconds=self.settings.tts_timeout_seconds,
                 synthesizer=generate_cached_tts,
             )
@@ -1776,7 +1783,7 @@ class LiveGenerationService:
             voice=voice,
             rate=rate,
             engine="edge-tts",
-            engine_version="7.2.8-dialogue-v3",
+            engine_version=DIALOGUE_TTS_ASSET_VERSION,
             duration_seconds=duration,
             transcript_hash=content_hash(passage.passage_ru),
             synthetic_tts=True,
@@ -1790,9 +1797,9 @@ class LiveGenerationService:
                 "rate": rate,
                 "pitch": pitch,
                 "volume": volume,
-                "prosody_profile": "dialogue-v1",
+                "prosody_profile": "dialogue-v5-three-native-voices",
                 "engine": "edge-tts",
-                "engine_version": "7.2.8-dialogue-v1",
+                "engine_version": DIALOGUE_TTS_ASSET_VERSION,
                 "synthetic": True,
             },
         })

@@ -314,3 +314,25 @@ The hosted adapter was also tested under simulated Hugging Face structured-outpu
 ## External-provider limitation
 
 No real user provider keys were available in the execution environment. No hosted tokens were spent. Deterministic providers exercised the same prompt builders, Pydantic schemas, staged audit/repair, blind verification, persistence, audio linkage, and fallback code. Actual model entitlements, provider latency, quotas, and remote Dataset permissions must be verified in the deployed Space account.
+
+
+## v1.6.5 dialogue-voice regression
+
+The complete automated suite passed with **175 tests**. Additional dialogue tests verified:
+
+- `Ведущий` / `Гость` routes to Dmitry / Svetlana / Dmitry across three turns;
+- `Интервьюер` / `Эксперт` receives two distinct voices;
+- explicit female labels retain the female neural voice while the other role receives the opposite voice;
+- a manually selected primary voice still assigns the other speaker the opposite voice;
+- the actual per-segment synthesizer calls receive two different Edge voice IDs; and
+- full turn durations remain intact during FFmpeg concatenation.
+
+## v1.6.6 three-native-voice regression
+
+- 180 automated tests passed.
+- Russian Training voice choices include Dariya and route the label to `ru-RU-DariyaNeural`.
+- Three distinct generic Russian speakers map to Dmitry, Svetlana, and Dariya.
+- A fourth speaker reuses a native voice with a bounded rate difference; repeated turns remain stable.
+- FFmpeg assembly tests confirmed the synthesizer receives all three Russian voice IDs.
+- Full starter/generated overlay validation passed: 51 passages, 160 questions, 27 audio assets.
+- Gradio Space smoke test passed with 105 UI components.

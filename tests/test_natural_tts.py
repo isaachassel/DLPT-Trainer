@@ -44,7 +44,7 @@ def test_cache_key_changes_for_pitch_and_volume():
     base = audio_cache_key("текст", "voice", "+0%", "v", "+0Hz", "+0%")
     assert base != audio_cache_key("текст", "voice", "+0%", "v", "+1Hz", "+0%")
 
-from core.audio import split_speaker_turns, _voice_for_turn
+from core.audio import split_speaker_turns, _dialogue_voice_map, _voice_for_turn
 
 
 def test_split_named_russian_speaker_turns():
@@ -72,6 +72,45 @@ def test_gendered_labels_receive_distinct_russian_voices():
     assert female == "ru-RU-SvetlanaNeural"
     assert male == "ru-RU-DmitryNeural"
 
+
+
+def test_generic_host_and_guest_get_distinct_stable_voices():
+    turns = split_speaker_turns(
+        "Ведущий: Добрый вечер.\nГость: Спасибо за приглашение.\nВедущий: Что изменилось?"
+    )
+    mapping = _dialogue_voice_map(turns, "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural")
+    voices = [mapping[label.casefold()] for label, _ in turns]
+    assert voices == [
+        "ru-RU-DmitryNeural",
+        "ru-RU-SvetlanaNeural",
+        "ru-RU-DmitryNeural",
+    ]
+
+
+def test_generic_interviewer_and_expert_do_not_collapse_to_one_voice():
+    turns = split_speaker_turns(
+        "Интервьюер: Почему вы приехали?\nЭксперт: Я участвую в конференции."
+    )
+    mapping = _dialogue_voice_map(turns, "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural")
+    assert len(set(mapping.values())) == 2
+
+
+def test_explicit_female_role_keeps_female_voice_and_other_speaker_gets_opposite():
+    turns = split_speaker_turns(
+        "Ведущая: Добрый вечер.\nЭксперт: Спасибо за приглашение."
+    )
+    mapping = _dialogue_voice_map(turns, "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural")
+    assert mapping["ведущая"] == "ru-RU-SvetlanaNeural"
+    assert mapping["эксперт"] == "ru-RU-DmitryNeural"
+
+
+def test_manual_female_primary_still_assigns_second_speaker_male_voice():
+    turns = split_speaker_turns("Ведущий: Первый вопрос.\nГость: Первый ответ.")
+    mapping = _dialogue_voice_map(turns, "ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural")
+    assert mapping == {
+        "ведущий": "ru-RU-SvetlanaNeural",
+        "гость": "ru-RU-DmitryNeural",
+    }
 
 def test_naturalize_removes_pause_heavy_typography():
     result = naturalize_spoken_text("Решение…  было принято — после обсуждения.", "ru")
@@ -105,9 +144,11 @@ def test_dialogue_assembly_preserves_complete_segment_duration(tmp_path):
         pytest.skip("ffmpeg/ffprobe are required")
 
     counter = {"value": 0}
+    requested_voices = []
 
     def fake_synth(text, cache_dir, **kwargs):
         counter["value"] += 1
+        requested_voices.append(kwargs.get("voice"))
         duration = 1.8 if counter["value"] == 1 else 2.2
         output = Path(cache_dir) / f"segment-{counter['value']}.mp3"
         subprocess.run(
@@ -129,5 +170,105 @@ def test_dialogue_assembly_preserves_complete_segment_duration(tmp_path):
     )
     duration = audio_duration_seconds(output)
     assert counter["value"] == 2
+    assert requested_voices == ["ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural"]
     assert duration is not None
     assert duration >= 3.8
+
+
+def test_russian_voice_choices_include_dariya():
+    from core.languages import voice_choices, voice_for_label, native_voice_pool
+
+    choices = voice_choices("ru")
+    assert "Russian Female — Dariya" in choices
+    assert voice_for_label("ru", "Russian Female — Dariya") == "ru-RU-DariyaNeural"
+    assert native_voice_pool("ru", "ru-RU-DmitryNeural")[:3] == (
+        "ru-RU-DmitryNeural",
+        "ru-RU-SvetlanaNeural",
+        "ru-RU-DariyaNeural",
+    )
+
+
+def test_three_generic_speakers_receive_three_distinct_native_russian_voices():
+    from core.audio import _dialogue_speaker_profiles, split_speaker_turns
+
+    turns = split_speaker_turns(
+        "Ведущий: Первый вопрос.\nГость: Первый ответ.\nЭксперт: Дополнительный комментарий."
+    )
+    profiles = _dialogue_speaker_profiles(
+        turns, "ru-RU-DmitryNeural", "ru", base_rate="+3%"
+    )
+    assert [profiles[key].voice for key in ("ведущий", "гость", "эксперт")] == [
+        "ru-RU-DmitryNeural",
+        "ru-RU-SvetlanaNeural",
+        "ru-RU-DariyaNeural",
+    ]
+    assert len({profile.voice for profile in profiles.values()}) == 3
+
+
+def test_fourth_speaker_reuses_native_voice_with_subtle_rate_difference():
+    from core.audio import _dialogue_speaker_profiles, split_speaker_turns
+
+    turns = split_speaker_turns(
+        "Ведущий: Один.\nГость: Два.\nЭксперт: Три.\nКорреспондент: Четыре."
+    )
+    profiles = _dialogue_speaker_profiles(
+        turns, "ru-RU-DmitryNeural", "ru", base_rate="+3%"
+    )
+    first = profiles["ведущий"]
+    fourth = profiles["корреспондент"]
+    assert len({profile.voice for profile in profiles.values()}) == 3
+    assert fourth.voice == first.voice
+    assert fourth.rate != first.rate
+    assert abs(int(fourth.rate.removesuffix("%")) - int(first.rate.removesuffix("%"))) <= 4
+
+
+def test_repeated_third_speaker_keeps_dariya_and_same_rate():
+    from core.audio import _dialogue_speaker_profiles, split_speaker_turns
+
+    turns = split_speaker_turns(
+        "Ведущий: Один.\nГость: Два.\nЭксперт: Три.\nЭксперт: Ещё три."
+    )
+    profiles = _dialogue_speaker_profiles(turns, "ru-RU-DmitryNeural", "ru", base_rate="+1%")
+    assert profiles["эксперт"].voice == "ru-RU-DariyaNeural"
+    assert profiles["эксперт"].rate == "+1%"
+
+
+def test_three_speaker_audio_synthesis_calls_three_voice_ids(tmp_path):
+    import shutil
+    import subprocess
+    import pytest
+    from pathlib import Path
+    from core.audio import generate_dialogue_cached_tts
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg is required")
+
+    requested: list[tuple[str, str]] = []
+
+    def fake_synth(text, cache_dir, **kwargs):
+        requested.append((kwargs["voice"], kwargs["rate"]))
+        output = Path(cache_dir) / f"segment-{len(requested)}.mp3"
+        subprocess.run(
+            [
+                "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                "-f", "lavfi", "-i", "sine=frequency=500:duration=0.6",
+                "-codec:a", "libmp3lame", "-q:a", "4", str(output),
+            ],
+            check=True,
+        )
+        return output
+
+    output = generate_dialogue_cached_tts(
+        "Ведущий: Один.\nГость: Два.\nЭксперт: Три.",
+        tmp_path,
+        voice="ru-RU-DmitryNeural",
+        rate="+3%",
+        synthesizer=fake_synth,
+        engine_version="three-speaker-regression-v1",
+    )
+    assert output.exists()
+    assert requested == [
+        ("ru-RU-DmitryNeural", "+3%"),
+        ("ru-RU-SvetlanaNeural", "+3%"),
+        ("ru-RU-DariyaNeural", "+3%"),
+    ]

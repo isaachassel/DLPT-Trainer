@@ -203,7 +203,7 @@ CONTENT RULES
 - Use a realistic communicative situation and a clear source type.
 - The English orientation identifies context/source type without revealing the main idea or any answer.
 - The {source} must sound native and internally coherent, with no repeated sentences, contradictions, dangling pronouns, fabricated quotations attributed to real people, or obvious translationese.
-- For Listening only: when the selected genre contains two or more speakers (interview, conversation, debate, discussion, call, or exchange), write every turn on its own line with a short explicit speaker label followed by a colon, such as "Ведущий:" and "Гость:" in Russian or natural equivalent labels in Mandarin. Use at least two distinct labels. Do not place narration and dialogue on the same line. For a single-speaker item, do not add speaker labels.
+- For Listening only: when the selected genre contains two or more speakers (interview, conversation, debate, discussion, call, or exchange), use two to four speakers and write every turn on its own line with a short, stable, explicit speaker label followed by a colon, such as "Ведущий:", "Гость:", and "Эксперт:" in Russian or natural equivalent labels in Mandarin. Reuse exactly the same label whenever that person speaks again. Do not place narration and dialogue on the same line. For a single-speaker item, do not add speaker labels.
 - Keep the content safe for a general educational audience and avoid personally identifying information.
 - Source type must be synthetic unless verifiable provenance and license are supplied by an administrator; live user generation is synthetic.
 - Do not mention DLPT, the app, ILR rules, generation, questions, or answer choices inside the {source} text.

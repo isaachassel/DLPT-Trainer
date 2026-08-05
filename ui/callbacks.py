@@ -9,7 +9,15 @@ from uuid import uuid4
 import gradio as gr
 
 from core.adaptive import clamp_ilr
-from core.audio import AudioError, controlled_audio_html, generate_cached_tts, generate_dialogue_cached_tts, resolve_audio_path
+from core.audio import (
+    DIALOGUE_TTS_ASSET_VERSION,
+    DIALOGUE_TTS_CACHE_VERSION,
+    AudioError,
+    controlled_audio_html,
+    generate_cached_tts,
+    generate_dialogue_cached_tts,
+    resolve_audio_path,
+)
 from core.bank_persistence import GeneratedBankPersistence
 from core.config import get_settings
 from core.constants import (
@@ -899,7 +907,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         # This avoids the old startup problem where every remote MP3 was restored or
         # regenerated at once, while ensuring classmates hear the new natural-v2
         # rendering even for passages already present in the generated bank.
-        if asset.engine.lower() not in {"edge-tts", "edge tts"} or asset.engine_version != "7.2.8-dialogue-v1":
+        if asset.engine.lower() not in {"edge-tts", "edge tts"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
             try:
                 _progress(progress, 0.42, "Preparing a native neural voice for this passage…")
                 voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
@@ -907,7 +915,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                 path = generate_dialogue_cached_tts(
                     bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
                     pitch=pitch, volume=volume, language=bundle.passage.language,
-                    engine_version="edge-tts-7.2.8-dialogue-v2",
+                    engine_version=DIALOGUE_TTS_CACHE_VERSION,
                     timeout_seconds=SETTINGS.tts_timeout_seconds,
                     synthesizer=generate_cached_tts,
                 )
@@ -920,12 +928,17 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             try:
                 _progress(progress, 0.48, "Preparing the selected training voice and speed…")
                 cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
+                selected_voice = (
+                    _natural_voice_profile(bundle.passage, SETTINGS)[0]
+                    if state.voice_label == starter_label
+                    else voice_for_label(state.language, state.voice_label)
+                )
                 path = generate_dialogue_cached_tts(
                     bundle.passage.passage_ru, cache_dir,
-                    voice=voice_for_label(state.language, state.voice_label),
+                    voice=selected_voice,
                     rate=rate_map.get(state.speech_rate_label, "+0%"),
                     pitch="+0Hz", volume="+0%", language=bundle.passage.language,
-                    engine_version="edge-tts-7.2.8-dialogue-v2-training",
+                    engine_version=f"{DIALOGUE_TTS_CACHE_VERSION}-training",
                     timeout_seconds=SETTINGS.tts_timeout_seconds,
                     synthesizer=generate_cached_tts,
                 )
