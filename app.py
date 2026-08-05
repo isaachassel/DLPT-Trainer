@@ -4,6 +4,13 @@ from pathlib import Path
 import logging
 import os
 
+# Hugging Face's optional Xet downloader can create short-lived asyncio loops
+# during startup. On Python 3.11/Spaces this sometimes prints harmless but alarming
+# ``Invalid file descriptor: -1`` finalizer tracebacks. The standard HTTP path is
+# fully adequate for these small JSONL/MP3 bank assets and is more predictable.
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+
 from core.config import get_settings
 from ui.layout import CUSTOM_CSS, build_app
 

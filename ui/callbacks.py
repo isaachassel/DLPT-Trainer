@@ -13,6 +13,7 @@ from core.audio import (
     DIALOGUE_TTS_ASSET_VERSION,
     DIALOGUE_TTS_CACHE_VERSION,
     AudioError,
+    VoiceUnavailableError,
     controlled_audio_html,
     generate_cached_tts,
     generate_dialogue_cached_tts,
@@ -37,8 +38,11 @@ from core.languages import (
     LANGUAGE_LABEL_TO_CODE,
     LANGUAGES,
     language_profile,
+    native_voice_pool,
     voice_choices,
+    voice_fallbacks,
     voice_for_label,
+    voice_label_for_id,
 )
 from core.models import PassageItem, QuestionItem, SessionState, UserHistory
 from core.reporting import build_exports, build_full_report
@@ -847,6 +851,10 @@ def start_session_callback(
             minimum_ilr=minimum_ilr,
             maximum_ilr=maximum_ilr,
         )
+        LOGGER.info(
+            "Session audio preference session=%s mode=%s language=%s selected_label=%s speed=%s",
+            state.session_id, state.mode, state.language, state.voice_label, state.speech_rate_label,
+        )
         bundle = _select_with_safe_history(state, progress)
         _progress(progress, 0.96, "Saving the initial checkpoint…")
         STORAGE.save_checkpoint(state)
@@ -884,6 +892,113 @@ def answer_changed_callback(state: SessionState | None, bundle_data: dict | None
     return state
 
 
+TRAINING_RATE_MAP = {"Very slow": "-25%", "Slow": "-15%", "Normal": "+0%", "Fast": "+10%"}
+
+
+def _training_audio_profile(state: SessionState, passage: PassageItem) -> tuple[str, str, str, str, str, bool]:
+    """Resolve the exact Training playback request shown in the UI.
+
+    Fresh-AI generation creates one canonical bank recording for durable reuse.
+    Training playback is a separate concern: an explicit learner selection must
+    win, even when the canonical bank recording used another voice.
+    """
+
+    automatic_label = language_profile(state.language).starter_voice_label
+    if state.voice_label == automatic_label:
+        voice, natural_rate, pitch, volume = _natural_voice_profile(passage, SETTINGS)
+        rate = natural_rate if state.speech_rate_label == "Normal" else TRAINING_RATE_MAP.get(state.speech_rate_label, "+0%")
+        display = f"{automatic_label} → {voice_label_for_id(state.language, voice)}"
+        return voice, rate, pitch, volume, display, False
+
+    if state.voice_label not in voice_choices(state.language):
+        raise AudioError(f"The saved Training voice selection is no longer available: {state.voice_label}")
+    voice = voice_for_label(state.language, state.voice_label)
+    rate = TRAINING_RATE_MAP.get(state.speech_rate_label, "+0%")
+    return voice, rate, "+0Hz", "+0%", state.voice_label, True
+
+
+
+def _generate_explicit_training_audio(
+    passage: PassageItem,
+    cache_dir: Path,
+    requested_voice: str,
+    rate: str,
+    pitch: str,
+    volume: str,
+) -> tuple[Path, str, tuple[str, ...]]:
+    """Render an explicit Training choice without silent voice substitution.
+
+    If Edge rejects one voice, retry with that voice removed from the pool.  The
+    returned metadata lets the UI name the actual primary voice and any voices
+    that were unavailable.
+    """
+
+    unavailable: set[str] = set()
+    actual_primary = requested_voice
+    last_error: Exception | None = None
+    for attempt in range(4):
+        pool = tuple(
+            candidate
+            for candidate in native_voice_pool(passage.language, actual_primary)
+            if candidate not in unavailable
+        )
+        if actual_primary not in pool:
+            replacements = [
+                candidate for candidate in voice_fallbacks(passage.language, requested_voice)
+                if candidate not in unavailable
+            ]
+            if not replacements:
+                break
+            actual_primary = replacements[0]
+            pool = tuple(
+                candidate
+                for candidate in native_voice_pool(passage.language, actual_primary)
+                if candidate not in unavailable
+            )
+        try:
+            path = generate_dialogue_cached_tts(
+                passage.passage_ru, cache_dir, voice=actual_primary, rate=rate,
+                pitch=pitch, volume=volume, language=passage.language,
+                engine_version=f"{DIALOGUE_TTS_CACHE_VERSION}-training-explicit-v3",
+                timeout_seconds=SETTINGS.tts_timeout_seconds,
+                synthesizer=generate_cached_tts,
+                voice_pool=pool,
+                allow_segment_fallback=False,
+            )
+            return path, actual_primary, tuple(sorted(unavailable))
+        except VoiceUnavailableError as exc:
+            last_error = exc
+            unavailable.add(exc.voice)
+            if exc.voice == actual_primary:
+                replacements = [
+                    candidate for candidate in voice_fallbacks(passage.language, requested_voice)
+                    if candidate not in unavailable
+                ]
+                if replacements:
+                    actual_primary = replacements[0]
+            LOGGER.warning(
+                "Explicit Training voice unavailable passage=%s voice=%s attempt=%s",
+                passage.id, exc.voice, attempt + 1,
+            )
+        except Exception as exc:
+            # Older Edge failures do not always expose the rejected voice. Treat
+            # the first generic synthesis failure as a primary-voice failure,
+            # then stop if the same class of failure repeats.
+            last_error = exc
+            if attempt == 0:
+                unavailable.add(actual_primary)
+                replacements = [
+                    candidate for candidate in voice_fallbacks(passage.language, requested_voice)
+                    if candidate not in unavailable
+                ]
+                if replacements:
+                    actual_primary = replacements[0]
+                    continue
+            break
+    if last_error:
+        raise last_error
+    raise AudioError("No usable native voice remained for the selected Training playback.")
+
 def play_audio_callback(state: SessionState | None, bundle_data: dict | None, progress=gr.Progress()):
     if not state or not bundle_data:
         return state, gr.update(value="", visible=False), gr.update(), gr.update(value="Start or resume a session first.")
@@ -898,53 +1013,83 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         asset = BANK.get_audio(bundle.passage.audio_asset_id)
         if not asset:
             raise AudioError("No validated audio asset is linked to this passage.")
-        _progress(progress, 0.30, "Loading validated audio…")
-        path = resolve_audio_path(asset, ROOT)
+        _progress(progress, 0.24, "Loading validated audio…")
+        validated_bank_path = resolve_audio_path(asset, ROOT)
+        path = validated_bank_path
         audio_note = ""
-        starter_label = language_profile(state.language).starter_voice_label
+        cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
 
-        # Upgrade previously saved AI audio lazily when it is actually selected.
-        # This avoids the old startup problem where every remote MP3 was restored or
-        # regenerated at once, while ensuring classmates hear the new natural-v2
-        # rendering even for passages already present in the generated bank.
-        if asset.engine.lower() not in {"edge-tts", "edge tts"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
+        if state.mode == "training":
+            voice, rate, pitch, volume, requested_display, explicit = _training_audio_profile(state, bundle.passage)
+            LOGGER.info(
+                "Training playback TTS requested passage=%s selected_label=%s primary_voice=%s rate=%s",
+                bundle.passage.id, state.voice_label, voice, rate,
+            )
+            _progress(progress, 0.42, f"Preparing {requested_display}…")
             try:
-                _progress(progress, 0.42, "Preparing a native neural voice for this passage…")
-                voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
-                cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
-                path = generate_dialogue_cached_tts(
-                    bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
-                    pitch=pitch, volume=volume, language=bundle.passage.language,
-                    engine_version=DIALOGUE_TTS_CACHE_VERSION,
-                    timeout_seconds=SETTINGS.tts_timeout_seconds,
-                    synthesizer=generate_cached_tts,
+                if explicit:
+                    path, actual_voice, unavailable = _generate_explicit_training_audio(
+                        bundle.passage, cache_dir, voice, rate, pitch, volume
+                    )
+                    actual_label = voice_label_for_id(state.language, actual_voice)
+                    if actual_voice == voice and not unavailable:
+                        audio_note = f" Training playback uses {requested_display} at {state.speech_rate_label.lower()} speed."
+                    else:
+                        unavailable_labels = ", ".join(
+                            voice_label_for_id(state.language, item) for item in unavailable
+                        ) or state.voice_label
+                        audio_note = (
+                            f" {unavailable_labels} was unavailable; this playback fell back to {actual_label}. "
+                            "Any additional dialogue speakers use the remaining native voices with controlled reuse."
+                        )
+                else:
+                    path = generate_dialogue_cached_tts(
+                        bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
+                        pitch=pitch, volume=volume, language=bundle.passage.language,
+                        engine_version=f"{DIALOGUE_TTS_CACHE_VERSION}-training-automatic-v3",
+                        timeout_seconds=SETTINGS.tts_timeout_seconds,
+                        synthesizer=generate_cached_tts,
+                    )
+                    actual_voice = voice
+                    audio_note = f" Training playback uses {requested_display} at {state.speech_rate_label.lower()} speed."
+                LOGGER.info(
+                    "Training playback TTS ready passage=%s selected_label=%s requested_voice=%s actual_primary_voice=%s path=%s",
+                    bundle.passage.id, state.voice_label, voice, actual_voice, Path(path).name,
                 )
-                audio_note = " Native neural speech loaded and cached for this passage."
-            except Exception as tts_exc:
-                audio_note = f" Natural speech upgrade was unavailable; the existing validated audio was used ({type(tts_exc).__name__})."
+            except Exception as selected_exc:
+                path = validated_bank_path
+                audio_note = (
+                    f" The requested Training render failed ({type(selected_exc).__name__}); "
+                    "the existing validated bank recording was used, so its voice may differ from the selector."
+                )
+                LOGGER.error(
+                    "Training playback render failed passage=%s selected_label=%s requested_voice=%s reason=%s",
+                    bundle.passage.id, state.voice_label, voice, type(selected_exc).__name__,
+                )
+        else:
+            # Strict modes use the canonical bank recording. Older assets receive
+            # one lazy neural upgrade, but learner voice preferences never affect
+            # Diagnostic or Simulation audio.
+            if asset.engine.lower() not in {"edge-tts", "edge tts"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
+                try:
+                    _progress(progress, 0.42, "Preparing the canonical native neural recording…")
+                    voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
+                    LOGGER.info(
+                        "Strict playback canonical TTS requested passage=%s primary_voice=%s rate=%s",
+                        bundle.passage.id, voice, rate,
+                    )
+                    path = generate_dialogue_cached_tts(
+                        bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
+                        pitch=pitch, volume=volume, language=bundle.passage.language,
+                        engine_version=DIALOGUE_TTS_CACHE_VERSION,
+                        timeout_seconds=SETTINGS.tts_timeout_seconds,
+                        synthesizer=generate_cached_tts,
+                    )
+                    audio_note = " Canonical native neural speech loaded and cached for this passage."
+                except Exception as tts_exc:
+                    path = validated_bank_path
+                    audio_note = f" Neural upgrade was unavailable; the existing validated audio was used ({type(tts_exc).__name__})."
 
-        if state.mode == "training" and (state.voice_label != starter_label or state.speech_rate_label != "Normal"):
-            rate_map = {"Very slow": "-25%", "Slow": "-15%", "Normal": "+0%", "Fast": "+10%"}
-            try:
-                _progress(progress, 0.48, "Preparing the selected training voice and speed…")
-                cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
-                selected_voice = (
-                    _natural_voice_profile(bundle.passage, SETTINGS)[0]
-                    if state.voice_label == starter_label
-                    else voice_for_label(state.language, state.voice_label)
-                )
-                path = generate_dialogue_cached_tts(
-                    bundle.passage.passage_ru, cache_dir,
-                    voice=selected_voice,
-                    rate=rate_map.get(state.speech_rate_label, "+0%"),
-                    pitch="+0Hz", volume="+0%", language=bundle.passage.language,
-                    engine_version=f"{DIALOGUE_TTS_CACHE_VERSION}-training",
-                    timeout_seconds=SETTINGS.tts_timeout_seconds,
-                    synthesizer=generate_cached_tts,
-                )
-                audio_note = " Requested training voice/speed loaded with natural spoken phrasing from the deterministic TTS cache."
-            except Exception as tts_exc:
-                audio_note = f" Requested training voice/speed was unavailable; cached starter audio was used ({type(tts_exc).__name__})."
         _progress(progress, 0.82, "Preparing browser playback…")
         audio_html = controlled_audio_html(
             str(path),
@@ -960,8 +1105,6 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         return (
             state,
             gr.update(value=audio_html, visible=True),
-            # Keep retry available when autoplay is blocked. Browser-confirmed
-            # playback disables this button in strict modes.
             gr.update(interactive=True, visible=True),
             gr.update(value=status),
         )

@@ -30,6 +30,14 @@ class AudioError(RuntimeError):
     pass
 
 
+class VoiceUnavailableError(AudioError):
+    """A requested Edge voice failed before a valid segment was produced."""
+
+    def __init__(self, voice: str, reason: str = "voice synthesis failed") -> None:
+        self.voice = voice
+        super().__init__(f"Voice {voice} was unavailable: {reason}")
+
+
 _T = TypeVar("_T")
 
 
@@ -456,6 +464,8 @@ def generate_dialogue_cached_tts(
     engine_version: str = DIALOGUE_TTS_CACHE_VERSION,
     timeout_seconds: float = 60.0,
     synthesizer=None,
+    voice_pool: Iterable[str] | None = None,
+    allow_segment_fallback: bool = True,
 ) -> Path:
     """Generate one narrator or a real multi-speaker recording.
 
@@ -468,13 +478,20 @@ def generate_dialogue_cached_tts(
     synth = synthesizer or generate_cached_tts
     turns = split_speaker_turns(transcript)
     if not turns:
-        return synth(
-            strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
-            language=language, naturalize=True, engine_version=engine_version,
-            timeout_seconds=timeout_seconds,
-        )
+        try:
+            return synth(
+                strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+                language=language, naturalize=True, engine_version=engine_version,
+                timeout_seconds=timeout_seconds,
+            )
+        except Exception as exc:
+            if not allow_segment_fallback:
+                raise VoiceUnavailableError(voice, type(exc).__name__) from exc
+            raise
 
-    profiles = _dialogue_speaker_profiles(turns, voice, language, base_rate=rate)
+    profiles = _dialogue_speaker_profiles(
+        turns, voice, language, base_rate=rate, voice_pool=voice_pool
+    )
     plan = [
         (
             label,
@@ -491,11 +508,16 @@ def generate_dialogue_cached_tts(
         len(plan),
     )
     if len(plan) < 2:
-        return synth(
-            strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
-            language=language, naturalize=True, engine_version=engine_version,
-            timeout_seconds=timeout_seconds,
-        )
+        try:
+            return synth(
+                strip_speaker_labels(transcript), cache_dir, voice=voice, rate=rate, pitch=pitch, volume=volume,
+                language=language, naturalize=True, engine_version=engine_version,
+                timeout_seconds=timeout_seconds,
+            )
+        except Exception as exc:
+            if not allow_segment_fallback:
+                raise VoiceUnavailableError(voice, type(exc).__name__) from exc
+            raise
 
     cache_root = Path(cache_dir).resolve()
     cache_root.mkdir(parents=True, exist_ok=True)
@@ -525,10 +547,13 @@ def generate_dialogue_cached_tts(
                     timeout_seconds=timeout_seconds,
                 )
             except Exception as exc:
-                # Dariya is in the current Microsoft/Edge catalog, but the live
-                # service can change independently. Fail gracefully to another
-                # native voice instead of losing the entire listening item.
-                fallback_pool = [candidate for candidate in _native_voice_pool(language, voice) if candidate != speaker_voice]
+                if not allow_segment_fallback:
+                    raise VoiceUnavailableError(speaker_voice, type(exc).__name__) from exc
+                # The live service can change independently. Canonical/automatic
+                # recordings may degrade gracefully, while explicit Training
+                # selections disable this silent segment-level substitution.
+                fallback_candidates = list(voice_pool) if voice_pool is not None else _native_voice_pool(language, voice)
+                fallback_pool = [candidate for candidate in fallback_candidates if candidate != speaker_voice]
                 if not fallback_pool:
                     raise
                 fallback_voice = fallback_pool[index % len(fallback_pool)]

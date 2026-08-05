@@ -272,3 +272,185 @@ def test_three_speaker_audio_synthesis_calls_three_voice_ids(tmp_path):
         ("ru-RU-SvetlanaNeural", "+3%"),
         ("ru-RU-DariyaNeural", "+3%"),
     ]
+
+
+def test_training_audio_profile_honors_explicit_dariya_selection():
+    from core.session import create_session
+    from ui.callbacks import _training_audio_profile
+
+    state = create_session(
+        language="ru",
+        mode="training",
+        selected_skills=["listening"],
+        start_level="1+",
+        target_level="2",
+        topics=[],
+        competencies=[],
+        max_questions_per_skill=8,
+        minimum_questions_per_skill=8,
+        timer_mode="off",
+        time_limit_seconds_per_skill=None,
+        profile_id=None,
+        feedback_mode="end_only",
+        hints_enabled=False,
+        transcript_review_enabled=True,
+        replay_allowed=True,
+        slow_audio_allowed=True,
+        voice_label="Russian Female — Dariya",
+        speech_rate_label="Normal",
+    )
+    voice, rate, pitch, volume, display, explicit = _training_audio_profile(state, _passage())
+    assert voice == "ru-RU-DariyaNeural"
+    assert rate == "+0%"
+    assert pitch == "+0Hz"
+    assert volume == "+0%"
+    assert display == "Russian Female — Dariya"
+    assert explicit is True
+
+
+def test_training_playback_uses_dariya_without_first_rendering_canonical_dmitry(monkeypatch, bank, tmp_path):
+    import ui.callbacks as callbacks
+    from core.session import create_session, select_next_bundle
+
+    state = create_session(
+        language="ru",
+        mode="training",
+        selected_skills=["listening"],
+        start_level="1+",
+        target_level="2",
+        topics=[],
+        competencies=[],
+        max_questions_per_skill=8,
+        minimum_questions_per_skill=8,
+        timer_mode="off",
+        time_limit_seconds_per_skill=None,
+        profile_id=None,
+        feedback_mode="end_only",
+        hints_enabled=False,
+        transcript_review_enabled=True,
+        replay_allowed=True,
+        slow_audio_allowed=True,
+        voice_label="Russian Female — Dariya",
+        speech_rate_label="Normal",
+    )
+    bundle = select_next_bundle(state, bank)
+    calls: list[str] = []
+    rendered = tmp_path / "dariya.mp3"
+    rendered.write_bytes(b"ID3" + b"0" * 1024)
+
+    def fake_generate(*args, **kwargs):
+        calls.append(kwargs["voice"])
+        return rendered
+
+    monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
+    monkeypatch.setattr(callbacks.STORAGE, "save_checkpoint", lambda *_: None)
+    result = callbacks.play_audio_callback(state, callbacks._bundle_to_dict(bundle), progress=None)
+    assert calls == ["ru-RU-DariyaNeural"]
+    assert "Russian Female — Dariya" in result[3]["value"]
+    assert str(rendered.resolve()) in result[1]["value"]
+
+
+def test_dariya_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypatch, bank, tmp_path):
+    import ui.callbacks as callbacks
+    from core.session import create_session, select_next_bundle
+
+    state = create_session(
+        language="ru",
+        mode="training",
+        selected_skills=["listening"],
+        start_level="1+",
+        target_level="2",
+        topics=[],
+        competencies=[],
+        max_questions_per_skill=8,
+        minimum_questions_per_skill=8,
+        timer_mode="off",
+        time_limit_seconds_per_skill=None,
+        profile_id=None,
+        feedback_mode="end_only",
+        hints_enabled=False,
+        transcript_review_enabled=True,
+        replay_allowed=True,
+        slow_audio_allowed=True,
+        voice_label="Russian Female — Dariya",
+        speech_rate_label="Normal",
+    )
+    bundle = select_next_bundle(state, bank)
+    calls: list[str] = []
+    fallback = tmp_path / "svetlana.mp3"
+    fallback.write_bytes(b"ID3" + b"0" * 1024)
+
+    def fake_generate(*args, **kwargs):
+        calls.append(kwargs["voice"])
+        if kwargs["voice"] == "ru-RU-DariyaNeural":
+            raise RuntimeError("voice unavailable")
+        return fallback
+
+    monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
+    monkeypatch.setattr(callbacks.STORAGE, "save_checkpoint", lambda *_: None)
+    result = callbacks.play_audio_callback(state, callbacks._bundle_to_dict(bundle), progress=None)
+    assert calls[:2] == ["ru-RU-DariyaNeural", "ru-RU-SvetlanaNeural"]
+    assert "fell back to Russian Female — Svetlana" in result[3]["value"]
+
+
+def test_explicit_dialogue_mode_does_not_silently_replace_failed_segment_voice(tmp_path):
+    import pytest
+    from core.audio import VoiceUnavailableError, generate_dialogue_cached_tts
+
+    requested: list[str] = []
+
+    def fake_synth(text, cache_dir, **kwargs):
+        requested.append(kwargs["voice"])
+        if kwargs["voice"] == "ru-RU-DariyaNeural":
+            raise RuntimeError("voice unavailable")
+        output = Path(cache_dir) / f"segment-{len(requested)}.mp3"
+        output.write_bytes(b"ID3" + b"0" * 1024)
+        return output
+
+    with pytest.raises(VoiceUnavailableError) as exc_info:
+        generate_dialogue_cached_tts(
+            "Ведущий: Один.\nГость: Два.\nЭксперт: Три.",
+            tmp_path,
+            voice="ru-RU-DmitryNeural",
+            rate="+0%",
+            synthesizer=fake_synth,
+            engine_version="no-silent-fallback-v1",
+            allow_segment_fallback=False,
+        )
+    assert exc_info.value.voice == "ru-RU-DariyaNeural"
+    assert requested == [
+        "ru-RU-DmitryNeural",
+        "ru-RU-SvetlanaNeural",
+        "ru-RU-DariyaNeural",
+    ]
+
+
+def test_explicit_training_helper_retries_with_unavailable_voice_removed(monkeypatch, tmp_path):
+    import ui.callbacks as callbacks
+    from core.audio import VoiceUnavailableError
+
+    passage = _passage(genre="interview")
+    attempts: list[tuple[str, tuple[str, ...]]] = []
+    rendered = tmp_path / "retry.mp3"
+    rendered.write_bytes(b"ID3" + b"0" * 1024)
+
+    def fake_generate(*args, **kwargs):
+        pool = tuple(kwargs.get("voice_pool") or ())
+        attempts.append((kwargs["voice"], pool))
+        if len(attempts) == 1:
+            raise VoiceUnavailableError("ru-RU-DariyaNeural")
+        return rendered
+
+    monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
+    path, actual, unavailable = callbacks._generate_explicit_training_audio(
+        passage,
+        tmp_path,
+        "ru-RU-DmitryNeural",
+        "+0%",
+        "+0Hz",
+        "+0%",
+    )
+    assert path == rendered
+    assert actual == "ru-RU-DmitryNeural"
+    assert unavailable == ("ru-RU-DariyaNeural",)
+    assert "ru-RU-DariyaNeural" not in attempts[1][1]

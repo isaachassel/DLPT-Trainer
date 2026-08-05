@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.7 — Training voice truth and startup hardening
+
+- Fixed the UI-to-playback path so an explicit Training voice selection is rendered first instead of generating/retaining the canonical automatic bank voice.
+- Renamed generation logs to distinguish canonical bank TTS from learner-selected Training playback TTS.
+- Added requested-versus-actual voice logging and visible playback status so a fallback can never masquerade as the selected voice.
+- Disabled silent per-segment voice substitution for explicit Training selections. Failed voices are removed from the dialogue pool and the recording is retried with the remaining native voices.
+- Dariya now falls back to Svetlana first when necessary; the UI states the substitution instead of quietly playing Dmitry.
+- Preserved automatic/canonical graceful fallback for strict modes and durable bank creation.
+- Disabled Hugging Face Xet for these small startup assets to avoid Python 3.11 event-loop finalizer noise and suppressed repetitive download progress bars.
+- Expanded regression coverage to 186 tests, including exact Dariya routing, explicit fallback reporting, and no-silent-segment-substitution behavior.
+
 ## 1.6.2 — Multi-Speaker Dialogue and Pause Cleanup
 
 - Added true turn-by-turn male/female synthesis for labelled Russian and Mandarin interviews, conversations, discussions, debates, calls, and dash-form dialogue.

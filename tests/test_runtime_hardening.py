@@ -43,3 +43,13 @@ def test_audio_component_registers_reactive_browser_handler() -> None:
     assert "Press the play button in the player" in source
     assert "audio.controls = false" in source
     assert "audio.dataset.strict === 'true'" in source
+
+
+def test_app_disables_hf_xet_before_importing_ui():
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    disable_index = source.index('os.environ.setdefault("HF_HUB_DISABLE_XET", "1")')
+    ui_import_index = source.index("from ui.layout import")
+    assert disable_index < ui_import_index
+    assert 'os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")' in source

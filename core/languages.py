@@ -86,6 +86,36 @@ def voice_for_label(code: str, label: str) -> str:
     return entries.get(label, profile.female_voice)
 
 
+
+
+def voice_label_for_id(code: str, voice_id: str) -> str:
+    """Return the user-facing label for a configured voice ID."""
+
+    for label, configured_id in voice_entries(code):
+        if configured_id == voice_id and label != language_profile(code).starter_voice_label:
+            return label
+    return voice_id
+
+
+def voice_fallbacks(code: str, preferred_voice: str) -> tuple[str, ...]:
+    """Return explicit fallback voices, preferring the same apparent gender.
+
+    The selector must never silently map Dariya to Dmitry.  When a selected voice
+    is temporarily unavailable, another same-gender native voice is tried first
+    and the UI reports the substitution.
+    """
+
+    profile = language_profile(code)
+    female = [profile.female_voice, *(voice for _label, voice in profile.additional_voices)]
+    male = [profile.male_voice]
+    if preferred_voice in female:
+        ordered = [voice for voice in female if voice != preferred_voice] + male
+    elif preferred_voice in male:
+        ordered = [voice for voice in male if voice != preferred_voice] + female
+    else:
+        ordered = list(native_voice_pool(code))
+    return tuple(dict.fromkeys(voice for voice in ordered if voice and voice != preferred_voice))
+
 def native_voice_pool(code: str, preferred_voice: str | None = None) -> tuple[str, ...]:
     """Return a de-duplicated native voice pool with the preferred voice first."""
 

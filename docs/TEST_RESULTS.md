@@ -336,3 +336,14 @@ The complete automated suite passed with **175 tests**. Additional dialogue test
 - FFmpeg assembly tests confirmed the synthesizer receives all three Russian voice IDs.
 - Full starter/generated overlay validation passed: 51 passages, 160 questions, 27 audio assets.
 - Gradio Space smoke test passed with 105 UI components.
+
+
+## v1.6.7 Training voice truth regression
+
+- 186 automated tests passed.
+- Explicit Dariya selection resolves to `ru-RU-DariyaNeural` before any canonical-bank upgrade path.
+- Playback tests confirm the first synthesis request is Dariya and not Dmitry.
+- If Dariya fails, Svetlana is tried first and the learner-facing status names the actual fallback.
+- Explicit multi-speaker rendering raises a typed failed-voice signal instead of silently substituting a different segment voice.
+- Retry tests remove unavailable voices from the dialogue pool while preserving the requested primary voice when possible.
+- Full multilingual bank validation and the Gradio Space smoke test passed.

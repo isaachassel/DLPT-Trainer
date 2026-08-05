@@ -1742,7 +1742,7 @@ class LiveGenerationService:
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
         voice, rate, pitch, volume = _natural_voice_profile(passage, self.settings)
         LOGGER.info(
-            "Listening TTS start passage=%s voice=%s rate=%s pitch=%s",
+            "Canonical bank TTS start passage=%s primary_voice=%s rate=%s pitch=%s",
             passage.id, voice, rate, pitch,
         )
         try:
@@ -1772,7 +1772,7 @@ class LiveGenerationService:
                 "audio_validation",
             )
         LOGGER.info(
-            "Listening TTS success passage=%s path=%s duration=%s",
+            "Canonical bank TTS success passage=%s path=%s duration=%s",
             passage.id, path.name, f"{duration:.1f}s" if duration is not None else "unknown",
         )
         audio_id = f"aud_{uuid4().hex[:16]}"

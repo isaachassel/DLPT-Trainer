@@ -18,17 +18,17 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.6.6
+### Audio behavior in v1.6.7
 
 The default **Automatic natural voice** setting generates a native Microsoft Edge neural recording lazily when each listening passage is selected. Legacy bundled eSpeak MP3s remain only as an offline fallback. Russian single-speaker material now rotates deterministically among Dmitry, Svetlana, and Dariya where appropriate; the app does not inject artificial paragraph pauses or random pitch changes.
 
 ## Natural multi-speaker listening audio
 
-Version 1.6.6 detects explicitly labelled interviews, conversations, debates, calls, and dash-form dialogue. Speaker labels are removed before synthesis. Russian dialogues use a three-voice native pool: `ru-RU-DmitryNeural`, `ru-RU-SvetlanaNeural`, and `ru-RU-DariyaNeural`. The first three distinct speakers receive separate voices whenever their labels permit it. A fourth distinct speaker reuses one native voice with a restrained rate difference, while repeated turns retain the same speaker profile. Mandarin continues to use its two native configured voices with controlled reuse for additional speakers.
+Version 1.6.7 detects explicitly labelled interviews, conversations, debates, calls, and dash-form dialogue. Speaker labels are removed before synthesis. Russian dialogues use a three-voice native pool: `ru-RU-DmitryNeural`, `ru-RU-SvetlanaNeural`, and `ru-RU-DariyaNeural`. The first three distinct speakers receive separate voices whenever their labels permit it. A fourth distinct speaker reuses one native voice with a restrained rate difference, while repeated turns retain the same speaker profile. Mandarin continues to use its two native configured voices with controlled reuse for additional speakers.
 
 Each dialogue turn is synthesized separately and the complete, untruncated turns are joined into one playable MP3. Single-speaker passages remain one continuous, single-voice recording. Previously cached dialogue recordings are upgraded lazily when selected because this release uses a new cache/asset version.
 
-Fresh AI-generated multi-speaker scripts are limited to two through four speakers and must put each turn on its own line with a stable explicit label. Users may also choose Dariya directly in Training mode. If a newly listed voice is temporarily unavailable from Microsoft's live service, dialogue generation retries with another native voice instead of discarding the entire item.
+Fresh AI-generated multi-speaker scripts are limited to two through four speakers and must put each turn on its own line with a stable explicit label. Users may also choose Dariya directly in Training mode. The selected Training voice is now resolved separately from the canonical bank recording, so choosing Dariya cannot silently continue playing a Dmitry cache. Runtime status and logs show the requested and actual primary voice. If a live voice is temporarily unavailable, the app reports the fallback explicitly and removes the failed voice from the dialogue pool before retrying.
 
 ## What happened to the original GenAI code
 
