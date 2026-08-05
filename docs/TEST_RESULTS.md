@@ -144,7 +144,7 @@ Version 1.2.7 retains all prior regression coverage and additionally verifies:
 - immediate in-memory indexing and reload into a new `ItemBank` instance;
 - malformed generated-overlay isolation without starter-bank failure;
 - Hugging Face Dataset JSONL/manifest/audio upload behavior;
-- remote Listening audio restoration and runtime-path rewriting;
+- lazy remote Listening audio registration, selected-file restoration, and runtime-path rewriting;
 - scalar single-topic CheckboxGroup payload normalization;
 - scalar single-competency CheckboxGroup payload normalization;
 - normal multi-value CheckboxGroup preservation;
@@ -280,7 +280,7 @@ The manifest test verified one generated Reading passage produced:
 64-character SHA-256 checksum
 ```
 
-A simulated remote startup restored a generated MP3 into the current runtime audio cache and rewrote the stored asset path.
+A simulated remote startup registered a generated MP3 without downloading it. The first selected access restored only that MP3 into the runtime cache and rewrote the live asset path.
 
 ## Reading scalar-selection runtime integration
 
@@ -359,3 +359,28 @@ The complete automated suite passed with **175 tests**. Additional dialogue test
 - Balanced selection strongly avoids recently overused Transportation content, and only recent Fresh-AI items count as recency.
 - Hugging Face quota failures activate an adapter cooldown, preventing repeated calls through weaker structured-output modes and later generation stages.
 - Generated-bank downloads use the synchronous HTTP cache path, while existing persistence upload/restore tests remain green.
+
+
+## v1.7.1 performance-regression results
+
+- 200 automated tests passed.
+- The combined bank remained unchanged at 51 passages, 160 questions, and 27 audio assets, with 40 correct answers in each A/B/C/D position.
+- The Gradio smoke test still built 105 UI components.
+- A simulated remote startup downloaded the JSONL bank only; no MP3 was fetched until `ensure_audio_available` was called for the selected asset.
+- Repeated operational passage lookup no longer reruns passage/question validators after the first indexed result.
+- Repeated bank-health rendering uses an independent cached copy and is invalidated after bank reindexing.
+- A three-turn production dialogue regression reached at least two and no more than three concurrent segment renders.
+- A Fresh-AI Listening regression persisted the requested explicit primary voice and rate in the canonical audio asset.
+- Canonical-match regression confirms playback can reuse the prepared MP3 without a second TTS request.
+
+Local microbenchmark on the release files:
+
+```text
+50 uncached Reading active-passages calls in v1.7.0: ~2.19 s
+1,000 cached Reading active-passages calls in v1.7.1: ~0.0002 s
+20 uncached Russian health-summary calls in v1.7.0: ~1.64 s
+1,000 cached Russian health-summary calls in v1.7.1: ~0.035 s
+Three simulated dialogue turns at 0.35 s each: ~0.48 s total with bounded parallel rendering
+```
+
+These are local implementation benchmarks, not promises for hosted provider/network latency.

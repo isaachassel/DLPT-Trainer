@@ -137,8 +137,13 @@ def test_hf_dataset_sync_uploads_bank_manifest_and_audio(monkeypatch, project_ro
         topics=[],
         competencies=["main idea"],
         maximum_questions=2,
+        preferred_audio_voice="ru-RU-DmitryNeural",
+        preferred_audio_rate="+10%",
     )
 
+    assert result.audio_asset is not None
+    assert result.audio_asset.voice == "ru-RU-DmitryNeural"
+    assert result.audio_asset.rate == "+10%"
     assert result.bank_remote_synced is True
     assert settings.hf_dataset_bank_filename in uploaded
     assert settings.hf_dataset_manifest_filename in uploaded
@@ -146,7 +151,7 @@ def test_hf_dataset_sync_uploads_bank_manifest_and_audio(monkeypatch, project_ro
     assert "synchronized to HF Dataset" in result.bank_persistence_note
 
 
-def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monkeypatch, project_root, tmp_path):
+def test_hf_dataset_startup_registers_remote_audio_and_restores_it_lazily(monkeypatch, project_root, tmp_path):
     remote_audio = tmp_path / "remote-audio.mp3"
     remote_audio.write_bytes(b"ID3" + b"1" * 1024)
     remote_bank = tmp_path / "remote-bank.jsonl"
@@ -174,7 +179,10 @@ def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monk
         encoding="utf-8",
     )
 
+    downloads: list[str] = []
+
     def fake_download(**kwargs):
+        downloads.append(kwargs["filename"])
         return str(remote_audio if kwargs["filename"].startswith("audio/") else remote_bank)
 
     class FakeApi:
@@ -198,8 +206,19 @@ def test_hf_dataset_startup_restores_remote_audio_and_rewrites_runtime_path(monk
     records = [json.loads(line) for line in settings.generated_bank_runtime_path(project_root).read_text(encoding="utf-8").splitlines()]
     restored_path = Path(records[0]["data"]["path"])
     assert restored_path.parent == settings.audio_cache_runtime_path(project_root)
+    assert not restored_path.exists()
+    assert downloads == [settings.hf_dataset_bank_filename]
+
+    class AssetRef:
+        path = str(restored_path)
+
+    asset = AssetRef()
+    assert persistence.audio_available(asset) is True
+    materialized = persistence.ensure_audio_available(asset)
+    assert materialized == restored_path
     assert restored_path.exists()
     assert restored_path.read_bytes() == remote_audio.read_bytes()
+    assert downloads == [settings.hf_dataset_bank_filename, "audio/generated-audio.mp3"]
 
 
 def test_auto_provisions_private_dataset_bank_from_space_id(monkeypatch, project_root, tmp_path):

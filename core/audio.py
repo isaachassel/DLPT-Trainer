@@ -13,6 +13,7 @@ import threading
 import time
 import tempfile
 import wave
+from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote as url_quote
 from urllib.request import Request, urlopen
@@ -101,6 +102,14 @@ class _AsyncLoopRunner:
 
 _RUNNER: _AsyncLoopRunner | None = None
 _RUNNER_LOCK = threading.Lock()
+_CACHE_LOCKS: dict[str, threading.Lock] = {}
+_CACHE_LOCKS_GUARD = threading.Lock()
+
+
+def _cache_lock(path: Path) -> threading.Lock:
+    key = str(path.resolve())
+    with _CACHE_LOCKS_GUARD:
+        return _CACHE_LOCKS.setdefault(key, threading.Lock())
 
 
 def _get_async_runner() -> _AsyncLoopRunner:
@@ -430,6 +439,7 @@ _PIPER_VOICE_FILES: dict[str, tuple[str, str]] = {
 _PIPER_MODEL_REPO = "rhasspy/piper-voices"
 _PIPER_LOADED: dict[str, object] = {}
 _PIPER_LOCK = threading.RLock()
+_PIPER_SYNTH_LOCK = threading.RLock()
 
 
 def _piper_rate_scale(rate: str) -> float:
@@ -515,25 +525,26 @@ def _piper_tts_save(
     piper_voice = _load_piper_voice(voice_id, model_root)
     wav_path = output_mp3.with_suffix(".tmp.wav")
     try:
-        with wave.open(str(wav_path), "wb") as wav_file:
-            if hasattr(piper_voice, "synthesize_wav"):
-                try:
-                    from piper import SynthesisConfig
-                    synth_config = SynthesisConfig(
+        with _PIPER_SYNTH_LOCK:
+            with wave.open(str(wav_path), "wb") as wav_file:
+                if hasattr(piper_voice, "synthesize_wav"):
+                    try:
+                        from piper import SynthesisConfig
+                        synth_config = SynthesisConfig(
+                            length_scale=_piper_rate_scale(rate),
+                            normalize_audio=True,
+                        )
+                        piper_voice.synthesize_wav(text, wav_file, syn_config=synth_config)
+                    except (ImportError, TypeError):
+                        piper_voice.synthesize_wav(text, wav_file)
+                else:
+                    # Compatibility with the pre-1.3 MIT API.
+                    piper_voice.synthesize(
+                        text,
+                        wav_file,
                         length_scale=_piper_rate_scale(rate),
-                        normalize_audio=True,
+                        sentence_silence=0.0,
                     )
-                    piper_voice.synthesize_wav(text, wav_file, syn_config=synth_config)
-                except (ImportError, TypeError):
-                    piper_voice.synthesize_wav(text, wav_file)
-            else:
-                # Compatibility with the pre-1.3 MIT API.
-                piper_voice.synthesize(
-                    text,
-                    wav_file,
-                    length_scale=_piper_rate_scale(rate),
-                    sentence_silence=0.0,
-                )
         if not validate_audio_file(wav_path):
             raise AudioError("Local Piper returned an empty audio file.")
         command = [
@@ -581,31 +592,32 @@ def generate_cached_tts(
     spoken_text = naturalize_spoken_text(transcript, language) if naturalize else transcript.strip()
     key = audio_cache_key(spoken_text, voice, rate, engine_version, pitch=pitch, volume=volume)
     output = cache_dir / f"{key}.mp3"
-    if validate_audio_file(output):
-        return output
-    temp = output.with_suffix(".tmp.mp3")
-    try:
-        if voice.startswith("piper:"):
-            _piper_tts_save(
-                spoken_text,
-                voice,
-                rate,
-                volume,
-                temp,
-                cache_dir.parent / "piper_models",
-                timeout_seconds,
-            )
-        else:
-            _get_async_runner().run(
-                _edge_tts_save(spoken_text, voice, rate, pitch, volume, temp), timeout_seconds
-            )
-        if not validate_audio_file(temp):
-            raise AudioError("TTS returned an empty or incomplete audio file.")
-        os.replace(temp, output)
-        return output
-    finally:
-        if temp.exists():
-            temp.unlink(missing_ok=True)
+    with _cache_lock(output):
+        if validate_audio_file(output):
+            return output
+        temp = output.with_name(f"{output.stem}.{threading.get_ident()}.{time.time_ns()}.tmp.mp3")
+        try:
+            if voice.startswith("piper:"):
+                _piper_tts_save(
+                    spoken_text,
+                    voice,
+                    rate,
+                    volume,
+                    temp,
+                    cache_dir.parent / "piper_models",
+                    timeout_seconds,
+                )
+            else:
+                _get_async_runner().run(
+                    _edge_tts_save(spoken_text, voice, rate, pitch, volume, temp), timeout_seconds
+                )
+            if not validate_audio_file(temp):
+                raise AudioError("TTS returned an empty or incomplete audio file.")
+            os.replace(temp, output)
+            return output
+        finally:
+            if temp.exists():
+                temp.unlink(missing_ok=True)
 
 
 def generate_dialogue_cached_tts(
@@ -683,68 +695,84 @@ def generate_dialogue_cached_tts(
     voice_signature = "+".join(dict.fromkeys(speaker_voice for _label, _spoken, speaker_voice, _rate in plan))
     key = audio_cache_key(signature, voice_signature, rate, engine_version, pitch, volume)
     output = cache_root / f"{key}.mp3"
-    if validate_audio_file(output):
-        return output
+    with _cache_lock(output):
+        if validate_audio_file(output):
+            return output
 
-    ffmpeg = shutil.which("ffmpeg")
-    if not ffmpeg:
-        raise AudioError("Multi-speaker audio requires ffmpeg, which is missing from this runtime.")
+        ffmpeg = shutil.which("ffmpeg")
+        if not ffmpeg:
+            raise AudioError("Multi-speaker audio requires ffmpeg, which is missing from this runtime.")
 
-    temp_output = output.with_suffix(".tmp.mp3")
-    with tempfile.TemporaryDirectory(prefix="dlpt_dialogue_", dir=cache_root) as work_dir:
-        work = Path(work_dir)
-        segment_paths: list[Path] = []
-        for index, (_label, spoken, speaker_voice, speaker_rate) in enumerate(plan):
-            try:
-                segment = synth(
-                    spoken, work, voice=speaker_voice, rate=speaker_rate, pitch=pitch, volume=volume,
-                    language=language, naturalize=False, engine_version=f"{engine_version}-segment",
-                    timeout_seconds=timeout_seconds,
-                )
-            except Exception as exc:
-                if not allow_segment_fallback:
-                    raise VoiceUnavailableError(speaker_voice, type(exc).__name__) from exc
-                # The live service can change independently. Canonical/automatic
-                # recordings may degrade gracefully, while explicit Training
-                # selections disable this silent segment-level substitution.
-                fallback_candidates = list(voice_pool) if voice_pool is not None else _native_voice_pool(language, voice)
-                fallback_pool = [candidate for candidate in fallback_candidates if candidate != speaker_voice]
-                if not fallback_pool:
-                    raise
-                fallback_voice = fallback_pool[index % len(fallback_pool)]
-                fallback_rate = _rate_with_delta(speaker_rate, -4 if index % 2 == 0 else +4)
-                LOGGER.warning(
-                    "Dialogue voice unavailable voice=%s; retrying voice=%s rate=%s reason=%s",
-                    speaker_voice, fallback_voice, fallback_rate, type(exc).__name__,
-                )
-                segment = synth(
-                    spoken, work, voice=fallback_voice, rate=fallback_rate, pitch=pitch, volume=volume,
-                    language=language, naturalize=False, engine_version=f"{engine_version}-segment-fallback",
-                    timeout_seconds=timeout_seconds,
-                )
-            segment_paths.append(segment)
-
-        command = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
-        for segment in segment_paths:
-            command.extend(["-i", str(segment)])
-        labels = [f"[{index}:a]" for index in range(len(segment_paths))]
-        filters = ["".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]"]
-        command.extend([
-            "-filter_complex", ";".join(filters), "-map", "[outa]",
-            "-codec:a", "libmp3lame", "-q:a", "3", str(temp_output),
-        ])
+        temp_output = output.with_name(f"{output.stem}.{threading.get_ident()}.{time.time_ns()}.tmp.mp3")
         try:
-            subprocess.run(command, check=True, capture_output=True, text=True, timeout=max(30, int(timeout_seconds)))
-        except subprocess.CalledProcessError as exc:
-            raise AudioError(f"Multi-speaker audio assembly failed: {exc.stderr[-240:]}") from exc
-        except subprocess.TimeoutExpired as exc:
-            raise AudioError("Multi-speaker audio assembly timed out.") from exc
+            with tempfile.TemporaryDirectory(prefix="dlpt_dialogue_", dir=cache_root) as work_dir:
+                work = Path(work_dir)
 
-    if not validate_audio_file(temp_output):
-        temp_output.unlink(missing_ok=True)
-        raise AudioError("Multi-speaker audio assembly returned an empty or incomplete file.")
-    os.replace(temp_output, output)
-    return output
+                def _render_segment(item: tuple[int, tuple[str, str, str, str]]) -> Path:
+                    index, (_label, spoken, speaker_voice, speaker_rate) = item
+                    try:
+                        return synth(
+                            spoken, work, voice=speaker_voice, rate=speaker_rate, pitch=pitch, volume=volume,
+                            language=language, naturalize=False, engine_version=f"{engine_version}-segment",
+                            timeout_seconds=timeout_seconds,
+                        )
+                    except Exception as exc:
+                        if not allow_segment_fallback:
+                            raise VoiceUnavailableError(speaker_voice, type(exc).__name__) from exc
+                        fallback_candidates = list(voice_pool) if voice_pool is not None else _native_voice_pool(language, voice)
+                        fallback_pool = [candidate for candidate in fallback_candidates if candidate != speaker_voice]
+                        if not fallback_pool:
+                            raise
+                        fallback_voice = fallback_pool[index % len(fallback_pool)]
+                        fallback_rate = _rate_with_delta(speaker_rate, -4 if index % 2 == 0 else +4)
+                        LOGGER.warning(
+                            "Dialogue voice unavailable voice=%s; retrying voice=%s rate=%s reason=%s",
+                            speaker_voice, fallback_voice, fallback_rate, type(exc).__name__,
+                        )
+                        return synth(
+                            spoken, work, voice=fallback_voice, rate=fallback_rate, pitch=pitch, volume=volume,
+                            language=language, naturalize=False, engine_version=f"{engine_version}-segment-fallback",
+                            timeout_seconds=timeout_seconds,
+                        )
+
+                indexed_plan = list(enumerate(plan))
+                # Production Edge requests are independent and benefit greatly from a
+                # small bounded pool. Custom/test synthesizers stay sequential so their
+                # call ordering and thread-safety contracts remain unchanged. Piper work
+                # is internally serialized to protect CPU/RAM and model thread safety.
+                if synth is generate_cached_tts and len(indexed_plan) > 1:
+                    workers = min(3, len(indexed_plan))
+                    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="dialogue-tts") as executor:
+                        segment_paths = list(executor.map(_render_segment, indexed_plan))
+                else:
+                    segment_paths = [_render_segment(item) for item in indexed_plan]
+
+                command = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
+                for segment in segment_paths:
+                    command.extend(["-i", str(segment)])
+                labels = [f"[{index}:a]" for index in range(len(segment_paths))]
+                filters = ["".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]"]
+                command.extend([
+                    "-filter_complex", ";".join(filters), "-map", "[outa]",
+                    "-codec:a", "libmp3lame", "-q:a", "3", str(temp_output),
+                ])
+                try:
+                    subprocess.run(
+                        command, check=True, capture_output=True, text=True,
+                        timeout=max(30, int(timeout_seconds)),
+                    )
+                except subprocess.CalledProcessError as exc:
+                    raise AudioError(f"Multi-speaker audio assembly failed: {exc.stderr[-240:]}") from exc
+                except subprocess.TimeoutExpired as exc:
+                    raise AudioError("Multi-speaker audio assembly timed out.") from exc
+
+            if not validate_audio_file(temp_output):
+                raise AudioError("Multi-speaker audio assembly returned an empty or incomplete file.")
+            os.replace(temp_output, output)
+            return output
+        finally:
+            temp_output.unlink(missing_ok=True)
+
 
 
 def cleanup_audio_files(

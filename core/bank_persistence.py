@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import atexit
 import hashlib
 import logging
 import json
@@ -10,12 +11,14 @@ import tempfile
 import time
 import threading
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
+from types import SimpleNamespace
 from typing import Any
 
 from huggingface_hub import HfApi
@@ -131,6 +134,139 @@ class GeneratedBankPersistence:
         self.resolved_repo_id: str | None = settings.hf_dataset_repo
         self._remote_repo_confirmed = False
         self._active_token: str | None = None
+        self._remote_audio_names: set[str] = set()
+        self._remote_files_cache: set[str] | None = None
+        self._audio_download_locks: dict[str, threading.Lock] = {}
+        self._prefetching: set[str] = set()
+        self._prefetch_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="bank-audio-prefetch")
+        atexit.register(self._shutdown_prefetch_executor)
+
+    def _shutdown_prefetch_executor(self) -> None:
+        try:
+            self._prefetch_executor.shutdown(wait=False, cancel_futures=True)
+        except Exception:
+            pass
+
+    @staticmethod
+    def _audio_name(asset_or_data: Any) -> str:
+        if hasattr(asset_or_data, "path"):
+            raw = getattr(asset_or_data, "path", None)
+        else:
+            raw = (asset_or_data or {}).get("path")
+        return Path(str(raw or "")).name
+
+    def _audio_target(self, name: str) -> Path:
+        return self.settings.audio_cache_runtime_path(self.project_root) / name
+
+    def audio_available(self, asset: Any) -> bool:
+        """Return True when audio is local or durably available for lazy restore."""
+
+        name = self._audio_name(asset)
+        if not name:
+            return False
+        target = self._audio_target(name)
+        if target.exists() and target.is_file() and target.stat().st_size > 0:
+            return True
+        raw_path = Path(str(getattr(asset, "path", "") or ""))
+        if raw_path.exists() and raw_path.is_file() and raw_path.stat().st_size > 0:
+            return True
+        return bool(self.remote_enabled and name in self._remote_audio_names)
+
+    def ensure_audio_available(self, asset: Any) -> Path:
+        """Restore one selected remote MP3 on demand instead of every MP3 at startup."""
+
+        name = self._audio_name(asset)
+        if not name:
+            raise FileNotFoundError("Audio asset has no file name.")
+        target = self._audio_target(name)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists() and target.stat().st_size > 0:
+            try:
+                asset.path = str(target)
+            except Exception:
+                pass
+            return target
+        raw_path = Path(str(getattr(asset, "path", "") or ""))
+        if raw_path.exists() and raw_path.stat().st_size > 0:
+            if raw_path.resolve() != target.resolve():
+                fd, tmp_name = tempfile.mkstemp(prefix=target.name, suffix=".tmp", dir=str(target.parent))
+                os.close(fd)
+                shutil.copyfile(raw_path, tmp_name)
+                os.replace(tmp_name, target)
+            try:
+                asset.path = str(target)
+            except Exception:
+                pass
+            return target
+        if not self.remote_enabled or name not in self._remote_audio_names:
+            raise FileNotFoundError(f"Audio {name} is not available locally or in the durable bank.")
+        with self._lock:
+            lock = self._audio_download_locks.setdefault(name, threading.Lock())
+        with lock:
+            if target.exists() and target.stat().st_size > 0:
+                return target
+            downloaded = self._download_remote(f"audio/{name}")
+            fd, tmp_name = tempfile.mkstemp(prefix=target.name, suffix=".tmp", dir=str(target.parent))
+            os.close(fd)
+            try:
+                shutil.copyfile(downloaded, tmp_name)
+                if Path(tmp_name).stat().st_size <= 0:
+                    raise RuntimeError(f"Downloaded audio {name} was empty.")
+                os.replace(tmp_name, target)
+            finally:
+                Path(tmp_name).unlink(missing_ok=True)
+            try:
+                asset.path = str(target)
+            except Exception:
+                pass
+            LOGGER.info("Lazy-restored generated audio file=%s", name)
+            return target
+
+    def prefetch_audio(self, asset: Any) -> None:
+        """Warm one selected audio asset in the background while the learner reads."""
+
+        name = self._audio_name(asset)
+        if not name or not self.audio_available(asset):
+            return
+        target = self._audio_target(name)
+        if target.exists() and target.stat().st_size > 0:
+            return
+        with self._lock:
+            if name in self._prefetching:
+                return
+            self._prefetching.add(name)
+
+        def _worker() -> None:
+            try:
+                self.ensure_audio_available(asset)
+            except Exception as exc:
+                LOGGER.warning("Background audio prefetch failed file=%s reason=%s", name, type(exc).__name__)
+            finally:
+                with self._lock:
+                    self._prefetching.discard(name)
+
+        self._prefetch_executor.submit(_worker)
+
+    def _register_remote_audio(self, records: list[dict[str, Any]], remote_names: set[str]) -> None:
+        cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        self._remote_audio_names.update(remote_names)
+        for record in records:
+            if record.get("kind") != "audio":
+                continue
+            data = record.get("data") or {}
+            name = self._audio_name(data)
+            if not name:
+                continue
+            target = cache_dir / name
+            current = Path(str(data.get("path") or ""))
+            if current.exists() and current.is_file() and current.stat().st_size > 0 and current.resolve() != target.resolve():
+                try:
+                    shutil.copyfile(current, target)
+                except OSError:
+                    pass
+            data["path"] = str(target)
+            record["data"] = data
 
     @property
     def token_candidates(self) -> tuple[str, ...]:
@@ -403,8 +539,20 @@ class GeneratedBankPersistence:
                 )
                 return self.last_note
 
+            remote_records, remote_warnings = self._read_valid_records(remote_file)
+            remote_audio_names = {
+                self._audio_name(record.get("data") or {})
+                for record in remote_records
+                if record.get("kind") == "audio" and self._audio_name(record.get("data") or {})
+            }
             records, warnings = self._merge_records(remote_file, self.bank_path)
-            warnings.extend(self._restore_remote_audio(records))
+            warnings.extend(f"remote {item}" for item in remote_warnings)
+            self._register_remote_audio(records, remote_audio_names)
+            self._remote_files_cache = {
+                self.settings.hf_dataset_bank_filename,
+                self.settings.hf_dataset_manifest_filename,
+                *(f"audio/{name}" for name in remote_audio_names),
+            }
             text = "".join(json.dumps(record, ensure_ascii=False) + "\n" for record in records)
             atomic_write_text(self.bank_path, text)
             result = self.refresh_manifest(remote_synced=True)
@@ -466,9 +614,11 @@ class GeneratedBankPersistence:
                 return []
             return list_files(repo_id=repo_id, repo_type="dataset", token=token)
 
-        remote_files = set(
-            self._remote_call("list generated-bank files", _list_remote_files)
-        )
+        if self._remote_files_cache is None:
+            self._remote_files_cache = set(
+                self._remote_call("list generated-bank files", _list_remote_files)
+            )
+        remote_files = self._remote_files_cache
         uploaded_audio: set[str] = set()
         for record in records:
             if record.get("kind") != "audio":
@@ -496,6 +646,7 @@ class GeneratedBankPersistence:
             )
             uploaded_audio.add(audio_path.name)
             remote_files.add(remote_name)
+            self._remote_audio_names.add(audio_path.name)
 
     def _upload_manifest(self) -> None:
         if not self.manifest_path.exists():
@@ -609,7 +760,15 @@ class GeneratedBankPersistence:
                 for record in records:
                     if record.get("kind") != "audio":
                         continue
-                    audio_path = Path(str((record.get("data") or {}).get("path") or ""))
+                    data = record.get("data") or {}
+                    audio_path = Path(str(data.get("path") or ""))
+                    if (not audio_path.exists() or audio_path.stat().st_size <= 0) and self._audio_name(data):
+                        try:
+                            audio_path = self.ensure_audio_available(
+                                SimpleNamespace(path=str(data.get("path") or ""))
+                            )
+                        except Exception:
+                            continue
                     if audio_path.exists() and audio_path.stat().st_size > 0 and audio_path.name not in seen_audio:
                         archive.write(audio_path, arcname=f"audio/{audio_path.name}")
                         seen_audio.add(audio_path.name)

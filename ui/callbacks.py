@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import atexit
 import html
 import logging
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from uuid import uuid4
 
@@ -80,6 +83,7 @@ BANK = ItemBank(
     [STARTER_BANK_PATH, MANDARIN_STARTER_BANK_PATH, GENERATED_BANK_PATH],
     writable_path=GENERATED_BANK_PATH,
     on_commit=BANK_PERSISTENCE.after_local_commit,
+    audio_available=BANK_PERSISTENCE.audio_available,
 ).load()
 BANK_STATUS_MESSAGE = BANK_PERSISTENCE.status_text()
 
@@ -158,6 +162,19 @@ CONTENT_SOURCE_CHOICES = [
 
 QUEUE_CONCURRENCY_LIMIT = SETTINGS.queue_concurrency_limit
 MAX_SLOTS = 5
+_AUDIO_PREFETCH_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="selected-audio-prefetch")
+_AUDIO_PREFETCH_LOCK = threading.Lock()
+_AUDIO_PREFETCH_KEYS: set[str] = set()
+
+
+def _shutdown_audio_prefetch() -> None:
+    try:
+        _AUDIO_PREFETCH_EXECUTOR.shutdown(wait=False, cancel_futures=True)
+    except Exception:
+        pass
+
+
+atexit.register(_shutdown_audio_prefetch)
 
 
 def topic_controls(skill_label: str, language_label: str = "Russian", current_topics=None):
@@ -396,6 +413,8 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
         bundle = select_next_bundle(state, BANK, None)
     origin = BANK.origin_for(bundle.passage.id)
     state.last_content_source = "generated_bank" if origin == "generated_bank" else "starter_bank"
+    if bundle.passage.skill == "listening":
+        _prefetch_selected_playback(state, bundle)
     if not state.last_content_note:
         source_label = (
             "a previously saved and validated AI-generated item"
@@ -410,6 +429,32 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
         else:
             state.last_content_note = f"Loaded {source_label}."
     return bundle
+
+
+def _fresh_generation_audio_preferences(state: SessionState) -> dict[str, str | None]:
+    """Use an explicit Training selection for the durable first render.
+
+    Automatic mode still lets the generated passage choose its natural profile.
+    Reusing the learner's explicit profile avoids synthesizing the same fresh
+    passage twice before its first playback.
+    """
+
+    if state.active_skill != "listening" or state.mode != "training":
+        return {}
+    automatic_label = language_profile(state.language).starter_voice_label
+    normalized_label = normalize_voice_label(state.language, state.voice_label)
+    if normalized_label != state.voice_label:
+        state.voice_label = normalized_label
+    if state.voice_label == automatic_label:
+        return {}
+    if state.voice_label not in voice_choices(state.language):
+        return {}
+    return {
+        "preferred_audio_voice": voice_for_label(state.language, state.voice_label),
+        "preferred_audio_rate": TRAINING_RATE_MAP.get(state.speech_rate_label, "+0%"),
+        "preferred_audio_pitch": "+0Hz",
+        "preferred_audio_volume": "+0%",
+    }
 
 
 def _select_with_safe_history(state: SessionState, progress=None) -> PassageBundle:
@@ -440,6 +485,7 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                     competencies=state.competencies,
                     maximum_questions=min(remaining, 5 if state.active_skill == "reading" else 3),
                     language=state.language,
+                    **_fresh_generation_audio_preferences(state),
                 )
                 _progress(progress, 0.82, "Accepted item validated; updating the reusable bank…")
                 questions = shuffled_bundle(
@@ -1007,6 +1053,95 @@ def _generate_explicit_training_audio(
         raise last_error
     raise AudioError("No usable Russian voice remained for the selected Training playback.")
 
+def _schedule_audio_prefetch(key: str, work) -> None:
+    with _AUDIO_PREFETCH_LOCK:
+        if key in _AUDIO_PREFETCH_KEYS:
+            return
+        _AUDIO_PREFETCH_KEYS.add(key)
+
+    def _worker() -> None:
+        try:
+            work()
+            LOGGER.info("Selected audio prefetch ready key=%s", key)
+        except Exception as exc:
+            LOGGER.info("Selected audio prefetch unavailable key=%s reason=%s", key, type(exc).__name__)
+        finally:
+            with _AUDIO_PREFETCH_LOCK:
+                _AUDIO_PREFETCH_KEYS.discard(key)
+
+    _AUDIO_PREFETCH_EXECUTOR.submit(_worker)
+
+
+def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> None:
+    """Warm only the audio the learner is likely to play next.
+
+    Remote bank MP3s are restored lazily, while neural Training/strict upgrades
+    are synthesized in the background. The shared audio cache lock makes a quick
+    Play click wait for the same render instead of starting duplicate work.
+    """
+
+    passage = bundle.passage
+    if passage.skill != "listening":
+        return
+    asset = BANK.get_audio(passage.audio_asset_id)
+    if asset is None:
+        return
+    BANK_PERSISTENCE.prefetch_audio(asset)
+    cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
+
+    if state.mode == "training":
+        try:
+            voice, rate, pitch, volume, _display, explicit = _training_audio_profile(state, passage)
+        except Exception:
+            return
+        if _canonical_audio_matches(asset, voice, rate):
+            return
+        key = f"training:{passage.content_hash}:{voice}:{rate}:{int(explicit)}"
+        if explicit:
+            _schedule_audio_prefetch(
+                key,
+                lambda: _generate_explicit_training_audio(
+                    passage, cache_dir, voice, rate, pitch, volume
+                ),
+            )
+        else:
+            _schedule_audio_prefetch(
+                key,
+                lambda: generate_dialogue_cached_tts(
+                    passage.passage_ru, cache_dir, voice=voice, rate=rate,
+                    pitch=pitch, volume=volume, language=passage.language,
+                    engine_version=f"{DIALOGUE_TTS_CACHE_VERSION}-training-automatic-v3",
+                    timeout_seconds=SETTINGS.tts_timeout_seconds,
+                    synthesizer=generate_cached_tts,
+                ),
+            )
+        return
+
+    if asset.engine_version == DIALOGUE_TTS_ASSET_VERSION:
+        return
+    voice, rate, pitch, volume = _natural_voice_profile(passage, SETTINGS)
+    key = f"strict:{passage.content_hash}:{voice}:{rate}"
+    _schedule_audio_prefetch(
+        key,
+        lambda: generate_dialogue_cached_tts(
+            passage.passage_ru, cache_dir, voice=voice, rate=rate,
+            pitch=pitch, volume=volume, language=passage.language,
+            engine_version=DIALOGUE_TTS_CACHE_VERSION,
+            timeout_seconds=SETTINGS.tts_timeout_seconds,
+            synthesizer=generate_cached_tts,
+        ),
+    )
+
+
+def _canonical_audio_matches(asset, voice: str, rate: str) -> bool:
+    return bool(
+        asset
+        and asset.engine_version == DIALOGUE_TTS_ASSET_VERSION
+        and asset.voice == voice
+        and asset.rate == rate
+    )
+
+
 def play_audio_callback(state: SessionState | None, bundle_data: dict | None, progress=gr.Progress()):
     if not state or not bundle_data:
         return state, gr.update(value="", visible=False), gr.update(), gr.update(value="Start or resume a session first.")
@@ -1022,6 +1157,10 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         if not asset:
             raise AudioError("No validated audio asset is linked to this passage.")
         _progress(progress, 0.24, "Loading validated audio…")
+        try:
+            BANK_PERSISTENCE.ensure_audio_available(asset)
+        except FileNotFoundError:
+            pass
         validated_bank_path = resolve_audio_path(asset, ROOT)
         path = validated_bank_path
         audio_note = ""
@@ -1035,7 +1174,15 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             )
             _progress(progress, 0.42, f"Preparing {requested_display}…")
             try:
-                if explicit:
+                if _canonical_audio_matches(asset, voice, rate):
+                    path = validated_bank_path
+                    actual_voice = voice
+                    unavailable = ()
+                    audio_note = (
+                        f" Training playback reuses the already prepared {requested_display} "
+                        f"recording at {state.speech_rate_label.lower()} speed."
+                    )
+                elif explicit:
                     path, actual_voice, unavailable = _generate_explicit_training_audio(
                         bundle.passage, cache_dir, voice, rate, pitch, volume
                     )

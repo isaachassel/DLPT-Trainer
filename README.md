@@ -18,7 +18,7 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.7.0
+### Audio behavior in v1.7.1
 
 The default **Automatic natural Russian voice** keeps Microsoft Edge TTS for the strongest free online voices: Dmitry and Svetlana. Single-speaker news, narration, announcements, and lectures remain one continuous recording. The app does not cut ordinary passages into sentence fragments.
 
@@ -26,7 +26,7 @@ The free Edge endpoint used by this Space does not currently accept `ru-RU-Dariy
 
 ## Hybrid multi-speaker listening audio
 
-Version 1.7.0 combines two completely free engines:
+Version 1.7.1 retains the two completely free engines introduced in v1.7.0:
 
 - Microsoft Edge TTS: Dmitry and Svetlana
 - Local Piper TTS: Irina and Ruslan
@@ -43,6 +43,15 @@ Speaker 4 → Ruslan (local Piper)
 Piper models are downloaded only when one of those supplemental voices is actually needed. Each medium Russian model is about 63 MB and is cached after its first use, so the app does not add both models to every startup. Manual Training choices now clearly identify whether a voice uses Edge or local Piper.
 
 Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
+
+
+## Performance behavior in v1.7.1
+
+This release is a targeted optimization of the working v1.7.0 build rather than a redesign. Startup restores the generated JSONL bank immediately but no longer downloads every saved MP3. A generated Listening file is fetched only when selected, and that one file begins prefetching in the background while the learner reads.
+
+The same selected-item prefetch warms any required neural Training or strict-mode upgrade. Multi-speaker Edge turns are rendered with a bounded three-request pool, while Piper remains serialized to protect free CPU memory. Fresh-AI Listening uses an explicit learner-selected Training voice and speed for its first durable render, so playback does not synthesize the same passage a second time when the requested profile already matches.
+
+Operational passage validation and bank-health totals are cached in memory and invalidated only when the bank changes. Reading and bank-only selection therefore avoid repeating the same Pydantic/deterministic validation work on every Next Passage action.
 
 ## Stable topic taxonomy and anti-repetition
 

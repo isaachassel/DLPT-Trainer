@@ -1834,9 +1834,21 @@ class LiveGenerationService:
             existing = path.read_text(encoding="utf-8") if path.exists() else ""
             atomic_write_text(path, existing + json.dumps(record, ensure_ascii=False, default=str) + "\n")
 
-    def _build_audio(self, passage: PassageItem) -> tuple[PassageItem, AudioAsset]:
+    def _build_audio(
+        self,
+        passage: PassageItem,
+        *,
+        preferred_voice: str | None = None,
+        preferred_rate: str | None = None,
+        preferred_pitch: str | None = None,
+        preferred_volume: str | None = None,
+    ) -> tuple[PassageItem, AudioAsset]:
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
-        voice, rate, pitch, volume = _natural_voice_profile(passage, self.settings)
+        natural_voice, natural_rate, natural_pitch, natural_volume = _natural_voice_profile(passage, self.settings)
+        voice = preferred_voice or natural_voice
+        rate = preferred_rate or natural_rate
+        pitch = preferred_pitch or natural_pitch
+        volume = preferred_volume or natural_volume
         LOGGER.info(
             "Canonical bank TTS start passage=%s primary_voice=%s rate=%s pitch=%s",
             passage.id, voice, rate, pitch,
@@ -2247,6 +2259,10 @@ class LiveGenerationService:
         competencies: list[str] | None,
         maximum_questions: int,
         language: str = "ru",
+        preferred_audio_voice: str | None = None,
+        preferred_audio_rate: str | None = None,
+        preferred_audio_pitch: str | None = None,
+        preferred_audio_volume: str | None = None,
     ) -> GeneratedBundle:
         ready, message = self.settings.provider_readiness()
         if not ready:
@@ -2397,7 +2413,13 @@ class LiveGenerationService:
             accepted_questions = [question.model_copy(update={"generation": final_metadata}) for question in accepted_questions]
             audio_asset = None
             if skill == "listening":
-                passage, audio_asset = self._build_audio(passage)
+                passage, audio_asset = self._build_audio(
+                    passage,
+                    preferred_voice=preferred_audio_voice,
+                    preferred_rate=preferred_audio_rate,
+                    preferred_pitch=preferred_audio_pitch,
+                    preferred_volume=preferred_audio_volume,
+                )
 
             commit_result = self.bank.append_validated_bundle(
                 passage,

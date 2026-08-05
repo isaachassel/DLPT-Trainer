@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.1 — Safe performance optimization
+
+- Kept v1.7.0 assessment behavior, topic logic, adaptive routing, UI flow, and free hybrid voice choices unchanged.
+- Stopped startup from downloading every saved generated-bank MP3. Remote audio records are indexed immediately and each selected MP3 is restored lazily.
+- Added background prefetch for only the selected Listening asset while the learner reads the orientation/questions.
+- Added background pre-rendering for the selected Training/strict neural audio profile so the Play button usually hits an already-warm cache.
+- Added process-wide cache locks so prefetch and user playback share one render instead of generating duplicate files.
+- Parallelized independent multi-speaker Edge TTS turns with a bounded three-worker pool while keeping Piper synthesis serialized for CPU/RAM safety.
+- Reused the learner's explicit Training voice/speed as the canonical audio for newly generated Listening items, eliminating the previous second TTS pass before first playback.
+- Reused a current canonical recording immediately when its voice and speed already match the Training selection.
+- Cached operational-passage validation and bank-health calculations, with automatic invalidation after reload or accepted-bank commits.
+- Cached the remote Dataset file index during the process to avoid a repeated repository-list request after every accepted Fresh-AI item.
+- Added collision-safe temporary audio names for concurrent synthesis.
+- Expanded regression coverage to 200 passing tests, including lazy audio restoration, validation-cache behavior, explicit first-render voice routing, canonical reuse, and bounded parallel dialogue synthesis.
+
 ## 1.7.0 — Hybrid Russian voices, topic balance, and quota resilience
 
 - Removed the nonfunctional Dariya selector after live logs confirmed that the free Edge endpoint rejects `ru-RU-DariyaNeural`; legacy Dariya sessions migrate to local Piper Irina.

@@ -27,9 +27,19 @@ storage/item_bank/generated_items.jsonl
 
 The first is immutable release content. The second is an atomic writable overlay. With mounted Space storage, the overlay resolves to `/data/item_bank/generated_items.jsonl`.
 
-The bank loads once at startup, maintains passage/question/audio indexes in memory, rejects duplicate IDs/content, and immediately indexes newly accepted generated bundles. `generated_items.meta.json` records the overlay checksum and record counts after every commit. Incomplete bundles, invalid questions, malformed overlay records, and Listening items with missing audio are never selectable.
+The bank loads once at startup, maintains passage/question/audio indexes in memory, rejects duplicate IDs/content, and immediately indexes newly accepted generated bundles. Operational passage validation and health summaries are cached and invalidated whenever the bank is reindexed. `generated_items.meta.json` records the overlay checksum and record counts after every commit. Incomplete bundles, invalid questions, malformed overlay records, and Listening items without either a local file or a durably indexed remote MP3 are never selectable.
 
-When `HF_DATASET_REPO` is configured, `GeneratedBankPersistence` merges the remote overlay before indexing. After an accepted local atomic commit, it mirrors the JSONL snapshot, health manifest, and generated Listening MP3s. Remote sync failure cannot roll back the already accepted local/in-memory bundle.
+When `HF_DATASET_REPO` is configured, `GeneratedBankPersistence` merges the remote overlay before indexing. Remote MP3s are registered but not downloaded in bulk; the selected file is restored lazily and prefetched in the background. After an accepted local atomic commit, the persistence layer mirrors the JSONL snapshot, health manifest, and new Listening MP3s. Remote sync failure cannot roll back the already accepted local/in-memory bundle.
+
+
+## Performance and audio-cache path
+
+- Bank-only Reading/Listening selection reuses cached operational indexes instead of rerunning deterministic validation for every request.
+- The selected remote Listening MP3 is prefetched while the learner reads; all other remote audio remains untouched.
+- Selected Training/strict neural upgrades are also warmed in the background. A per-output cache lock ensures prefetch and an immediate Play click wait on the same render.
+- Independent Edge dialogue turns use at most three concurrent synthesis requests. Piper synthesis remains serialized because the free CPU tier has limited RAM and local model objects are not assumed thread-safe.
+- Newly generated Listening uses an explicit Training voice/speed for the first canonical render when one was selected, allowing playback to reuse that file.
+- Temporary MP3 names include thread/time identifiers so concurrent renders cannot overwrite each other's partial files.
 
 ## Content selection paths
 

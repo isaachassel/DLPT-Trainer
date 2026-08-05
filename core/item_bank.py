@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import random
 import threading
@@ -27,6 +28,7 @@ class ItemBank:
         path: str | Path | Sequence[str | Path],
         writable_path: str | Path | None = None,
         on_commit: Callable[[Path], Any] | None = None,
+        audio_available: Callable[[AudioAsset], bool] | None = None,
     ):
         if isinstance(path, (str, Path)):
             self.paths = [Path(path)]
@@ -48,8 +50,11 @@ class ItemBank:
         self._loaded = False
         self._lock = threading.RLock()
         self.on_commit = on_commit
+        self.audio_available = audio_available
         self.last_commit_result: Any | None = None
         self.load_warnings: list[str] = []
+        self._active_cache: dict[tuple[str, str | None], tuple[PassageItem, ...]] = {}
+        self._health_cache: dict[str | None, dict[str, Any]] = {}
 
     def _load_path(self, source: Path, required: bool) -> None:
         if not source.exists():
@@ -98,7 +103,12 @@ class ItemBank:
                     # excluded from indexing and surfaced through bank health status.
                     self.load_warnings.append(message)
 
+    def _invalidate_runtime_caches(self) -> None:
+        self._active_cache.clear()
+        self._health_cache.clear()
+
     def _reindex(self) -> None:
+        self._invalidate_runtime_caches()
         self.questions_by_passage = defaultdict(list)
         self.passage_ids_by_skill = {"reading": set(), "listening": set()}
         self.passage_ids_by_language_skill = defaultdict(set)
@@ -211,12 +221,22 @@ class ItemBank:
             return "listening audio transcript hash does not match the passage"
         audio_path = self._resolve_audio_path(asset)
         if audio_path is None or not audio_path.exists() or audio_path.stat().st_size <= 0:
+            if self.audio_available is not None:
+                try:
+                    if self.audio_available(asset):
+                        return None
+                except Exception:
+                    pass
             return "listening audio file is missing or empty"
         return None
 
     def active_passages(self, skill: str, language: str | None = None) -> list[PassageItem]:
         if skill not in {"reading", "listening"}:
             raise ItemBankError(f"Unsupported skill: {skill}")
+        cache_key = (skill, language)
+        cached = self._active_cache.get(cache_key)
+        if cached is not None:
+            return list(cached)
         active: list[PassageItem] = []
         passage_ids = (
             self.passage_ids_by_language_skill[(language, skill)]
@@ -237,7 +257,8 @@ class ItemBank:
             if self._audio_relationship_error(passage):
                 continue
             active.append(passage)
-        return active
+        self._active_cache[cache_key] = tuple(active)
+        return list(active)
 
     def topics_for_skill(self, skill: str, language: str | None = None) -> list[str]:
         if skill not in self.topics_by_skill:
@@ -259,6 +280,9 @@ class ItemBank:
         accepted fresh-generation commit or an explicit import/merge can add to
         the generated overlay.
         """
+        cached = self._health_cache.get(language)
+        if cached is not None:
+            return copy.deepcopy(cached)
         included_ids = {
             pid for pid, passage in self.passages.items()
             if language is None or passage.language == language
@@ -351,6 +375,7 @@ class ItemBank:
                 })
             summary[skill] = skill_data
         summary["cross_skill_related_pairs"] = self._cross_skill_related_pair_count(language)
+        self._health_cache[language] = copy.deepcopy(summary)
         return summary
 
     def _cross_skill_related_pair_count(self, language: str | None = None) -> int:
