@@ -117,7 +117,7 @@ def test_duplicate_live_content_is_quarantined_without_polluting_bank(project_ro
     )
     passage_count = len(bank.passages)
 
-    with pytest.raises(GenerationValidationError, match="duplicated"):
+    with pytest.raises(GenerationValidationError, match="duplicated|repetition|repeat"):
         service.generate_and_store(
             skill="reading", level="2", mode="training", topics=[], competencies=[], maximum_questions=2
         )
@@ -125,7 +125,8 @@ def test_duplicate_live_content_is_quarantined_without_polluting_bank(project_ro
     assert len(bank.passages) == passage_count
     quarantine = tmp_path / "quarantine" / "live_generation_failures.jsonl"
     assert quarantine.exists()
-    assert "duplicate" in quarantine.read_text(encoding="utf-8").lower()
+    quarantine_text = quarantine.read_text(encoding="utf-8").lower()
+    assert "duplicate" in quarantine_text or "repetition" in quarantine_text or "repeat" in quarantine_text
 
 
 def test_fresh_ai_unavailable_falls_back_without_losing_session(monkeypatch):

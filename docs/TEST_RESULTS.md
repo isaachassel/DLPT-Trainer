@@ -347,3 +347,15 @@ The complete automated suite passed with **175 tests**. Additional dialogue test
 - Explicit multi-speaker rendering raises a typed failed-voice signal instead of silently substituting a different segment voice.
 - Retry tests remove unavailable voices from the dialogue pool while preserving the requested primary voice when possible.
 - Full multilingual bank validation and the Gradio Space smoke test passed.
+
+
+## v1.7.0 hybrid voice and topic-balance regression
+
+- 194 automated tests passed.
+- The unavailable Dariya Edge route was removed from current choices and legacy Dariya selections migrate to Piper Irina.
+- Three- and four-speaker Russian scripts map to Dmitry, Svetlana, Irina, and Ruslan with stable identities.
+- Piper synthesis dispatch is tested independently from the Edge asyncio worker.
+- Generated subtopics are canonicalized into the 15 stable selector categories; bike-sharing and bike-lane labels no longer pollute the UI.
+- Balanced selection strongly avoids recently overused Transportation content, and only recent Fresh-AI items count as recency.
+- Hugging Face quota failures activate an adapter cooldown, preventing repeated calls through weaker structured-output modes and later generation stages.
+- Generated-bank downloads use the synchronous HTTP cache path, while existing persistence upload/restore tests remain green.

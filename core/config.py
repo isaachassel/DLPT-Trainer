@@ -51,8 +51,8 @@ class Settings(BaseModel):
     groq_verifier_model: str = "openai/gpt-oss-20b"
     structured_output_mode: str = "auto"
     provider_timeout_seconds: int = Field(default=45, ge=5, le=180)
-    provider_max_retries: int = Field(default=2, ge=0, le=6)
-    max_provider_attempts_per_stage: int = Field(default=8, ge=1, le=20)
+    provider_max_retries: int = Field(default=1, ge=0, le=6)
+    max_provider_attempts_per_stage: int = Field(default=4, ge=1, le=20)
     generation_concurrency_limit: int = Field(default=1, ge=1, le=4)
     queue_concurrency_limit: int = Field(default=4, ge=1, le=16)
     max_generation_requests_per_session: int = Field(default=8, ge=0, le=40)
@@ -349,8 +349,8 @@ def get_settings() -> Settings:
         groq_verifier_model=os.getenv("GROQ_VERIFIER_MODEL", "openai/gpt-oss-20b"),
         structured_output_mode=os.getenv("STRUCTURED_OUTPUT_MODE", "auto"),
         provider_timeout_seconds=int(os.getenv("PROVIDER_TIMEOUT_SECONDS", "45")),
-        provider_max_retries=int(os.getenv("PROVIDER_MAX_RETRIES", "2")),
-        max_provider_attempts_per_stage=int(os.getenv("MAX_PROVIDER_ATTEMPTS_PER_STAGE", "8")),
+        provider_max_retries=int(os.getenv("PROVIDER_MAX_RETRIES", "1")),
+        max_provider_attempts_per_stage=int(os.getenv("MAX_PROVIDER_ATTEMPTS_PER_STAGE", "4")),
         generation_concurrency_limit=int(os.getenv("GENERATION_CONCURRENCY_LIMIT", "1")),
         queue_concurrency_limit=int(os.getenv("QUEUE_CONCURRENCY_LIMIT", "4")),
         max_generation_requests_per_session=int(os.getenv("MAX_GENERATION_REQUESTS_PER_SESSION", "8")),

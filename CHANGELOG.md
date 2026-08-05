@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.7.0 — Hybrid Russian voices, topic balance, and quota resilience
+
+- Removed the nonfunctional Dariya selector after live logs confirmed that the free Edge endpoint rejects `ru-RU-DariyaNeural`; legacy Dariya sessions migrate to local Piper Irina.
+- Added the free local `piper-tts` engine alongside Edge TTS rather than replacing it.
+- Added Russian Piper Irina and Ruslan as lazy-downloaded, cached supplemental voices.
+- Expanded detected Russian dialogue to four distinct speaker profiles: Edge Dmitry, Edge Svetlana, Piper Irina, and Piper Ruslan before controlled reuse.
+- Preserved single-speaker passages as one continuous synthesis request; only reliably detected multi-speaker scripts are segmented.
+- Added modern Piper 1.5 Python API support with compatibility for older synthesis APIs and synchronous public-model downloads.
+- Replaced the growing generated-topic dropdown with 15 stable broad categories.
+- Canonicalized historical and future subtopics such as bike sharing, bike lanes, library services, delivery, and utility outages into the stable taxonomy.
+- Added server-side exposure balancing, consecutive-category prevention, and narrow-theme similarity rejection based only on recent Fresh-AI items rather than starter-bank file order.
+- Strengthened prompts so Transportation scenarios are not produced unless Transportation is the selected/balanced category.
+- Added provider cooldowns for quota, permission, rate-limit, and timeout failures and prevented weaker-mode retries against an endpoint already known to be unavailable.
+- Made the optional secondary verifier non-blocking when a free provider is unavailable; primary blind verification remains mandatory.
+- Replaced generated-bank startup downloads with a synchronous direct-HTTP cache path to prevent misleading event-loop finalizer warnings.
+- Reduced default per-stage provider attempts from eight to four and default outer retries from two to one.
+- Expanded regression coverage to 194 passing tests, including topic canonicalization, transportation avoidance, four-speaker routing, Piper dispatch, and provider cooldown behavior.
+
 ## 1.6.7 — Training voice truth and startup hardening
 
 - Fixed the UI-to-playback path so an explicit Training voice selection is rendered first instead of generating/retaining the canonical automatic bank voice.

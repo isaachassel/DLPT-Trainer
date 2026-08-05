@@ -46,9 +46,12 @@ def test_topic_choices_follow_selected_skill():
     reading = topic_controls("Reading", [])
     listening = topic_controls("Listening", [])
     combined = topic_controls("Reading + Listening (separate sections)", [])
-    assert set(reading["choices"]) == set(BANK.topics_for_skill("reading"))
-    assert set(listening["choices"]) == set(BANK.topics_for_skill("listening"))
-    assert set(combined["choices"]) == set(TOPICS_BY_SKILL["reading"]) | set(TOPICS_BY_SKILL["listening"])
+    from core.topics import CANONICAL_TOPICS
+    expected = set(CANONICAL_TOPICS)
+    assert set(reading["choices"]) == expected
+    assert set(listening["choices"]) == expected
+    assert set(combined["choices"]) == expected
+    assert not any("bike" in choice.casefold() for choice in reading["choices"])
 
 
 def test_reading_bundle_with_audio_is_rejected(project_root, tmp_path):

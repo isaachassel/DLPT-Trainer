@@ -18,17 +18,39 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.6.7
+### Audio behavior in v1.7.0
 
-The default **Automatic natural voice** setting generates a native Microsoft Edge neural recording lazily when each listening passage is selected. Legacy bundled eSpeak MP3s remain only as an offline fallback. Russian single-speaker material now rotates deterministically among Dmitry, Svetlana, and Dariya where appropriate; the app does not inject artificial paragraph pauses or random pitch changes.
+The default **Automatic natural Russian voice** keeps Microsoft Edge TTS for the strongest free online voices: Dmitry and Svetlana. Single-speaker news, narration, announcements, and lectures remain one continuous recording. The app does not cut ordinary passages into sentence fragments.
 
-## Natural multi-speaker listening audio
+The free Edge endpoint used by this Space does not currently accept `ru-RU-DariyaNeural`, even though that name appears in broader Microsoft voice documentation. The unavailable Dariya choice has therefore been removed instead of presenting a selector that silently plays another voice. Existing saved sessions that selected Dariya migrate to **Irina (local Piper)**.
 
-Version 1.6.7 detects explicitly labelled interviews, conversations, debates, calls, and dash-form dialogue. Speaker labels are removed before synthesis. Russian dialogues use a three-voice native pool: `ru-RU-DmitryNeural`, `ru-RU-SvetlanaNeural`, and `ru-RU-DariyaNeural`. The first three distinct speakers receive separate voices whenever their labels permit it. A fourth distinct speaker reuses one native voice with a restrained rate difference, while repeated turns retain the same speaker profile. Mandarin continues to use its two native configured voices with controlled reuse for additional speakers.
+## Hybrid multi-speaker listening audio
 
-Each dialogue turn is synthesized separately and the complete, untruncated turns are joined into one playable MP3. Single-speaker passages remain one continuous, single-voice recording. Previously cached dialogue recordings are upgraded lazily when selected because this release uses a new cache/asset version.
+Version 1.7.0 combines two completely free engines:
 
-Fresh AI-generated multi-speaker scripts are limited to two through four speakers and must put each turn on its own line with a stable explicit label. Users may also choose Dariya directly in Training mode. The selected Training voice is now resolved separately from the canonical bank recording, so choosing Dariya cannot silently continue playing a Dmitry cache. Runtime status and logs show the requested and actual primary voice. If a live voice is temporarily unavailable, the app reports the fallback explicitly and removes the failed voice from the dialogue pool before retrying.
+- Microsoft Edge TTS: Dmitry and Svetlana
+- Local Piper TTS: Irina and Ruslan
+
+Detected dialogue is split only at reliable speaker turns. Labels are removed before synthesis, each speaker keeps one stable profile, and the completed turns are joined into one playable MP3. Russian scripts can therefore use four distinct voices before any voice must be reused:
+
+```text
+Speaker 1 → Dmitry (Edge)
+Speaker 2 → Svetlana (Edge)
+Speaker 3 → Irina (local Piper)
+Speaker 4 → Ruslan (local Piper)
+```
+
+Piper models are downloaded only when one of those supplemental voices is actually needed. Each medium Russian model is about 63 MB and is cached after its first use, so the app does not add both models to every startup. Manual Training choices now clearly identify whether a voice uses Edge or local Piper.
+
+Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
+
+## Stable topic taxonomy and anti-repetition
+
+The topic selector now exposes only a stable set of broad DLPT-style categories. AI-authored subtopics such as `bike lanes`, `urban transportation / bike sharing`, `library hours`, or `utility outage` remain metadata beneath their broad category and are no longer appended as new top-level selector choices.
+
+When the topic box is blank, the server favors underrepresented categories, strongly avoids the most recent Fresh-AI categories, and rejects repeated or near-repeated themes. Starter-bank file order is not treated as learner recency. Explicitly selected categories are still honored.
+
+Provider quota handling is also bounded: a Hugging Face 402 or Groq 429 activates a short provider cooldown instead of repeatedly calling the same unavailable free endpoint during every generation stage. Generated-bank startup downloads use a synchronous HTTP path to avoid the misleading asyncio finalizer tracebacks previously printed by some Spaces.
 
 ## What happened to the original GenAI code
 

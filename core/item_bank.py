@@ -11,6 +11,7 @@ from .adaptive import select_passage
 from .constants import LETTERS
 from .models import AdaptiveSelection, AudioAsset, PassageItem, QuestionItem, ValidationReport
 from .storage import atomic_write_text
+from .topics import canonicalize_topic
 from .validation import content_hash, near_duplicate, validate_passage, validate_question
 
 
@@ -104,7 +105,11 @@ class ItemBank:
         self.question_ids_by_skill = {"reading": set(), "listening": set()}
         self.topics_by_skill = {"reading": set(), "listening": set()}
         self.topics_by_language_skill = defaultdict(set)
-        for passage in self.passages.values():
+        for passage_id, original in list(self.passages.items()):
+            canonical_topic = canonicalize_topic(original.topic, original.subtopic, original.genre)
+            passage = original if canonical_topic == original.topic else original.model_copy(update={"topic": canonical_topic})
+            if passage is not original:
+                self.passages[passage_id] = passage
             self.passage_ids_by_skill[passage.skill].add(passage.id)
             self.passage_ids_by_language_skill[(passage.language, passage.skill)].add(passage.id)
             self.topics_by_skill[passage.skill].add(passage.topic)

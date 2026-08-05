@@ -27,10 +27,13 @@ LANGUAGES: dict[str, LanguageProfile] = {
         native_name="Русский",
         female_voice="ru-RU-SvetlanaNeural",
         male_voice="ru-RU-DmitryNeural",
-        female_voice_label="Russian Female — Svetlana",
-        male_voice_label="Russian Male — Dmitry",
+        female_voice_label="Russian Female — Svetlana (Edge)",
+        male_voice_label="Russian Male — Dmitry (Edge)",
         starter_voice_label="Automatic natural Russian voice",
-        additional_voices=(("Russian Female — Dariya", "ru-RU-DariyaNeural"),),
+        additional_voices=(
+            ("Russian Female — Irina (local Piper)", "piper:ru_RU-irina-medium"),
+            ("Russian Male — Ruslan (local Piper)", "piper:ru_RU-ruslan-medium"),
+        ),
     ),
     "zh-CN": LanguageProfile(
         code="zh-CN",
@@ -46,9 +49,16 @@ LANGUAGES: dict[str, LanguageProfile] = {
     ),
 }
 
+LEGACY_VOICE_LABEL_ALIASES: dict[tuple[str, str], str] = {
+    ("ru", "Russian Female — Svetlana"): "Russian Female — Svetlana (Edge)",
+    ("ru", "Russian Male — Dmitry"): "Russian Male — Dmitry (Edge)",
+    # Dariya is not exposed by the free Edge endpoint used by edge-tts. Existing
+    # saved sessions migrate to the supplemental local female voice instead of
+    # silently pretending Dariya was rendered.
+    ("ru", "Russian Female — Dariya"): "Russian Female — Irina (local Piper)",
+}
+
 LANGUAGE_LABEL_TO_CODE = {profile.label: code for code, profile in LANGUAGES.items()}
-# Preserve old UI/bookmark payloads created before high-level generated Reading
-# began alternating between Simplified and Traditional characters.
 LANGUAGE_LABEL_TO_CODE["Mandarin Chinese (Simplified)"] = "zh-CN"
 LANGUAGE_CODE_TO_LABEL = {code: profile.label for code, profile in LANGUAGES.items()}
 SUPPORTED_LANGUAGE_CODES = tuple(LANGUAGES)
@@ -62,16 +72,12 @@ def language_profile(code: str) -> LanguageProfile:
 
 
 def voice_entries(code: str) -> list[tuple[str, str]]:
-    """Return stable user-facing labels and native voice IDs for a language."""
-
     profile = language_profile(code)
     entries = [
         (profile.female_voice_label, profile.female_voice),
         *profile.additional_voices,
         (profile.male_voice_label, profile.male_voice),
     ]
-    # Keep the automatic option last for compatibility with existing saved UI
-    # payloads while the layout explicitly selects it as the default value.
     entries.append((profile.starter_voice_label, profile.female_voice))
     return entries
 
@@ -80,45 +86,34 @@ def voice_choices(code: str) -> list[str]:
     return [label for label, _voice in voice_entries(code)]
 
 
+def normalize_voice_label(code: str, label: str) -> str:
+    return LEGACY_VOICE_LABEL_ALIASES.get((code, label), label)
+
+
 def voice_for_label(code: str, label: str) -> str:
+    label = normalize_voice_label(code, label)
     entries = dict(voice_entries(code))
     profile = language_profile(code)
     return entries.get(label, profile.female_voice)
 
 
-
-
 def voice_label_for_id(code: str, voice_id: str) -> str:
-    """Return the user-facing label for a configured voice ID."""
-
     for label, configured_id in voice_entries(code):
         if configured_id == voice_id and label != language_profile(code).starter_voice_label:
             return label
     return voice_id
 
 
-def voice_fallbacks(code: str, preferred_voice: str) -> tuple[str, ...]:
-    """Return explicit fallback voices, preferring the same apparent gender.
+def voice_gender(voice_id: str) -> str | None:
+    lower = voice_id.casefold()
+    if any(token in lower for token in ("svetlana", "irina", "xiaoxiao")):
+        return "female"
+    if any(token in lower for token in ("dmitry", "ruslan", "yunxi")):
+        return "male"
+    return None
 
-    The selector must never silently map Dariya to Dmitry.  When a selected voice
-    is temporarily unavailable, another same-gender native voice is tried first
-    and the UI reports the substitution.
-    """
-
-    profile = language_profile(code)
-    female = [profile.female_voice, *(voice for _label, voice in profile.additional_voices)]
-    male = [profile.male_voice]
-    if preferred_voice in female:
-        ordered = [voice for voice in female if voice != preferred_voice] + male
-    elif preferred_voice in male:
-        ordered = [voice for voice in male if voice != preferred_voice] + female
-    else:
-        ordered = list(native_voice_pool(code))
-    return tuple(dict.fromkeys(voice for voice in ordered if voice and voice != preferred_voice))
 
 def native_voice_pool(code: str, preferred_voice: str | None = None) -> tuple[str, ...]:
-    """Return a de-duplicated native voice pool with the preferred voice first."""
-
     profile = language_profile(code)
     configured = [
         profile.male_voice,
@@ -131,3 +126,11 @@ def native_voice_pool(code: str, preferred_voice: str | None = None) -> tuple[st
         if voice and voice not in result:
             result.append(voice)
     return tuple(result)
+
+
+def voice_fallbacks(code: str, preferred_voice: str) -> tuple[str, ...]:
+    preferred_gender = voice_gender(preferred_voice)
+    pool = list(native_voice_pool(code))
+    same_gender = [voice for voice in pool if voice != preferred_voice and voice_gender(voice) == preferred_gender]
+    other = [voice for voice in pool if voice != preferred_voice and voice not in same_gender]
+    return tuple(same_gender + other)

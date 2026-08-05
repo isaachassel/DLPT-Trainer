@@ -45,6 +45,7 @@ from .prompts import (
     verifier_system,
 )
 from .storage import atomic_write_text
+from .topics import canonicalize_topic, choose_balanced_topic, normalize_requested_topics, theme_similarity
 from .validation import (
     answer_length_leakage_summary,
     answer_position_balance,
@@ -654,6 +655,30 @@ class HostedProvider(AuthoringProvider):
     fenced JSON document; it never extracts an arbitrary first ``{...}`` substring.
     """
 
+    def _provider_is_cooling_down(self, provider: str) -> bool:
+        with self._cooldown_lock:
+            until = self._provider_cooldowns.get(provider, 0.0)
+            if until <= time.monotonic():
+                self._provider_cooldowns.pop(provider, None)
+                return False
+            return True
+
+    def _mark_provider_cooldown(self, provider: str, friendly_reason: str) -> None:
+        lower = friendly_reason.casefold()
+        if "authentication" in lower or "permission" in lower or "credits/quota" in lower:
+            seconds = 15 * 60
+        elif "rate limit" in lower:
+            seconds = 20
+        elif "timed out" in lower:
+            seconds = 5
+        else:
+            return
+        with self._cooldown_lock:
+            self._provider_cooldowns[provider] = max(
+                self._provider_cooldowns.get(provider, 0.0), time.monotonic() + seconds
+            )
+        LOGGER.info("Provider cooldown activated provider=%s seconds=%s reason=%s", provider, seconds, friendly_reason)
+
     def __init__(self, settings: Settings, purpose: Literal["author", "verifier", "secondary_verifier"] = "author"):
         super().__init__()
         self.settings = settings
@@ -665,6 +690,11 @@ class HostedProvider(AuthoringProvider):
         self.last_mode = "unknown"
         self.last_errors: list[str] = []
         self._mode_cache: dict[tuple[str, str], str] = {}
+        # Cooldowns are kept for the lifetime of this provider adapter. This is
+        # long enough to prevent repeated quota/rate-limit calls across one app
+        # session without leaking failures across independent instances/tests.
+        self._provider_cooldowns: dict[str, float] = {}
+        self._cooldown_lock = threading.RLock()
 
     def _provider_order(self) -> list[str]:
         if self.purpose == "author":
@@ -673,10 +703,11 @@ class HostedProvider(AuthoringProvider):
             configured = self.settings.verifier_provider_order()
             if self.purpose == "secondary_verifier":
                 configured = list(reversed(configured))
-        return [
+        available = [
             name for name in configured
             if (name == "hf" and self.settings.hf_token) or (name == "groq" and self.settings.groq_api_key)
         ]
+        return [name for name in available if not self._provider_is_cooling_down(name)]
 
     def _model_for(self, provider: str) -> str:
         if provider == "hf":
@@ -818,7 +849,14 @@ class HostedProvider(AuthoringProvider):
         if not self.settings.groq_api_key:
             raise ProviderError("Groq generation was selected but GROQ_API_KEY is unavailable.")
         if self._groq is None:
-            self._groq = Groq(api_key=self.settings.groq_api_key, timeout=self.settings.provider_timeout_seconds)
+            try:
+                self._groq = Groq(
+                    api_key=self.settings.groq_api_key,
+                    timeout=self.settings.provider_timeout_seconds,
+                    max_retries=0,
+                )
+            except TypeError:
+                self._groq = Groq(api_key=self.settings.groq_api_key, timeout=self.settings.provider_timeout_seconds)
         common: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}],
@@ -946,6 +984,11 @@ class HostedProvider(AuthoringProvider):
         plan = self._attempt_plan(order)
         for retry in range(self.settings.provider_max_retries + 1):
             for provider, model, mode in plan:
+                # A quota/rate-limit failure earlier in this request may have
+                # activated a cooldown. Skip the remaining weaker modes for that
+                # provider instead of hammering the same free endpoint again.
+                if self._provider_is_cooling_down(provider):
+                    continue
                 if stage_attempts >= attempt_cap:
                     exhausted = True
                     break
@@ -993,6 +1036,7 @@ class HostedProvider(AuthoringProvider):
                     return parsed
                 except Exception as exc:
                     safe = self._friendly_error(exc)
+                    self._mark_provider_cooldown(provider, safe)
                     entry = f"{provider}/{model}/{mode}:{type(exc).__name__}:{safe}"
                     errors.append(entry)
                     if self.settings.generation_diagnostics:
@@ -1198,12 +1242,64 @@ def _desired_question_count(skill: str, maximum: int, word_count: int, mode: str
     return max(1, min(maximum, suggested))
 
 
-def _novelty_context(bank: ItemBank, skill: str, language: str = "ru", limit: int = 12) -> list[str]:
+def _novelty_context(bank: ItemBank, skill: str, language: str = "ru", limit: int = 20) -> list[str]:
     items = [
-        f"{passage.genre}: {passage.topic} / {passage.subtopic}"
+        f"{passage.genre}: {canonicalize_topic(passage.topic, passage.subtopic, passage.genre)} / {passage.subtopic}"
         for passage in bank.active_passages(skill, language)
     ]
     return items[-limit:]
+
+
+def _recent_generated_passages(
+    bank: ItemBank, skill: str, language: str, limit: int | None = None
+) -> list[PassageItem]:
+    """Return recent Fresh-AI items, excluding immutable starter-bank ordering.
+
+    Starter items are loaded in file order rather than chronological order, so
+    treating the tail of that bank as recent exposure creates false repetition
+    failures. Only accepted generated overlays represent actual recent authoring.
+    """
+
+    generated = [
+        passage for passage in bank.active_passages(skill, language)
+        if bank.origin_for(passage.id) == "generated_bank" or passage.id.startswith("gen_")
+    ]
+    return generated[-limit:] if limit else generated
+
+
+def _generation_topic(
+    bank: ItemBank,
+    *,
+    skill: str,
+    language: str,
+    requested_topics: list[str] | None,
+    nonce: str,
+) -> str:
+    active = bank.active_passages(skill, language)
+    recent_generated = _recent_generated_passages(bank, skill, language, 8)
+    return choose_balanced_topic(
+        requested_topics=requested_topics,
+        existing_topics=[passage.topic for passage in active],
+        recent_topics=[passage.topic for passage in recent_generated],
+        nonce=nonce,
+    )
+
+
+def _recent_theme_repetition(
+    bank: ItemBank,
+    candidate: "CandidatePassageDraft",
+    *,
+    skill: str,
+    language: str,
+    limit: int = 16,
+) -> bool:
+    active = _recent_generated_passages(bank, skill, language, limit)
+    candidate_parts = (candidate.topic, candidate.subtopic, candidate.genre)
+    return any(
+        canonicalize_topic(item.topic, item.subtopic, item.genre) == canonicalize_topic(*candidate_parts)
+        and theme_similarity(candidate_parts, (item.topic, item.subtopic, item.genre)) >= 0.24
+        for item in active
+    )
 
 
 def _candidate_passage_json(candidate: CandidatePassageDraft) -> str:
@@ -1657,9 +1753,9 @@ def _natural_voice_profile(passage: PassageItem, settings: Settings) -> tuple[st
         if any(cue in genre for cue in male_cues):
             voice = "ru-RU-DmitryNeural"
         elif any(cue in genre for cue in female_cues):
-            voice = ("ru-RU-SvetlanaNeural", "ru-RU-DariyaNeural")[seed % 2]
+            voice = "ru-RU-SvetlanaNeural"
         else:
-            voice = ("ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural", "ru-RU-DariyaNeural")[seed % 3]
+            voice = ("ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural")[seed % 2]
     else:
         voice = (settings.mandarin_edge_tts_voice, "zh-CN-YunxiNeural")[seed % 2]
 
@@ -1782,7 +1878,7 @@ class LiveGenerationService:
             content_hash=content_hash(passage.passage_ru),
             voice=voice,
             rate=rate,
-            engine="edge-tts",
+            engine="hybrid-edge-piper",
             engine_version=DIALOGUE_TTS_ASSET_VERSION,
             duration_seconds=duration,
             transcript_hash=content_hash(passage.passage_ru),
@@ -1797,8 +1893,8 @@ class LiveGenerationService:
                 "rate": rate,
                 "pitch": pitch,
                 "volume": volume,
-                "prosody_profile": "dialogue-v5-three-native-voices",
-                "engine": "edge-tts",
+                "prosody_profile": "hybrid-dialogue-v6-edge-plus-local-piper",
+                "engine": "hybrid-edge-piper",
                 "engine_version": DIALOGUE_TTS_ASSET_VERSION,
                 "synthetic": True,
             },
@@ -1835,11 +1931,20 @@ class LiveGenerationService:
         language: str,
     ) -> tuple[CandidatePassageDraft, PassageAudit | None]:
         nonce = uuid4().hex[:12]
+        explicit_topic_request = bool(topics)
+        required_topic = _generation_topic(
+            self.bank,
+            skill=skill,
+            language=language,
+            requested_topics=topics,
+            nonce=nonce,
+        )
+        trace.add("topic_selection", "selected", required_topic=required_topic, requested_topics=topics)
         prompt = passage_authoring_prompt(
             skill=skill,
             mode=mode,
             level=level,
-            topics=topics,
+            topics=[required_topic],
             competencies=competencies,
             novelty_context=_novelty_context(self.bank, skill, language),
             generation_nonce=nonce,
@@ -1860,6 +1965,23 @@ class LiveGenerationService:
         audit: PassageAudit | None = None
         for attempt in range(self.settings.generation_repair_attempts + 1):
             issues = validate_candidate_passage(candidate, skill=skill, requested_level=level, language=language)
+            candidate_topic = canonicalize_topic(candidate.topic, candidate.subtopic, candidate.genre)
+            if explicit_topic_request and candidate_topic != required_topic:
+                issues.append(f"broad_topic_mismatch_required_{required_topic}")
+            recent_topics = [
+                canonicalize_topic(item.topic, item.subtopic, item.genre)
+                for item in _recent_generated_passages(self.bank, skill, language, 6)
+            ]
+            # In balanced mode, never allow the same broad category twice in a
+            # row. A user who explicitly selected one category may reasonably
+            # receive repeated items inside it, but exact/narrow theme repeats
+            # are still rejected below.
+            if not explicit_topic_request and candidate_topic in recent_topics[-2:]:
+                issues.append("recent_broad_topic_repeat")
+            elif recent_topics.count(candidate_topic) >= 2:
+                issues.append("recent_broad_topic_overexposure")
+            if _recent_theme_repetition(self.bank, candidate, skill=skill, language=language):
+                issues.append("recent_theme_or_subtopic_repetition")
             audit_required = _should_audit_passage(
                 self.settings, mode=mode, skill=skill, level=level
             )
@@ -1903,7 +2025,15 @@ class LiveGenerationService:
                 if duration_issue:
                     issues.append(duration_issue)
             if not issues:
-                trace.add("passage_validation", "accepted", audit=audit.model_dump(mode="json") if audit else None)
+                accepted_topic = required_topic if explicit_topic_request else candidate_topic
+                candidate = candidate.model_copy(update={"topic": accepted_topic})
+                trace.add(
+                    "passage_validation",
+                    "accepted",
+                    audit=audit.model_dump(mode="json") if audit else None,
+                    canonical_topic=accepted_topic,
+                    balanced_suggestion=required_topic,
+                )
                 return candidate, audit
             trace.add("passage_validation", "rejected", attempt=attempt, issues=issues)
             if attempt >= self.settings.generation_repair_attempts:
@@ -2012,17 +2142,30 @@ class LiveGenerationService:
                 ]
                 if high_risk_indices:
                     high_risk_questions = [questions[index] for index in high_risk_indices]
-                    secondary_batch = validate_with_blind_verifier_batch(
-                        self.secondary_verifier_provider,
-                        passage,
-                        high_risk_questions,
-                        max_tokens=_stage_token_budget(
-                            self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill,
-                            question_count=len(high_risk_questions),
-                        ),
-                        temperature=self.settings.verification_temperature,
-                        seed_suffix="secondary",
-                    )
+                    try:
+                        secondary_batch = validate_with_blind_verifier_batch(
+                            self.secondary_verifier_provider,
+                            passage,
+                            high_risk_questions,
+                            max_tokens=_stage_token_budget(
+                                self.settings.verifier_max_tokens, stage="verifier", level=level, skill=skill,
+                                question_count=len(high_risk_questions),
+                            ),
+                            temperature=self.settings.verification_temperature,
+                            seed_suffix="secondary",
+                        )
+                    except ProviderError as exc:
+                        # A second verifier is useful but must not make the free
+                        # app unusable when one hosted provider is rate-limited or
+                        # out of credits. The primary blind verification remains
+                        # mandatory and deterministic validation still applies.
+                        secondary_batch = []
+                        trace.add(
+                            "secondary_verification",
+                            "skipped_provider_unavailable",
+                            reason=type(exc).__name__,
+                        )
+                        LOGGER.warning("Secondary verifier unavailable; primary verification retained reason=%s", type(exc).__name__)
                     for original_index, second in zip(high_risk_indices, secondary_batch):
                         secondary_reports[original_index] = second
                         issues.extend(
@@ -2114,7 +2257,9 @@ class LiveGenerationService:
         if level not in ILR_LEVELS:
             raise ValueError(f"level must be one of {ILR_LEVELS}")
         maximum = max(1, min(maximum_questions, 5 if skill == "reading" else 3))
-        clean_topics = _safe_guidance(topics, "balanced real-world topics")
+        # A blank selector means genuinely balanced server-side selection. Do
+        # not turn the explanatory fallback text into an explicit topic request.
+        clean_topics = normalize_requested_topics(topics)
         clean_competencies = [item for item in _safe_guidance(competencies, "balanced comprehension competencies") if item in QUESTION_TYPES]
         if not clean_competencies:
             clean_competencies = []

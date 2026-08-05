@@ -175,16 +175,20 @@ def test_dialogue_assembly_preserves_complete_segment_duration(tmp_path):
     assert duration >= 3.8
 
 
-def test_russian_voice_choices_include_dariya():
+def test_russian_voice_choices_include_edge_and_local_piper_speakers():
     from core.languages import voice_choices, voice_for_label, native_voice_pool
 
     choices = voice_choices("ru")
-    assert "Russian Female — Dariya" in choices
-    assert voice_for_label("ru", "Russian Female — Dariya") == "ru-RU-DariyaNeural"
-    assert native_voice_pool("ru", "ru-RU-DmitryNeural")[:3] == (
+    assert "Russian Female — Irina (local Piper)" in choices
+    assert "Russian Male — Ruslan (local Piper)" in choices
+    assert voice_for_label("ru", "Russian Female — Irina (local Piper)") == "piper:ru_RU-irina-medium"
+    # Existing saved sessions that selected the unavailable Dariya label migrate safely.
+    assert voice_for_label("ru", "Russian Female — Dariya") == "piper:ru_RU-irina-medium"
+    assert native_voice_pool("ru", "ru-RU-DmitryNeural")[:4] == (
         "ru-RU-DmitryNeural",
         "ru-RU-SvetlanaNeural",
-        "ru-RU-DariyaNeural",
+        "piper:ru_RU-irina-medium",
+        "piper:ru_RU-ruslan-medium",
     )
 
 
@@ -200,12 +204,12 @@ def test_three_generic_speakers_receive_three_distinct_native_russian_voices():
     assert [profiles[key].voice for key in ("ведущий", "гость", "эксперт")] == [
         "ru-RU-DmitryNeural",
         "ru-RU-SvetlanaNeural",
-        "ru-RU-DariyaNeural",
+        "piper:ru_RU-irina-medium",
     ]
     assert len({profile.voice for profile in profiles.values()}) == 3
 
 
-def test_fourth_speaker_reuses_native_voice_with_subtle_rate_difference():
+def test_fourth_speaker_receives_fourth_distinct_free_russian_voice():
     from core.audio import _dialogue_speaker_profiles, split_speaker_turns
 
     turns = split_speaker_turns(
@@ -214,22 +218,20 @@ def test_fourth_speaker_reuses_native_voice_with_subtle_rate_difference():
     profiles = _dialogue_speaker_profiles(
         turns, "ru-RU-DmitryNeural", "ru", base_rate="+3%"
     )
-    first = profiles["ведущий"]
     fourth = profiles["корреспондент"]
-    assert len({profile.voice for profile in profiles.values()}) == 3
-    assert fourth.voice == first.voice
-    assert fourth.rate != first.rate
-    assert abs(int(fourth.rate.removesuffix("%")) - int(first.rate.removesuffix("%"))) <= 4
+    assert len({profile.voice for profile in profiles.values()}) == 4
+    assert fourth.voice == "piper:ru_RU-ruslan-medium"
+    assert fourth.rate == "+3%"
 
 
-def test_repeated_third_speaker_keeps_dariya_and_same_rate():
+def test_repeated_third_speaker_keeps_irina_and_same_rate():
     from core.audio import _dialogue_speaker_profiles, split_speaker_turns
 
     turns = split_speaker_turns(
         "Ведущий: Один.\nГость: Два.\nЭксперт: Три.\nЭксперт: Ещё три."
     )
     profiles = _dialogue_speaker_profiles(turns, "ru-RU-DmitryNeural", "ru", base_rate="+1%")
-    assert profiles["эксперт"].voice == "ru-RU-DariyaNeural"
+    assert profiles["эксперт"].voice == "piper:ru_RU-irina-medium"
     assert profiles["эксперт"].rate == "+1%"
 
 
@@ -270,11 +272,11 @@ def test_three_speaker_audio_synthesis_calls_three_voice_ids(tmp_path):
     assert requested == [
         ("ru-RU-DmitryNeural", "+3%"),
         ("ru-RU-SvetlanaNeural", "+3%"),
-        ("ru-RU-DariyaNeural", "+3%"),
+        ("piper:ru_RU-irina-medium", "+3%"),
     ]
 
 
-def test_training_audio_profile_honors_explicit_dariya_selection():
+def test_training_audio_profile_honors_explicit_irina_selection():
     from core.session import create_session
     from ui.callbacks import _training_audio_profile
 
@@ -296,19 +298,19 @@ def test_training_audio_profile_honors_explicit_dariya_selection():
         transcript_review_enabled=True,
         replay_allowed=True,
         slow_audio_allowed=True,
-        voice_label="Russian Female — Dariya",
+        voice_label="Russian Female — Irina (local Piper)",
         speech_rate_label="Normal",
     )
     voice, rate, pitch, volume, display, explicit = _training_audio_profile(state, _passage())
-    assert voice == "ru-RU-DariyaNeural"
+    assert voice == "piper:ru_RU-irina-medium"
     assert rate == "+0%"
     assert pitch == "+0Hz"
     assert volume == "+0%"
-    assert display == "Russian Female — Dariya"
+    assert display == "Russian Female — Irina (local Piper)"
     assert explicit is True
 
 
-def test_training_playback_uses_dariya_without_first_rendering_canonical_dmitry(monkeypatch, bank, tmp_path):
+def test_training_playback_uses_irina_without_first_rendering_canonical_edge_voice(monkeypatch, bank, tmp_path):
     import ui.callbacks as callbacks
     from core.session import create_session, select_next_bundle
 
@@ -330,12 +332,12 @@ def test_training_playback_uses_dariya_without_first_rendering_canonical_dmitry(
         transcript_review_enabled=True,
         replay_allowed=True,
         slow_audio_allowed=True,
-        voice_label="Russian Female — Dariya",
+        voice_label="Russian Female — Irina (local Piper)",
         speech_rate_label="Normal",
     )
     bundle = select_next_bundle(state, bank)
     calls: list[str] = []
-    rendered = tmp_path / "dariya.mp3"
+    rendered = tmp_path / "irina.mp3"
     rendered.write_bytes(b"ID3" + b"0" * 1024)
 
     def fake_generate(*args, **kwargs):
@@ -345,12 +347,12 @@ def test_training_playback_uses_dariya_without_first_rendering_canonical_dmitry(
     monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
     monkeypatch.setattr(callbacks.STORAGE, "save_checkpoint", lambda *_: None)
     result = callbacks.play_audio_callback(state, callbacks._bundle_to_dict(bundle), progress=None)
-    assert calls == ["ru-RU-DariyaNeural"]
-    assert "Russian Female — Dariya" in result[3]["value"]
+    assert calls == ["piper:ru_RU-irina-medium"]
+    assert "Russian Female — Irina (local Piper)" in result[3]["value"]
     assert str(rendered.resolve()) in result[1]["value"]
 
 
-def test_dariya_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypatch, bank, tmp_path):
+def test_irina_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypatch, bank, tmp_path):
     import ui.callbacks as callbacks
     from core.session import create_session, select_next_bundle
 
@@ -372,7 +374,7 @@ def test_dariya_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypa
         transcript_review_enabled=True,
         replay_allowed=True,
         slow_audio_allowed=True,
-        voice_label="Russian Female — Dariya",
+        voice_label="Russian Female — Irina (local Piper)",
         speech_rate_label="Normal",
     )
     bundle = select_next_bundle(state, bank)
@@ -382,14 +384,14 @@ def test_dariya_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypa
 
     def fake_generate(*args, **kwargs):
         calls.append(kwargs["voice"])
-        if kwargs["voice"] == "ru-RU-DariyaNeural":
+        if kwargs["voice"] == "piper:ru_RU-irina-medium":
             raise RuntimeError("voice unavailable")
         return fallback
 
     monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
     monkeypatch.setattr(callbacks.STORAGE, "save_checkpoint", lambda *_: None)
     result = callbacks.play_audio_callback(state, callbacks._bundle_to_dict(bundle), progress=None)
-    assert calls[:2] == ["ru-RU-DariyaNeural", "ru-RU-SvetlanaNeural"]
+    assert calls[:2] == ["piper:ru_RU-irina-medium", "ru-RU-SvetlanaNeural"]
     assert "fell back to Russian Female — Svetlana" in result[3]["value"]
 
 
@@ -401,7 +403,7 @@ def test_explicit_dialogue_mode_does_not_silently_replace_failed_segment_voice(t
 
     def fake_synth(text, cache_dir, **kwargs):
         requested.append(kwargs["voice"])
-        if kwargs["voice"] == "ru-RU-DariyaNeural":
+        if kwargs["voice"] == "piper:ru_RU-irina-medium":
             raise RuntimeError("voice unavailable")
         output = Path(cache_dir) / f"segment-{len(requested)}.mp3"
         output.write_bytes(b"ID3" + b"0" * 1024)
@@ -417,11 +419,11 @@ def test_explicit_dialogue_mode_does_not_silently_replace_failed_segment_voice(t
             engine_version="no-silent-fallback-v1",
             allow_segment_fallback=False,
         )
-    assert exc_info.value.voice == "ru-RU-DariyaNeural"
+    assert exc_info.value.voice == "piper:ru_RU-irina-medium"
     assert requested == [
         "ru-RU-DmitryNeural",
         "ru-RU-SvetlanaNeural",
-        "ru-RU-DariyaNeural",
+        "piper:ru_RU-irina-medium",
     ]
 
 
@@ -438,7 +440,7 @@ def test_explicit_training_helper_retries_with_unavailable_voice_removed(monkeyp
         pool = tuple(kwargs.get("voice_pool") or ())
         attempts.append((kwargs["voice"], pool))
         if len(attempts) == 1:
-            raise VoiceUnavailableError("ru-RU-DariyaNeural")
+            raise VoiceUnavailableError("piper:ru_RU-irina-medium")
         return rendered
 
     monkeypatch.setattr(callbacks, "generate_dialogue_cached_tts", fake_generate)
@@ -452,5 +454,5 @@ def test_explicit_training_helper_retries_with_unavailable_voice_removed(monkeyp
     )
     assert path == rendered
     assert actual == "ru-RU-DmitryNeural"
-    assert unavailable == ("ru-RU-DariyaNeural",)
-    assert "ru-RU-DariyaNeural" not in attempts[1][1]
+    assert unavailable == ("piper:ru_RU-irina-medium",)
+    assert "piper:ru_RU-irina-medium" not in attempts[1][1]

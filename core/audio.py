@@ -12,18 +12,23 @@ import subprocess
 import threading
 import time
 import tempfile
+import wave
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote as url_quote
+from urllib.request import Request, urlopen
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Coroutine, Iterable, TypeVar
 from urllib.parse import quote
 
 from .models import AudioAsset
+from .languages import native_voice_pool as configured_native_voice_pool, voice_gender as configured_voice_gender
 
 
 LOGGER = logging.getLogger("dlpt.audio")
 
-DIALOGUE_TTS_CACHE_VERSION = "edge-tts-7.2.8-dialogue-v5-three-native-voices"
-DIALOGUE_TTS_ASSET_VERSION = "7.2.8-dialogue-v5-three-native-voices"
+DIALOGUE_TTS_CACHE_VERSION = "hybrid-edge-piper-dialogue-v6"
+DIALOGUE_TTS_ASSET_VERSION = "hybrid-edge-piper-dialogue-v6"
 
 
 class AudioError(RuntimeError):
@@ -255,7 +260,8 @@ _MALE_LABEL_CUES = ("мужчина", "man", "male", "男")
 _RUSSIAN_NATIVE_VOICES = (
     "ru-RU-DmitryNeural",
     "ru-RU-SvetlanaNeural",
-    "ru-RU-DariyaNeural",
+    "piper:ru_RU-irina-medium",
+    "piper:ru_RU-ruslan-medium",
 )
 _MANDARIN_NATIVE_VOICES = (
     "zh-CN-YunxiNeural",
@@ -279,21 +285,11 @@ def _speaker_gender_preference(label: str) -> str | None:
 
 
 def _voice_gender(voice: str) -> str | None:
-    if any(name in voice for name in ("Svetlana", "Dariya", "Xiaoxiao")):
-        return "female"
-    if any(name in voice for name in ("Dmitry", "Yunxi")):
-        return "male"
-    return None
+    return configured_voice_gender(voice)
 
 
 def _native_voice_pool(language: str, primary_voice: str) -> list[str]:
-    configured = _MANDARIN_NATIVE_VOICES if language == "zh-CN" else _RUSSIAN_NATIVE_VOICES
-    ordered = [primary_voice, *configured]
-    pool: list[str] = []
-    for candidate in ordered:
-        if candidate and candidate not in pool:
-            pool.append(candidate)
-    return pool
+    return list(configured_native_voice_pool(language, primary_voice))
 
 
 def _parse_rate_percent(rate: str) -> int:
@@ -318,8 +314,8 @@ def _dialogue_speaker_profiles(
 ) -> dict[str, SpeakerVoiceProfile]:
     """Assign stable voices to speaker identities.
 
-    Russian gets three distinct native neural voices: Dmitry, Svetlana, and
-    Dariya. A fourth distinct speaker reuses a native voice with a restrained
+    Russian uses two Edge voices first, then local Piper Irina and Ruslan. A fifth
+    distinct speaker reuses an available voice with a restrained
     rate difference so the role remains distinguishable without artificial pitch
     manipulation. Repeated turns always retain the same profile.
     """
@@ -420,6 +416,154 @@ async def _edge_tts_save(
     await communicator.save(str(path))
 
 
+
+_PIPER_VOICE_FILES: dict[str, tuple[str, str]] = {
+    "piper:ru_RU-irina-medium": (
+        "ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx",
+        "ru/ru_RU/irina/medium/ru_RU-irina-medium.onnx.json",
+    ),
+    "piper:ru_RU-ruslan-medium": (
+        "ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx",
+        "ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx.json",
+    ),
+}
+_PIPER_MODEL_REPO = "rhasspy/piper-voices"
+_PIPER_LOADED: dict[str, object] = {}
+_PIPER_LOCK = threading.RLock()
+
+
+def _piper_rate_scale(rate: str) -> float:
+    speed = 1.0 + (_parse_rate_percent(rate) / 100.0)
+    return max(0.70, min(1.45, 1.0 / max(0.55, speed)))
+
+
+def _download_piper_file(filename: str, model_root: Path, minimum_bytes: int) -> Path:
+    """Download a public Piper model synchronously and cache it permanently."""
+
+    target = model_root / Path(filename).name
+    if target.exists() and target.stat().st_size >= minimum_bytes:
+        return target
+    encoded = "/".join(url_quote(part, safe="") for part in filename.split("/"))
+    url = f"https://huggingface.co/{_PIPER_MODEL_REPO}/resolve/main/{encoded}"
+    request = Request(url, headers={"User-Agent": "dlpt-trainer-piper/1.0"}, method="GET")
+    model_root.mkdir(parents=True, exist_ok=True)
+    temp = target.with_suffix(target.suffix + ".tmp")
+    try:
+        try:
+            with urlopen(request, timeout=180) as response, temp.open("wb") as output:
+                shutil.copyfileobj(response, output, length=1024 * 1024)
+        except HTTPError as exc:
+            raise AudioError(f"Piper model download returned HTTP {exc.code}.") from exc
+        except URLError as exc:
+            raise AudioError(f"Piper model download failed: {exc.reason}") from exc
+        if not temp.exists() or temp.stat().st_size < minimum_bytes:
+            raise AudioError("Piper model download was empty or incomplete.")
+        os.replace(temp, target)
+        return target
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+def _load_piper_voice(voice_id: str, model_root: Path):
+    if voice_id not in _PIPER_VOICE_FILES:
+        raise VoiceUnavailableError(voice_id, "unknown local Piper voice")
+    with _PIPER_LOCK:
+        loaded = _PIPER_LOADED.get(voice_id)
+        if loaded is not None:
+            return loaded
+        try:
+            from piper import PiperVoice
+        except Exception as exc:
+            try:
+                from piper.voice import PiperVoice
+            except Exception:
+                raise VoiceUnavailableError(
+                    voice_id,
+                    "the optional piper-tts package is unavailable",
+                ) from exc
+
+        model_root.mkdir(parents=True, exist_ok=True)
+        model_file, config_file = _PIPER_VOICE_FILES[voice_id]
+        try:
+            model_path = _download_piper_file(model_file, model_root, minimum_bytes=1_000_000)
+            config_path = _download_piper_file(config_file, model_root, minimum_bytes=1_000)
+            # Piper 1.3+ accepts an explicit config path; keeping it adjacent also
+            # supports releases that auto-discover ``.onnx.json``.
+            try:
+                loaded = PiperVoice.load(str(model_path), str(config_path))
+            except TypeError:
+                loaded = PiperVoice.load(str(model_path))
+        except Exception as exc:
+            raise VoiceUnavailableError(voice_id, f"local voice model could not load ({type(exc).__name__})") from exc
+        _PIPER_LOADED[voice_id] = loaded
+        LOGGER.info("Local Piper voice ready voice=%s", voice_id)
+        return loaded
+
+
+def _piper_tts_save(
+    text: str,
+    voice_id: str,
+    rate: str,
+    volume: str,
+    output_mp3: Path,
+    model_root: Path,
+    timeout_seconds: float,
+) -> None:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise AudioError("Local Piper speech requires ffmpeg, which is missing from this runtime.")
+    piper_voice = _load_piper_voice(voice_id, model_root)
+    wav_path = output_mp3.with_suffix(".tmp.wav")
+    try:
+        with wave.open(str(wav_path), "wb") as wav_file:
+            if hasattr(piper_voice, "synthesize_wav"):
+                try:
+                    from piper import SynthesisConfig
+                    synth_config = SynthesisConfig(
+                        length_scale=_piper_rate_scale(rate),
+                        normalize_audio=True,
+                    )
+                    piper_voice.synthesize_wav(text, wav_file, syn_config=synth_config)
+                except (ImportError, TypeError):
+                    piper_voice.synthesize_wav(text, wav_file)
+            else:
+                # Compatibility with the pre-1.3 MIT API.
+                piper_voice.synthesize(
+                    text,
+                    wav_file,
+                    length_scale=_piper_rate_scale(rate),
+                    sentence_silence=0.0,
+                )
+        if not validate_audio_file(wav_path):
+            raise AudioError("Local Piper returned an empty audio file.")
+        command = [
+            ffmpeg, "-hide_banner", "-loglevel", "error", "-y",
+            "-i", str(wav_path), "-codec:a", "libmp3lame", "-q:a", "3",
+        ]
+        volume_match = re.fullmatch(r"([+-]?\d+)%", str(volume).strip())
+        if volume_match and int(volume_match.group(1)):
+            multiplier = max(0.2, 1.0 + int(volume_match.group(1)) / 100.0)
+            command.extend(["-filter:a", f"volume={multiplier:.3f}"])
+        command.append(str(output_mp3))
+        subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=max(20, int(timeout_seconds)),
+        )
+    except VoiceUnavailableError:
+        raise
+    except subprocess.TimeoutExpired as exc:
+        raise AudioError("Local Piper synthesis timed out.") from exc
+    except subprocess.CalledProcessError as exc:
+        raise AudioError(f"Local Piper conversion failed: {exc.stderr[-240:]}") from exc
+    except Exception as exc:
+        raise VoiceUnavailableError(voice_id, type(exc).__name__) from exc
+    finally:
+        wav_path.unlink(missing_ok=True)
+
+
 def generate_cached_tts(
     transcript: str,
     cache_dir: str | Path,
@@ -441,9 +585,20 @@ def generate_cached_tts(
         return output
     temp = output.with_suffix(".tmp.mp3")
     try:
-        _get_async_runner().run(
-            _edge_tts_save(spoken_text, voice, rate, pitch, volume, temp), timeout_seconds
-        )
+        if voice.startswith("piper:"):
+            _piper_tts_save(
+                spoken_text,
+                voice,
+                rate,
+                volume,
+                temp,
+                cache_dir.parent / "piper_models",
+                timeout_seconds,
+            )
+        else:
+            _get_async_runner().run(
+                _edge_tts_save(spoken_text, voice, rate, pitch, volume, temp), timeout_seconds
+            )
         if not validate_audio_file(temp):
             raise AudioError("TTS returned an empty or incomplete audio file.")
         os.replace(temp, output)
@@ -470,7 +625,7 @@ def generate_dialogue_cached_tts(
     """Generate one narrator or a real multi-speaker recording.
 
     Only detected dialogue is segmented. Each distinct Russian speaker receives
-    an unused native voice first (Dmitry, Svetlana, Dariya). Speaker labels never
+    an unused voice first (Edge Dmitry/Svetlana, then local Piper Irina/Ruslan). Speaker labels never
     reach TTS. Four-plus speaker scripts reuse voices with restrained rate
     differences rather than fake pitch shifts.
     """

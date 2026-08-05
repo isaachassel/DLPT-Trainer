@@ -10,12 +10,15 @@ import tempfile
 import time
 import threading
 import zipfile
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from huggingface_hub import HfApi, hf_hub_download
+from huggingface_hub import HfApi
 from huggingface_hub.utils import EntryNotFoundError, HfHubHTTPError, RepositoryNotFoundError
 
 from .config import Settings
@@ -23,6 +26,67 @@ from .storage import atomic_write_text
 
 
 LOGGER = logging.getLogger("dlpt.persistence")
+
+
+def hf_hub_download(
+    *,
+    repo_id: str,
+    filename: str,
+    repo_type: str = "dataset",
+    token: str | None = None,
+    cache_dir: str | None = None,
+    force_download: bool = False,
+    revision: str = "main",
+    **_kwargs,
+) -> str:
+    """Small synchronous Hub downloader for startup bank assets.
+
+    The full Hub downloader may initialize optional transfer/event-loop helpers
+    that emit ``Invalid file descriptor`` finalizer tracebacks on some Python
+    3.11 Spaces. Generated-bank files are small enough for a direct HTTPS
+    download, which is deterministic and keeps startup entirely synchronous.
+    The module-level name is intentionally retained so persistence tests and
+    deployments can still monkeypatch it.
+    """
+
+    root = Path(cache_dir or tempfile.gettempdir()) / "dlpt-direct-hub"
+    digest = hashlib.sha256(
+        f"{repo_type}:{repo_id}:{revision}:{filename}".encode("utf-8")
+    ).hexdigest()
+    suffix = Path(filename).suffix or ".bin"
+    target = root / f"{digest}{suffix}"
+    if target.exists() and target.stat().st_size > 0 and not force_download:
+        return str(target)
+
+    namespace = "datasets" if repo_type == "dataset" else "spaces" if repo_type == "space" else "models"
+    encoded_repo = "/".join(quote(part, safe="") for part in repo_id.split("/"))
+    encoded_revision = quote(revision, safe="")
+    encoded_filename = "/".join(quote(part, safe="") for part in filename.split("/"))
+    url = f"https://huggingface.co/{namespace}/{encoded_repo}/resolve/{encoded_revision}/{encoded_filename}"
+    headers = {"User-Agent": "dlpt-trainer-direct-bank-download/1.0"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = Request(url, headers=headers, method="GET")
+    root.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(prefix=target.name, suffix=".tmp", dir=str(root))
+    os.close(fd)
+    temp_path = Path(temp_name)
+    try:
+        try:
+            with urlopen(request, timeout=90) as response, temp_path.open("wb") as output:
+                shutil.copyfileobj(response, output, length=1024 * 1024)
+        except HTTPError as exc:
+            if exc.code == 404:
+                raise EntryNotFoundError(f"Remote file not found: {filename}") from exc
+            raise RuntimeError(f"Hub download HTTP {exc.code} for {filename}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Hub download failed for {filename}: {exc.reason}") from exc
+        if not temp_path.exists() or temp_path.stat().st_size <= 0:
+            raise RuntimeError(f"Hub returned an empty file for {filename}")
+        os.replace(temp_path, target)
+        return str(target)
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 @dataclass(frozen=True)
@@ -264,7 +328,11 @@ class GeneratedBankPersistence:
                     repo_type="dataset",
                     token=token,
                     cache_dir=str(self._cache_dir()),
-                    force_download=False,
+                    # The bank and manifest are mutable; hashed audio objects are immutable.
+                    force_download=filename in {
+                        self.settings.hf_dataset_bank_filename,
+                        self.settings.hf_dataset_manifest_filename,
+                    },
                 ),
             )
         )

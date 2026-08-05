@@ -9,7 +9,7 @@ from .languages import language_profile
 
 # Persisted with every newly generated bundle so prompt-policy cohorts remain
 # distinguishable from earlier generated-bank records.
-PROMPT_VERSION = "genai-pipeline-v10"
+PROMPT_VERSION = "genai-pipeline-v11"
 
 
 @dataclass(frozen=True)
@@ -185,7 +185,7 @@ REQUEST
 - Skill: {skill}
 - Product mode: {mode}
 - Provisional target ILR: {level}
-- Topic guidance: {_csv(topics, 'balanced real-world topics')}
+- Required broad topic category: {_csv(topics, 'balanced real-world topics')}
 - Competencies likely to be tested later: {_csv(competencies, 'balanced comprehension competencies')}
 - Generation nonce: {generation_nonce}
 
@@ -200,6 +200,9 @@ LEVEL PROFILE
 {script_guidance}
 
 CONTENT RULES
+- The topic metadata field must exactly match the required broad topic category above. Put the narrower scenario only in subtopic.
+- Stay inside that category. In particular, do not write about roads, transit, vehicles, cycling, bike sharing, or urban mobility unless the required category is Transportation.
+- Treat every theme in the recent-bank list as prohibited for this generation, including close paraphrases and neighboring versions of the same municipal program.
 - Use a realistic communicative situation and a clear source type.
 - The English orientation identifies context/source type without revealing the main idea or any answer.
 - The {source} must sound native and internally coherent, with no repeated sentences, contradictions, dangling pronouns, fabricated quotations attributed to real people, or obvious translationese.

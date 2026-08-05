@@ -39,6 +39,7 @@ from core.languages import (
     LANGUAGES,
     language_profile,
     native_voice_pool,
+    normalize_voice_label,
     voice_choices,
     voice_fallbacks,
     voice_for_label,
@@ -63,6 +64,7 @@ from core.session import (
     update_history,
 )
 from core.storage import LocalStorage, StorageError
+from core.topics import CANONICAL_TOPICS, normalize_requested_topics
 
 LOGGER = logging.getLogger("dlpt.genai")
 
@@ -145,10 +147,10 @@ EXPORT_DIR = SETTINGS.runtime_path(Path("storage/exports"), ROOT, "exports")
 GENERATOR = LiveGenerationService(SETTINGS, BANK, ROOT)
 PROVIDER_READY, PROVIDER_MESSAGE = SETTINGS.provider_readiness()
 TOPICS_BY_SKILL = {
-    "reading": BANK.topics_for_skill("reading"),
-    "listening": BANK.topics_for_skill("listening"),
+    "reading": list(CANONICAL_TOPICS),
+    "listening": list(CANONICAL_TOPICS),
 }
-TOPICS = sorted(set(TOPICS_BY_SKILL["reading"]) | set(TOPICS_BY_SKILL["listening"]))
+TOPICS = list(CANONICAL_TOPICS)
 CONTENT_SOURCE_CHOICES = [
     "Validated bank only — fastest",
     "Fresh AI preferred — validate, save to bank, then fall back automatically",
@@ -167,10 +169,12 @@ def topic_controls(skill_label: str, language_label: str = "Russian", current_to
         language = None
     else:
         language = LANGUAGE_LABEL_TO_CODE.get(language_label, "ru")
-    skills = SKILL_LABELS.get(skill_label, ["reading"])
-    choices = sorted({topic for skill in skills for topic in BANK.topics_for_skill(skill, language)})
+    _skills = SKILL_LABELS.get(skill_label, ["reading"])
+    # Keep the selector stable. Generated subtopics belong in passage metadata,
+    # not in the broad topic taxonomy shown to learners.
+    choices = list(CANONICAL_TOPICS)
     current = [] if current_topics in (None, "") else ([current_topics] if isinstance(current_topics, str) else list(current_topics))
-    retained = [topic for topic in current if topic in choices]
+    retained = [topic for topic in normalize_requested_topics(current) if topic in choices]
     return gr.update(choices=choices, value=retained)
 
 
@@ -823,8 +827,8 @@ def start_session_callback(
                 raise ValueError("The selected starting ILR band must fall inside the allowed adaptive range.")
         if mode == "training" and not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(target_level) <= ILR_LEVELS.index(maximum_ilr):
             raise ValueError("The Training target ILR band must fall inside the allowed adaptive range.")
-        allowed_topics = sorted({topic for selected_skill in skills for topic in BANK.topics_for_skill(selected_skill, language)})
-        topics = _normalize_multiselect(topics, allowed_topics, "topic")
+        allowed_topics = list(CANONICAL_TOPICS)
+        topics = normalize_requested_topics(_normalize_multiselect(topics, allowed_topics, "topic"))
         competencies = _normalize_multiselect(competencies, QUESTION_TYPES, "competency")
         max_q, minimum, simulation_full, shortened, simulation_seconds = _length_settings(mode, length_label)
         timer_mode = "off" if timer_label == "Off" else ("standard" if timer_label == "Standard count-up" else "strict")
@@ -835,6 +839,7 @@ def start_session_callback(
             time_limit = max(1200, max_q * 120)
         feedback_mode = "end_of_passage" if mode == "training" and feedback_timing == "After each passage" else "end_only"
         _progress(progress, 0.10, "Creating independent adaptive skill state…")
+        voice_label = normalize_voice_label(language, voice_label)
         state = create_session(
             language=language,
             mode=mode, selected_skills=skills, start_level=start_level, target_level=target_level,
@@ -904,6 +909,9 @@ def _training_audio_profile(state: SessionState, passage: PassageItem) -> tuple[
     """
 
     automatic_label = language_profile(state.language).starter_voice_label
+    normalized_label = normalize_voice_label(state.language, state.voice_label)
+    if normalized_label != state.voice_label:
+        state.voice_label = normalized_label
     if state.voice_label == automatic_label:
         voice, natural_rate, pitch, volume = _natural_voice_profile(passage, SETTINGS)
         rate = natural_rate if state.speech_rate_label == "Normal" else TRAINING_RATE_MAP.get(state.speech_rate_label, "+0%")
@@ -997,7 +1005,7 @@ def _generate_explicit_training_audio(
             break
     if last_error:
         raise last_error
-    raise AudioError("No usable native voice remained for the selected Training playback.")
+    raise AudioError("No usable Russian voice remained for the selected Training playback.")
 
 def play_audio_callback(state: SessionState | None, bundle_data: dict | None, progress=gr.Progress()):
     if not state or not bundle_data:
@@ -1040,7 +1048,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                         ) or state.voice_label
                         audio_note = (
                             f" {unavailable_labels} was unavailable; this playback fell back to {actual_label}. "
-                            "Any additional dialogue speakers use the remaining native voices with controlled reuse."
+                            "Any additional dialogue speakers use the remaining free Edge/Piper voices with controlled reuse."
                         )
                 else:
                     path = generate_dialogue_cached_tts(
@@ -1070,7 +1078,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             # Strict modes use the canonical bank recording. Older assets receive
             # one lazy neural upgrade, but learner voice preferences never affect
             # Diagnostic or Simulation audio.
-            if asset.engine.lower() not in {"edge-tts", "edge tts"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
+            if asset.engine.lower() not in {"edge-tts", "edge tts", "hybrid-edge-piper"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
                 try:
                     _progress(progress, 0.42, "Preparing the canonical native neural recording…")
                     voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
