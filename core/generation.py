@@ -1747,7 +1747,7 @@ class LiveGenerationService:
                 pitch=pitch,
                 volume=volume,
                 language=passage.language,
-                engine_version="edge-tts-7.2.8-dialogue-v2",
+                engine_version="edge-tts-7.2.8-dialogue-v3",
                 timeout_seconds=self.settings.tts_timeout_seconds,
                 synthesizer=generate_cached_tts,
             )
@@ -1776,7 +1776,7 @@ class LiveGenerationService:
             voice=voice,
             rate=rate,
             engine="edge-tts",
-            engine_version="7.2.8-dialogue-v1",
+            engine_version="7.2.8-dialogue-v3",
             duration_seconds=duration,
             transcript_hash=content_hash(passage.passage_ru),
             synthetic_tts=True,

@@ -541,3 +541,11 @@
 - Assign and preserve separate voices for alternating speakers.
 - Force a new dialogue cache version so older one-voice or label-spoken files are not reused.
 - Keep dash-dialogue support and remove dash markers from spoken segments.
+
+## 1.6.4 — Dialogue duration and persistence hotfix
+
+- Fixed multi-speaker FFmpeg assembly truncating turns at the first natural internal pause.
+- Removed the destructive `silenceremove` stage and now concatenates complete speaker turns.
+- Bumped the dialogue audio cache generation so damaged 1.6.3 files are not reused.
+- Generated-bank synchronization now checks the remote file index once and uploads only new audio instead of retrying every historical MP3.
+- Corrected dialogue audio asset engine-version metadata.

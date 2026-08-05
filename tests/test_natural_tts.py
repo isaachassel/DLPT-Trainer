@@ -92,3 +92,42 @@ def test_inline_speaker_labels_are_split_and_never_spoken():
 def test_malformed_guest_label_is_removed_from_fallback_audio():
     from core.audio import strip_speaker_labels
     assert strip_speaker_labels("Гост: Спасибо за приглашение.") == "Спасибо за приглашение."
+
+
+def test_dialogue_assembly_preserves_complete_segment_duration(tmp_path):
+    import shutil
+    import subprocess
+    import pytest
+    from pathlib import Path
+    from core.audio import audio_duration_seconds, generate_dialogue_cached_tts
+
+    if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
+        pytest.skip("ffmpeg/ffprobe are required")
+
+    counter = {"value": 0}
+
+    def fake_synth(text, cache_dir, **kwargs):
+        counter["value"] += 1
+        duration = 1.8 if counter["value"] == 1 else 2.2
+        output = Path(cache_dir) / f"segment-{counter['value']}.mp3"
+        subprocess.run(
+            [
+                "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                "-f", "lavfi", "-i",
+                f"sine=frequency={400 + counter['value'] * 100}:duration={duration}",
+                "-codec:a", "libmp3lame", "-q:a", "4", str(output),
+            ],
+            check=True,
+        )
+        return output
+
+    output = generate_dialogue_cached_tts(
+        "Ведущий: Добрый вечер.\nГость: Спасибо за приглашение.",
+        tmp_path,
+        synthesizer=fake_synth,
+        engine_version="duration-regression-v3",
+    )
+    duration = audio_duration_seconds(output)
+    assert counter["value"] == 2
+    assert duration is not None
+    assert duration >= 3.8

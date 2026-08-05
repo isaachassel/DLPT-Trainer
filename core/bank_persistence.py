@@ -386,13 +386,34 @@ class GeneratedBankPersistence:
             ),
         )
         records, _ = self._read_valid_records(self.bank_path)
+        # Fetch the remote file index once and upload only genuinely new audio.
+        # The previous implementation attempted every historical MP3 after each
+        # accepted item, producing dozens of empty-commit warnings and needless
+        # network traffic.
+        def _list_remote_files(token: str) -> list[str]:
+            api = HfApi(token=token)
+            list_files = getattr(api, "list_repo_files", None)
+            if list_files is None:
+                # Compatibility with older clients and lightweight test doubles.
+                return []
+            return list_files(repo_id=repo_id, repo_type="dataset", token=token)
+
+        remote_files = set(
+            self._remote_call("list generated-bank files", _list_remote_files)
+        )
         uploaded_audio: set[str] = set()
         for record in records:
             if record.get("kind") != "audio":
                 continue
             data = record.get("data") or {}
             audio_path = Path(str(data.get("path") or ""))
-            if not audio_path.exists() or audio_path.stat().st_size <= 0 or audio_path.name in uploaded_audio:
+            remote_name = f"audio/{audio_path.name}"
+            if (
+                not audio_path.exists()
+                or audio_path.stat().st_size <= 0
+                or audio_path.name in uploaded_audio
+                or remote_name in remote_files
+            ):
                 continue
             self._remote_call(
                 f"upload audio {audio_path.name}",
@@ -406,6 +427,7 @@ class GeneratedBankPersistence:
                 ),
             )
             uploaded_audio.add(audio_path.name)
+            remote_files.add(remote_name)
 
     def _upload_manifest(self) -> None:
         if not self.manifest_path.exists():

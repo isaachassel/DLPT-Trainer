@@ -319,7 +319,7 @@ def generate_dialogue_cached_tts(
     pitch: str = "+0Hz",
     volume: str = "+0%",
     language: str = "ru",
-    engine_version: str = "edge-tts-7.2.8-dialogue-v2",
+    engine_version: str = "edge-tts-7.2.8-dialogue-v3",
     timeout_seconds: float = 60.0,
     synthesizer=None,
 ) -> Path:
@@ -378,17 +378,13 @@ def generate_dialogue_cached_tts(
         command = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
         for segment in segment_paths:
             command.extend(["-i", str(segment)])
-        filters = []
-        labels = []
-        for index in range(len(segment_paths)):
-            # Trim only boundary silence; do not compress pauses within a speaker's turn.
-            out_label = f"a{index}"
-            filters.append(
-                f"[{index}:a]silenceremove=start_periods=1:start_duration=0.03:start_threshold=-48dB:"
-                f"stop_periods=1:stop_duration=0.10:stop_threshold=-48dB[{out_label}]"
-            )
-            labels.append(f"[{out_label}]")
-        filters.append("".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]")
+        # Do not use ``silenceremove`` here. Edge speech naturally contains
+        # short internal pauses, and FFmpeg's stop-period behavior can treat the
+        # first pause as end-of-turn and truncate an entire segment. Concatenate
+        # the complete turns instead; the small native boundary pause is safer
+        # and sounds more natural than damaged dialogue.
+        labels = [f"[{index}:a]" for index in range(len(segment_paths))]
+        filters = ["".join(labels) + f"concat=n={len(segment_paths)}:v=0:a=1[outa]"]
         command.extend([
             "-filter_complex", ";".join(filters), "-map", "[outa]",
             "-codec:a", "libmp3lame", "-q:a", "3", str(temp_output),
