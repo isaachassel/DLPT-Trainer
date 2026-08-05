@@ -1632,6 +1632,48 @@ def validate_with_blind_verifier_batch(
     return reports
 
 
+def _natural_voice_profile(passage: PassageItem, settings: Settings) -> tuple[str, str, str, str]:
+    """Choose subtle, repeatable Edge prosody from the passage context.
+
+    The values are intentionally restrained. Large global pitch/rate changes make
+    neural speech less natural, not more natural. The content hash makes variation
+    stable so retries and cache restores produce the same recording.
+    """
+
+    language = passage.language
+    genre = f"{passage.genre} {passage.topic} {passage.subtopic}".lower()
+    seed = int(hashlib.sha256(f"{passage.content_hash}|{genre}".encode("utf-8")).hexdigest()[:8], 16)
+
+    if language == "ru":
+        male_cues = ("news", "report", "brief", "military", "government", "analysis", "lecture", "новост", "доклад")
+        female_cues = ("interview", "conversation", "human interest", "health", "culture", "education", "интерв", "бесед")
+        if any(cue in genre for cue in male_cues):
+            voice = "ru-RU-DmitryNeural"
+        elif any(cue in genre for cue in female_cues):
+            voice = "ru-RU-SvetlanaNeural"
+        else:
+            voice = ("ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural")[seed % 2]
+    else:
+        voice = (settings.mandarin_edge_tts_voice, "zh-CN-YunxiNeural")[seed % 2]
+
+    if any(cue in genre for cue in ("announcement", "instruction", "public service", "объявлен")):
+        base_rate = -2
+    elif any(cue in genre for cue in ("news", "report", "brief", "новост", "репортаж")):
+        base_rate = 2
+    elif any(cue in genre for cue in ("interview", "conversation", "dialogue", "интерв", "бесед")):
+        base_rate = 0
+    else:
+        base_rate = 1
+
+    # Tiny deterministic variation prevents every clip from having identical cadence.
+    rate = max(-3, min(3, base_rate + ((seed >> 2) % 3) - 1))
+    pitch = ((seed >> 5) % 5) - 2
+    if voice.endswith("DmitryNeural") or voice.endswith("YunxiNeural"):
+        pitch -= 1
+    pitch = max(-3, min(3, pitch))
+    return voice, f"{rate:+d}%", f"{pitch:+d}Hz", "+0%"
+
+
 @dataclass
 class GeneratedBundle:
     passage: PassageItem
@@ -1700,18 +1742,22 @@ class LiveGenerationService:
 
     def _build_audio(self, passage: PassageItem) -> tuple[PassageItem, AudioAsset]:
         cache_dir = self.settings.audio_cache_runtime_path(self.project_root)
-        voice = self.settings.tts_voice_for(passage.language)
+        voice, rate, pitch, volume = _natural_voice_profile(passage, self.settings)
         LOGGER.info(
-            "Listening TTS start passage=%s voice=%s rate=%s",
-            passage.id, voice, self.settings.edge_tts_rate,
+            "Listening TTS start passage=%s voice=%s rate=%s pitch=%s",
+            passage.id, voice, rate, pitch,
         )
         try:
             path = generate_cached_tts(
                 passage.passage_ru,
                 cache_dir,
                 voice=voice,
-                rate=self.settings.edge_tts_rate,
-                engine_version="edge-tts-7.2.8",
+                rate=rate,
+                pitch=pitch,
+                volume=volume,
+                language=passage.language,
+                naturalize=True,
+                engine_version="edge-tts-7.2.8-natural-v2",
             )
         except Exception as exc:
             raise _stage_error(
@@ -1736,9 +1782,9 @@ class LiveGenerationService:
             path=str(path),
             content_hash=content_hash(passage.passage_ru),
             voice=voice,
-            rate=self.settings.edge_tts_rate,
+            rate=rate,
             engine="edge-tts",
-            engine_version="7.2.8",
+            engine_version="7.2.8-natural-v2",
             duration_seconds=duration,
             transcript_hash=content_hash(passage.passage_ru),
             synthetic_tts=True,
@@ -1749,7 +1795,10 @@ class LiveGenerationService:
             "audio_duration_seconds": duration,
             "voice_metadata": {
                 "voice": voice,
-                "rate": self.settings.edge_tts_rate,
+                "rate": rate,
+                "pitch": pitch,
+                "volume": volume,
+                "prosody_profile": "natural-v2",
                 "engine": "edge-tts",
                 "engine_version": "7.2.8",
                 "synthetic": True,

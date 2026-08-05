@@ -23,7 +23,7 @@ from core.constants import (
     SKILL_LABELS,
     TRAINING_LENGTHS,
 )
-from core.generation import LiveGenerationService, ProviderError
+from core.generation import LiveGenerationService, ProviderError, _natural_voice_profile
 from core.item_bank import ItemBank, shuffled_bundle
 from core.languages import (
     LANGUAGE_LABEL_TO_CODE,
@@ -894,13 +894,40 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         path = resolve_audio_path(asset, ROOT)
         audio_note = ""
         starter_label = language_profile(state.language).starter_voice_label
+
+        # Upgrade previously saved AI audio lazily when it is actually selected.
+        # This avoids the old startup problem where every remote MP3 was restored or
+        # regenerated at once, while ensuring classmates hear the new natural-v2
+        # rendering even for passages already present in the generated bank.
+        if bundle.passage.id.startswith("gen_") and asset.engine_version != "7.2.8-natural-v2":
+            try:
+                _progress(progress, 0.42, "Upgrading this saved passage to natural speech…")
+                voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
+                cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
+                path = generate_cached_tts(
+                    bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
+                    pitch=pitch, volume=volume, language=bundle.passage.language,
+                    naturalize=True, engine_version="edge-tts-7.2.8-natural-v2",
+                    timeout_seconds=SETTINGS.tts_timeout_seconds,
+                )
+                audio_note = " Natural-v2 speech loaded and cached for this saved AI passage."
+            except Exception as tts_exc:
+                audio_note = f" Natural speech upgrade was unavailable; the existing validated audio was used ({type(tts_exc).__name__})."
+
         if state.mode == "training" and (state.voice_label != starter_label or state.speech_rate_label != "Normal"):
             rate_map = {"Very slow": "-25%", "Slow": "-15%", "Normal": "+0%", "Fast": "+10%"}
             try:
                 _progress(progress, 0.48, "Preparing the selected training voice and speed…")
                 cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
-                path = generate_cached_tts(bundle.passage.passage_ru, cache_dir, voice_for_label(state.language, state.voice_label), rate_map.get(state.speech_rate_label, "+0%"), timeout_seconds=SETTINGS.tts_timeout_seconds)
-                audio_note = " Requested training voice/speed loaded from the deterministic TTS cache."
+                path = generate_cached_tts(
+                    bundle.passage.passage_ru, cache_dir,
+                    voice=voice_for_label(state.language, state.voice_label),
+                    rate=rate_map.get(state.speech_rate_label, "+0%"),
+                    pitch="+0Hz", volume="+0%", language=bundle.passage.language,
+                    naturalize=True, engine_version="edge-tts-7.2.8-natural-v2-training",
+                    timeout_seconds=SETTINGS.tts_timeout_seconds,
+                )
+                audio_note = " Requested training voice/speed loaded with natural spoken phrasing from the deterministic TTS cache."
             except Exception as tts_exc:
                 audio_note = f" Requested training voice/speed was unavailable; cached starter audio was used ({type(tts_exc).__name__})."
         _progress(progress, 0.82, "Preparing browser playback…")

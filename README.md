@@ -576,3 +576,9 @@ Version 1.3.3 distinguishes three separate failure stages:
 - **Level 3 Listening requested a duration repair:** the first transcript rendered below 2:00 or above 2:30. The app now measures the real cached MP3 before writing questions and asks the authoring model to repair the transcript while preserving natural sentence boundaries. Mandarin Level 3 targets 520-650 Chinese characters as guidance, but the measured audio duration is authoritative.
 
 A message such as `q2:no_near_duplicate_choices` is therefore a question-quality rejection, not an audio failure. The generated bank and Dataset synchronization remain intact.
+
+
+## Natural listening speech
+
+Version 1.6.0 keeps the no-cost Edge TTS backend and improves generated Russian and Mandarin listening audio through conservative text phrasing, passage-aware voice selection, and small deterministic rate/pitch adjustments. Previously saved AI passages are upgraded lazily when played and then cached, so startup remains fast. The app does not claim human-recorded audio; generated recordings remain synthetic practice material.
+

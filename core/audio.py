@@ -5,6 +5,7 @@ import atexit
 import hashlib
 import html
 import os
+import re
 import shutil
 import subprocess
 import threading
@@ -99,8 +100,10 @@ def _close_async_runner() -> None:
 atexit.register(_close_async_runner)
 
 
-def audio_cache_key(transcript: str, voice: str, rate: str, engine_version: str) -> str:
-    raw = "\n".join([transcript.strip(), voice.strip(), rate.strip(), engine_version.strip()])
+def audio_cache_key(
+    transcript: str, voice: str, rate: str, engine_version: str, pitch: str = "+0Hz", volume: str = "+0%"
+) -> str:
+    raw = "\n".join([transcript.strip(), voice.strip(), rate.strip(), pitch.strip(), volume.strip(), engine_version.strip()])
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
@@ -138,12 +141,60 @@ def resolve_audio_path(asset: AudioAsset, project_root: str | Path) -> Path:
     return path
 
 
-async def _edge_tts_save(text: str, voice: str, rate: str, path: Path) -> None:
+_SPOKEN_MARKERS_RU = (
+    "однако", "кроме того", "тем не менее",
+    "таким образом", "в результате", "например", "во-первых", "во-вторых",
+    "с другой стороны", "между тем", "в частности",
+)
+
+
+def naturalize_spoken_text(text: str, language: str = "ru") -> str:
+    """Prepare authored prose for speech without changing its words or meaning.
+
+    Edge voices react strongly to punctuation and sentence boundaries.  Generated
+    passages often arrive as visually valid prose but with weak spoken phrasing.
+    This conservative pass only repairs whitespace, punctuation spacing, paragraph
+    boundaries, and missing commas after common Russian discourse markers.
+    """
+
+    value = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
+    value = re.sub(r"[ \t]+", " ", value)
+    value = re.sub(r" *\n *", "\n", value)
+    value = re.sub(r"\n{3,}", "\n\n", value)
+    value = re.sub(r"\s+([,.;:!?])", r"\1", value)
+    value = re.sub(r"([,;:!?])(?=[^\s\n])", r"\1 ", value)
+    value = re.sub(r"(?<!\.)\.{3,}", "…", value)
+    value = re.sub(r"([!?]){2,}", r"\1", value)
+
+    if language == "ru":
+        marker_pattern = "|".join(re.escape(marker) for marker in _SPOKEN_MARKERS_RU)
+        value = re.sub(
+            rf"(?im)(^|[.!?]\s+|\n)({marker_pattern})(?!\s*[,—-])\s+",
+            lambda match: f"{match.group(1)}{match.group(2)}, ",
+            value,
+        )
+
+    # A paragraph boundary gives Edge a more natural reset than one uninterrupted
+    # wall of text. Preserve authored paragraphs and add one after full stops only
+    # when the passage otherwise contains none and is long enough to benefit.
+    if "\n" not in value and len(value) > 250:
+        sentences = re.split(r"(?<=[.!?])\s+", value)
+        if len(sentences) >= 5:
+            groups = [" ".join(sentences[i:i + 3]) for i in range(0, len(sentences), 3)]
+            value = "\n\n".join(groups)
+    return value.strip()
+
+
+async def _edge_tts_save(
+    text: str, voice: str, rate: str, pitch: str, volume: str, path: Path
+) -> None:
     try:
         import edge_tts
     except Exception as exc:
         raise AudioError("edge-tts is not installed. Install pinned requirements or use prebuilt starter audio.") from exc
-    communicator = edge_tts.Communicate(text=text, voice=voice, rate=rate)
+    communicator = edge_tts.Communicate(
+        text=text, voice=voice, rate=rate, pitch=pitch, volume=volume
+    )
     await communicator.save(str(path))
 
 
@@ -152,18 +203,25 @@ def generate_cached_tts(
     cache_dir: str | Path,
     voice: str = "ru-RU-SvetlanaNeural",
     rate: str = "+0%",
+    pitch: str = "+0Hz",
+    volume: str = "+0%",
+    language: str = "ru",
+    naturalize: bool = True,
     engine_version: str = "edge-tts-7",
     timeout_seconds: float = 60.0,
 ) -> Path:
     cache_dir = Path(cache_dir).resolve()
     cache_dir.mkdir(parents=True, exist_ok=True)
-    key = audio_cache_key(transcript, voice, rate, engine_version)
+    spoken_text = naturalize_spoken_text(transcript, language) if naturalize else transcript.strip()
+    key = audio_cache_key(spoken_text, voice, rate, engine_version, pitch=pitch, volume=volume)
     output = cache_dir / f"{key}.mp3"
     if validate_audio_file(output):
         return output
     temp = output.with_suffix(".tmp.mp3")
     try:
-        _get_async_runner().run(_edge_tts_save(transcript, voice, rate, temp), timeout_seconds)
+        _get_async_runner().run(
+            _edge_tts_save(spoken_text, voice, rate, pitch, volume, temp), timeout_seconds
+        )
         if not validate_audio_file(temp):
             raise AudioError("TTS returned an empty or incomplete audio file.")
         os.replace(temp, output)

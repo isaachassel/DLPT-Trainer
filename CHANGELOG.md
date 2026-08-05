@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 — Natural Listening Prosody
+
+- Kept the free Microsoft Edge TTS engine while replacing flat one-profile synthesis with restrained passage-aware prosody.
+- Added deterministic Russian voice selection between Svetlana and Dmitry based on passage genre and topic.
+- Added subtle, bounded speaking-rate and pitch variation so recordings do not all share identical cadence.
+- Added conservative spoken-text preparation that repairs punctuation spacing, inserts natural pauses after Russian discourse markers, and creates paragraph-level breathing resets without changing tested words or meaning.
+- Invalidated the old generated-audio cache so newly authored listening passages use the natural-v2 rendering.
+- Lazily upgrades older saved AI audio only when selected, then caches it, avoiding mass regeneration and slow startup.
+- Applies natural spoken phrasing to user-selected Training voices and speeds.
+- Added regression coverage for phrasing, deterministic voice/prosody selection, parameter bounds, and cache-key separation.
+
 ## 1.5.2 — Reliable Listening Playback and Faster Restarts
 
 - Replaced blocked autoplay-only Listening behavior with an explicit browser audio play control.

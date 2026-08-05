@@ -88,7 +88,7 @@ def test_corrupt_generated_overlay_does_not_disable_starter_bank(project_root, t
 def test_hf_dataset_sync_uploads_bank_manifest_and_audio(monkeypatch, project_root, tmp_path):
     import core.generation as generation
 
-    def fake_tts(transcript, cache_dir, voice, rate, engine_version):
+    def fake_tts(transcript, cache_dir, voice, rate, engine_version, **kwargs):
         path = Path(cache_dir) / "generated-fixture.mp3"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(b"ID3" + b"0" * 2048)

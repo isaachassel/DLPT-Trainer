@@ -202,7 +202,7 @@ def test_generation_limit_uses_reusable_bank(monkeypatch):
 def test_live_listening_generation_creates_validated_cached_audio(project_root, tmp_path, monkeypatch):
     import core.generation as generation
 
-    def fake_tts(transcript, cache_dir, voice, rate, engine_version):
+    def fake_tts(transcript, cache_dir, voice, rate, engine_version, **kwargs):
         path = Path(cache_dir) / "fixture.mp3"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(b"ID3" + b"0" * 1024)
