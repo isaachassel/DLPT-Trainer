@@ -133,8 +133,52 @@ def test_gemini_http_payload_uses_json_schema_and_zero_thinking():
     assert captured["path"] == "/v1beta/models/gemini-2.5-flash:generateContent"
     config = captured["json"]["generationConfig"]
     assert config["thinkingConfig"] == {"thinkingBudget": 0}
-    assert config["responseFormat"]["text"]["mimeType"] == "application/json"
-    assert config["responseFormat"]["text"]["schema"]["type"] == "object"
+    assert config["responseMimeType"] == "application/json"
+    assert config["responseJsonSchema"]["type"] == "object"
+    # Pydantic-only validation constraints are intentionally kept local rather
+    # than sent to Gemini's smaller structured-output schema vocabulary.
+    assert "maxItems" not in json.dumps(config["responseJsonSchema"])
+    assert "$defs" not in config["responseJsonSchema"]
     assert provider.usage.calls == 1
     assert provider.usage.input_tokens == 100
     assert provider.usage.output_tokens == 50
+
+
+def test_gemini_404_retries_flash_lite_before_groq():
+    settings = Settings(
+        generation_provider="gemini",
+        gemini_api_key="gemini-test",
+        gemini_model="gemini-2.5-flash",
+    )
+    provider = HostedProvider(settings, "author")
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.text = json.dumps(payload)
+        def json(self):
+            return self._payload
+
+    class FakeClient:
+        def post(self, path, json):
+            calls.append(path)
+            if "gemini-2.5-flash:" in path:
+                return FakeResponse(404, {"error": {"message": "model not found"}})
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {},
+            })
+
+    provider._gemini = FakeClient()
+    fmt = HostedProvider._response_format(CandidatePassageDraft, "strict", "gemini")
+    text = provider._call_gemini(
+        AUTHORING_SYSTEM, "Target ILR: 1", model="gemini-2.5-flash",
+        response_format=fmt, max_tokens=1200, temperature=0.2,
+    )
+    assert json.loads(text)["target_ilr"] == "1"
+    assert calls == [
+        "/v1beta/models/gemini-2.5-flash:generateContent",
+        "/v1beta/models/gemini-2.5-flash-lite:generateContent",
+    ]

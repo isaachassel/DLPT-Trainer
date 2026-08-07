@@ -18,7 +18,7 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.7.3
+### Audio behavior in v1.7.4
 
 The default **Automatic natural Russian voice** keeps Microsoft Edge TTS for the strongest free online voices: Dmitry and Svetlana. Single-speaker news, narration, announcements, and lectures remain one continuous recording. The app does not cut ordinary passages into sentence fragments.
 
@@ -45,7 +45,7 @@ Piper models are downloaded only when one of those supplemental voices is actual
 Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
 
 
-## Performance behavior in v1.7.3
+## Performance behavior in v1.7.4
 
 This release preserves the v1.7.1 performance design and v1.7.2 startup/provider resilience without changing assessment behavior. Startup restores the generated JSONL bank immediately but no longer downloads every saved MP3. A generated Listening file is fetched only when selected, and that one file begins prefetching in the background while the learner reads.
 
@@ -61,13 +61,13 @@ When the topic box is blank, the server favors underrepresented categories, stro
 
 Provider quota handling is also bounded: a Hugging Face 402 or Groq 429 activates a shared cooldown across authoring and verification stages instead of repeatedly calling the same unavailable free endpoint. If every configured provider is cooling down, Fresh AI immediately uses an accepted bank item. Structured-output 400 responses are remembered per provider/model so later stages reuse a compatible JSON mode rather than repeating a rejected request.
 
-## Runtime resilience in v1.7.3
+## Runtime resilience in v1.7.4
 
 Gradio and Hugging Face telemetry are disabled before the interface is built. This removes the short-lived telemetry event loops that produced misleading `Invalid file descriptor: -1` cleanup tracebacks even though the Space had already returned HTTP 200. Expected free-tier quota and rate-limit recoveries are logged concisely, while unexpected application errors still remain visible.
 
 For hosted question generation, a valid verified subset may be retained when one question in a batch fails deterministic checks. This avoids an immediate repair call that can trigger Groq free-tier rate limits, while still requiring passage audit, local validation, and blind answer verification. Compatible v1.7.0 neural recordings are also reused when their voice and rate match, preventing needless Listening regeneration after an app upgrade.
 
-## Free GenAI routing in v1.7.3
+## Free GenAI routing in v1.7.4
 
 Fresh-AI authoring now defaults to **Gemini 2.5 Flash → Groq GPT-OSS** instead of spending Hugging Face Inference Providers credits first. Hugging Face remains the generated-bank storage layer, but hosted HF inference is disabled by default. This separation matters because a write-capable `HF_BANK_TOKEN` can keep the private Dataset bank durable without consuming the very small monthly HF inference allowance.
 
@@ -84,7 +84,7 @@ ENABLE_HF_INFERENCE=false
 
 With `VERIFICATION_PROVIDER=auto`, authoring prefers Gemini while passage audits and blind answer verification prefer Groq. This spreads the multi-stage workload across independent providers instead of spending Groq's per-minute GPT-OSS token budget on passage authoring, question authoring, and verification back-to-back. If one provider is rate-limited, the existing cooldown/circuit-breaker path uses the other provider or immediately falls back to the validated bank.
 
-Existing Spaces that still contain `GENERATION_PROVIDER=hf_then_groq` do not have to be reconfigured immediately: when `GEMINI_API_KEY` is present and `PREFER_GEMINI_IF_AVAILABLE=true`, v1.7.3 automatically promotes Gemini ahead of that legacy chain while `ENABLE_HF_INFERENCE=false` keeps HF inference out of normal generation. Setting `GENERATION_PROVIDER=gemini_then_groq` is still recommended for clarity.
+Existing Spaces that still contain `GENERATION_PROVIDER=hf_then_groq` do not have to be reconfigured immediately: when `GEMINI_API_KEY` is present and `PREFER_GEMINI_IF_AVAILABLE=true`, v1.7.4 automatically promotes Gemini ahead of that legacy chain while `ENABLE_HF_INFERENCE=false` keeps HF inference out of normal generation. Setting `GENERATION_PROVIDER=gemini_then_groq` is still recommended for clarity.
 
 Cerebras REST support is included only as an optional alternate route for users who already have usable credits/access; it is **not** part of the default all-free configuration.
 
@@ -654,3 +654,8 @@ A message such as `q2:no_near_duplicate_choices` is therefore a question-quality
 
 Version 1.6.0 keeps the no-cost Edge TTS backend and improves generated Russian and Mandarin listening audio through conservative text phrasing, passage-aware voice selection, and small deterministic rate/pitch adjustments. Previously saved AI passages are upgraded lazily when played and then cached, so startup remains fast. The app does not claim human-recorded audio; generated recordings remain synthetic practice material.
 
+
+
+## v1.7.4 runtime repair
+
+This release repairs the Gemini `generateContent` structured-output request shape and broadens dialogue-role detection so role labels such as seller/buyer are removed before TTS and receive distinct voices. Gemini 2.5 Flash remains the preferred free authoring model, with 2.5 Flash-Lite as a route fallback and Groq retained for independent verification/failover.

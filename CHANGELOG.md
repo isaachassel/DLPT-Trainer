@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.7.4 - Gemini + Dialogue Runtime Repair
+
+- Fixed Gemini `generateContent` structured-output requests to use the provider-compatible `responseMimeType` / `responseJsonSchema` fields and a Gemini-safe JSON Schema subset.
+- Added automatic `gemini-2.5-flash-lite` fallback when the configured Flash route returns 404.
+- Added safe Gemini error-detail logging without exposing API keys.
+- Reworked dialogue detection so open-ended roles such as `Продавец`, `Покупатель`, `Представитель банка`, Seller, Buyer, and other role labels are segmented instead of spoken aloud.
+- Guaranteed stable voice identity for newly detected dialogue roles; two-speaker Russian dialogue uses distinct native voices before local Piper voices are considered for additional speakers.
+- Expanded generation instructions so multi-speaker passages use parser-friendly stable role labels.
+- Suppressed only the known benign Python 3.11 `BaseEventLoop.__del__` invalid-file-descriptor finalizer warning after successful Space startup.
+- Added regressions for seller/buyer parsing, label stripping, two-voice synthesis routing, Gemini schema compatibility, and Gemini Flash-Lite route fallback.
+
 ## 1.7.3 — Free GenAI routing and quota resilience
 
 - Added Gemini Developer API support using lightweight direct REST calls; no Google SDK dependency is required.

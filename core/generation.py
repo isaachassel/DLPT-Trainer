@@ -993,6 +993,47 @@ class HostedProvider(AuthoringProvider):
         return self._response_text(response)
 
 
+    @staticmethod
+    def _gemini_json_schema(schema: dict[str, Any]) -> dict[str, Any]:
+        """Reduce Pydantic JSON Schema to Gemini's supported structured-output subset.
+
+        Gemini validates a smaller JSON-Schema vocabulary than Pydantic emits.
+        Runtime constraints (lengths, numeric ranges, exact item counts, etc.) are
+        still enforced locally by Pydantic after generation, so they do not need
+        to be sent to the provider.
+        """
+
+        import copy
+
+        raw = copy.deepcopy(schema)
+        defs = raw.get("$defs") or {}
+        supported = {"type", "properties", "required", "items", "enum", "anyOf", "oneOf", "description"}
+
+        def clean(value: Any, seen: set[str] | None = None) -> Any:
+            seen = set(seen or ())
+            if isinstance(value, list):
+                return [clean(item, seen) for item in value]
+            if not isinstance(value, dict):
+                return value
+            ref = value.get("$ref")
+            if isinstance(ref, str) and ref.startswith("#/$defs/"):
+                name = ref.split("/", 2)[-1]
+                if name in defs and name not in seen:
+                    return clean(defs[name], seen | {name})
+            out: dict[str, Any] = {}
+            for key, item in value.items():
+                if key in {"$defs", "$ref", "title", "additionalProperties", "minLength", "maxLength", "minItems", "maxItems", "minimum", "maximum", "pattern", "format", "default"}:
+                    continue
+                if key not in supported:
+                    continue
+                if key == "properties" and isinstance(item, dict):
+                    out[key] = {str(name): clean(child, seen) for name, child in item.items()}
+                else:
+                    out[key] = clean(item, seen)
+            return out
+
+        return clean(raw)
+
     def _call_gemini(
         self,
         system: str,
@@ -1024,27 +1065,51 @@ class HostedProvider(AuthoringProvider):
             # Gemini 2.5 Flash supports disabling thinking; this keeps assessment
             # generation fast and avoids consuming quota on hidden reasoning.
             "thinkingConfig": {"thinkingBudget": 0},
+            # generateContent still accepts these legacy-compatible fields and they
+            # are considerably more deployment-compatible than the newer
+            # Interactions-style responseFormat shape.
+            "responseMimeType": "application/json",
         }
-        if response_format is not None:
-            if response_format.get("type") == "json_schema":
-                generation_config["responseFormat"] = {
-                    "text": {
-                        "mimeType": "application/json",
-                        "schema": response_format["json_schema"]["schema"],
-                    }
-                }
-            elif response_format.get("type") == "json_object":
-                generation_config["responseFormat"] = {
-                    "text": {"mimeType": "application/json"}
-                }
+        if response_format is not None and response_format.get("type") == "json_schema":
+            generation_config["responseJsonSchema"] = self._gemini_json_schema(
+                response_format["json_schema"]["schema"]
+            )
         payload = {
             "systemInstruction": {"parts": [{"text": system}]},
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
             "generationConfig": generation_config,
         }
         self.usage.start_call()
-        response = self._gemini.post(f"/v1beta/models/{model}:generateContent", json=payload)
-        response.raise_for_status()
+        candidates = [model]
+        fallback_model = "gemini-2.5-flash-lite"
+        if fallback_model not in candidates:
+            candidates.append(fallback_model)
+        response = None
+        last_error: Exception | None = None
+        for candidate_model in candidates:
+            try:
+                current = self._gemini.post(f"/v1beta/models/{candidate_model}:generateContent", json=payload)
+                status_code = int(getattr(current, "status_code", 200) or 200)
+                if status_code == 404 and candidate_model != candidates[-1]:
+                    last_error = ProviderError(f"Gemini model {candidate_model} was not found; trying fallback model.")
+                    continue
+                if status_code >= 400:
+                    message = ""
+                    try:
+                        body = current.json()
+                        message = str((body.get("error") or {}).get("message") or "").strip()
+                    except Exception:
+                        message = str(getattr(current, "text", "") or "").strip()
+                    message = re.sub(r"\s+", " ", message)[:400]
+                    raise ProviderError(f"Gemini HTTP {status_code}: {message or 'request rejected'}")
+                response = current
+                break
+            except ProviderError as exc:
+                last_error = exc
+                if "HTTP 404" not in str(exc) and "not found" not in str(exc).lower():
+                    raise
+        if response is None:
+            raise last_error or ProviderError("Gemini returned no response.")
         data = response.json()
         usage = data.get("usageMetadata") or {}
         self.usage.add_tokens(usage.get("promptTokenCount"), usage.get("candidatesTokenCount"))

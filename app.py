@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import logging
 import os
+import sys
 
 # Hugging Face's optional Xet downloader can create short-lived asyncio loops
 # during startup. On Python 3.11/Spaces this sometimes prints harmless but alarming
@@ -13,6 +14,23 @@ os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
 os.environ.setdefault("DO_NOT_TRACK", "1")
+
+# Python 3.11 + some HF/Gradio dependency combinations can emit an unraisable
+# BaseEventLoop finalizer warning after a successful startup. It is not an app
+# failure, but it looks like one in Space logs. Suppress only this exact benign
+# finalizer; every other unraisable exception still goes to Python's default hook.
+_DEFAULT_UNRAISABLE_HOOK = sys.unraisablehook
+
+def _dlpt_unraisable_hook(args):
+    exc = getattr(args, "exc_value", None)
+    obj = getattr(args, "object", None)
+    if isinstance(exc, ValueError) and "Invalid file descriptor: -1" in str(exc):
+        name = getattr(obj, "__qualname__", "") or getattr(obj, "__name__", "")
+        if "BaseEventLoop.__del__" in name:
+            return
+    _DEFAULT_UNRAISABLE_HOOK(args)
+
+sys.unraisablehook = _dlpt_unraisable_hook
 
 from core.config import get_settings
 from ui.layout import CUSTOM_CSS, build_app

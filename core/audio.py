@@ -202,7 +202,12 @@ _KNOWN_SPEAKER_LABELS = {
     "гость", "гост", "гостья", "эксперт", "экспертка", "мужчина", "женщина",
     "диктор", "дикторша", "сотрудник", "сотрудница", "репортёр", "репортер",
     "клиент", "клиентка", "врач", "пациент", "пациентка", "учитель",
-    "учительница", "студент", "студентка", "speaker 1", "speaker 2",
+    "учительница", "студент", "студентка", "продавец", "продавщица",
+    "покупатель", "покупательница", "кассир", "кассирша", "менеджер",
+    "начальник", "начальница", "коллега", "работник", "работница",
+    "представитель", "представительница", "оператор", "операторша",
+    "диспетчер", "диспетчерша", "официант", "официантка", "собеседник",
+    "собеседница", "speaker 1", "speaker 2",
     "host", "guest", "interviewer", "reporter", "expert", "man", "woman",
     "主持人", "记者", "嘉宾", "专家", "男", "女", "顾客", "工作人员",
 }
@@ -221,18 +226,139 @@ def _speaker_marker_pattern() -> re.Pattern[str]:
 _SPEAKER_MARKER = _speaker_marker_pattern()
 
 
+def _line_label_candidate(line: str) -> tuple[str, str] | None:
+    """Return a plausible ``speaker label: utterance`` pair for one line.
+
+    Generated dialogue roles are intentionally open-ended (for example
+    ``Продавец``, ``Покупатель``, or ``Представитель банка``).  Limiting parsing
+    to a hard-coded role list made those labels reach TTS and collapsed the whole
+    script to one narrator.  This conservative line parser accepts short role-like
+    labels while rejecting ordinary prose such as ``Главная причина: ...`` unless
+    the surrounding passage contains a genuine multi-speaker pattern.
+    """
+
+    match = _SPEAKER_LINE.match(str(line or ""))
+    if not match:
+        return None
+    label = re.sub(r"\s+", " ", match.group("label")).strip(" ._-\t")
+    spoken = match.group("text").strip()
+    if not label or not spoken:
+        return None
+    # Speaker labels should be compact names/roles, not sentence fragments.
+    if len(label) > 32 or len(label.split()) > 4 or any(mark in label for mark in "!?;,()[]{}"):
+        return None
+    # Reject numeric headings/timestamps while retaining explicit Speaker 1/2.
+    if any(ch.isdigit() for ch in label) and not re.match(r"(?i)^(speaker|говорящий|собеседник)\s*[0-9абab]+$", label):
+        return None
+    return label, spoken
+
+
+def _looks_like_speaker_label(label: str) -> bool:
+    normalized = str(label or "").casefold().strip()
+    if normalized in _KNOWN_SPEAKER_LABELS:
+        return True
+    role_cues = (
+        "продав", "покуп", "кассир", "клиент", "сотруд", "работ", "менедж",
+        "началь", "коллег", "врач", "пациент", "учител", "студент", "ведущ",
+        "гост", "эксперт", "журналист", "корреспондент", "интервью", "оператор",
+        "диспетчер", "представител", "официант", "консультант", "администратор",
+        "директор", "сотрудник", "сотрудница", "speaker", "говорящ", "собесед",
+        "host", "guest", "seller", "buyer", "customer", "clerk", "manager",
+        "主持", "记者", "嘉宾", "专家", "顾客", "工作人员",
+    )
+    return any(cue in normalized for cue in role_cues)
+
+
+def _dynamic_line_dialogue(text: str) -> list[tuple[str, str]]:
+    """Detect arbitrary speaker roles from line boundaries.
+
+    We only activate the generic parser when at least two distinct labels are
+    present and labelled turns dominate the non-empty lines.  That avoids turning
+    a narrator sentence containing a colon into dialogue.
+    """
+
+    lines = [line.strip() for line in str(text or "").replace("\r\n", "\n").replace("\r", "\n").split("\n") if line.strip()]
+    if len(lines) < 2:
+        return []
+
+    turns: list[tuple[str, str]] = []
+    current_label: str | None = None
+    current_parts: list[str] = []
+    labelled_lines = 0
+
+    def flush() -> None:
+        nonlocal current_label, current_parts
+        if current_label and current_parts:
+            spoken = " ".join(part.strip() for part in current_parts if part.strip()).strip()
+            if spoken:
+                turns.append((current_label, spoken))
+        current_label = None
+        current_parts = []
+
+    for line in lines:
+        candidate = _line_label_candidate(line)
+        if candidate is not None:
+            flush()
+            current_label, spoken = candidate
+            current_parts = [spoken]
+            labelled_lines += 1
+        elif current_label is not None:
+            # Wrapped continuation belonging to the preceding speaker.
+            current_parts.append(line)
+        else:
+            # Unlabelled narration before the first role means the passage is not
+            # safely machine-segmentable as pure dialogue.
+            return []
+    flush()
+
+    distinct = {label.casefold().strip() for label, _ in turns}
+    if len(turns) < 2 or len(distinct) < 2:
+        return []
+    if not all(_looks_like_speaker_label(label) for label, _ in turns):
+        return []
+    # Nearly all generated dialogue lines should carry role labels. Continuation
+    # lines are allowed, so compare against the original line count conservatively.
+    if labelled_lines < 2 or labelled_lines / max(1, len(lines)) < 0.5:
+        return []
+    return turns
+
+
 def strip_speaker_labels(text: str) -> str:
-    """Remove role labels from the synthesis copy under all circumstances."""
+    """Remove known or clearly role-like labels from the synthesis copy.
+
+    Multi-speaker passages are normally segmented before this function is used.
+    The line-based pass is a final safety net so a role such as ``Продавец:`` is
+    never read aloud merely because it was not present in a static whitelist.
+    """
 
     value = str(text or "")
     value = _SPEAKER_MARKER.sub("", value)
+    cleaned_lines: list[str] = []
+    for line in value.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        candidate = _line_label_candidate(line.strip())
+        if candidate is not None:
+            label, spoken = candidate
+            if _looks_like_speaker_label(label):
+                line = spoken
+        cleaned_lines.append(line)
+    value = "\n".join(cleaned_lines)
     return re.sub(r"(?m)^\s*[—–-]\s*", "", value).strip()
 
 
 def split_speaker_turns(text: str) -> list[tuple[str, str]]:
-    """Extract dialogue turns while keeping all labels out of spoken text."""
+    """Extract dialogue turns while keeping all labels out of spoken text.
+
+    Prefer line-oriented generic role detection so novel roles such as Seller /
+    Buyer are handled.  Fall back to the legacy inline-known-label parser and
+    finally dash dialogue.
+    """
 
     raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n")
+
+    dynamic = _dynamic_line_dialogue(raw)
+    if dynamic:
+        return [(label, strip_speaker_labels(turn)) for label, turn in dynamic if strip_speaker_labels(turn)]
+
     matches = list(_SPEAKER_MARKER.finditer(raw))
     labelled: list[tuple[str, str]] = []
     for index, match in enumerate(matches):
@@ -256,6 +382,7 @@ def split_speaker_turns(text: str) -> list[tuple[str, str]]:
     if len(dashed) >= 2:
         return [(f"speaker_{index % 2}", turn) for index, turn in enumerate(dashed)]
     return []
+
 _FEMALE_LABEL_CUES = (
     "женщина", "ведущая", "журналистка", "корреспондентка", "гостья",
     "экспертка", "сотрудница", "клиентка", "пациентка", "учительница",

@@ -456,3 +456,69 @@ def test_explicit_training_helper_retries_with_unavailable_voice_removed(monkeyp
     assert actual == "ru-RU-DmitryNeural"
     assert unavailable == ("piper:ru_RU-irina-medium",)
     assert "piper:ru_RU-irina-medium" not in attempts[1][1]
+
+
+def test_seller_buyer_roles_are_detected_and_labels_are_not_spoken():
+    from core.audio import split_speaker_turns
+    turns = split_speaker_turns(
+        "Продавец: Добрый день. Чем могу помочь?\n"
+        "Покупатель: Мне нужен новый телефон.\n"
+        "Продавец: Есть несколько моделей."
+    )
+    assert [label for label, _ in turns] == ["Продавец", "Покупатель", "Продавец"]
+    assert [spoken for _, spoken in turns] == [
+        "Добрый день. Чем могу помочь?",
+        "Мне нужен новый телефон.",
+        "Есть несколько моделей.",
+    ]
+    assert all("продав" not in spoken.casefold() and "покуп" not in spoken.casefold() for _, spoken in turns)
+
+
+def test_arbitrary_two_role_dialogue_gets_two_distinct_voices():
+    from core.audio import _dialogue_speaker_profiles, split_speaker_turns
+    turns = split_speaker_turns(
+        "Продавец: Добрый день.\nПокупатель: Здравствуйте.\nПродавец: Что вы ищете?"
+    )
+    profiles = _dialogue_speaker_profiles(turns, "ru-RU-DmitryNeural", "ru", base_rate="+3%")
+    assert profiles["продавец"].voice == "ru-RU-DmitryNeural"
+    assert profiles["покупатель"].voice == "ru-RU-SvetlanaNeural"
+
+
+def test_generic_colon_prose_still_is_not_misclassified_as_dialogue():
+    from core.audio import split_speaker_turns
+    assert split_speaker_turns("Москва: сегодня ожидается дождь.\nТемпература: около десяти градусов.") == []
+
+def test_seller_buyer_audio_path_calls_two_voices_and_never_synthesizes_labels(tmp_path):
+    import shutil
+    import subprocess
+    import pytest
+    from pathlib import Path
+    from core.audio import generate_dialogue_cached_tts
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg is required")
+
+    requested = []
+    def fake_synth(text, cache_dir, **kwargs):
+        requested.append((text, kwargs["voice"]))
+        output = Path(cache_dir) / f"seller-buyer-{len(requested)}.mp3"
+        subprocess.run([
+            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+            "-f", "lavfi", "-i", "sine=frequency=500:duration=0.35",
+            "-codec:a", "libmp3lame", "-q:a", "4", str(output),
+        ], check=True)
+        return output
+
+    output = generate_dialogue_cached_tts(
+        "Продавец: Добрый день.\nПокупатель: Здравствуйте.\nПродавец: Что вы ищете?",
+        tmp_path,
+        voice="ru-RU-DmitryNeural",
+        rate="+3%",
+        synthesizer=fake_synth,
+        engine_version="seller-buyer-routing-v1",
+    )
+    assert output.exists()
+    assert [voice for _text, voice in requested] == [
+        "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural"
+    ]
+    assert all("продавец" not in text.casefold() and "покупатель" not in text.casefold() for text, _voice in requested)
