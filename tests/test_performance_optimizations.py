@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from core.item_bank import ItemBank
 from core.session import create_session
 from ui.callbacks import (
+    _asset_is_current_for_passage,
     _canonical_audio_matches,
     _fresh_generation_audio_preferences,
 )
@@ -114,6 +115,27 @@ def test_current_canonical_audio_can_be_reused_without_second_tts_render():
     assert _canonical_audio_matches(asset, "ru-RU-DmitryNeural", "+10%") is True
     assert _canonical_audio_matches(asset, "ru-RU-SvetlanaNeural", "+10%") is False
     assert _canonical_audio_matches(asset, "ru-RU-DmitryNeural", "+0%") is False
+
+
+def test_old_dialogue_asset_is_regenerated_after_role_parser_upgrade():
+    asset = SimpleNamespace(
+        engine_version="hybrid-edge-piper-dialogue-v6",
+        voice="ru-RU-DmitryNeural",
+        rate="+5%",
+        validated=True,
+    )
+    passage = SimpleNamespace(
+        passage_ru="Продавец: Добрый день.\nПокупатель: Мне нужен билет.\nПродавец: Конечно."
+    )
+    assert _asset_is_current_for_passage(asset, passage) is False
+
+    current = SimpleNamespace(
+        engine_version="hybrid-edge-piper-dialogue-v7",
+        voice="ru-RU-DmitryNeural",
+        rate="+5%",
+        validated=True,
+    )
+    assert _asset_is_current_for_passage(current, passage) is True
 
 
 def test_production_dialogue_segments_are_rendered_with_bounded_parallelism(monkeypatch, tmp_path):

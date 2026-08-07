@@ -18,7 +18,7 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.7.4
+### Audio behavior in v1.7.5
 
 The default **Automatic natural Russian voice** keeps Microsoft Edge TTS for the strongest free online voices: Dmitry and Svetlana. Single-speaker news, narration, announcements, and lectures remain one continuous recording. The app does not cut ordinary passages into sentence fragments.
 
@@ -26,7 +26,7 @@ The free Edge endpoint used by this Space does not currently accept `ru-RU-Dariy
 
 ## Hybrid multi-speaker listening audio
 
-Version 1.7.3 retains the two completely free engines introduced in v1.7.0:
+Version 1.7.5 retains the two completely free engines introduced in v1.7.0:
 
 - Microsoft Edge TTS: Dmitry and Svetlana
 - Local Piper TTS: Irina and Ruslan
@@ -42,10 +42,10 @@ Speaker 4 → Ruslan (local Piper)
 
 Piper models are downloaded only when one of those supplemental voices is actually needed. Each medium Russian model is about 63 MB and is cached after its first use, so the app does not add both models to every startup. Manual Training choices now clearly identify whether a voice uses Edge or local Piper.
 
-Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
+Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. Multi-speaker generated-bank assets produced before the v1.7.5 speaker-parser cache bump are regenerated once when selected, so an older one-narrator MP3 cannot bypass the repaired dialogue renderer. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
 
 
-## Performance behavior in v1.7.4
+## Performance behavior in v1.7.5
 
 This release preserves the v1.7.1 performance design and v1.7.2 startup/provider resilience without changing assessment behavior. Startup restores the generated JSONL bank immediately but no longer downloads every saved MP3. A generated Listening file is fetched only when selected, and that one file begins prefetching in the background while the learner reads.
 
@@ -61,15 +61,15 @@ When the topic box is blank, the server favors underrepresented categories, stro
 
 Provider quota handling is also bounded: a Hugging Face 402 or Groq 429 activates a shared cooldown across authoring and verification stages instead of repeatedly calling the same unavailable free endpoint. If every configured provider is cooling down, Fresh AI immediately uses an accepted bank item. Structured-output 400 responses are remembered per provider/model so later stages reuse a compatible JSON mode rather than repeating a rejected request.
 
-## Runtime resilience in v1.7.4
+## Runtime resilience in v1.7.5
 
 Gradio and Hugging Face telemetry are disabled before the interface is built. This removes the short-lived telemetry event loops that produced misleading `Invalid file descriptor: -1` cleanup tracebacks even though the Space had already returned HTTP 200. Expected free-tier quota and rate-limit recoveries are logged concisely, while unexpected application errors still remain visible.
 
 For hosted question generation, a valid verified subset may be retained when one question in a batch fails deterministic checks. This avoids an immediate repair call that can trigger Groq free-tier rate limits, while still requiring passage audit, local validation, and blind answer verification. Compatible v1.7.0 neural recordings are also reused when their voice and rate match, preventing needless Listening regeneration after an app upgrade.
 
-## Free GenAI routing in v1.7.4
+## Free GenAI routing in v1.7.5
 
-Fresh-AI authoring now defaults to **Gemini 2.5 Flash → Groq GPT-OSS** instead of spending Hugging Face Inference Providers credits first. Hugging Face remains the generated-bank storage layer, but hosted HF inference is disabled by default. This separation matters because a write-capable `HF_BANK_TOKEN` can keep the private Dataset bank durable without consuming the very small monthly HF inference allowance.
+Fresh-AI authoring now defaults to **Gemini 3.6 Flash → Groq GPT-OSS** instead of spending Hugging Face Inference Providers credits first. Hugging Face remains the generated-bank storage layer, but hosted HF inference is disabled by default. This separation matters because a write-capable `HF_BANK_TOKEN` can keep the private Dataset bank durable without consuming the very small monthly HF inference allowance.
 
 Recommended free setup:
 
@@ -82,9 +82,13 @@ VERIFICATION_PROVIDER=auto
 ENABLE_HF_INFERENCE=false
 ```
 
+Before its first Gemini generation, the app now calls Google's model-list endpoint with the configured key and filters to models that actually support `generateContent`. The configured model is used only if that exact project exposes it; otherwise the app prefers current stable Flash models (`gemini-3.6-flash`, then other available Flash-family models) returned by Google. This prevents stale hard-coded model IDs from causing repeated 404s. The current REST structured-output contract uses `generationConfig.responseFormat.text` with `mimeType=application/json` and the JSON schema.
+
+If model discovery returns HTTP 400/401/403, the log reports a Gemini key/project authentication problem instead of pretending the model is missing. A 200 model-list response proves the key is accepted and lets the app select an actually available model. You normally should not set `GEMINI_MODEL` manually; the default is only a preference and runtime discovery is authoritative.
+
 With `VERIFICATION_PROVIDER=auto`, authoring prefers Gemini while passage audits and blind answer verification prefer Groq. This spreads the multi-stage workload across independent providers instead of spending Groq's per-minute GPT-OSS token budget on passage authoring, question authoring, and verification back-to-back. If one provider is rate-limited, the existing cooldown/circuit-breaker path uses the other provider or immediately falls back to the validated bank.
 
-Existing Spaces that still contain `GENERATION_PROVIDER=hf_then_groq` do not have to be reconfigured immediately: when `GEMINI_API_KEY` is present and `PREFER_GEMINI_IF_AVAILABLE=true`, v1.7.4 automatically promotes Gemini ahead of that legacy chain while `ENABLE_HF_INFERENCE=false` keeps HF inference out of normal generation. Setting `GENERATION_PROVIDER=gemini_then_groq` is still recommended for clarity.
+Existing Spaces that still contain `GENERATION_PROVIDER=hf_then_groq` do not have to be reconfigured immediately: when `GEMINI_API_KEY` is present and `PREFER_GEMINI_IF_AVAILABLE=true`, v1.7.5 automatically promotes Gemini ahead of that legacy chain while `ENABLE_HF_INFERENCE=false` keeps HF inference out of normal generation. Setting `GENERATION_PROVIDER=gemini_then_groq` is still recommended for clarity.
 
 Cerebras REST support is included only as an optional alternate route for users who already have usable credits/access; it is **not** part of the default all-free configuration.
 
@@ -303,8 +307,8 @@ A single matching generation key is enough to enable Fresh AI; using both Gemini
 Current defaults:
 
 ```text
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_VERIFIER_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.6-flash
+GEMINI_VERIFIER_MODEL=gemini-3.5-flash-lite
 GROQ_MODEL=openai/gpt-oss-120b
 GROQ_VERIFIER_MODEL=openai/gpt-oss-20b
 HF_PROVIDER=auto
@@ -319,7 +323,7 @@ Original configuration remains compatible:
 
 ```text
 GENAI_PROVIDER=gemini_then_groq
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.6-flash
 GROQ_MODEL=your_supported_model
 # Optional legacy HF inference route:
 HF_PROVIDER=auto

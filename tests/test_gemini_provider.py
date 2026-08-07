@@ -94,57 +94,77 @@ def test_gemini_rate_limit_fails_over_to_groq(monkeypatch):
     assert "gemini" in provider.cooldown_remaining()
 
 
-def test_gemini_http_payload_uses_json_schema_and_zero_thinking():
+def test_gemini_http_payload_uses_current_response_format_and_model_discovery():
     settings = Settings(
         generation_provider="gemini",
         gemini_api_key="gemini-test",
-        gemini_model="gemini-2.5-flash",
+        gemini_model="gemini-3.6-flash",
     )
     provider = HostedProvider(settings, "author")
     captured = {}
 
     class FakeResponse:
-        def raise_for_status(self):
-            return None
+        def __init__(self, status_code=200, payload=None):
+            self.status_code = status_code
+            self._payload = payload or {}
+            self.text = json.dumps(self._payload)
 
         def json(self):
-            return {
-                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
-                "usageMetadata": {"promptTokenCount": 100, "candidatesTokenCount": 50},
-            }
+            return self._payload
 
     class FakeClient:
+        def get(self, path, params=None):
+            captured["list_path"] = path
+            captured["list_params"] = params
+            return FakeResponse(200, {
+                "models": [
+                    {
+                        "name": "models/gemini-3.6-flash",
+                        "supportedGenerationMethods": ["generateContent"],
+                    },
+                    {
+                        "name": "models/gemini-3.5-flash-lite",
+                        "supportedGenerationMethods": ["generateContent"],
+                    },
+                ]
+            })
+
         def post(self, path, json):
             captured["path"] = path
             captured["json"] = json
-            return FakeResponse()
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {"promptTokenCount": 100, "candidatesTokenCount": 50},
+            })
 
     provider._gemini = FakeClient()
     fmt = HostedProvider._response_format(CandidateQuestionSet, "strict", "gemini")
     text = provider._call_gemini(
         AUTHORING_SYSTEM,
         "Target ILR: 1",
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         response_format=fmt,
         max_tokens=1200,
         temperature=0.2,
     )
     assert json.loads(text)["target_ilr"] == "1"
-    assert captured["path"] == "/v1beta/models/gemini-2.5-flash:generateContent"
+    assert captured["list_path"] == "/v1beta/models"
+    assert captured["path"] == "/v1beta/models/gemini-3.6-flash:generateContent"
     config = captured["json"]["generationConfig"]
-    assert config["thinkingConfig"] == {"thinkingBudget": 0}
-    assert config["responseMimeType"] == "application/json"
-    assert config["responseJsonSchema"]["type"] == "object"
-    # Pydantic-only validation constraints are intentionally kept local rather
-    # than sent to Gemini's smaller structured-output schema vocabulary.
-    assert "maxItems" not in json.dumps(config["responseJsonSchema"])
-    assert "$defs" not in config["responseJsonSchema"]
+    assert config["maxOutputTokens"] == 1200
+    assert config["responseFormat"]["text"]["mimeType"] == "application/json"
+    schema = config["responseFormat"]["text"]["schema"]
+    assert schema["type"] == "object"
+    assert "responseMimeType" not in config
+    assert "responseJsonSchema" not in config
+    assert "maxItems" not in json.dumps(schema)
+    assert "$defs" not in schema
     assert provider.usage.calls == 1
     assert provider.usage.input_tokens == 100
     assert provider.usage.output_tokens == 50
 
 
-def test_gemini_404_retries_flash_lite_before_groq():
+def test_gemini_discovery_skips_unavailable_configured_model_without_404_loop():
     settings = Settings(
         generation_provider="gemini",
         gemini_api_key="gemini-test",
@@ -162,10 +182,16 @@ def test_gemini_404_retries_flash_lite_before_groq():
             return self._payload
 
     class FakeClient:
+        def get(self, path, params=None):
+            return FakeResponse(200, {
+                "models": [
+                    {"name": "models/gemini-3.6-flash", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-3.5-flash-lite", "supportedGenerationMethods": ["generateContent"]},
+                ]
+            })
+
         def post(self, path, json):
             calls.append(path)
-            if "gemini-2.5-flash:" in path:
-                return FakeResponse(404, {"error": {"message": "model not found"}})
             return FakeResponse(200, {
                 "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
                 "usageMetadata": {},
@@ -178,7 +204,29 @@ def test_gemini_404_retries_flash_lite_before_groq():
         response_format=fmt, max_tokens=1200, temperature=0.2,
     )
     assert json.loads(text)["target_ilr"] == "1"
-    assert calls == [
-        "/v1beta/models/gemini-2.5-flash:generateContent",
-        "/v1beta/models/gemini-2.5-flash-lite:generateContent",
-    ]
+    assert calls == ["/v1beta/models/gemini-3.6-flash:generateContent"]
+    assert provider.last_model == "gemini-3.6-flash"
+
+
+def test_gemini_model_discovery_reports_key_rejection_clearly():
+    settings = Settings(generation_provider="gemini", gemini_api_key="bad-test")
+    provider = HostedProvider(settings, "author")
+
+    class FakeResponse:
+        status_code = 403
+        text = ""
+        def json(self):
+            return {"error": {"message": "API key does not have permission to use the Gemini API"}}
+
+    class FakeClient:
+        def get(self, path, params=None):
+            return FakeResponse()
+
+    provider._gemini = FakeClient()
+    try:
+        provider._discover_gemini_models()
+        assert False, "expected ProviderError"
+    except Exception as exc:
+        assert "API key/project was rejected" in str(exc)
+        assert "403" in str(exc)
+

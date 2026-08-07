@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.7.5 - Gemini Runtime Discovery + Dialogue Cache Repair
+
+- Replaced hard-coded Gemini 2.5 routing with runtime `models.list` discovery using the configured Space secret, so the app selects a `generateContent` model that the exact Google project/key actually exposes.
+- Updated the preferred free authoring model to `gemini-3.6-flash` and the lightweight fallback preference to `gemini-3.5-flash-lite`, while retaining compatibility with any still-available Flash models returned by Google.
+- Updated Gemini structured output to the current `generationConfig.responseFormat.text` REST contract instead of the deprecated `responseMimeType` / `responseJsonSchema` pair.
+- Added explicit model-discovery diagnostics that distinguish an invalid/restricted Gemini key (400/401/403) from a missing model route (404) without logging the secret.
+- Cached the discovered Gemini catalog for 30 minutes and refresh it once if a running Space receives a later model 404, preventing repeated dead-route calls.
+- Bumped the dialogue audio pipeline to v7. Detected multi-speaker passages with older v5/v6 assets are regenerated once, preventing an old single-narrator MP3 from bypassing the repaired Seller/Buyer and open-role parser. Single-speaker v5/v6 neural recordings remain reusable for performance.
+- Added regressions for current Gemini response format, key rejection diagnostics, stale configured-model replacement, and old-dialogue-asset invalidation.
+- Expanded regression coverage to 222 passing tests.
+
 ## v1.7.4 - Gemini + Dialogue Runtime Repair
 
 - Fixed Gemini `generateContent` structured-output requests to use the provider-compatible `responseMimeType` / `responseJsonSchema` fields and a Gemini-safe JSON Schema subset.

@@ -22,6 +22,7 @@ from core.audio import (
     generate_cached_tts,
     generate_dialogue_cached_tts,
     resolve_audio_path,
+    split_speaker_turns,
 )
 from core.bank_persistence import GeneratedBankPersistence
 from core.config import get_settings
@@ -1104,7 +1105,7 @@ def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> N
             voice, rate, pitch, volume, _display, explicit = _training_audio_profile(state, passage)
         except Exception:
             return
-        if _canonical_audio_matches(asset, voice, rate):
+        if _canonical_audio_matches(asset, voice, rate, passage):
             return
         key = f"training:{passage.content_hash}:{voice}:{rate}:{int(explicit)}"
         if explicit:
@@ -1127,7 +1128,7 @@ def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> N
             )
         return
 
-    if _is_compatible_neural_asset(asset):
+    if _asset_is_current_for_passage(asset, passage):
         return
     voice, rate, pitch, volume = _natural_voice_profile(passage, SETTINGS)
     key = f"strict:{passage.content_hash}:{voice}:{rate}"
@@ -1156,19 +1157,35 @@ def _is_compatible_neural_asset(asset) -> bool:
     version = str(getattr(asset, "engine_version", "") or "")
     if version == DIALOGUE_TTS_ASSET_VERSION:
         return True
-    engine = str(getattr(asset, "engine", "") or "").strip().casefold()
-    if engine not in {"edge-tts", "edge tts", "hybrid-edge-piper"}:
-        return False
+    # Historical v5/v6 generated-bank assets did not always persist the engine
+    # field consistently, but the version tag itself identifies the validated
+    # neural pipeline. They remain reusable for single-speaker passages.
     match = re.search(r"hybrid-edge-piper-dialogue-v(\d+)", version)
-    return bool(match and int(match.group(1)) >= 5)
+    if match and int(match.group(1)) >= 5:
+        return True
+    engine = str(getattr(asset, "engine", "") or "").strip().casefold()
+    return engine in {"edge-tts", "edge tts", "hybrid-edge-piper"} and version == DIALOGUE_TTS_ASSET_VERSION
 
 
-def _canonical_audio_matches(asset, voice: str, rate: str) -> bool:
-    return bool(
-        _is_compatible_neural_asset(asset)
-        and asset.voice == voice
-        and asset.rate == rate
-    )
+def _asset_is_current_for_passage(asset, passage) -> bool:
+    """Reuse old neural audio only when it cannot preserve a repaired dialogue plan.
+
+    v1.7.4 broadened dialogue-role parsing, but assets produced before that repair
+    may still carry a v5/v6 engine tag while containing one narrator reading role
+    labels.  Single-speaker neural audio remains reusable; detected dialogue is
+    regenerated once with the v7 speaker-safe pipeline.
+    """
+
+    if not _is_compatible_neural_asset(asset):
+        return False
+    if split_speaker_turns(getattr(passage, "passage_ru", "")):
+        return str(getattr(asset, "engine_version", "") or "") == DIALOGUE_TTS_ASSET_VERSION
+    return True
+
+
+def _canonical_audio_matches(asset, voice: str, rate: str, passage=None) -> bool:
+    compatible = _asset_is_current_for_passage(asset, passage) if passage is not None else _is_compatible_neural_asset(asset)
+    return bool(compatible and asset.voice == voice and asset.rate == rate)
 
 
 def play_audio_callback(state: SessionState | None, bundle_data: dict | None, progress=gr.Progress()):
@@ -1203,7 +1220,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             )
             _progress(progress, 0.42, f"Preparing {requested_display}…")
             try:
-                if _canonical_audio_matches(asset, voice, rate):
+                if _canonical_audio_matches(asset, voice, rate, bundle.passage):
                     path = validated_bank_path
                     actual_voice = voice
                     unavailable = ()
@@ -1254,7 +1271,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             # Strict modes use the canonical bank recording. Older assets receive
             # one lazy neural upgrade, but learner voice preferences never affect
             # Diagnostic or Simulation audio.
-            if not _is_compatible_neural_asset(asset):
+            if not _asset_is_current_for_passage(asset, bundle.passage):
                 try:
                     _progress(progress, 0.42, "Preparing the canonical native neural recording…")
                     voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)

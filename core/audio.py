@@ -28,8 +28,8 @@ from .languages import native_voice_pool as configured_native_voice_pool, voice_
 
 LOGGER = logging.getLogger("dlpt.audio")
 
-DIALOGUE_TTS_CACHE_VERSION = "hybrid-edge-piper-dialogue-v6"
-DIALOGUE_TTS_ASSET_VERSION = "hybrid-edge-piper-dialogue-v6"
+DIALOGUE_TTS_CACHE_VERSION = "hybrid-edge-piper-dialogue-v7"
+DIALOGUE_TTS_ASSET_VERSION = "hybrid-edge-piper-dialogue-v7"
 
 
 class AudioError(RuntimeError):
