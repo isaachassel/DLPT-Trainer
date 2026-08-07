@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.7.3 — Free GenAI routing and quota resilience
+
+- Added Gemini Developer API support using lightweight direct REST calls; no Google SDK dependency is required.
+- Made `gemini-2.5-flash` the default Fresh-AI authoring model while preserving Groq GPT-OSS as the independent verifier/fallback route.
+- Disabled Hugging Face hosted inference by default in production while preserving `HF_BANK_TOKEN`/`HF_TOKEN` Dataset persistence, because HF free Inference Providers credits are monthly rather than a daily-reset resource.
+- Added backwards-compatible auto-promotion: an existing `hf_then_groq` Space automatically routes `Gemini → Groq` after `GEMINI_API_KEY` is added, unless the user explicitly disables Gemini preference.
+- Added current Gemini structured-output REST support with JSON Schema, zero thinking budget for 2.5 Flash, token-usage accounting, redacted errors, provider cooldowns, and failover.
+- Preserved Groq GPT-OSS models; production logs showed the models were healthy but the app was exhausting the 8K-token-per-minute free bucket with several large pipeline stages in rapid succession.
+- Generalized provider chains and readiness reporting to Gemini, Groq, optional Cerebras, and opt-in Hugging Face inference.
+- Included optional Cerebras REST routing without making trial/paid credits part of the default all-free configuration.
+- Updated deployment documentation and `.env.example` so bank storage credentials are clearly separated from model-inference credentials.
+- Expanded regression coverage to 215 passing tests including Gemini-first legacy migration, Gemini/Groq failover, structured-output payloads, quota cooldowns, and secret redaction.
+
+## 1.7.2 — Provider resilience and clean startup
+
+- Disabled Gradio and Hugging Face telemetry before UI construction so Space startup no longer creates short-lived telemetry event loops that print misleading `Invalid file descriptor: -1` finalizer tracebacks.
+- Added structured-output compatibility learning: a provider/model that rejects strict JSON schema is downgraded once, and the compatible mode is reused by later stages instead of repeating the same 400 response.
+- Shared provider cooldown state across author, verifier, and secondary-verifier stages so one Hugging Face 402 or Groq 429 immediately protects the whole generation pipeline.
+- Added header-aware cooldown parsing for `Retry-After` and rate-limit reset values, with bounded fallback delays when a provider omits usable headers.
+- Added a runtime circuit breaker: when every configured free provider is cooling down, Fresh-AI immediately selects an accepted bank item instead of making doomed network calls.
+- Added a small shared post-response pacing interval for Groq to reduce immediate back-to-back free-tier requests.
+- Kept a locally valid subset of hosted-generated questions when only some questions fail deterministic checks, avoiding an unnecessary second author request while preserving passage audit and blind verification.
+- Reused compatible v1.7.0 neural/hybrid audio when voice and rate match, rather than regenerating an already-valid MP3 solely because the cache version changed.
+- Downgraded expected provider-fallback events to concise informational logs while preserving warnings for unexpected application failures.
+- Expanded regression coverage to 206 passing tests, including clean startup, shared cooldowns, structured-output downgrade caching, rate-limit header parsing, hosted valid-subset reuse, and compatible prior-audio reuse.
+
 ## 1.7.1 — Safe performance optimization
 
 - Kept v1.7.0 assessment behavior, topic logic, adaptive routing, UI flow, and free hybrid voice choices unchanged.

@@ -165,3 +165,37 @@ def test_four_speakers_receive_four_free_voice_profiles_before_reuse():
         "piper:ru_RU-irina-medium",
         "piper:ru_RU-ruslan-medium",
     ]
+
+
+def test_provider_rate_limit_cooldown_is_shared_across_generation_stages(tmp_path):
+    import threading
+    from core.generation import HostedProvider
+    from core.config import Settings
+
+    shared = {}
+    lock = threading.RLock()
+    settings = Settings(
+        generation_provider="hf_then_groq",
+        verification_provider="auto",
+        hf_token="hf-test",
+        groq_api_key="groq-test",
+    )
+    author = HostedProvider(settings, "author", cooldown_state=shared, cooldown_lock=lock)
+    verifier = HostedProvider(settings, "verifier", cooldown_state=shared, cooldown_lock=lock)
+
+    author._mark_provider_cooldown("groq", "provider rate limit reached")
+
+    assert "groq" not in verifier._provider_order()
+    assert verifier.cooldown_remaining()["groq"] >= 89
+
+
+def test_retry_after_and_reset_headers_are_parsed_for_cooldown():
+    from types import SimpleNamespace
+    from core.generation import HostedProvider
+
+    exc = RuntimeError("429 Too Many Requests")
+    exc.response = SimpleNamespace(headers={
+        "retry-after": "4",
+        "x-ratelimit-reset-tokens": "1m17.5s",
+    })
+    assert HostedProvider._retry_delay_from_exception(exc) == 77.5

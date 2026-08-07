@@ -39,9 +39,11 @@ class Settings(BaseModel):
     hf_token: str | None = Field(default=None, exclude=True, repr=False)
     hf_bank_token: str | None = Field(default=None, exclude=True, repr=False)
     groq_api_key: str | None = Field(default=None, exclude=True, repr=False)
+    cerebras_api_key: str | None = Field(default=None, exclude=True, repr=False)
+    gemini_api_key: str | None = Field(default=None, exclude=True, repr=False)
 
     # Hybrid authoring/provider configuration.
-    generation_provider: str = "hf_then_groq"
+    generation_provider: str = "gemini_then_groq"
     verification_provider: str = "auto"
     enable_user_generation: bool = True
     hf_provider: str = "auto"
@@ -49,6 +51,13 @@ class Settings(BaseModel):
     hf_verifier_model: str = "openai/gpt-oss-20b"
     groq_model: str = "openai/gpt-oss-120b"
     groq_verifier_model: str = "openai/gpt-oss-20b"
+    cerebras_model: str = "gpt-oss-120b"
+    cerebras_verifier_model: str = "gpt-oss-120b"
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_verifier_model: str = "gemini-2.5-flash"
+    enable_hf_inference: bool = True
+    prefer_cerebras_if_available: bool = False
+    prefer_gemini_if_available: bool = True
     structured_output_mode: str = "auto"
     provider_timeout_seconds: int = Field(default=45, ge=5, le=180)
     provider_max_retries: int = Field(default=1, ge=0, le=6)
@@ -92,27 +101,40 @@ class Settings(BaseModel):
             raise ValueError(f"STORAGE_BACKEND must be one of: {', '.join(sorted(allowed))}")
         return value
 
+    @staticmethod
+    def _normalize_provider_chain(value: str, *, allow_auto: bool = False) -> str:
+        value = value.strip().lower()
+        aliases = {
+            "hf": "huggingface", "hf_only": "huggingface",
+            "groq_only": "groq", "cerebras_only": "cerebras", "gemini_only": "gemini",
+        }
+        value = aliases.get(value, value)
+        if allow_auto and value == "auto":
+            return value
+        if value in {"disabled", "mock"}:
+            return value
+        parts = value.split("_then_")
+        allowed_parts = {"huggingface", "hf", "groq", "cerebras", "gemini"}
+        if not parts or any(part not in allowed_parts for part in parts):
+            raise ValueError("Provider chain may contain only huggingface/hf, groq, cerebras, and gemini.")
+        normalized_for_uniqueness = ["huggingface" if part == "hf" else part for part in parts]
+        if len(set(normalized_for_uniqueness)) != len(normalized_for_uniqueness):
+            raise ValueError("Provider chain may not repeat a provider.")
+        # Preserve legacy composite spellings such as groq_then_hf so existing
+        # Space variables and regression expectations remain stable.
+        if len(parts) == 1 and parts[0] == "hf":
+            return "huggingface"
+        return "_then_".join(parts)
+
     @field_validator("generation_provider")
     @classmethod
     def validate_provider(cls, value: str) -> str:
-        allowed = {"disabled", "huggingface", "groq", "hf_then_groq", "groq_then_hf", "mock"}
-        value = value.strip().lower()
-        aliases = {"hf": "huggingface", "hf_only": "huggingface", "groq_only": "groq"}
-        value = aliases.get(value, value)
-        if value not in allowed:
-            raise ValueError(f"GENERATION_PROVIDER/GENAI_PROVIDER must be one of: {', '.join(sorted(allowed))}")
-        return value
+        return cls._normalize_provider_chain(value)
 
     @field_validator("verification_provider")
     @classmethod
     def validate_verifier_provider(cls, value: str) -> str:
-        allowed = {"auto", "huggingface", "groq", "hf_then_groq", "groq_then_hf", "mock"}
-        value = value.strip().lower()
-        aliases = {"hf": "huggingface", "hf_only": "huggingface", "groq_only": "groq"}
-        value = aliases.get(value, value)
-        if value not in allowed:
-            raise ValueError(f"VERIFICATION_PROVIDER must be one of: {', '.join(sorted(allowed))}")
-        return value
+        return cls._normalize_provider_chain(value, allow_auto=True)
 
     @field_validator("structured_output_mode")
     @classmethod
@@ -193,28 +215,45 @@ class Settings(BaseModel):
     def tts_voice_for(self, language: str) -> str:
         return self.mandarin_edge_tts_voice if language == "zh-CN" else self.edge_tts_voice
 
+    @staticmethod
+    def _provider_chain_to_order(chain: str) -> list[str]:
+        if chain == "disabled":
+            return []
+        if chain == "mock":
+            return ["mock"]
+        mapping = {"huggingface": "hf", "hf": "hf", "groq": "groq", "cerebras": "cerebras", "gemini": "gemini"}
+        return [mapping[part] for part in chain.split("_then_")]
+
     def _author_provider_order(self) -> list[str]:
-        return {
-            "huggingface": ["hf"],
-            "groq": ["groq"],
-            "hf_then_groq": ["hf", "groq"],
-            "groq_then_hf": ["groq", "hf"],
-            "mock": ["mock"],
-            "disabled": [],
-        }[self.generation_provider]
+        order = self._provider_chain_to_order(self.generation_provider)
+        # Existing Spaces commonly still have GENERATION_PROVIDER=hf_then_groq.
+        # When a Cerebras key is added, promote it automatically rather than
+        # requiring a second configuration change. Explicit single-provider
+        # choices remain explicit.
+        if (
+            self.gemini_api_key
+            and self.prefer_gemini_if_available
+            and len(order) > 1
+            and "gemini" not in order
+        ):
+            order.insert(0, "gemini")
+        if (
+            self.cerebras_api_key
+            and self.prefer_cerebras_if_available
+            and len(order) > 1
+            and "cerebras" not in order
+        ):
+            insert_at = 1 if order and order[0] == "gemini" else 0
+            order.insert(insert_at, "cerebras")
+        return order
 
     def verifier_provider_order(self) -> list[str]:
         if self.verification_provider == "auto":
             author = self._author_provider_order()
-            # Reverse the author order so a second configured provider is preferred for verification.
+            # Reverse the author order so a separately configured provider is
+            # preferred for auditing and blind verification.
             return list(reversed(author))
-        return {
-            "huggingface": ["hf"],
-            "groq": ["groq"],
-            "hf_then_groq": ["hf", "groq"],
-            "groq_then_hf": ["groq", "hf"],
-            "mock": ["mock"],
-        }[self.verification_provider]
+        return self._provider_chain_to_order(self.verification_provider)
 
     def model_warnings(self) -> list[str]:
         warnings: list[str] = []
@@ -239,6 +278,10 @@ class Settings(BaseModel):
                 provider == "hf" and self.hf_text_model == self.hf_verifier_model
             ) or (
                 provider == "groq" and self.groq_model == self.groq_verifier_model
+            ) or (
+                provider == "cerebras" and self.cerebras_model == self.cerebras_verifier_model
+            ) or (
+                provider == "gemini" and self.gemini_model == self.gemini_verifier_model
             )
             if same_model:
                 warnings.append(
@@ -254,15 +297,24 @@ class Settings(BaseModel):
         if self.generation_provider == "mock":
             return True, "Deterministic mock provider enabled for development/testing only."
         order = self._author_provider_order()
-        available = ("hf" in order and bool(self.hf_token)) or ("groq" in order and bool(self.groq_api_key))
+        available = (
+            ("hf" in order and self.enable_hf_inference and bool(self.hf_token))
+            or ("groq" in order and bool(self.groq_api_key))
+            or ("cerebras" in order and bool(self.cerebras_api_key))
+            or ("gemini" in order and bool(self.gemini_api_key))
+        )
         if not available:
             return False, "The configured provider has no matching API key/secret. Fresh-AI requests will fall back to the bank."
         warning = " ".join(self.model_warnings())
         providers: list[str] = []
-        if "hf" in order and self.hf_token:
-            providers.append(f"Hugging Face ({self.hf_text_model})")
+        if "gemini" in order and self.gemini_api_key:
+            providers.append(f"Gemini ({self.gemini_model})")
+        if "cerebras" in order and self.cerebras_api_key:
+            providers.append(f"Cerebras ({self.cerebras_model})")
         if "groq" in order and self.groq_api_key:
             providers.append(f"Groq ({self.groq_model})")
+        if "hf" in order and self.enable_hf_inference and self.hf_token:
+            providers.append(f"Hugging Face ({self.hf_text_model})")
         provider_text = " → ".join(providers) or "configured provider"
         message = (
             f"Fresh-AI generation is available through {provider_text}; accepted items will be audited, "
@@ -292,7 +344,7 @@ def _env_float(name: str, default: float) -> float:
 def get_settings() -> Settings:
     # GENERATION_PROVIDER is the new name. GENAI_PROVIDER remains a backward-compatible alias
     # for the original repository and existing Hugging Face Space configuration.
-    generation_provider = os.getenv("GENERATION_PROVIDER") or os.getenv("GENAI_PROVIDER") or "hf_then_groq"
+    generation_provider = os.getenv("GENERATION_PROVIDER") or os.getenv("GENAI_PROVIDER") or "gemini_then_groq"
     hf_dataset_repo = os.getenv("HF_DATASET_REPO") or None
     hf_token = os.getenv("HF_TOKEN") or None
     hf_bank_token = os.getenv("HF_BANK_TOKEN") or hf_token
@@ -339,6 +391,8 @@ def get_settings() -> Settings:
         hf_token=hf_token,
         hf_bank_token=hf_bank_token,
         groq_api_key=os.getenv("GROQ_API_KEY") or None,
+        cerebras_api_key=os.getenv("CEREBRAS_API_KEY") or None,
+        gemini_api_key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or None,
         generation_provider=generation_provider,
         verification_provider=os.getenv("VERIFICATION_PROVIDER", "auto"),
         enable_user_generation=_env_bool("ENABLE_USER_GENERATION", True),
@@ -347,6 +401,13 @@ def get_settings() -> Settings:
         hf_verifier_model=os.getenv("HF_VERIFIER_MODEL", "openai/gpt-oss-20b"),
         groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         groq_verifier_model=os.getenv("GROQ_VERIFIER_MODEL", "openai/gpt-oss-20b"),
+        cerebras_model=os.getenv("CEREBRAS_MODEL", "gpt-oss-120b"),
+        cerebras_verifier_model=os.getenv("CEREBRAS_VERIFIER_MODEL", "gpt-oss-120b"),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        gemini_verifier_model=os.getenv("GEMINI_VERIFIER_MODEL", "gemini-2.5-flash"),
+        enable_hf_inference=_env_bool("ENABLE_HF_INFERENCE", False),
+        prefer_cerebras_if_available=_env_bool("PREFER_CEREBRAS_IF_AVAILABLE", False),
+        prefer_gemini_if_available=_env_bool("PREFER_GEMINI_IF_AVAILABLE", True),
         structured_output_mode=os.getenv("STRUCTURED_OUTPUT_MODE", "auto"),
         provider_timeout_seconds=int(os.getenv("PROVIDER_TIMEOUT_SECONDS", "45")),
         provider_max_retries=int(os.getenv("PROVIDER_MAX_RETRIES", "1")),

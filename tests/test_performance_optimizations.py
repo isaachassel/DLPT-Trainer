@@ -162,3 +162,14 @@ def test_production_dialogue_segments_are_rendered_with_bounded_parallelism(monk
     assert output.exists()
     assert state["maximum"] >= 2
     assert state["maximum"] <= 3
+
+
+def test_prior_stable_v170_neural_audio_is_reused_without_regeneration():
+    asset = SimpleNamespace(
+        engine="hybrid-edge-piper",
+        engine_version="hybrid-edge-piper-dialogue-v5",
+        voice="ru-RU-DmitryNeural",
+        rate="+5%",
+        validated=True,
+    )
+    assert _canonical_audio_matches(asset, "ru-RU-DmitryNeural", "+5%") is True

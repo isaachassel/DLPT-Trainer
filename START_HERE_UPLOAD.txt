@@ -27,3 +27,22 @@ https://www.python.org/downloads/windows/
 
 During Python installation, select "Add Python to PATH", then run the BAT file
 again.
+
+AFTER THE SPACE REBUILDS - FRESH AI v1.7.3
+===========================================
+For the recommended all-free GenAI route, open the Space's
+Settings > Variables and secrets and add:
+
+  GEMINI_API_KEY   (free Google AI Studio API key)
+  GROQ_API_KEY     (keep your existing Groq key)
+  HF_BANK_TOKEN    (keep/use a write token for the private generated bank)
+
+Recommended variables:
+  GENERATION_PROVIDER=gemini_then_groq
+  VERIFICATION_PROVIDER=auto
+  ENABLE_HF_INFERENCE=false
+  PREFER_GEMINI_IF_AVAILABLE=true
+
+If your Space still has GENERATION_PROVIDER=hf_then_groq, v1.7.3 automatically
+promotes Gemini when GEMINI_API_KEY is present, but changing the variable to
+`gemini_then_groq` makes the intended routing explicit.

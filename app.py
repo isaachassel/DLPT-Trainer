@@ -10,6 +10,9 @@ import os
 # fully adequate for these small JSONL/MP3 bank assets and is more predictable.
 os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
+os.environ.setdefault("DO_NOT_TRACK", "1")
 
 from core.config import get_settings
 from ui.layout import CUSTOM_CSS, build_app

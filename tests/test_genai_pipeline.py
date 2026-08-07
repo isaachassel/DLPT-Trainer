@@ -470,3 +470,42 @@ def test_only_failed_question_is_repaired_before_listening_tts(project_root, tmp
     assert any("Repair only these failed questions: Q2" in prompt for prompt in author.question_prompts)
     assert result.questions[0].stem_en == "What is the main purpose of the announcement?"
     assert result.questions[1].stem_en == "When must an applicant submit the registration form?"
+
+
+class HostedSubsetProvider(HostedProvider):
+    def __init__(self, settings):
+        super().__init__(settings, "author")
+        self.fixture = MockProvider()
+        self.repair_requested = False
+
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        if schema is CandidateQuestionSet:
+            if "Repair only these failed questions" in prompt or "Repair the complete question set" in prompt:
+                self.repair_requested = True
+                raise AssertionError("Hosted valid-subset routing should not spend a repair call")
+            base = self.fixture.generate_json(system, prompt, schema, max_tokens=max_tokens, temperature=temperature)
+            questions = list(base.questions[:2])
+            questions[1] = questions[1].model_copy(update={
+                "choices": ["By Friday", "By Friday only", "After the first month", "Only after receiving an email"],
+            })
+            return CandidateQuestionSet(questions=questions)
+        return self.fixture.generate_json(system, prompt, schema, max_tokens=max_tokens, temperature=temperature)
+
+
+def test_hosted_generation_keeps_valid_question_subset_instead_of_extra_repair(project_root, tmp_path):
+    generated_path = tmp_path / "generated.jsonl"
+    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    settings = _settings(tmp_path)
+    author = HostedSubsetProvider(settings)
+    verifier = MockProvider()
+    service = LiveGenerationService(settings, bank, project_root, provider=author, verifier_provider=verifier)
+
+    result = service.generate_and_store(
+        skill="reading", level="2", mode="training", topics=["education"],
+        competencies=["main idea", "prominent detail"], maximum_questions=2,
+    )
+
+    assert author.repair_requested is False
+    assert result.repair_count == 0
+    assert len(result.questions) == 1
+    assert result.questions[0].stem_en == "What is the main purpose of the announcement?"

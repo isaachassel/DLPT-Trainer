@@ -384,3 +384,29 @@ Three simulated dialogue turns at 0.35 s each: ~0.48 s total with bounded parall
 ```
 
 These are local implementation benchmarks, not promises for hosted provider/network latency.
+
+
+## v1.7.2 provider-resilience and clean-startup results
+
+- 206 automated tests passed.
+- Gradio and Hugging Face telemetry are disabled before UI import; a clean local launch returned HTTP 200 for both the main page and startup-events endpoint without an invalid-file-descriptor traceback.
+- A Hugging Face strict structured-output 400 is remembered and later stages use the compatible mode rather than repeating the rejected request.
+- Hugging Face 402 and Groq 429 cooldowns are shared across author, verifier, and secondary-verifier adapters.
+- `Retry-After` and provider reset-header formats are parsed into bounded cooldown durations.
+- When every configured provider is cooling down, the callback selects an accepted bank item without attempting another hosted request.
+- Hosted generation can retain a locally valid question subset rather than issuing an immediate repair request for an otherwise usable batch.
+- Compatible v1.7.0 neural/hybrid audio is reused when voice and rate match; legacy eSpeak assets still upgrade.
+- Full multilingual bank validation, dependency validation, release-manifest verification, and the Gradio Space smoke test passed.
+
+## v1.7.3 free-GenAI routing and quota-resilience results
+
+- 215 automated tests passed.
+- Existing `GENERATION_PROVIDER=hf_then_groq` configuration automatically resolves to Gemini → Groq when `GEMINI_API_KEY` is present and production HF inference is disabled.
+- Gemini 2.5 Flash authoring uses the Developer API REST route with JSON-Schema structured output, zero thinking budget, usage accounting, redacted errors, and the shared provider cooldown circuit breaker.
+- Gemini 429 simulation falls through to Groq without losing the generation request; Groq remains the preferred independent verifier under `VERIFICATION_PROVIDER=auto`.
+- Hugging Face inference is disabled by default in production while the same HF credentials remain available to private Dataset bank persistence.
+- Optional Cerebras routing remains covered by adapter/schema/failover tests but is not part of the default all-free provider chain.
+- Full multilingual bank validation passed: 51 passages, 160 questions, 27 audio assets, and exactly 40 correct answers in each A/B/C/D position.
+- Space dependency validation and the 105-component Gradio smoke test passed.
+- A clean local app launch returned HTTP 200 for the main page and startup-events endpoint with no invalid-file-descriptor warning.
+- No live external API key was available in the release environment, so Gemini/Groq network inference itself was not charged or invoked during release QA; provider HTTP behavior is regression-tested with controlled responses.

@@ -18,7 +18,7 @@ Choose **Russian** or **Mandarin Chinese** before starting. Half of the bundled 
 
 > **Important:** This is not official DLPT material. It is not affiliated with DLIFLC, DoD, or any government testing authority. It does not generate an official score or DLPT prediction. Provisional working bands are for practice guidance only.
 
-### Audio behavior in v1.7.1
+### Audio behavior in v1.7.3
 
 The default **Automatic natural Russian voice** keeps Microsoft Edge TTS for the strongest free online voices: Dmitry and Svetlana. Single-speaker news, narration, announcements, and lectures remain one continuous recording. The app does not cut ordinary passages into sentence fragments.
 
@@ -26,7 +26,7 @@ The free Edge endpoint used by this Space does not currently accept `ru-RU-Dariy
 
 ## Hybrid multi-speaker listening audio
 
-Version 1.7.1 retains the two completely free engines introduced in v1.7.0:
+Version 1.7.3 retains the two completely free engines introduced in v1.7.0:
 
 - Microsoft Edge TTS: Dmitry and Svetlana
 - Local Piper TTS: Irina and Ruslan
@@ -45,9 +45,9 @@ Piper models are downloaded only when one of those supplemental voices is actual
 Fresh AI multi-speaker scripts are limited to two through four speakers and must use stable explicit labels. If a supplemental voice cannot load, automatic/canonical audio can fall back safely; an explicit Training selection reports the actual fallback rather than pretending the requested voice played.
 
 
-## Performance behavior in v1.7.1
+## Performance behavior in v1.7.3
 
-This release is a targeted optimization of the working v1.7.0 build rather than a redesign. Startup restores the generated JSONL bank immediately but no longer downloads every saved MP3. A generated Listening file is fetched only when selected, and that one file begins prefetching in the background while the learner reads.
+This release preserves the v1.7.1 performance design and v1.7.2 startup/provider resilience without changing assessment behavior. Startup restores the generated JSONL bank immediately but no longer downloads every saved MP3. A generated Listening file is fetched only when selected, and that one file begins prefetching in the background while the learner reads.
 
 The same selected-item prefetch warms any required neural Training or strict-mode upgrade. Multi-speaker Edge turns are rendered with a bounded three-request pool, while Piper remains serialized to protect free CPU memory. Fresh-AI Listening uses an explicit learner-selected Training voice and speed for its first durable render, so playback does not synthesize the same passage a second time when the requested profile already matches.
 
@@ -59,20 +59,38 @@ The topic selector now exposes only a stable set of broad DLPT-style categories.
 
 When the topic box is blank, the server favors underrepresented categories, strongly avoids the most recent Fresh-AI categories, and rejects repeated or near-repeated themes. Starter-bank file order is not treated as learner recency. Explicitly selected categories are still honored.
 
-Provider quota handling is also bounded: a Hugging Face 402 or Groq 429 activates a short provider cooldown instead of repeatedly calling the same unavailable free endpoint during every generation stage. Generated-bank startup downloads use a synchronous HTTP path to avoid the misleading asyncio finalizer tracebacks previously printed by some Spaces.
+Provider quota handling is also bounded: a Hugging Face 402 or Groq 429 activates a shared cooldown across authoring and verification stages instead of repeatedly calling the same unavailable free endpoint. If every configured provider is cooling down, Fresh AI immediately uses an accepted bank item. Structured-output 400 responses are remembered per provider/model so later stages reuse a compatible JSON mode rather than repeating a rejected request.
 
-## What happened to the original GenAI code
+## Runtime resilience in v1.7.3
 
-The original Hugging Face/Groq capability was **not removed**. The current release supports both providers, ordered fallback, user-requested fresh content, validation, TTS, and generated-bank storage.
+Gradio and Hugging Face telemetry are disabled before the interface is built. This removes the short-lived telemetry event loops that produced misleading `Invalid file descriptor: -1` cleanup tracebacks even though the Space had already returned HTTP 200. Expected free-tier quota and rate-limit recoveries are logged concisely, while unexpected application errors still remain visible.
 
-Real API secret values are never stored in the repository. Use the same secret names in a local `.env` or Hugging Face Space secrets:
+For hosted question generation, a valid verified subset may be retained when one question in a batch fails deterministic checks. This avoids an immediate repair call that can trigger Groq free-tier rate limits, while still requiring passage audit, local validation, and blind answer verification. Compatible v1.7.0 neural recordings are also reused when their voice and rate match, preventing needless Listening regeneration after an app upgrade.
+
+## Free GenAI routing in v1.7.3
+
+Fresh-AI authoring now defaults to **Gemini 2.5 Flash → Groq GPT-OSS** instead of spending Hugging Face Inference Providers credits first. Hugging Face remains the generated-bank storage layer, but hosted HF inference is disabled by default. This separation matters because a write-capable `HF_BANK_TOKEN` can keep the private Dataset bank durable without consuming the very small monthly HF inference allowance.
+
+Recommended free setup:
 
 ```text
-HF_TOKEN
-GROQ_API_KEY
+GEMINI_API_KEY=<free Google AI Studio key>
+GROQ_API_KEY=<existing Groq key>
+HF_BANK_TOKEN=<write-capable Hugging Face token for the private generated bank>
+GENERATION_PROVIDER=gemini_then_groq
+VERIFICATION_PROVIDER=auto
+ENABLE_HF_INFERENCE=false
 ```
 
-The original environment names `GENAI_PROVIDER`, `HF_PROVIDER`, `HF_TEXT_MODEL`, and `GROQ_MODEL` remain supported. `GENERATION_PROVIDER` is the preferred replacement for `GENAI_PROVIDER` and takes precedence when both exist.
+With `VERIFICATION_PROVIDER=auto`, authoring prefers Gemini while passage audits and blind answer verification prefer Groq. This spreads the multi-stage workload across independent providers instead of spending Groq's per-minute GPT-OSS token budget on passage authoring, question authoring, and verification back-to-back. If one provider is rate-limited, the existing cooldown/circuit-breaker path uses the other provider or immediately falls back to the validated bank.
+
+Existing Spaces that still contain `GENERATION_PROVIDER=hf_then_groq` do not have to be reconfigured immediately: when `GEMINI_API_KEY` is present and `PREFER_GEMINI_IF_AVAILABLE=true`, v1.7.3 automatically promotes Gemini ahead of that legacy chain while `ENABLE_HF_INFERENCE=false` keeps HF inference out of normal generation. Setting `GENERATION_PROVIDER=gemini_then_groq` is still recommended for clarity.
+
+Cerebras REST support is included only as an optional alternate route for users who already have usable credits/access; it is **not** part of the default all-free configuration.
+
+Google's Gemini free tier is free of charge but its pricing terms state that free-tier content may be used to improve Google products. Do not put private or sensitive learner information into generation prompts. This app's normal prompts contain assessment-generation instructions and target-language content rather than learner identity data.
+
+Real API secret values are never stored in the repository. The original `GENAI_PROVIDER`, `HF_PROVIDER`, `HF_TEXT_MODEL`, and `GROQ_MODEL` environment names remain supported. `GENERATION_PROVIDER` is the preferred replacement for `GENAI_PROVIDER` and takes precedence when both exist.
 
 The original prompt file was not preserved line-for-line. Valuable level-specific Reading/Listening rules were rebuilt in `core/prompts.py`; unsafe fixed answer-letter sequences, fragile JSON extraction, overreliance on paragraph/word counts, and author self-verification were intentionally removed. See `docs/GENAI_AUDIT.md` for the exact audit and migration.
 
@@ -269,36 +287,43 @@ Production dependencies live in `requirements.txt`. Test-only packages such as `
 
 ## Enabling live generation locally
 
-Add at least one key to `.env`:
+For the recommended no-cost routing, add Gemini and Groq keys to `.env`:
 
 ```text
 ENABLE_USER_GENERATION=true
-GENERATION_PROVIDER=hf_then_groq
+GENERATION_PROVIDER=gemini_then_groq
 VERIFICATION_PROVIDER=auto
-HF_TOKEN=your_hugging_face_token
+GEMINI_API_KEY=your_google_ai_studio_key
 GROQ_API_KEY=your_groq_key
+ENABLE_HF_INFERENCE=false
 ```
 
-One matching key is sufficient. When both are present, `VERIFICATION_PROVIDER=auto` prefers the reverse provider order for auditing and blind verification.
+A single matching generation key is enough to enable Fresh AI; using both Gemini and Groq is strongly recommended because it provides independent author/verifier routing and better quota resilience. Hugging Face bank persistence is configured separately with `HF_BANK_TOKEN` (preferred) or the backwards-compatible `HF_TOKEN`.
 
 Current defaults:
 
 ```text
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_VERIFIER_MODEL=gemini-2.5-flash
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_VERIFIER_MODEL=openai/gpt-oss-20b
 HF_PROVIDER=auto
 HF_TEXT_MODEL=openai/gpt-oss-120b
 HF_VERIFIER_MODEL=openai/gpt-oss-20b
-GROQ_MODEL=openai/gpt-oss-120b
-GROQ_VERIFIER_MODEL=openai/gpt-oss-20b
+ENABLE_HF_INFERENCE=false
+PREFER_GEMINI_IF_AVAILABLE=true
 STRUCTURED_OUTPUT_MODE=auto
 ```
 
 Original configuration remains compatible:
 
 ```text
-GENAI_PROVIDER=hf_then_groq
+GENAI_PROVIDER=gemini_then_groq
+GEMINI_MODEL=gemini-2.5-flash
+GROQ_MODEL=your_supported_model
+# Optional legacy HF inference route:
 HF_PROVIDER=auto
 HF_TEXT_MODEL=your_supported_model
-GROQ_MODEL=your_supported_model
 ```
 
 Do not set both `GENERATION_PROVIDER` and `GENAI_PROVIDER` to conflicting values.
@@ -309,10 +334,10 @@ Do not set both `GENERATION_PROVIDER` and `GENAI_PROVIDER` to conflicting values
 MAX_GENERATION_REQUESTS_PER_SESSION=8
 GENERATION_CONCURRENCY_LIMIT=1
 PROVIDER_TIMEOUT_SECONDS=45
-PROVIDER_MAX_RETRIES=2
-MAX_PROVIDER_ATTEMPTS_PER_STAGE=8
+PROVIDER_MAX_RETRIES=1
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
 GENERATION_AUDIT_MODE=always
-GENERATION_REPAIR_ATTEMPTS=1
+GENERATION_REPAIR_ATTEMPTS=2
 SECOND_VERIFIER_HIGH_RISK=true
 AUTHORING_TEMPERATURE=0.25
 VERIFICATION_TEMPERATURE=0.0
@@ -343,28 +368,32 @@ None for bank-only operation.
 
 ### Fresh-AI secrets
 
-At least one:
+Recommended:
 
 ```text
-HF_TOKEN
+GEMINI_API_KEY
 GROQ_API_KEY
 ```
+
+`GEMINI_API_KEY` is the primary authoring route and `GROQ_API_KEY` provides independent verification/fallback. Fresh AI can still operate with only one of them, but two-provider routing is more reliable. Use `HF_BANK_TOKEN` separately for durable private Dataset persistence.
 
 ### Recommended Space variables
 
 ```text
 ENABLE_USER_GENERATION=true
-GENERATION_PROVIDER=hf_then_groq
+GENERATION_PROVIDER=gemini_then_groq
 VERIFICATION_PROVIDER=auto
+ENABLE_HF_INFERENCE=false
+PREFER_GEMINI_IF_AVAILABLE=true
 STRUCTURED_OUTPUT_MODE=auto
 GENERATION_AUDIT_MODE=always
-GENERATION_REPAIR_ATTEMPTS=1
+GENERATION_REPAIR_ATTEMPTS=2
 SECOND_VERIFIER_HIGH_RISK=true
 MAX_GENERATION_REQUESTS_PER_SESSION=8
 GENERATION_CONCURRENCY_LIMIT=1
 PROVIDER_TIMEOUT_SECONDS=45
-PROVIDER_MAX_RETRIES=2
-MAX_PROVIDER_ATTEMPTS_PER_STAGE=8
+PROVIDER_MAX_RETRIES=1
+MAX_PROVIDER_ATTEMPTS_PER_STAGE=4
 QUEUE_CONCURRENCY_LIMIT=4
 ALLOW_PLAIN_JSON_FALLBACK=true
 GENERATION_DIAGNOSTICS=true
@@ -448,7 +477,7 @@ Confirm:
 - `MAX_GENERATION_REQUESTS_PER_SESSION` is above zero;
 - the candidate is not being rejected by validation or duplicate checks.
 
-For Hugging Face generation, the token must be authorized to make Inference Providers calls. A read-only repository token can exist yet still fail hosted inference.
+For optional Hugging Face generation (`ENABLE_HF_INFERENCE=true`), the token must be authorized to make Inference Providers calls. A repository token can remain perfectly valid for the generated-bank Dataset while hosted HF inference is unavailable or out of monthly credits.
 
 The active-session banner now distinguishes:
 

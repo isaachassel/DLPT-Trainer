@@ -76,7 +76,7 @@ class GenerationValidationError(RuntimeError):
 def _redact_error(value: object, settings: Settings | None = None, limit: int = 1000) -> str:
     text = str(value)
     if settings is not None:
-        for secret in (settings.hf_token, settings.groq_api_key):
+        for secret in (settings.hf_token, settings.groq_api_key, settings.cerebras_api_key, settings.gemini_api_key):
             if secret:
                 text = text.replace(secret, "[REDACTED]")
     text = re.sub(r"(?i)(authorization|api[_ -]?key|token)([=: ]+)([^\s,;]+)", r"\1\2[REDACTED]", text)
@@ -663,38 +663,130 @@ class HostedProvider(AuthoringProvider):
                 return False
             return True
 
-    def _mark_provider_cooldown(self, provider: str, friendly_reason: str) -> None:
+    @staticmethod
+    def _duration_header_seconds(value: object) -> float | None:
+        """Parse Retry-After and Groq reset headers such as ``17`` or ``2m59.5s``."""
+
+        if value is None:
+            return None
+        text = str(value).strip().lower()
+        if not text:
+            return None
+        try:
+            return max(0.0, float(text))
+        except ValueError:
+            pass
+        match = re.fullmatch(
+            r"(?:(?P<hours>\d+(?:\.\d+)?)h)?"
+            r"(?:(?P<minutes>\d+(?:\.\d+)?)m)?"
+            r"(?:(?P<seconds>\d+(?:\.\d+)?)s)?",
+            text,
+        )
+        if not match:
+            return None
+        return (
+            float(match.group("hours") or 0.0) * 3600.0
+            + float(match.group("minutes") or 0.0) * 60.0
+            + float(match.group("seconds") or 0.0)
+        )
+
+    @classmethod
+    def _retry_delay_from_exception(cls, exc: Exception) -> float | None:
+        response = getattr(exc, "response", None)
+        headers = getattr(response, "headers", None) or getattr(exc, "headers", None) or {}
+        candidates: list[float] = []
+        for name in (
+            "retry-after",
+            "x-ratelimit-reset-tokens",
+            "x-ratelimit-reset-requests",
+        ):
+            try:
+                raw = headers.get(name)
+            except Exception:
+                raw = None
+            parsed = cls._duration_header_seconds(raw)
+            if parsed is not None:
+                candidates.append(parsed)
+        return max(candidates) if candidates else None
+
+    def _mark_provider_cooldown(
+        self, provider: str, friendly_reason: str, exc: Exception | None = None
+    ) -> None:
         lower = friendly_reason.casefold()
-        if "authentication" in lower or "permission" in lower or "credits/quota" in lower:
-            seconds = 15 * 60
+        if "authentication" in lower or "permission" in lower:
+            seconds = 6 * 60 * 60
+        elif "credits/quota" in lower:
+            seconds = 60 * 60
         elif "rate limit" in lower:
-            seconds = 20
+            provider_delay = self._retry_delay_from_exception(exc) if exc is not None else None
+            # A missing Retry-After generally means a token-window limit rather
+            # than a one-request burst. One minute prevents repeated failed
+            # Fresh-AI attempts while still allowing the bank to respond instantly.
+            seconds = min(10 * 60, max(90.0, (provider_delay or 0.0) + 1.0))
         elif "timed out" in lower:
-            seconds = 5
+            seconds = 10
         else:
             return
         with self._cooldown_lock:
             self._provider_cooldowns[provider] = max(
                 self._provider_cooldowns.get(provider, 0.0), time.monotonic() + seconds
             )
-        LOGGER.info("Provider cooldown activated provider=%s seconds=%s reason=%s", provider, seconds, friendly_reason)
+        LOGGER.info(
+            "Provider cooldown activated provider=%s seconds=%s reason=%s",
+            provider, int(seconds), friendly_reason,
+        )
 
-    def __init__(self, settings: Settings, purpose: Literal["author", "verifier", "secondary_verifier"] = "author"):
+    def __init__(
+        self,
+        settings: Settings,
+        purpose: Literal["author", "verifier", "secondary_verifier"] = "author",
+        *,
+        cooldown_state: dict[str, float] | None = None,
+        cooldown_lock: threading.RLock | None = None,
+        request_completion_state: dict[str, float] | None = None,
+        request_gate_lock: threading.Lock | None = None,
+    ):
         super().__init__()
         self.settings = settings
         self.purpose = purpose
         self._hf = None
         self._groq = None
+        self._cerebras = None
+        self._gemini = None
         self.last_provider = "unknown"
         self.last_model = "unknown"
         self.last_mode = "unknown"
         self.last_errors: list[str] = []
         self._mode_cache: dict[tuple[str, str], str] = {}
-        # Cooldowns are kept for the lifetime of this provider adapter. This is
-        # long enough to prevent repeated quota/rate-limit calls across one app
-        # session without leaking failures across independent instances/tests.
-        self._provider_cooldowns: dict[str, float] = {}
-        self._cooldown_lock = threading.RLock()
+        self._mode_blacklist: dict[tuple[str, str], set[str]] = {}
+        # The generation service shares this registry across author and verifier
+        # adapters. A quota/rate-limit response therefore stops all stages from
+        # hammering the same free account, while separately constructed test or
+        # custom-provider instances remain isolated.
+        self._provider_cooldowns = cooldown_state if cooldown_state is not None else {}
+        self._cooldown_lock = cooldown_lock if cooldown_lock is not None else threading.RLock()
+        self._request_completion_state = request_completion_state if request_completion_state is not None else {}
+        self._request_gate_lock = request_gate_lock if request_gate_lock is not None else threading.Lock()
+
+    def _wait_for_provider_gap(self, provider: str) -> None:
+        """Leave a short quiet gap between Groq calls across all pipeline stages.
+
+        Free-tier 429s in production were occurring when a repair/verifier call
+        started immediately after a successful question call. A bounded 0.8 s
+        post-response gap is much cheaper than a failed request plus bank fallback.
+        """
+
+        minimum_gap = 0.8 if provider == "groq" else 0.0
+        if minimum_gap <= 0:
+            return
+        with self._request_gate_lock:
+            remaining = minimum_gap - (time.monotonic() - self._request_completion_state.get(provider, 0.0))
+            if remaining > 0:
+                time.sleep(remaining)
+
+    def _record_provider_completion(self, provider: str) -> None:
+        with self._request_gate_lock:
+            self._request_completion_state[provider] = time.monotonic()
 
     def _provider_order(self) -> list[str]:
         if self.purpose == "author":
@@ -705,13 +797,31 @@ class HostedProvider(AuthoringProvider):
                 configured = list(reversed(configured))
         available = [
             name for name in configured
-            if (name == "hf" and self.settings.hf_token) or (name == "groq" and self.settings.groq_api_key)
+            if (name == "hf" and self.settings.enable_hf_inference and self.settings.hf_token)
+            or (name == "groq" and self.settings.groq_api_key)
+            or (name == "cerebras" and self.settings.cerebras_api_key)
+            or (name == "gemini" and self.settings.gemini_api_key)
         ]
         return [name for name in available if not self._provider_is_cooling_down(name)]
+
+    def cooldown_remaining(self) -> dict[str, int]:
+        """Return active provider cooldowns in whole seconds for UI routing."""
+
+        now = time.monotonic()
+        with self._cooldown_lock:
+            return {
+                provider: max(1, int(until - now))
+                for provider, until in self._provider_cooldowns.items()
+                if until > now
+            }
 
     def _model_for(self, provider: str) -> str:
         if provider == "hf":
             return self.settings.hf_text_model if self.purpose == "author" else self.settings.hf_verifier_model
+        if provider == "cerebras":
+            return self.settings.cerebras_model if self.purpose == "author" else self.settings.cerebras_verifier_model
+        if provider == "gemini":
+            return self.settings.gemini_model if self.purpose == "author" else self.settings.gemini_verifier_model
         return self.settings.groq_model if self.purpose == "author" else self.settings.groq_verifier_model
 
     @staticmethod
@@ -882,6 +992,129 @@ class HostedProvider(AuthoringProvider):
         self.usage.add_tokens(prompt_tokens, completion_tokens)
         return self._response_text(response)
 
+
+    def _call_gemini(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        model: str,
+        response_format: dict[str, Any] | None,
+        max_tokens: int,
+        temperature: float,
+    ) -> str:
+        """Call the Gemini Developer API free tier using the stable generateContent REST API."""
+        import httpx
+
+        if not self.settings.gemini_api_key:
+            raise ProviderError("Gemini generation was selected but GEMINI_API_KEY is unavailable.")
+        if self._gemini is None:
+            self._gemini = httpx.Client(
+                base_url="https://generativelanguage.googleapis.com",
+                headers={
+                    "x-goog-api-key": self.settings.gemini_api_key,
+                    "Content-Type": "application/json",
+                },
+                timeout=self.settings.provider_timeout_seconds,
+            )
+        generation_config: dict[str, Any] = {
+            "temperature": temperature,
+            "topP": 0.9,
+            "maxOutputTokens": max_tokens,
+            # Gemini 2.5 Flash supports disabling thinking; this keeps assessment
+            # generation fast and avoids consuming quota on hidden reasoning.
+            "thinkingConfig": {"thinkingBudget": 0},
+        }
+        if response_format is not None:
+            if response_format.get("type") == "json_schema":
+                generation_config["responseFormat"] = {
+                    "text": {
+                        "mimeType": "application/json",
+                        "schema": response_format["json_schema"]["schema"],
+                    }
+                }
+            elif response_format.get("type") == "json_object":
+                generation_config["responseFormat"] = {
+                    "text": {"mimeType": "application/json"}
+                }
+        payload = {
+            "systemInstruction": {"parts": [{"text": system}]},
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": generation_config,
+        }
+        self.usage.start_call()
+        response = self._gemini.post(f"/v1beta/models/{model}:generateContent", json=payload)
+        response.raise_for_status()
+        data = response.json()
+        usage = data.get("usageMetadata") or {}
+        self.usage.add_tokens(usage.get("promptTokenCount"), usage.get("candidatesTokenCount"))
+        try:
+            parts = data["candidates"][0]["content"]["parts"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ProviderError("Gemini returned no usable assistant message.") from exc
+        text = "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
+        if not text.strip():
+            raise ProviderError("Gemini returned an empty assistant message.")
+        return text
+
+    def _call_cerebras(
+        self,
+        system: str,
+        prompt: str,
+        *,
+        model: str,
+        response_format: dict[str, Any] | None,
+        max_tokens: int,
+        temperature: float,
+    ) -> str:
+        """Call Cerebras' OpenAI-compatible endpoint without another heavy SDK.
+
+        This route is optional and is not part of the default all-free provider
+        chain. Keeping the adapter on httpx avoids adding another runtime dependency
+        for users who choose to configure a Cerebras key.
+        """
+        import httpx
+
+        if not self.settings.cerebras_api_key:
+            raise ProviderError("Cerebras generation was selected but CEREBRAS_API_KEY is unavailable.")
+        if self._cerebras is None:
+            self._cerebras = httpx.Client(
+                base_url="https://api.cerebras.ai",
+                headers={
+                    "Authorization": f"Bearer {self.settings.cerebras_api_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=self.settings.provider_timeout_seconds,
+            )
+        payload: dict[str, Any] = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "max_completion_tokens": max_tokens,
+            "temperature": temperature,
+            "top_p": 0.9,
+            "stream": False,
+        }
+        if model == "gpt-oss-120b":
+            payload["reasoning_effort"] = "low"
+        if response_format is not None:
+            payload["response_format"] = response_format
+        self.usage.start_call()
+        response = self._cerebras.post("/v1/chat/completions", json=payload)
+        response.raise_for_status()
+        data = response.json()
+        usage = data.get("usage") or {}
+        self.usage.add_tokens(usage.get("prompt_tokens"), usage.get("completion_tokens"))
+        try:
+            content = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ProviderError("Cerebras returned no usable assistant message.") from exc
+        if isinstance(content, str):
+            return content
+        return json.dumps(content, ensure_ascii=False)
+
     def _response_modes(self, provider: str, model: str) -> list[str]:
         configured = self.settings.structured_output_mode
         if configured == "strict":
@@ -894,23 +1127,50 @@ class HostedProvider(AuthoringProvider):
             modes = ["strict", "best_effort", "json_object"]
         if self.settings.allow_plain_json_fallback and configured != "strict":
             modes.append("plain_json")
-        cached = self._mode_cache.get((provider, model))
+        key = (provider, model)
+        blocked = self._mode_blacklist.get(key, set())
+        modes = [mode for mode in modes if mode not in blocked]
+        if not modes and self.settings.allow_plain_json_fallback:
+            modes = ["plain_json"]
+        cached = self._mode_cache.get(key)
         if cached in modes:
             modes = [cached] + [mode for mode in modes if mode != cached]
         return modes
 
     @staticmethod
-    def _response_format(schema: type[BaseModel], mode: str) -> dict[str, Any] | None:
+    def _cerebras_schema(schema: type[BaseModel]) -> dict[str, Any]:
+        """Remove JSON-Schema keywords unsupported by Cerebras strict decoding.
+
+        Pydantic length/item constraints remain enforced locally after generation;
+        the provider only needs the structural contract for constrained decoding.
+        """
+        raw = schema.model_json_schema(by_alias=True)
+        unsupported = {"minItems", "maxItems", "pattern", "format"}
+
+        def clean(value: Any) -> Any:
+            if isinstance(value, dict):
+                return {key: clean(item) for key, item in value.items() if key not in unsupported}
+            if isinstance(value, list):
+                return [clean(item) for item in value]
+            return value
+
+        return clean(raw)
+
+    @classmethod
+    def _response_format(
+        cls, schema: type[BaseModel], mode: str, provider: str | None = None
+    ) -> dict[str, Any] | None:
         if mode == "plain_json":
             return None
         if mode == "json_object":
             return {"type": "json_object"}
+        provider_schema = cls._cerebras_schema(schema) if provider == "cerebras" else schema.model_json_schema(by_alias=True)
         return {
             "type": "json_schema",
             "json_schema": {
                 "name": re.sub(r"[^A-Za-z0-9_-]", "_", schema.__name__)[:64],
                 "description": f"Structured output for {schema.__name__}",
-                "schema": schema.model_json_schema(by_alias=True),
+                "schema": provider_schema,
                 "strict": mode == "strict",
             },
         }
@@ -930,11 +1190,13 @@ class HostedProvider(AuthoringProvider):
         if "401" in lower or "unauthorized" in lower:
             return "authentication failed; verify the secret value"
         if "403" in lower or "forbidden" in lower:
-            return "token lacks Inference Providers permission or provider access"
+            return "provider access is forbidden; verify this API key and model access"
         if "402" in lower or "payment required" in lower or "credits" in lower:
             return "provider credits/quota are unavailable"
         if "429" in lower or "rate limit" in lower:
             return "provider rate limit reached"
+        if "400" in lower or "bad request" in lower:
+            return "provider rejected this structured-output request"
         if "404" in lower or "not found" in lower:
             return "configured model/provider route was not found"
         if "timeout" in lower or "timed out" in lower:
@@ -969,7 +1231,8 @@ class HostedProvider(AuthoringProvider):
             if self.settings.generation_provider == "disabled":
                 raise ProviderError("Live generation is disabled; validated bank content remains available.")
             raise ProviderError(
-                "No configured live provider is ready. Add an HF_TOKEN with Inference Providers permission and/or GROQ_API_KEY."
+                "No configured live provider is ready. Add GEMINI_API_KEY and/or GROQ_API_KEY. "
+                "HF inference is optional and disabled by default because its free credits are monthly."
             )
         max_tokens = int(max_tokens or 3200)
         temperature = float(
@@ -996,7 +1259,7 @@ class HostedProvider(AuthoringProvider):
                 self.last_provider = "huggingface" if provider == "hf" else provider
                 self.last_model = model
                 self.last_mode = mode
-                response_format = self._response_format(schema, mode)
+                response_format = self._response_format(schema, mode, provider)
                 request_prompt = prompt
                 if mode in {"json_object", "plain_json"}:
                     request_prompt += self._schema_instruction(schema)
@@ -1006,25 +1269,30 @@ class HostedProvider(AuthoringProvider):
                         self.purpose, schema.__name__, provider, model, mode, stage_attempts, attempt_cap,
                     )
                 try:
-                    text = (
-                        self._call_hf(
-                            system,
-                            request_prompt,
-                            model=model,
-                            response_format=response_format,
-                            max_tokens=max_tokens,
-                            temperature=temperature,
-                        )
-                        if provider == "hf"
-                        else self._call_groq(
-                            system,
-                            request_prompt,
-                            model=model,
-                            response_format=response_format,
-                            max_tokens=max_tokens,
-                            temperature=temperature,
-                        )
-                    )
+                    self._wait_for_provider_gap(provider)
+                    try:
+                        if provider == "hf":
+                            text = self._call_hf(
+                                system, request_prompt, model=model, response_format=response_format,
+                                max_tokens=max_tokens, temperature=temperature,
+                            )
+                        elif provider == "gemini":
+                            text = self._call_gemini(
+                                system, request_prompt, model=model, response_format=response_format,
+                                max_tokens=max_tokens, temperature=temperature,
+                            )
+                        elif provider == "cerebras":
+                            text = self._call_cerebras(
+                                system, request_prompt, model=model, response_format=response_format,
+                                max_tokens=max_tokens, temperature=temperature,
+                            )
+                        else:
+                            text = self._call_groq(
+                                system, request_prompt, model=model, response_format=response_format,
+                                max_tokens=max_tokens, temperature=temperature,
+                            )
+                    finally:
+                        self._record_provider_completion(provider)
                     parsed = self._parse_structured_text(text, schema)
                     self._mode_cache[(provider, model)] = mode
                     self.last_errors = errors[-8:]
@@ -1036,11 +1304,28 @@ class HostedProvider(AuthoringProvider):
                     return parsed
                 except Exception as exc:
                     safe = self._friendly_error(exc)
-                    self._mark_provider_cooldown(provider, safe)
+                    compatibility_failure = (
+                        "structured-output request" in safe
+                        and mode in {"strict", "best_effort", "json_object"}
+                    )
+                    if compatibility_failure:
+                        key = (provider, model)
+                        self._mode_blacklist.setdefault(key, set()).add(mode)
+                        remaining = [
+                            candidate
+                            for candidate in ("best_effort", "json_object", "plain_json")
+                            if candidate not in self._mode_blacklist[key]
+                            and (candidate != "plain_json" or self.settings.allow_plain_json_fallback)
+                        ]
+                        if remaining:
+                            self._mode_cache[key] = remaining[0]
+                    else:
+                        self._mark_provider_cooldown(provider, safe, exc)
                     entry = f"{provider}/{model}/{mode}:{type(exc).__name__}:{safe}"
                     errors.append(entry)
                     if self.settings.generation_diagnostics:
-                        LOGGER.warning(
+                        log = LOGGER.info if compatibility_failure else LOGGER.warning
+                        log(
                             "GenAI attempt failed purpose=%s schema=%s provider=%s model=%s mode=%s reason=%s",
                             self.purpose, schema.__name__, provider, model, mode, safe,
                         )
@@ -1490,6 +1775,33 @@ def _question_issue_indices(issues: list[str], question_count: int) -> list[int]
     return sorted(indices)
 
 
+def _prunable_question_indices(issues: list[str], question_count: int) -> tuple[list[int], list[str]]:
+    """Split question-local failures from bundle-wide failures.
+
+    Fresh providers occasionally return two strong questions plus one malformed
+    distractor set. Keeping the independently valid questions is safer and much
+    cheaper than immediately spending another free-provider request to rewrite
+    the entire bundle. Count shortfalls are intentionally soft because sessions
+    continue until their configured total-question target is reached.
+    """
+
+    local = _question_issue_indices(issues, question_count)
+    global_issues = [
+        issue for issue in issues
+        if not re.match(r"q\d+:", issue)
+        and not issue.startswith("question_count_must_be_exactly_")
+    ]
+    return local, global_issues
+
+
+def _question_subset(
+    question_set: CandidateQuestionSet, keep_indices: list[int]
+) -> CandidateQuestionSet:
+    return CandidateQuestionSet(
+        questions=[question_set.questions[index] for index in keep_indices]
+    )
+
+
 def _merge_question_repairs(
     original: CandidateQuestionSet,
     replacements: CandidateQuestionSet,
@@ -1809,21 +2121,80 @@ class LiveGenerationService:
         self.settings = settings
         self.bank = bank
         self.project_root = Path(project_root)
-        self.provider = provider or (MockProvider() if settings.generation_provider == "mock" else HostedProvider(settings, "author"))
+        shared_cooldowns: dict[str, float] = {}
+        shared_cooldown_lock = threading.RLock()
+        shared_request_completions: dict[str, float] = {}
+        shared_request_gate_lock = threading.Lock()
+        self.provider = provider or (
+            MockProvider()
+            if settings.generation_provider == "mock"
+            else HostedProvider(
+                settings,
+                "author",
+                cooldown_state=shared_cooldowns,
+                cooldown_lock=shared_cooldown_lock,
+                request_completion_state=shared_request_completions,
+                request_gate_lock=shared_request_gate_lock,
+            )
+        )
         if verifier_provider is not None:
             self.verifier_provider = verifier_provider
         elif provider is not None:
             self.verifier_provider = provider
         else:
-            self.verifier_provider = MockProvider() if settings.generation_provider == "mock" else HostedProvider(settings, "verifier")
+            self.verifier_provider = (
+                MockProvider()
+                if settings.generation_provider == "mock"
+                else HostedProvider(
+                    settings,
+                    "verifier",
+                    cooldown_state=shared_cooldowns,
+                    cooldown_lock=shared_cooldown_lock,
+                    request_completion_state=shared_request_completions,
+                    request_gate_lock=shared_request_gate_lock,
+                )
+            )
         if secondary_verifier_provider is not None:
             self.secondary_verifier_provider = secondary_verifier_provider
         elif provider is not None:
             self.secondary_verifier_provider = provider
         else:
-            self.secondary_verifier_provider = MockProvider() if settings.generation_provider == "mock" else HostedProvider(settings, "secondary_verifier")
+            self.secondary_verifier_provider = (
+                MockProvider()
+                if settings.generation_provider == "mock"
+                else HostedProvider(
+                    settings,
+                    "secondary_verifier",
+                    cooldown_state=shared_cooldowns,
+                    cooldown_lock=shared_cooldown_lock,
+                    request_completion_state=shared_request_completions,
+                    request_gate_lock=shared_request_gate_lock,
+                )
+            )
         self._semaphore = threading.BoundedSemaphore(settings.generation_concurrency_limit)
         self._quarantine_lock = threading.RLock()
+
+    def runtime_provider_readiness(self) -> tuple[bool, str]:
+        """Report whether an authoring provider is currently usable.
+
+        Configuration readiness only says that keys exist. This runtime check
+        prevents a learner from waiting through another doomed Fresh-AI request
+        while every free provider is already in a quota/rate-limit cooldown.
+        """
+
+        if self.settings.generation_provider == "mock" or not isinstance(self.provider, HostedProvider):
+            return True, "Provider ready."
+        if self.provider._provider_order():
+            return True, "Provider ready."
+        cooldowns = self.provider.cooldown_remaining()
+        if not cooldowns:
+            return False, "No configured provider is currently available."
+        wait = min(cooldowns.values())
+        names = ", ".join(sorted(cooldowns))
+        return False, (
+            f"Fresh-AI providers are temporarily cooling down after a free-tier "
+            f"quota or rate-limit response ({names}; about {wait} seconds remaining)."
+        )
 
     def _quarantine(self, payload: dict[str, Any]) -> None:
         path = self.settings.quarantine_runtime_path(self.project_root) / "live_generation_failures.jsonl"
@@ -2106,6 +2477,22 @@ class LiveGenerationService:
             temperature=min(self.settings.authoring_temperature, 0.15),
         ))
         trace.add("question_generation", "received", count=len(question_set.questions), desired_count=desired_count)
+        if len(question_set.questions) > desired_count:
+            question_set = CandidateQuestionSet(questions=question_set.questions[:desired_count])
+            trace.add(
+                "question_count_normalization", "trimmed_excess",
+                retained=desired_count,
+            )
+        elif len(question_set.questions) < desired_count:
+            # Desired count is a passage-length recommendation, not a psychometric
+            # requirement. One to three validated Listening questions (or one to
+            # five Reading questions) remain operational and the session simply
+            # selects another passage sooner.
+            desired_count = len(question_set.questions)
+            trace.add(
+                "question_count_normalization", "accepted_shortfall",
+                retained=desired_count,
+            )
 
         last_issues: list[str] = []
         for attempt in range(self.settings.generation_repair_attempts + 1):
@@ -2126,6 +2513,35 @@ class LiveGenerationService:
                 desired_count=desired_count,
                 requested_level=level,
             )
+            local_bad, global_issues = _prunable_question_indices(issues, len(questions))
+            if (
+                isinstance(self.provider, HostedProvider)
+                and local_bad
+                and not global_issues
+                and len(local_bad) < len(questions)
+            ):
+                keep_indices = [index for index in range(len(questions)) if index not in set(local_bad)]
+                question_set = _question_subset(question_set, keep_indices)
+                desired_count = len(question_set.questions)
+                passage, questions = materialize_candidate(
+                    candidate_passage,
+                    question_set,
+                    passage_id,
+                    skill,
+                    requested_level=level,
+                    generation_metadata=metadata,
+                    shuffle=False,
+                    language=language,
+                )
+                issues = validate_candidate_questions(
+                    question_set, passage, questions,
+                    desired_count=desired_count, requested_level=level,
+                )
+                trace.add(
+                    "question_local_pruning", "accepted_valid_subset",
+                    removed_indices=[index + 1 for index in local_bad],
+                    retained=desired_count,
+                )
             primary_reports: list[ValidationReport] = []
             secondary_reports: list[ValidationReport | None] = [None for _ in questions]
             if not issues:
@@ -2184,6 +2600,40 @@ class LiveGenerationService:
                             f"q{original_index + 1}:secondary:{item}"
                             for item in second.failure_reasons + second.ambiguity_flags
                         )
+                verifier_bad, verifier_global = _prunable_question_indices(issues, len(questions))
+                if (
+                    isinstance(self.provider, HostedProvider)
+                    and verifier_bad
+                    and not verifier_global
+                    and len(verifier_bad) < len(questions)
+                ):
+                    keep_indices = [
+                        index for index in range(len(questions))
+                        if index not in set(verifier_bad)
+                    ]
+                    question_set = _question_subset(question_set, keep_indices)
+                    primary_reports = [primary_reports[index] for index in keep_indices]
+                    secondary_reports = [secondary_reports[index] for index in keep_indices]
+                    desired_count = len(question_set.questions)
+                    passage, questions = materialize_candidate(
+                        candidate_passage,
+                        question_set,
+                        passage_id,
+                        skill,
+                        requested_level=level,
+                        generation_metadata=metadata,
+                        shuffle=False,
+                        language=language,
+                    )
+                    issues = validate_candidate_questions(
+                        question_set, passage, questions,
+                        desired_count=desired_count, requested_level=level,
+                    )
+                    trace.add(
+                        "question_verifier_pruning", "accepted_verified_subset",
+                        removed_indices=[index + 1 for index in verifier_bad],
+                        retained=desired_count,
+                    )
             if not issues:
                 passage_report = validate_passage(passage, questions)
                 if passage_report.status != "accepted":

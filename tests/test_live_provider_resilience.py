@@ -132,7 +132,7 @@ def test_provider_error_message_explains_permission_problem(monkeypatch):
     monkeypatch.setattr(provider, "_call_hf", forbidden)
     with pytest.raises(Exception) as caught:
         provider.generate_json(AUTHORING_SYSTEM, "Target ILR: 1", CandidatePassageDraft)
-    assert "Inference Providers permission" in str(caught.value)
+    assert "provider access is forbidden" in str(caught.value)
     assert "hf-test" not in str(caught.value)
 
 
@@ -317,3 +317,36 @@ def test_full_live_service_accepts_realistic_question_variants_and_persists(proj
     assert len(bank.get_questions(result.passage.id)) == 2
     assert all(question.target_ilr == "2" for question in bank.get_questions(result.passage.id))
     assert any("Create exactly" in prompt for prompt in calls)
+
+
+def test_hf_bad_request_downgrades_structured_mode_for_following_stage(monkeypatch):
+    from core.config import Settings
+    from core.generation import CandidatePassageDraft, HostedProvider, MockProvider
+
+    settings = Settings(
+        generation_provider="huggingface",
+        hf_token="hf-test",
+        structured_output_mode="auto",
+        max_provider_attempts_per_stage=4,
+        provider_max_retries=0,
+    )
+    provider = HostedProvider(settings, "author")
+    fixture = MockProvider().generate_json("", "", CandidatePassageDraft)
+    calls = []
+
+    def fake_hf(system, prompt, *, model, response_format, max_tokens, temperature):
+        calls.append(response_format)
+        strict = bool(
+            response_format
+            and response_format.get("type") == "json_schema"
+            and response_format.get("json_schema", {}).get("strict") is True
+        )
+        if strict:
+            raise RuntimeError("400 Bad Request")
+        return fixture.model_dump_json()
+
+    monkeypatch.setattr(provider, "_call_hf", fake_hf)
+    result = provider.generate_json("system", "prompt", CandidatePassageDraft)
+    assert result.passage_ru
+    assert len(calls) == 2
+    assert provider._response_modes("hf", settings.hf_text_model)[0] == "best_effort"

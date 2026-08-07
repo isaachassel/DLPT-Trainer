@@ -3,6 +3,7 @@ from __future__ import annotations
 import atexit
 import html
 import logging
+import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -462,6 +463,7 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
     _progress(progress, 0.18, "Checking content source and reusable bank…")
     if state.content_source == "fresh_ai_preferred":
         ready, readiness_message = SETTINGS.provider_readiness()
+        runtime_ready, runtime_message = GENERATOR.runtime_provider_readiness()
         if not ready:
             state.bank_fallback_count += 1
             state.last_content_note = f"Fresh AI was requested but unavailable: {readiness_message} Bank fallback loaded immediately."
@@ -470,6 +472,13 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
             state.last_content_note = (
                 f"The per-session live-generation limit ({SETTINGS.max_generation_requests_per_session}) was reached. "
                 "A validated bank item was loaded instead."
+            )
+        elif not runtime_ready:
+            state.bank_fallback_count += 1
+            state.last_content_note = f"{runtime_message} A validated bank item loaded immediately instead."
+            LOGGER.info(
+                "Fresh generation skipped during provider cooldown session=%s skill=%s",
+                state.session_id, state.active_skill,
             )
         else:
             state.generation_requests += 1
@@ -527,8 +536,9 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                 # learner UI. A rejected AI draft is a recovered content event,
                 # not a learner/session error.
                 state.last_error = None
-                LOGGER.warning(
-                    "Fresh generation failed; using bank fallback session=%s skill=%s error_type=%s reason=%s",
+                log = LOGGER.info if isinstance(exc, ProviderError) else LOGGER.warning
+                log(
+                    "Fresh generation recovered with bank fallback session=%s skill=%s error_type=%s reason=%s",
                     state.session_id, state.active_skill, type(exc).__name__, str(exc)[:500],
                 )
                 pipeline_stage = str(getattr(exc, "pipeline_stage", "") or "").strip()
@@ -1117,7 +1127,7 @@ def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> N
             )
         return
 
-    if asset.engine_version == DIALOGUE_TTS_ASSET_VERSION:
+    if _is_compatible_neural_asset(asset):
         return
     voice, rate, pitch, volume = _natural_voice_profile(passage, SETTINGS)
     key = f"strict:{passage.content_hash}:{voice}:{rate}"
@@ -1133,10 +1143,29 @@ def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> N
     )
 
 
+def _is_compatible_neural_asset(asset) -> bool:
+    """Recognize validated neural audio from the current and prior stable pipeline.
+
+    v1.7.1 changed the cache signature for performance work, but that should not
+    force a perfectly valid v1.7.0 MP3 to be synthesized again. Versions v5 and
+    newer include the corrected dialogue-duration and speaker-routing behavior.
+    """
+
+    if not asset or not bool(getattr(asset, "validated", True)):
+        return False
+    version = str(getattr(asset, "engine_version", "") or "")
+    if version == DIALOGUE_TTS_ASSET_VERSION:
+        return True
+    engine = str(getattr(asset, "engine", "") or "").strip().casefold()
+    if engine not in {"edge-tts", "edge tts", "hybrid-edge-piper"}:
+        return False
+    match = re.search(r"hybrid-edge-piper-dialogue-v(\d+)", version)
+    return bool(match and int(match.group(1)) >= 5)
+
+
 def _canonical_audio_matches(asset, voice: str, rate: str) -> bool:
     return bool(
-        asset
-        and asset.engine_version == DIALOGUE_TTS_ASSET_VERSION
+        _is_compatible_neural_asset(asset)
         and asset.voice == voice
         and asset.rate == rate
     )
@@ -1225,7 +1254,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
             # Strict modes use the canonical bank recording. Older assets receive
             # one lazy neural upgrade, but learner voice preferences never affect
             # Diagnostic or Simulation audio.
-            if asset.engine.lower() not in {"edge-tts", "edge tts", "hybrid-edge-piper"} or asset.engine_version != DIALOGUE_TTS_ASSET_VERSION:
+            if not _is_compatible_neural_asset(asset):
                 try:
                     _progress(progress, 0.42, "Preparing the canonical native neural recording…")
                     voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)

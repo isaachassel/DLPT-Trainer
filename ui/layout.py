@@ -102,7 +102,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role='radio'
 
 
 def build_app() -> gr.Blocks:
-    with gr.Blocks(title="Russian & Mandarin Adaptive Proficiency Practice") as demo:
+    with gr.Blocks(
+        title="Russian & Mandarin Adaptive Proficiency Practice",
+        analytics_enabled=False,
+    ) as demo:
         with gr.Column(elem_classes=["app-shell"]):
             gr.Markdown("# Russian & Mandarin Adaptive Proficiency Practice")
             gr.Markdown(DISCLAIMER, elem_classes=["disclaimer"])
