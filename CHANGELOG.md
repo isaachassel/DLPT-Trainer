@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.7.6 - Gemini Catalog Routing Fix
+
+- Fixed a runtime bug where Gemini model discovery succeeded but the adapter could still call a stale/preferred model instead of the stable model actually exposed to the Space's API key.
+- The Gemini author route now prefers `gemini-2.5-flash` when Google's live catalog exposes it, then other discovered Flash-family models.
+- Added dual structured-output compatibility: stable 2.x/3.1 routes use `responseMimeType` + `responseJsonSchema`; newer routes can use `responseFormat`, with automatic alternate-format retry on HTTP 400.
+- A model-specific 400/404 now tries another discovered Gemini model before falling back to Groq, reducing unnecessary Groq TPM pressure.
+- Gemini diagnostics now log the actual candidate list, selected runtime model, schema style, and sanitized Google error detail.
+- GenAI success logs now report the actual runtime-selected model rather than the configured placeholder.
+- Added regression coverage using the exact model-catalog shape observed in the deployed Space log.
+
 ## v1.7.5 - Gemini Runtime Discovery + Dialogue Cache Repair
 
 - Replaced hard-coded Gemini 2.5 routing with runtime `models.list` discovery using the configured Space secret, so the app selects a `generateContent` model that the exact Google project/key actually exposes.

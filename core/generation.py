@@ -1047,7 +1047,7 @@ class HostedProvider(AuthoringProvider):
                 headers={
                     "x-goog-api-key": self.settings.gemini_api_key,
                     "Content-Type": "application/json",
-                    "x-goog-api-client": "dlpt-trainer/1.7.5",
+                    "x-goog-api-client": "dlpt-trainer/1.7.6",
                 },
                 timeout=self.settings.provider_timeout_seconds,
             )
@@ -1129,30 +1129,87 @@ class HostedProvider(AuthoringProvider):
         return models
 
     def _gemini_candidates(self, requested: str, *, refresh: bool = False) -> list[str]:
+        """Return only models this exact key advertised via models.list.
+
+        Prefer the stable Gemini 2.5 Flash route first because it is broadly
+        available on free-tier projects and supports structured outputs on the
+        legacy generateContent endpoint. Preview/latest aliases remain fallbacks.
+        A configured model is never called unless it was actually returned by
+        Google's catalog for this key/project.
+        """
+
         available = self._discover_gemini_models(refresh=refresh)
+        available_set = set(available)
         preference = [
-            requested,
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
-            "gemini-3.5-flash-lite",
-            "gemini-3.1-flash-lite",
             "gemini-2.5-flash",
+            "gemini-3.1-flash-lite",
             "gemini-2.5-flash-lite",
+            "gemini-3-flash-preview",
+            "gemini-flash-latest",
+            requested,
+            "gemini-2.5-pro",
+            "gemini-pro-latest",
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
         ]
         selected: list[str] = []
         for name in preference:
-            if name in available and name not in selected:
+            if name and name in available_set and name not in selected:
                 selected.append(name)
-        # Future-proofing: if Google changes the catalog again, prefer a stable
-        # Flash-family text model returned by the project rather than failing.
+        # Future-proofing: if Google changes the catalog again, use another
+        # text Flash model that the project actually advertised.
         for name in available:
             lowered = name.casefold()
-            if "flash" in lowered and "preview" not in lowered and name not in selected:
+            if "flash" in lowered and name not in selected:
                 selected.append(name)
         for name in available:
             if name not in selected:
                 selected.append(name)
-        return selected[:6]
+        return selected[:8]
+
+    def _gemini_generation_config(
+        self,
+        *,
+        response_format: dict[str, Any] | None,
+        max_tokens: int,
+        temperature: float,
+        schema_style: str,
+    ) -> dict[str, Any]:
+        """Build a generateContent config using a provider-compatible JSON mode.
+
+        Gemini's legacy generateContent endpoint still accepts
+        responseMimeType/responseJsonSchema for the stable 2.5 family, while
+        newer model families can expose responseFormat. We support both and
+        retry the alternate representation on a 400 compatibility rejection.
+        """
+
+        config: dict[str, Any] = {
+            "maxOutputTokens": max_tokens,
+            "temperature": temperature,
+        }
+        if response_format is None:
+            return config
+
+        if response_format.get("type") == "json_schema":
+            schema = self._gemini_json_schema(response_format["json_schema"]["schema"])
+            if schema_style == "response_format":
+                config["responseFormat"] = {
+                    "text": {
+                        "mimeType": "application/json",
+                        "schema": schema,
+                    }
+                }
+            else:
+                config["responseMimeType"] = "application/json"
+                config["responseJsonSchema"] = schema
+        elif response_format.get("type") == "json_object":
+            if schema_style == "response_format":
+                config["responseFormat"] = {
+                    "text": {"mimeType": "application/json"}
+                }
+            else:
+                config["responseMimeType"] = "application/json"
+        return config
 
     def _call_gemini(
         self,
@@ -1164,91 +1221,119 @@ class HostedProvider(AuthoringProvider):
         max_tokens: int,
         temperature: float,
     ) -> str:
-        """Call Gemini through the current generateContent REST contract.
+        """Call Gemini using only models advertised to this API key/project.
 
-        The runtime discovers the model catalog exposed to the configured key
-        instead of assuming a particular generation name remains available.
+        Model discovery and payload compatibility are both handled here. A
+        model-specific 400/404 no longer ejects the whole Gemini provider and
+        burns Groq quota; the adapter tries the next compatible discovered
+        model first.
         """
 
         client = self._ensure_gemini_client()
-        generation_config: dict[str, Any] = {
-            "maxOutputTokens": max_tokens,
-        }
-        if response_format is not None:
-            if response_format.get("type") == "json_schema":
-                generation_config["responseFormat"] = {
-                    "text": {
-                        "mimeType": "application/json",
-                        "schema": self._gemini_json_schema(response_format["json_schema"]["schema"]),
-                    }
-                }
-            elif response_format.get("type") == "json_object":
-                generation_config["responseFormat"] = {
-                    "text": {"mimeType": "application/json"}
-                }
-        payload = {
-            "systemInstruction": {"parts": [{"text": system}]},
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": generation_config,
-        }
         self.usage.start_call()
         candidates = self._gemini_candidates(model)
-        response = None
+        LOGGER.info("Gemini runtime candidates requested=%s candidates=%s", model, candidates)
         last_error: Exception | None = None
         refreshed = False
-        for candidate_model in candidates:
-            try:
-                current = client.post(f"/v1beta/models/{candidate_model}:generateContent", json=payload)
+
+        for candidate_model in list(candidates):
+            # Stable 2.x/3.1 families are most compatible with the legacy
+            # responseMimeType/responseJsonSchema representation. Newer 3.6+
+            # models prefer responseFormat. If either rejects the schema, retry
+            # the alternate representation before abandoning Gemini.
+            styles = (
+                ["response_format", "legacy"]
+                if candidate_model.startswith("gemini-3.6")
+                else ["legacy", "response_format"]
+            )
+            if response_format is None:
+                styles = ["legacy"]
+
+            for schema_style in styles:
+                generation_config = self._gemini_generation_config(
+                    response_format=response_format,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    schema_style=schema_style,
+                )
+                payload = {
+                    "systemInstruction": {"parts": [{"text": system}]},
+                    "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                    "generationConfig": generation_config,
+                }
+                current = client.post(
+                    f"/v1beta/models/{candidate_model}:generateContent",
+                    json=payload,
+                )
                 status_code, message = self._gemini_http_error(current)
+
+                if status_code < 400:
+                    response = current
+                    self.last_model = candidate_model
+                    LOGGER.info(
+                        "Gemini runtime model selected requested=%s actual=%s schema_style=%s",
+                        model,
+                        candidate_model,
+                        schema_style,
+                    )
+                    data = response.json()
+                    usage = data.get("usageMetadata") or {}
+                    self.usage.add_tokens(usage.get("promptTokenCount"), usage.get("candidatesTokenCount"))
+                    try:
+                        parts = data["candidates"][0]["content"]["parts"]
+                    except (KeyError, IndexError, TypeError) as exc:
+                        raise ProviderError("Gemini returned no usable assistant message.") from exc
+                    text = "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
+                    if not text.strip():
+                        raise ProviderError("Gemini returned an empty assistant message.")
+                    return text
+
+                safe_detail = re.sub(r"\s+", " ", message or "request rejected")[:300]
+                LOGGER.info(
+                    "Gemini candidate rejected model=%s schema_style=%s status=%s detail=%s",
+                    candidate_model,
+                    schema_style,
+                    status_code,
+                    safe_detail,
+                )
+
+                if status_code in {401, 403}:
+                    raise ProviderError(
+                        f"Gemini API key/project rejected the request (HTTP {status_code}): {safe_detail}"
+                    )
+                if status_code == 400:
+                    lower = safe_detail.casefold()
+                    if "api key" in lower or "permission" in lower or "credential" in lower:
+                        raise ProviderError(
+                            f"Gemini API key/project rejected the request (HTTP 400): {safe_detail}"
+                        )
+                    last_error = ProviderError(
+                        f"Gemini model {candidate_model} rejected the {schema_style} request (HTTP 400): {safe_detail}"
+                    )
+                    # Try the alternate structured-output representation, then
+                    # another model from the project catalog.
+                    continue
                 if status_code == 404:
                     last_error = ProviderError(
-                        f"Gemini model {candidate_model} was not available to this project: {message or 'not found'}"
+                        f"Gemini model {candidate_model} was not available to this project: {safe_detail}"
                     )
                     if not refreshed:
-                        # The model catalog can change while a long-running Space is
-                        # alive. Refresh once, then continue with the new list.
                         refreshed = True
                         try:
-                            refreshed_candidates = self._gemini_candidates(model, refresh=True)
-                            for discovered in refreshed_candidates:
+                            for discovered in self._gemini_candidates(model, refresh=True):
                                 if discovered not in candidates:
                                     candidates.append(discovered)
                         except Exception:
                             pass
-                    continue
-                if status_code >= 400:
-                    if status_code in {400, 401, 403}:
-                        lower = message.casefold()
-                        if "api key" in lower or "permission" in lower or "credential" in lower:
-                            raise ProviderError(
-                                f"Gemini API key/project rejected the request (HTTP {status_code}): "
-                                f"{message or 'authentication failed'}"
-                            )
-                    raise ProviderError(f"Gemini HTTP {status_code}: {message or 'request rejected'}")
-                response = current
-                self.last_model = candidate_model
-                if candidate_model != model:
-                    LOGGER.info(
-                        "Gemini runtime model selected requested=%s actual=%s", model, candidate_model
-                    )
-                break
-            except ProviderError as exc:
-                last_error = exc
-                if "not available to this project" not in str(exc):
-                    raise
-        if response is None:
-            raise last_error or ProviderError("Gemini returned no response.")
-        data = response.json()
-        usage = data.get("usageMetadata") or {}
-        self.usage.add_tokens(usage.get("promptTokenCount"), usage.get("candidatesTokenCount"))
-        try:
-            parts = data["candidates"][0]["content"]["parts"]
-        except (KeyError, IndexError, TypeError) as exc:
-            raise ProviderError("Gemini returned no usable assistant message.") from exc
-        text = "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
-        if not text.strip():
-            raise ProviderError("Gemini returned an empty assistant message.")
-        return text
+                    break
+                if status_code == 429:
+                    raise ProviderError(f"Gemini HTTP 429: {safe_detail}")
+                if status_code >= 500:
+                    last_error = ProviderError(f"Gemini HTTP {status_code}: {safe_detail}")
+                    break
+                raise ProviderError(f"Gemini HTTP {status_code}: {safe_detail}")
+
+        raise last_error or ProviderError("Gemini returned no usable response from discovered models.")
 
     def _call_cerebras(
         self,
@@ -1489,12 +1574,13 @@ class HostedProvider(AuthoringProvider):
                     finally:
                         self._record_provider_completion(provider)
                     parsed = self._parse_structured_text(text, schema)
-                    self._mode_cache[(provider, model)] = mode
+                    actual_model = self.last_model or model
+                    self._mode_cache[(provider, actual_model)] = mode
                     self.last_errors = errors[-8:]
                     if self.settings.generation_diagnostics:
                         LOGGER.info(
                             "GenAI success purpose=%s schema=%s provider=%s model=%s mode=%s",
-                            self.purpose, schema.__name__, provider, model, mode,
+                            self.purpose, schema.__name__, provider, actual_model, mode,
                         )
                     return parsed
                 except Exception as exc:

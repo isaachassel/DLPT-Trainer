@@ -230,3 +230,110 @@ def test_gemini_model_discovery_reports_key_rejection_clearly():
         assert "API key/project was rejected" in str(exc)
         assert "403" in str(exc)
 
+
+
+def test_gemini_runtime_discovery_uses_actual_user_catalog_not_stale_36_default():
+    """Regression for the Aug-2026 Space log: catalog had 2.5 Flash, not 3.6."""
+    settings = Settings(
+        generation_provider="gemini",
+        gemini_api_key="gemini-test",
+        gemini_model="gemini-3.6-flash",
+    )
+    provider = HostedProvider(settings, "author")
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.text = json.dumps(payload)
+        def json(self):
+            return self._payload
+
+    class FakeClient:
+        def get(self, path, params=None):
+            return FakeResponse(200, {
+                "models": [
+                    {"name": "models/gemini-2.5-flash", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-2.5-pro", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-flash-latest", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-2.5-flash-lite", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-3-flash-preview", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-3.1-flash-lite", "supportedGenerationMethods": ["generateContent"]},
+                ]
+            })
+
+        def post(self, path, json):
+            calls.append((path, json))
+            assert path == "/v1beta/models/gemini-2.5-flash:generateContent"
+            config = json["generationConfig"]
+            assert config["responseMimeType"] == "application/json"
+            assert "responseJsonSchema" in config
+            assert "responseFormat" not in config
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {},
+            })
+
+    provider._gemini = FakeClient()
+    fmt = HostedProvider._response_format(CandidatePassageDraft, "strict", "gemini")
+    text = provider._call_gemini(
+        AUTHORING_SYSTEM,
+        "Target ILR: 1",
+        model="gemini-3.6-flash",
+        response_format=fmt,
+        max_tokens=1200,
+        temperature=0.2,
+    )
+    assert json.loads(text)["target_ilr"] == "1"
+    assert len(calls) == 1
+    assert provider.last_model == "gemini-2.5-flash"
+
+
+def test_gemini_400_schema_compatibility_retries_alternate_format_before_groq():
+    settings = Settings(
+        generation_provider="gemini",
+        gemini_api_key="gemini-test",
+        gemini_model="gemini-2.5-flash",
+    )
+    provider = HostedProvider(settings, "author")
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.text = json.dumps(payload)
+        def json(self):
+            return self._payload
+
+    class FakeClient:
+        def get(self, path, params=None):
+            return FakeResponse(200, {
+                "models": [
+                    {"name": "models/gemini-2.5-flash", "supportedGenerationMethods": ["generateContent"]},
+                ]
+            })
+
+        def post(self, path, json):
+            calls.append(json["generationConfig"])
+            if len(calls) == 1:
+                return FakeResponse(400, {"error": {"message": "Unknown name responseJsonSchema"}})
+            assert "responseFormat" in json["generationConfig"]
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {},
+            })
+
+    provider._gemini = FakeClient()
+    fmt = HostedProvider._response_format(CandidatePassageDraft, "strict", "gemini")
+    text = provider._call_gemini(
+        AUTHORING_SYSTEM,
+        "Target ILR: 1",
+        model="gemini-2.5-flash",
+        response_format=fmt,
+        max_tokens=1200,
+        temperature=0.2,
+    )
+    assert json.loads(text)["target_ilr"] == "1"
+    assert len(calls) == 2
