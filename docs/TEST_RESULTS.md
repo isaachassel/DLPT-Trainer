@@ -1,5 +1,17 @@
 # Test Results
 
+Executed for the v1.7.8 provider-cleanup/performance release on 2026-08-08.
+
+## Current release automated suite
+
+```text
+236 passed
+```
+
+Version 1.7.8 additionally verifies shared Gemini runtime model memory across author/verifier adapters, a current `gemini-3.1-flash-lite` default, Groq transport-schema simplification, same-provider JSON-object recovery after a batched-verifier structured-output 400, and immediate prefetch of the selected Training speed for Fresh-AI Listening items.
+
+---
+
 Executed for the v1.5.1 generated-content recovery release on 2026-08-03.
 
 ## Automated unit/integration suite

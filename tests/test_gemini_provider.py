@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 
 from core.config import Settings, get_settings
-from core.generation import AUTHORING_SYSTEM, CandidatePassageDraft, CandidateQuestionSet, HostedProvider
+from core.generation import AUTHORING_SYSTEM, CandidatePassageDraft, CandidateQuestionSet, GeminiRuntimeState, HostedProvider
 
 
 def _passage_json() -> str:
@@ -204,8 +204,8 @@ def test_gemini_discovery_skips_unavailable_configured_model_without_404_loop():
         response_format=fmt, max_tokens=1200, temperature=0.2,
     )
     assert json.loads(text)["target_ilr"] == "1"
-    assert calls == ["/v1beta/models/gemini-3.6-flash:generateContent"]
-    assert provider.last_model == "gemini-3.6-flash"
+    assert calls == ["/v1beta/models/gemini-3.5-flash-lite:generateContent"]
+    assert provider.last_model == "gemini-3.5-flash-lite"
 
 
 def test_gemini_model_discovery_reports_key_rejection_clearly():
@@ -265,7 +265,7 @@ def test_gemini_runtime_discovery_uses_actual_user_catalog_not_stale_36_default(
 
         def post(self, path, json):
             calls.append((path, json))
-            assert path == "/v1beta/models/gemini-2.5-flash:generateContent"
+            assert path == "/v1beta/models/gemini-3.1-flash-lite:generateContent"
             config = json["generationConfig"]
             assert config["responseMimeType"] == "application/json"
             assert "responseJsonSchema" in config
@@ -287,7 +287,7 @@ def test_gemini_runtime_discovery_uses_actual_user_catalog_not_stale_36_default(
     )
     assert json.loads(text)["target_ilr"] == "1"
     assert len(calls) == 1
-    assert provider.last_model == "gemini-2.5-flash"
+    assert provider.last_model == "gemini-3.1-flash-lite"
 
 
 def test_gemini_400_schema_compatibility_retries_alternate_format_before_groq():
@@ -392,4 +392,73 @@ def test_gemini_remembers_retired_model_and_reuses_working_runtime_model():
         "/v1beta/models/gemini-3.1-flash-lite:generateContent",
     ]
     assert gets == ["/v1beta/models"]
-    assert provider._gemini_preferred_model == "gemini-3.1-flash-lite"
+    assert provider._gemini_runtime.preferred_model == "gemini-3.1-flash-lite"
+
+
+def test_gemini_runtime_model_memory_is_shared_across_pipeline_adapters():
+    settings = Settings(
+        generation_provider="gemini_then_groq",
+        gemini_api_key="gemini-test",
+        groq_api_key="groq-test",
+        gemini_model="gemini-2.5-flash",
+        gemini_verifier_model="gemini-2.5-flash",
+    )
+    shared = GeminiRuntimeState()
+    author = HostedProvider(settings, "author", gemini_runtime_state=shared)
+    verifier = HostedProvider(settings, "verifier", gemini_runtime_state=shared)
+    gets: list[str] = []
+    posts: list[str] = []
+
+    class FakeResponse:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.text = json.dumps(payload)
+        def json(self):
+            return self._payload
+
+    class FakeClient:
+        def get(self, path, params=None):
+            gets.append(path)
+            return FakeResponse(200, {
+                "models": [
+                    {"name": "models/gemini-2.5-flash", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-3.1-flash-lite", "supportedGenerationMethods": ["generateContent"]},
+                ]
+            })
+
+        def post(self, path, json):
+            posts.append(path)
+            if "gemini-2.5-flash:" in path:
+                return FakeResponse(404, {"error": {"message": "This model is no longer available to new users."}})
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {},
+            })
+
+    author._gemini = FakeClient()
+    verifier._gemini = FakeClient()
+    fmt = HostedProvider._response_format(CandidatePassageDraft, "strict", "gemini")
+    author._call_gemini(
+        AUTHORING_SYSTEM, "Target ILR: 1", model="gemini-2.5-flash",
+        response_format=fmt, max_tokens=1200, temperature=0.2,
+    )
+    verifier._call_gemini(
+        AUTHORING_SYSTEM, "Target ILR: 1", model="gemini-2.5-flash",
+        response_format=fmt, max_tokens=1200, temperature=0.0,
+    )
+
+    assert gets == ["/v1beta/models"]
+    assert posts == [
+        "/v1beta/models/gemini-2.5-flash:generateContent",
+        "/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        "/v1beta/models/gemini-3.1-flash-lite:generateContent",
+    ]
+    assert shared.preferred_model == "gemini-3.1-flash-lite"
+    assert "gemini-2.5-flash" in shared.rejected_models
+
+
+def test_default_gemini_model_is_current_low_latency_flash_lite():
+    settings = Settings()
+    assert settings.gemini_model == "gemini-3.1-flash-lite"
+    assert settings.gemini_verifier_model == "gemini-3.1-flash-lite"

@@ -381,6 +381,24 @@ class BlindVerificationBatch(CandidateModel):
 
 
 @dataclass
+class GeminiRuntimeState:
+    """Process-wide Gemini discovery state shared by all pipeline adapters.
+
+    The author, verifier, and secondary verifier use separate HostedProvider
+    instances so their provider order can differ.  Model availability, however,
+    belongs to the API key/project, not to an individual stage. Sharing this state
+    prevents each adapter from rediscovering the catalog or retrying an alias that
+    Google already rejected for this running Space.
+    """
+
+    catalog: tuple[str, ...] | None = None
+    checked_at: float = 0.0
+    rejected_models: set[str] = field(default_factory=set)
+    preferred_model: str | None = None
+    lock: threading.RLock = field(default_factory=threading.RLock)
+
+
+@dataclass
 class ProviderUsage:
     calls: int = 0
     input_tokens: int = 0
@@ -746,6 +764,7 @@ class HostedProvider(AuthoringProvider):
         cooldown_lock: threading.RLock | None = None,
         request_completion_state: dict[str, float] | None = None,
         request_gate_lock: threading.Lock | None = None,
+        gemini_runtime_state: GeminiRuntimeState | None = None,
     ):
         super().__init__()
         self.settings = settings
@@ -754,10 +773,7 @@ class HostedProvider(AuthoringProvider):
         self._groq = None
         self._cerebras = None
         self._gemini = None
-        self._gemini_model_catalog: tuple[str, ...] | None = None
-        self._gemini_catalog_checked_at = 0.0
-        self._gemini_rejected_models: set[str] = set()
-        self._gemini_preferred_model: str | None = None
+        self._gemini_runtime = gemini_runtime_state or GeminiRuntimeState()
         self.last_provider = "unknown"
         self.last_model = "unknown"
         self.last_mode = "unknown"
@@ -1050,7 +1066,7 @@ class HostedProvider(AuthoringProvider):
                 headers={
                     "x-goog-api-key": self.settings.gemini_api_key,
                     "Content-Type": "application/json",
-                    "x-goog-api-client": "dlpt-trainer/1.7.7",
+                    "x-goog-api-client": "dlpt-trainer/1.7.8",
                 },
                 timeout=self.settings.provider_timeout_seconds,
             )
@@ -1086,18 +1102,19 @@ class HostedProvider(AuthoringProvider):
     def _discover_gemini_models(self, *, refresh: bool = False) -> tuple[str, ...]:
         """Ask Google which generateContent models this exact API key can use.
 
-        Model access can differ by project, region, key type, and API lifecycle.
-        Discovery prevents the app from repeatedly guessing model IDs that return
-        404 and gives an actionable auth error when the key itself is rejected.
+        The catalog is shared across author/verifier adapters because model access
+        belongs to the API key/project. A 30-minute cache avoids repeated model-list
+        calls during a learner session.
         """
 
         now = time.monotonic()
-        if (
-            not refresh
-            and self._gemini_model_catalog is not None
-            and now - self._gemini_catalog_checked_at < 30 * 60
-        ):
-            return self._gemini_model_catalog
+        with self._gemini_runtime.lock:
+            if (
+                not refresh
+                and self._gemini_runtime.catalog is not None
+                and now - self._gemini_runtime.checked_at < 30 * 60
+            ):
+                return self._gemini_runtime.catalog
 
         client = self._ensure_gemini_client()
         response = client.get("/v1beta/models", params={"pageSize": 1000})
@@ -1119,12 +1136,10 @@ class HostedProvider(AuthoringProvider):
             for name in [self._usable_gemini_model_name(item)]
             if name
         )
-        self._gemini_model_catalog = models
-        self._gemini_catalog_checked_at = now
-        LOGGER.info(
-            "Gemini model discovery ready usable_models=%s",
-            list(models[:16]),
-        )
+        with self._gemini_runtime.lock:
+            self._gemini_runtime.catalog = models
+            self._gemini_runtime.checked_at = now
+        LOGGER.info("Gemini model discovery ready usable_models=%s", list(models[:16]))
         if not models:
             raise ProviderError(
                 "Gemini API key is accepted, but Google returned no text generateContent models for this project."
@@ -1132,52 +1147,49 @@ class HostedProvider(AuthoringProvider):
         return models
 
     def _gemini_candidates(self, requested: str, *, refresh: bool = False) -> list[str]:
-        """Return only models this exact key advertised via models.list.
+        """Choose the lowest-latency usable Gemini route exposed by this project.
 
-        Prefer the stable Gemini 2.5 Flash route first because it is broadly
-        available on free-tier projects and supports structured outputs on the
-        legacy generateContent endpoint. Preview/latest aliases remain fallbacks.
-        A configured model is never called unless it was actually returned by
-        Google's catalog for this key/project.
+        Gemini 3.1 Flash-Lite is the stable low-latency baseline as of this release.
+        A user-specified model is still honored when it is actually advertised, but
+        models rejected by generateContent are remembered process-wide.
         """
 
         available = self._discover_gemini_models(refresh=refresh)
         available_set = set(available)
+        with self._gemini_runtime.lock:
+            preferred_model = self._gemini_runtime.preferred_model
+            rejected_models = set(self._gemini_runtime.rejected_models)
+
         preference = [
-            "gemini-2.5-flash",
-            "gemini-3.1-flash-lite",
-            "gemini-2.5-flash-lite",
-            "gemini-3-flash-preview",
-            "gemini-flash-latest",
+            preferred_model,
             requested,
+            "gemini-3.1-flash-lite",
+            "gemini-flash-lite-latest",
+            "gemini-3.5-flash-lite",
+            "gemini-3.5-flash",
+            "gemini-flash-latest",
+            "gemini-3-flash-preview",
+            "gemini-2.5-flash-lite",
             "gemini-2.5-pro",
             "gemini-pro-latest",
-            "gemini-2.0-flash",
-            "gemini-2.0-flash-lite",
         ]
         selected: list[str] = []
-        if (
-            self._gemini_preferred_model
-            and self._gemini_preferred_model in available_set
-            and self._gemini_preferred_model not in self._gemini_rejected_models
-        ):
-            selected.append(self._gemini_preferred_model)
         for name in preference:
             if (
                 name
                 and name in available_set
-                and name not in self._gemini_rejected_models
+                and name not in rejected_models
                 and name not in selected
             ):
                 selected.append(name)
-        # Future-proofing: if Google changes the catalog again, use another
-        # text Flash model that the project actually advertised.
+        # Future-proofing: use another text Flash model that the project actually
+        # advertises before trying a non-Flash fallback.
         for name in available:
             lowered = name.casefold()
-            if "flash" in lowered and name not in self._gemini_rejected_models and name not in selected:
+            if "flash" in lowered and name not in rejected_models and name not in selected:
                 selected.append(name)
         for name in available:
-            if name not in self._gemini_rejected_models and name not in selected:
+            if name not in rejected_models and name not in selected:
                 selected.append(name)
         return selected[:8]
 
@@ -1283,7 +1295,8 @@ class HostedProvider(AuthoringProvider):
                 if status_code < 400:
                     response = current
                     self.last_model = candidate_model
-                    self._gemini_preferred_model = candidate_model
+                    with self._gemini_runtime.lock:
+                        self._gemini_runtime.preferred_model = candidate_model
                     LOGGER.info(
                         "Gemini runtime model selected requested=%s actual=%s schema_style=%s",
                         model,
@@ -1335,9 +1348,10 @@ class HostedProvider(AuthoringProvider):
                     # users. Remember the actual generateContent rejection for the
                     # life of this process so later passage/question stages do not
                     # repeat the same dead request or refresh an unchanged catalog.
-                    self._gemini_rejected_models.add(candidate_model)
-                    if self._gemini_preferred_model == candidate_model:
-                        self._gemini_preferred_model = None
+                    with self._gemini_runtime.lock:
+                        self._gemini_runtime.rejected_models.add(candidate_model)
+                        if self._gemini_runtime.preferred_model == candidate_model:
+                            self._gemini_runtime.preferred_model = None
                     break
                 if status_code == 429:
                     raise ProviderError(f"Gemini HTTP 429: {safe_detail}")
@@ -1447,6 +1461,32 @@ class HostedProvider(AuthoringProvider):
 
         return clean(raw)
 
+    @staticmethod
+    def _groq_schema(schema: type[BaseModel]) -> dict[str, Any]:
+        """Keep Groq strict schemas structural and enforce fine constraints locally.
+
+        Groq documents a JSON-Schema subset for constrained decoding. Pydantic
+        emits presentation and collection-bound keywords that are useful to our
+        local validator but are not needed to describe the response shape. Removing
+        them makes the blind-verification batch less likely to trigger an HTTP 400
+        while preserving all semantic validation after the response is parsed.
+        """
+        raw = schema.model_json_schema(by_alias=True)
+        unsupported = {
+            "title", "default", "examples",
+            "minItems", "maxItems", "minLength", "maxLength",
+            "pattern", "format",
+        }
+
+        def clean(value: Any) -> Any:
+            if isinstance(value, dict):
+                return {key: clean(item) for key, item in value.items() if key not in unsupported}
+            if isinstance(value, list):
+                return [clean(item) for item in value]
+            return value
+
+        return clean(raw)
+
     @classmethod
     def _response_format(
         cls, schema: type[BaseModel], mode: str, provider: str | None = None
@@ -1455,7 +1495,12 @@ class HostedProvider(AuthoringProvider):
             return None
         if mode == "json_object":
             return {"type": "json_object"}
-        provider_schema = cls._cerebras_schema(schema) if provider == "cerebras" else schema.model_json_schema(by_alias=True)
+        if provider == "cerebras":
+            provider_schema = cls._cerebras_schema(schema)
+        elif provider == "groq":
+            provider_schema = cls._groq_schema(schema)
+        else:
+            provider_schema = schema.model_json_schema(by_alias=True)
         return {
             "type": "json_schema",
             "json_schema": {
@@ -1497,12 +1542,27 @@ class HostedProvider(AuthoringProvider):
         return _redact_error(exc, None, 220)
 
     def _attempt_plan(self, order: list[str]) -> list[tuple[str, str, str]]:
-        """Round-robin output modes across providers instead of exhausting one provider first."""
+        """Build a bounded provider/mode plan tuned to each pipeline role.
+
+        Authoring remains round-robin so a provider compatibility issue quickly
+        reaches the next independent author route. Verification stays provider-major:
+        if Groq rejects strict schema transport, we first try its weaker JSON modes
+        and validate locally instead of immediately using Gemini (the author vendor)
+        as the verifier. Quota/rate-limit failures still activate cooldown and skip
+        the remaining modes automatically.
+        """
         provider_modes = {
             provider: self._response_modes(provider, self._model_for(provider)) for provider in order
         }
-        max_modes = max((len(modes) for modes in provider_modes.values()), default=0)
         plan: list[tuple[str, str, str]] = []
+        if self.purpose != "author":
+            for provider in order:
+                model = self._model_for(provider)
+                for mode in provider_modes[provider]:
+                    plan.append((provider, model, mode))
+            return plan
+
+        max_modes = max((len(modes) for modes in provider_modes.values()), default=0)
         for mode_index in range(max_modes):
             for provider in order:
                 modes = provider_modes[provider]
@@ -1540,6 +1600,8 @@ class HostedProvider(AuthoringProvider):
         plan = self._attempt_plan(order)
         for retry in range(self.settings.provider_max_retries + 1):
             for provider, model, mode in plan:
+                if mode in self._mode_blacklist.get((provider, model), set()):
+                    continue
                 # A quota/rate-limit failure earlier in this request may have
                 # activated a cooldown. Skip the remaining weaker modes for that
                 # provider instead of hammering the same free endpoint again.
@@ -1604,7 +1666,14 @@ class HostedProvider(AuthoringProvider):
                     )
                     if compatibility_failure:
                         key = (provider, model)
-                        self._mode_blacklist.setdefault(key, set()).add(mode)
+                        blocked_modes = self._mode_blacklist.setdefault(key, set())
+                        blocked_modes.add(mode)
+                        # The deployed Space showed Groq GPT-OSS 20B rejecting the
+                        # batched verifier's constrained schema. Best-effort uses the
+                        # same schema transport and can fail the same way, so move
+                        # directly to JSON Object Mode and validate with Pydantic.
+                        if provider == "groq" and schema is BlindVerificationBatch and mode == "strict":
+                            blocked_modes.add("best_effort")
                         remaining = [
                             candidate
                             for candidate in ("best_effort", "json_object", "plain_json")
@@ -2442,6 +2511,7 @@ class LiveGenerationService:
         shared_cooldown_lock = threading.RLock()
         shared_request_completions: dict[str, float] = {}
         shared_request_gate_lock = threading.Lock()
+        shared_gemini_runtime = GeminiRuntimeState()
         self.provider = provider or (
             MockProvider()
             if settings.generation_provider == "mock"
@@ -2452,6 +2522,7 @@ class LiveGenerationService:
                 cooldown_lock=shared_cooldown_lock,
                 request_completion_state=shared_request_completions,
                 request_gate_lock=shared_request_gate_lock,
+                gemini_runtime_state=shared_gemini_runtime,
             )
         )
         if verifier_provider is not None:
@@ -2469,6 +2540,7 @@ class LiveGenerationService:
                     cooldown_lock=shared_cooldown_lock,
                     request_completion_state=shared_request_completions,
                     request_gate_lock=shared_request_gate_lock,
+                    gemini_runtime_state=shared_gemini_runtime,
                 )
             )
         if secondary_verifier_provider is not None:
@@ -2486,6 +2558,7 @@ class LiveGenerationService:
                     cooldown_lock=shared_cooldown_lock,
                     request_completion_state=shared_request_completions,
                     request_gate_lock=shared_request_gate_lock,
+                    gemini_runtime_state=shared_gemini_runtime,
                 )
             )
         self._semaphore = threading.BoundedSemaphore(settings.generation_concurrency_limit)

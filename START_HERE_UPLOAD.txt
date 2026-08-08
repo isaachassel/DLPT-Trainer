@@ -28,7 +28,7 @@ https://www.python.org/downloads/windows/
 During Python installation, select "Add Python to PATH", then run the BAT file
 again.
 
-AFTER THE SPACE REBUILDS - FRESH AI v1.7.7
+AFTER THE SPACE REBUILDS - FRESH AI v1.7.8
 ===========================================
 For the recommended all-free GenAI route, open the Space's
 Settings > Variables and secrets and add:
@@ -43,6 +43,6 @@ Recommended variables:
   ENABLE_HF_INFERENCE=false
   PREFER_GEMINI_IF_AVAILABLE=true
 
-If your Space still has GENERATION_PROVIDER=hf_then_groq, v1.7.7 automatically
+If your Space still has GENERATION_PROVIDER=hf_then_groq, v1.7.8 automatically
 promotes Gemini when GEMINI_API_KEY is present, but changing the variable to
 `gemini_then_groq` makes the intended routing explicit.

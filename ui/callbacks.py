@@ -526,6 +526,11 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
                     state.session_id, state.active_skill, generated.passage.id, generated.provider_name,
                     generated.model_name, len(generated.questions),
                 )
+                if bundle.passage.skill == "listening":
+                    # Fresh generation already created the durable canonical bank
+                    # recording. Warm the learner's selected Training speed/voice
+                    # immediately so the later Play click normally hits cache.
+                    _prefetch_selected_playback(state, bundle)
                 _progress(progress, 0.94, "Fresh item saved and ready…")
                 return bundle
             except Exception as exc:

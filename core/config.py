@@ -53,8 +53,8 @@ class Settings(BaseModel):
     groq_verifier_model: str = "openai/gpt-oss-20b"
     cerebras_model: str = "gpt-oss-120b"
     cerebras_verifier_model: str = "gpt-oss-120b"
-    gemini_model: str = "gemini-2.5-flash"
-    gemini_verifier_model: str = "gemini-3.5-flash-lite"
+    gemini_model: str = "gemini-3.1-flash-lite"
+    gemini_verifier_model: str = "gemini-3.1-flash-lite"
     enable_hf_inference: bool = True
     prefer_cerebras_if_available: bool = False
     prefer_gemini_if_available: bool = True
@@ -403,8 +403,8 @@ def get_settings() -> Settings:
         groq_verifier_model=os.getenv("GROQ_VERIFIER_MODEL", "openai/gpt-oss-20b"),
         cerebras_model=os.getenv("CEREBRAS_MODEL", "gpt-oss-120b"),
         cerebras_verifier_model=os.getenv("CEREBRAS_VERIFIER_MODEL", "gpt-oss-120b"),
-        gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
-        gemini_verifier_model=os.getenv("GEMINI_VERIFIER_MODEL", "gemini-3.5-flash-lite"),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite"),
+        gemini_verifier_model=os.getenv("GEMINI_VERIFIER_MODEL", "gemini-3.1-flash-lite"),
         enable_hf_inference=_env_bool("ENABLE_HF_INFERENCE", False),
         prefer_cerebras_if_available=_env_bool("PREFER_CEREBRAS_IF_AVAILABLE", False),
         prefer_gemini_if_available=_env_bool("PREFER_GEMINI_IF_AVAILABLE", True),

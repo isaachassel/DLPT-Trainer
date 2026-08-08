@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -230,3 +231,55 @@ def test_live_listening_generation_creates_validated_cached_audio(project_root, 
     assert result.passage.audio_asset_id == result.audio_asset.id
     assert bank.get_audio(result.audio_asset.id) is not None
     assert Path(result.audio_asset.path).stat().st_size > 512
+
+
+def test_fresh_listening_item_immediately_prefetches_selected_training_speed(monkeypatch):
+    import ui.callbacks as callbacks
+
+    state = create_session(
+        language="ru",
+        mode="training",
+        selected_skills=["listening"],
+        start_level="1+",
+        target_level="2",
+        topics=[],
+        competencies=[],
+        max_questions_per_skill=8,
+        minimum_questions_per_skill=8,
+        timer_mode="off",
+        time_limit_seconds_per_skill=None,
+        profile_id=None,
+        feedback_mode="end_only",
+        hints_enabled=False,
+        transcript_review_enabled=True,
+        replay_allowed=True,
+        slow_audio_allowed=True,
+        voice_label="Automatic natural Russian voice",
+        speech_rate_label="Fast",
+        content_source="fresh_ai_preferred",
+    )
+    monkeypatch.setattr(callbacks.SETTINGS, "generation_provider", "mock")
+    passage = callbacks.BANK.get_passage("l001")
+    questions = callbacks.BANK.get_questions("l001")[:2]
+    generated = SimpleNamespace(
+        passage=passage,
+        questions=questions,
+        request_count=2,
+        repair_count=0,
+        provider_name="mock",
+        model_name="fixture",
+        verifier_provider="mock",
+        verifier_model="fixture",
+        bank_persistence_note="saved",
+    )
+    monkeypatch.setattr(callbacks.GENERATOR, "generate_and_store", lambda **kwargs: generated)
+    prefetched: list[tuple[str, str]] = []
+
+    def fake_prefetch(current_state, bundle):
+        prefetched.append((bundle.passage.id, current_state.speech_rate_label))
+
+    monkeypatch.setattr(callbacks, "_prefetch_selected_playback", fake_prefetch)
+    bundle = callbacks._select_with_safe_history(state)
+
+    assert bundle.passage.id == "l001"
+    assert prefetched == [("l001", "Fast")]

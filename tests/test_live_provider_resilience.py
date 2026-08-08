@@ -8,6 +8,7 @@ from core.config import Settings
 from core.generation import (
     AUTHORING_SYSTEM,
     BlindVerificationBatch,
+    BlindVerificationBatchItem,
     CandidatePassageDraft,
     HostedProvider,
     MockProvider,
@@ -350,3 +351,79 @@ def test_hf_bad_request_downgrades_structured_mode_for_following_stage(monkeypat
     assert result.passage_ru
     assert len(calls) == 2
     assert provider._response_modes("hf", settings.hf_text_model)[0] == "best_effort"
+
+
+def _blind_batch_json() -> str:
+    return BlindVerificationBatch(
+        verifications=[
+            BlindVerificationBatchItem(
+                question_index=0,
+                selected_index=0,
+                second_best_index=-1,
+                confidence=0.96,
+                multiple_plausible=False,
+                requires_outside_knowledge=False,
+                evidence_sufficient=True,
+                reasoning_match=True,
+                answer_leakage=False,
+                evidence_quote_ru="вечерние курсы",
+                explanation="The first choice is directly supported by the source.",
+            )
+        ]
+    ).model_dump_json()
+
+
+def test_groq_blind_batch_schema_is_transport_safe_but_locally_strict():
+    schema = HostedProvider._groq_schema(BlindVerificationBatch)
+    encoded = json.dumps(schema)
+    assert "minItems" not in encoded
+    assert "maxItems" not in encoded
+    assert '"title"' not in encoded
+    assert schema["additionalProperties"] is False
+    item = schema["$defs"]["BlindVerificationBatchItem"]
+    assert item["additionalProperties"] is False
+    assert set(item["required"]) == set(item["properties"])
+
+
+def test_verifier_stays_on_groq_json_mode_after_batch_strict_400(monkeypatch):
+    settings = Settings(
+        generation_provider="gemini_then_groq",
+        verification_provider="groq_then_gemini",
+        gemini_api_key="gemini-test",
+        groq_api_key="groq-test",
+        provider_max_retries=0,
+        max_provider_attempts_per_stage=4,
+        structured_output_mode="auto",
+        allow_plain_json_fallback=True,
+    )
+    provider = HostedProvider(settings, "verifier")
+    groq_modes: list[str | None] = []
+    gemini_calls: list[str] = []
+
+    def fake_groq(*args, **kwargs):
+        response_format = kwargs["response_format"]
+        mode = None if response_format is None else response_format["type"]
+        groq_modes.append(mode)
+        if mode == "json_schema":
+            raise RuntimeError("400 Bad Request: structured schema rejected")
+        return _blind_batch_json()
+
+    def fake_gemini(*args, **kwargs):
+        gemini_calls.append("gemini")
+        return _blind_batch_json()
+
+    monkeypatch.setattr(provider, "_call_groq", fake_groq)
+    monkeypatch.setattr(provider, "_call_gemini", fake_gemini)
+    result = provider.generate_json(
+        "Verify independently.",
+        "Verify question 0.",
+        BlindVerificationBatch,
+        max_tokens=900,
+        temperature=0.0,
+    )
+
+    assert result.verifications[0].question_index == 0
+    assert groq_modes == ["json_schema", "json_object"]
+    assert gemini_calls == []
+    assert provider.last_provider == "groq"
+    assert provider.last_mode == "json_object"

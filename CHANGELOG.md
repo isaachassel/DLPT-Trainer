@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.8 — Provider cleanup and first-play performance
+
+- Changes the default Gemini author/verifier preference to `gemini-3.1-flash-lite`, matching the stable low-latency model that the deployed Space actually accepts.
+- Shares Gemini model discovery, rejected aliases, and the last known-good runtime model across author, verifier, and secondary-verifier adapters, preventing repeated model-list calls and repeated retired-model 404s in the same Space process.
+- Simplifies Groq's provider-facing JSON Schema while preserving the full Pydantic constraints locally.
+- Keeps blind verification on Groq after a structured-output HTTP 400 by moving directly to JSON Object Mode and validating locally before using Gemini as verifier fallback.
+- Starts selected Training-speed/voice prefetch immediately after a Fresh-AI Listening item is accepted, so Fast/Slow playback can finish rendering while the learner reads the questions instead of starting only after Play is pressed.
+- Preserves v1.7.7 dialogue-name parsing, stable speaker identities, topic balancing, adaptive routing, bank persistence, and UI behavior.
+- Expands regression coverage to 236 passing tests.
+
 ## 1.7.7 — Mixed role/name dialogue detection
 
 - Fixes multi-speaker Russian listening scripts that label one participant by role and another by personal name (for example `Менеджер:` / `Алексей:`).
