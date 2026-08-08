@@ -522,3 +522,74 @@ def test_seller_buyer_audio_path_calls_two_voices_and_never_synthesizes_labels(t
         "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural"
     ]
     assert all("продавец" not in text.casefold() and "покупатель" not in text.casefold() for text, _voice in requested)
+
+
+def test_role_and_person_name_dialogue_is_detected():
+    from core.audio import split_speaker_turns
+
+    script = (
+        "Менеджер: Алексей, сможете прийти во вторник немного раньше?\n"
+        "Алексей: Смогу, если встречу с клиентами перенесут на десять часов.\n"
+        "Менеджер: Хорошо, я изменю расписание.\n"
+        "Алексей: Тогда я буду в офисе к восьми тридцати."
+    )
+    turns = split_speaker_turns(script)
+    assert [label for label, _ in turns] == ["Менеджер", "Алексей", "Менеджер", "Алексей"]
+    assert all("Менеджер:" not in spoken and "Алексей:" not in spoken for _, spoken in turns)
+
+
+def test_role_and_person_name_inline_dialogue_is_detected():
+    from core.audio import split_speaker_turns
+
+    script = (
+        "Менеджер: Алексей, сможете прийти раньше? "
+        "Алексей: Да, если встречу перенесут. "
+        "Менеджер: Договорились."
+    )
+    turns = split_speaker_turns(script)
+    assert [label for label, _ in turns] == ["Менеджер", "Алексей", "Менеджер"]
+
+
+def test_two_heading_lines_still_do_not_become_name_dialogue():
+    from core.audio import split_speaker_turns
+
+    assert split_speaker_turns("Москва: сегодня ожидается дождь.\nТемпература: около десяти градусов.") == []
+    assert split_speaker_turns("Тема: новый график. Итог: решение отложено.") == []
+
+
+def test_manager_alexey_audio_path_switches_voices_and_never_speaks_labels(tmp_path):
+    import shutil
+    import subprocess
+    import pytest
+    from pathlib import Path
+    from core.audio import generate_dialogue_cached_tts
+
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg is required")
+
+    requested = []
+    def fake_synth(text, cache_dir, **kwargs):
+        requested.append((text, kwargs["voice"]))
+        output = Path(cache_dir) / f"manager-alexey-{len(requested)}.mp3"
+        subprocess.run([
+            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+            "-f", "lavfi", "-i", "sine=frequency=600:duration=0.20",
+            "-codec:a", "libmp3lame", "-q:a", "4", str(output),
+        ], check=True)
+        return output
+
+    output = generate_dialogue_cached_tts(
+        "Менеджер: Алексей, сможете прийти раньше?\n"
+        "Алексей: Да, если встречу перенесут.\n"
+        "Менеджер: Хорошо, договорились.",
+        tmp_path,
+        voice="ru-RU-SvetlanaNeural",
+        rate="+3%",
+        synthesizer=fake_synth,
+        engine_version="manager-alexey-routing-v1",
+    )
+    assert output.exists()
+    assert [voice for _text, voice in requested] == [
+        "ru-RU-SvetlanaNeural", "ru-RU-DmitryNeural", "ru-RU-SvetlanaNeural"
+    ]
+    assert all("менеджер:" not in text.casefold() and "алексей:" not in text.casefold() for text, _ in requested)

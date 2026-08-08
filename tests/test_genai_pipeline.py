@@ -509,3 +509,55 @@ def test_hosted_generation_keeps_valid_question_subset_instead_of_extra_repair(p
     assert result.repair_count == 0
     assert len(result.questions) == 1
     assert result.questions[0].stem_en == "What is the main purpose of the announcement?"
+
+
+def test_multispeaker_listening_requires_segmentable_turns():
+    from core.generation import CandidatePassageDraft, validate_candidate_passage
+
+    candidate = CandidatePassageDraft(
+        orientation_en="A manager and employee discuss a schedule change.",
+        passage_ru=(
+            "Менеджер попросил Алексея прийти во вторник раньше. "
+            "Алексей согласился только при условии, что встречу перенесут. "
+            "Они обсудили новый график и договорились о времени. "
+            "После этого менеджер подтвердил изменение. "
+            "Алексей поблагодарил его за помощь."
+        ),
+        genre="workplace conversation",
+        topic="Workplace",
+        subtopic="schedule change",
+        target_ilr="2",
+        register="neutral professional",
+        text_mode="two-person conversation",
+        discourse_features=["turn-taking", "condition and response"],
+        vocabulary_features=["work schedule", "meeting logistics"],
+        provisional_difficulty=0.5,
+    )
+    issues = validate_candidate_passage(candidate, skill="listening", requested_level="2", language="ru")
+    assert "multi_speaker_listening_requires_explicit_segmentable_speaker_turns" in issues
+
+
+def test_multispeaker_listening_with_role_and_name_is_segmentable():
+    from core.generation import CandidatePassageDraft, validate_candidate_passage
+
+    candidate = CandidatePassageDraft(
+        orientation_en="A manager and employee discuss a schedule change.",
+        passage_ru=(
+            "Менеджер: Алексей, сможете прийти во вторник немного раньше?\n"
+            "Алексей: Смогу, если встречу перенесут на десять часов.\n"
+            "Менеджер: Хорошо, я изменю расписание.\n"
+            "Алексей: Тогда я буду в офисе к восьми тридцати.\n"
+            "Менеджер: Спасибо, договорились."
+        ),
+        genre="workplace conversation",
+        topic="Workplace",
+        subtopic="schedule change",
+        target_ilr="2",
+        register="neutral professional",
+        text_mode="two-person conversation",
+        discourse_features=["turn-taking", "condition and response"],
+        vocabulary_features=["work schedule", "meeting logistics"],
+        provisional_difficulty=0.5,
+    )
+    issues = validate_candidate_passage(candidate, skill="listening", requested_level="2", language="ru")
+    assert "multi_speaker_listening_requires_explicit_segmentable_speaker_turns" not in issues

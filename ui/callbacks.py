@@ -1306,7 +1306,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         return (
             state,
             gr.update(value=audio_html, visible=True),
-            gr.update(interactive=True, visible=True),
+            gr.update(value="Play / Replay Audio", interactive=True, visible=True),
             gr.update(value=status),
         )
     except Exception as exc:

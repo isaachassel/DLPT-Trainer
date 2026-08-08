@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.7 — Mixed role/name dialogue detection
+
+- Fixes multi-speaker Russian listening scripts that label one participant by role and another by personal name (for example `Менеджер:` / `Алексей:`).
+- Adds conservative inline dialogue recovery when a provider collapses labelled turns onto one paragraph.
+- Adds generation-time validation: listening genres declared as conversations/interviews/calls/discussions must contain at least two segmentable speaker identities before question generation continues.
+- Strengthens author/repair prompts to prefer stable role labels for every speaker.
+- Bumps the dialogue audio pipeline to v8 so previously mis-rendered one-voice dialogue is regenerated once instead of being reused.
+- Keeps ordinary colon prose such as weather headings out of dialogue detection.
+- Remembers Gemini models that actually succeed and skips retired aliases after the first 404, avoiding repeated model-list/404 overhead within the Space process.
+- Restores the Listening button label after audio preparation so the UI no longer remains stuck on `Preparing Audio…` after the player is ready.
+
 ## v1.7.6 - Gemini Catalog Routing Fix
 
 - Fixed a runtime bug where Gemini model discovery succeeded but the adapter could still call a stale/preferred model instead of the stable model actually exposed to the Space's API key.

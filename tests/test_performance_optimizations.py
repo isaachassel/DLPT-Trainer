@@ -130,7 +130,7 @@ def test_old_dialogue_asset_is_regenerated_after_role_parser_upgrade():
     assert _asset_is_current_for_passage(asset, passage) is False
 
     current = SimpleNamespace(
-        engine_version="hybrid-edge-piper-dialogue-v7",
+        engine_version="hybrid-edge-piper-dialogue-v8",
         voice="ru-RU-DmitryNeural",
         rate="+5%",
         validated=True,

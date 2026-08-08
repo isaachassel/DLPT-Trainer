@@ -28,8 +28,8 @@ from .languages import native_voice_pool as configured_native_voice_pool, voice_
 
 LOGGER = logging.getLogger("dlpt.audio")
 
-DIALOGUE_TTS_CACHE_VERSION = "hybrid-edge-piper-dialogue-v7"
-DIALOGUE_TTS_ASSET_VERSION = "hybrid-edge-piper-dialogue-v7"
+DIALOGUE_TTS_CACHE_VERSION = "hybrid-edge-piper-dialogue-v8"
+DIALOGUE_TTS_ASSET_VERSION = "hybrid-edge-piper-dialogue-v8"
 
 
 class AudioError(RuntimeError):
@@ -264,9 +264,55 @@ def _looks_like_speaker_label(label: str) -> bool:
         "диспетчер", "представител", "официант", "консультант", "администратор",
         "директор", "сотрудник", "сотрудница", "speaker", "говорящ", "собесед",
         "host", "guest", "seller", "buyer", "customer", "clerk", "manager",
+        "supervisor", "employee", "coworker", "colleague",
         "主持", "记者", "嘉宾", "专家", "顾客", "工作人员",
     )
     return any(cue in normalized for cue in role_cues)
+
+
+def _looks_like_person_name_label(label: str) -> bool:
+    """Conservatively recognize a personal name used as a dialogue marker.
+
+    Gemini commonly emits mixed labels such as ``Менеджер:`` / ``Алексей:``.
+    The older parser required every label to be a known role, which made the
+    personal-name turn invalidate the whole dialogue.  A name is accepted only
+    inside an already-established dialogue context; this helper alone never
+    causes prose such as ``Москва:`` / ``Температура:`` to become dialogue.
+    """
+
+    value = re.sub(r"\s+", " ", str(label or "").strip(" ._-\t"))
+    if not value or len(value) > 32:
+        return False
+    parts = value.split()
+    if not 1 <= len(parts) <= 3:
+        return False
+    # Exclude labels that look like headings/metadata rather than human names.
+    heading_words = {
+        "москва", "температура", "причина", "итог", "вывод", "тема", "дата",
+        "время", "место", "адрес", "телефон", "справка", "вопрос", "ответ",
+        "moscow", "temperature", "reason", "result", "topic", "date", "time",
+        "place", "address", "question", "answer",
+    }
+    if value.casefold() in heading_words:
+        return False
+    token_re = re.compile(r"^[А-ЯЁA-Z][А-Яа-яЁёA-Za-z'’-]*$")
+    return all(token_re.fullmatch(part) is not None for part in parts)
+
+
+def _dialogue_label_set_is_plausible(labels: list[str], turns_count: int) -> bool:
+    """Accept role labels plus personal names without opening the prose floodgate."""
+
+    if len(labels) < 2:
+        return False
+    role_flags = [_looks_like_speaker_label(label) for label in labels]
+    name_flags = [_looks_like_person_name_label(label) for label in labels]
+    # Safest and most common case: at least one explicit role anchors the
+    # conversation, while the other participant may be named (Менеджер/Алексей).
+    if any(role_flags):
+        return all(role or name for role, name in zip(role_flags, name_flags))
+    # Two people may both be named. Require at least three turns so two ordinary
+    # ``Heading: value`` lines are not mistaken for a conversation.
+    return turns_count >= 3 and all(name_flags)
 
 
 def _dynamic_line_dialogue(text: str) -> list[tuple[str, str]]:
@@ -311,16 +357,52 @@ def _dynamic_line_dialogue(text: str) -> list[tuple[str, str]]:
             return []
     flush()
 
-    distinct = {label.casefold().strip() for label, _ in turns}
+    distinct_ordered = list(dict.fromkeys(label.strip() for label, _ in turns))
+    distinct = {label.casefold().strip() for label in distinct_ordered}
     if len(turns) < 2 or len(distinct) < 2:
         return []
-    if not all(_looks_like_speaker_label(label) for label, _ in turns):
+    if not _dialogue_label_set_is_plausible(distinct_ordered, len(turns)):
         return []
     # Nearly all generated dialogue lines should carry role labels. Continuation
     # lines are allowed, so compare against the original line count conservatively.
     if labelled_lines < 2 or labelled_lines / max(1, len(lines)) < 0.5:
         return []
     return turns
+
+
+_GENERIC_INLINE_MARKER = re.compile(
+    r"(?<![\wА-Яа-яЁё])(?P<label>[А-ЯЁA-Z][А-Яа-яЁёA-Za-z ._'-]{0,30})\s*[:：]\s*"
+)
+
+
+def _dynamic_inline_dialogue(text: str) -> list[tuple[str, str]]:
+    """Recover compact ``Role: ... Name: ...`` dialogue on one paragraph.
+
+    Some providers obey the role-label rule but collapse newlines during JSON
+    generation.  We accept the inline form only when the set of labels is
+    contextually plausible (role + name, role + role, or repeated personal names).
+    """
+
+    raw = str(text or "")
+    matches = list(_GENERIC_INLINE_MARKER.finditer(raw))
+    if len(matches) < 2:
+        return []
+    candidates: list[tuple[str, str]] = []
+    for index, match in enumerate(matches):
+        label = re.sub(r"\s+", " ", match.group("label")).strip(" ._-\t")
+        if not label or len(label.split()) > 4:
+            continue
+        start = match.end()
+        stop = matches[index + 1].start() if index + 1 < len(matches) else len(raw)
+        spoken = raw[start:stop].strip(" \t\n—–-")
+        if spoken:
+            candidates.append((label, spoken))
+    labels = list(dict.fromkeys(label for label, _ in candidates))
+    if len(candidates) < 2 or len({label.casefold() for label in labels}) < 2:
+        return []
+    if not _dialogue_label_set_is_plausible(labels, len(candidates)):
+        return []
+    return candidates
 
 
 def strip_speaker_labels(text: str) -> str:
@@ -358,6 +440,10 @@ def split_speaker_turns(text: str) -> list[tuple[str, str]]:
     dynamic = _dynamic_line_dialogue(raw)
     if dynamic:
         return [(label, strip_speaker_labels(turn)) for label, turn in dynamic if strip_speaker_labels(turn)]
+
+    dynamic_inline = _dynamic_inline_dialogue(raw)
+    if dynamic_inline:
+        return [(label, strip_speaker_labels(turn)) for label, turn in dynamic_inline if strip_speaker_labels(turn)]
 
     matches = list(_SPEAKER_MARKER.finditer(raw))
     labelled: list[tuple[str, str]] = []

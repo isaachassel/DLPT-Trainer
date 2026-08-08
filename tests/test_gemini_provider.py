@@ -337,3 +337,59 @@ def test_gemini_400_schema_compatibility_retries_alternate_format_before_groq():
     )
     assert json.loads(text)["target_ilr"] == "1"
     assert len(calls) == 2
+
+
+def test_gemini_remembers_retired_model_and_reuses_working_runtime_model():
+    settings = Settings(
+        generation_provider="gemini",
+        gemini_api_key="gemini-test",
+        gemini_model="gemini-2.5-flash",
+    )
+    provider = HostedProvider(settings, "author")
+    gets = []
+    posts = []
+
+    class FakeResponse:
+        def __init__(self, status_code, payload):
+            self.status_code = status_code
+            self._payload = payload
+            self.text = json.dumps(payload)
+        def json(self):
+            return self._payload
+
+    class FakeClient:
+        def get(self, path, params=None):
+            gets.append(path)
+            return FakeResponse(200, {
+                "models": [
+                    {"name": "models/gemini-2.5-flash", "supportedGenerationMethods": ["generateContent"]},
+                    {"name": "models/gemini-3.1-flash-lite", "supportedGenerationMethods": ["generateContent"]},
+                ]
+            })
+
+        def post(self, path, json):
+            posts.append(path)
+            if "gemini-2.5-flash:" in path:
+                return FakeResponse(404, {"error": {"message": "This model is no longer available to new users."}})
+            return FakeResponse(200, {
+                "candidates": [{"content": {"parts": [{"text": _passage_json()}]}}],
+                "usageMetadata": {},
+            })
+
+    provider._gemini = FakeClient()
+    fmt = HostedProvider._response_format(CandidatePassageDraft, "strict", "gemini")
+    provider._call_gemini(
+        AUTHORING_SYSTEM, "Target ILR: 1", model="gemini-2.5-flash",
+        response_format=fmt, max_tokens=1200, temperature=0.2,
+    )
+    provider._call_gemini(
+        AUTHORING_SYSTEM, "Target ILR: 1", model="gemini-2.5-flash",
+        response_format=fmt, max_tokens=1200, temperature=0.2,
+    )
+    assert posts == [
+        "/v1beta/models/gemini-2.5-flash:generateContent",
+        "/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        "/v1beta/models/gemini-3.1-flash-lite:generateContent",
+    ]
+    assert gets == ["/v1beta/models"]
+    assert provider._gemini_preferred_model == "gemini-3.1-flash-lite"

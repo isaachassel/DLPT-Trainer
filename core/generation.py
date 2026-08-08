@@ -22,6 +22,7 @@ from .audio import (
     audio_duration_seconds,
     generate_cached_tts,
     generate_dialogue_cached_tts,
+    split_speaker_turns,
     validate_audio_file,
 )
 from .config import Settings
@@ -755,6 +756,8 @@ class HostedProvider(AuthoringProvider):
         self._gemini = None
         self._gemini_model_catalog: tuple[str, ...] | None = None
         self._gemini_catalog_checked_at = 0.0
+        self._gemini_rejected_models: set[str] = set()
+        self._gemini_preferred_model: str | None = None
         self.last_provider = "unknown"
         self.last_model = "unknown"
         self.last_mode = "unknown"
@@ -1047,7 +1050,7 @@ class HostedProvider(AuthoringProvider):
                 headers={
                     "x-goog-api-key": self.settings.gemini_api_key,
                     "Content-Type": "application/json",
-                    "x-goog-api-client": "dlpt-trainer/1.7.6",
+                    "x-goog-api-client": "dlpt-trainer/1.7.7",
                 },
                 timeout=self.settings.provider_timeout_seconds,
             )
@@ -1153,17 +1156,28 @@ class HostedProvider(AuthoringProvider):
             "gemini-2.0-flash-lite",
         ]
         selected: list[str] = []
+        if (
+            self._gemini_preferred_model
+            and self._gemini_preferred_model in available_set
+            and self._gemini_preferred_model not in self._gemini_rejected_models
+        ):
+            selected.append(self._gemini_preferred_model)
         for name in preference:
-            if name and name in available_set and name not in selected:
+            if (
+                name
+                and name in available_set
+                and name not in self._gemini_rejected_models
+                and name not in selected
+            ):
                 selected.append(name)
         # Future-proofing: if Google changes the catalog again, use another
         # text Flash model that the project actually advertised.
         for name in available:
             lowered = name.casefold()
-            if "flash" in lowered and name not in selected:
+            if "flash" in lowered and name not in self._gemini_rejected_models and name not in selected:
                 selected.append(name)
         for name in available:
-            if name not in selected:
+            if name not in self._gemini_rejected_models and name not in selected:
                 selected.append(name)
         return selected[:8]
 
@@ -1234,7 +1248,6 @@ class HostedProvider(AuthoringProvider):
         candidates = self._gemini_candidates(model)
         LOGGER.info("Gemini runtime candidates requested=%s candidates=%s", model, candidates)
         last_error: Exception | None = None
-        refreshed = False
 
         for candidate_model in list(candidates):
             # Stable 2.x/3.1 families are most compatible with the legacy
@@ -1270,6 +1283,7 @@ class HostedProvider(AuthoringProvider):
                 if status_code < 400:
                     response = current
                     self.last_model = candidate_model
+                    self._gemini_preferred_model = candidate_model
                     LOGGER.info(
                         "Gemini runtime model selected requested=%s actual=%s schema_style=%s",
                         model,
@@ -1317,14 +1331,13 @@ class HostedProvider(AuthoringProvider):
                     last_error = ProviderError(
                         f"Gemini model {candidate_model} was not available to this project: {safe_detail}"
                     )
-                    if not refreshed:
-                        refreshed = True
-                        try:
-                            for discovered in self._gemini_candidates(model, refresh=True):
-                                if discovered not in candidates:
-                                    candidates.append(discovered)
-                        except Exception:
-                            pass
+                    # models.list may continue advertising retired aliases to new
+                    # users. Remember the actual generateContent rejection for the
+                    # life of this process so later passage/question stages do not
+                    # repeat the same dead request or refresh an unchanged catalog.
+                    self._gemini_rejected_models.add(candidate_model)
+                    if self._gemini_preferred_model == candidate_model:
+                        self._gemini_preferred_model = None
                     break
                 if status_code == 429:
                     raise ProviderError(f"Gemini HTTP 429: {safe_detail}")
@@ -1756,6 +1769,25 @@ def _level3_listening_duration_issue(duration: float | None) -> str | None:
     return None
 
 
+_MULTISPEAKER_GENRE_CUES = (
+    "conversation", "dialogue", "dialog", "interview", "discussion", "debate",
+    "phone call", "call", "exchange", "two-person", "multi-speaker", "meeting dialogue",
+    "разговор", "диалог", "интервью", "беседа", "дискус", "дебат", "звонок",
+    "переговор", "обмен репликами",
+)
+
+
+def _candidate_declares_multispeaker(candidate: CandidatePassageDraft, skill: str) -> bool:
+    if skill != "listening":
+        return False
+    metadata = " ".join([
+        str(candidate.genre or ""),
+        str(candidate.text_mode or ""),
+        " ".join(str(item) for item in candidate.discourse_features),
+    ]).casefold()
+    return any(cue in metadata for cue in _MULTISPEAKER_GENRE_CUES)
+
+
 def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, requested_level: str, language: str = "ru") -> list[str]:
     issues: list[str] = []
     text = candidate.passage_ru.strip()
@@ -1784,6 +1816,10 @@ def validate_candidate_passage(candidate: CandidatePassageDraft, *, skill: str, 
         issues.append("unreasonably_long_sentence_detected")
     if skill == "listening" and any(units > listening_limit for units in sentence_units):
         issues.append("listening_sentence_too_long_for_natural_tts")
+    if _candidate_declares_multispeaker(candidate, skill):
+        turns = split_speaker_turns(text)
+        if len(turns) < 2 or len({label.casefold().strip() for label, _ in turns}) < 2:
+            issues.append("multi_speaker_listening_requires_explicit_segmentable_speaker_turns")
     if re.search(r"[<>{}\[\]|]", text):
         issues.append("tts_or_markup_breaking_characters_detected")
     if re.search(r"(?i)\b(dlpt|dliflc|department of defense|dod)\b", text):
@@ -2557,7 +2593,7 @@ class LiveGenerationService:
                 "rate": rate,
                 "pitch": pitch,
                 "volume": volume,
-                "prosody_profile": "hybrid-dialogue-v6-edge-plus-local-piper",
+                "prosody_profile": "hybrid-dialogue-v8-edge-plus-local-piper",
                 "engine": "hybrid-edge-piper",
                 "engine_version": DIALOGUE_TTS_ASSET_VERSION,
                 "synthetic": True,
