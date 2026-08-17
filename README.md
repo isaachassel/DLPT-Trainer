@@ -1,4 +1,6 @@
 ---
+
+
 title: "Russian & Mandarin Adaptive Proficiency Practice"
 emoji: 🎧
 colorFrom: red
@@ -11,6 +13,10 @@ pinned: false
 ---
 
 # Russian & Mandarin Adaptive Proficiency Practice
+
+## v1.7.9 verifier recovery
+
+Fresh-AI passages are no longer discarded solely because a hosted blind verifier returns an incomplete or misnumbered batch. The app preserves valid verification entries, normalizes an unambiguous one-based batch, and independently re-verifies only missing or duplicate indexes with the single-question verifier contract. This specifically fixes the production Level 3 Reading fallback `Blind verifier did not return exactly one result for every question.` while keeping blind answer verification mandatory.
 
 An independent Russian and Mandarin Chinese Reading/Listening practice platform with Training, Adaptive Diagnostic, and a strict DLPT-style adaptive practice simulation.
 

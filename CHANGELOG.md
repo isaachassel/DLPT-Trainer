@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.9 — Blind-verifier cardinality recovery
+
+- Fixes Fresh-AI Level 3 Reading bundles being discarded when an otherwise successful `BlindVerificationBatch` omitted, duplicated, or misnumbered one `question_index`.
+- Preserves every unique in-range batch verification and re-verifies only unresolved questions through the single-question blind-verifier schema.
+- Normalizes complete one-based verifier batches (`1..N`) back to the required zero-based indexes (`0..N-1`) instead of rejecting the entire passage.
+- Ignores extraneous out-of-range batch entries while still requiring independent verification for every actual question.
+- Strengthens the verifier prompt with the exact required `question_index` list and explicit no-omit/no-duplicate/no-renumber instructions.
+- Keeps the proposed correct answer hidden during both batch verification and recovery verification.
+- Adds targeted diagnostics for verifier-cardinality recovery without exposing answer keys or secrets.
+- Bumps the generation prompt contract to `genai-pipeline-v12`.
+- Adds regressions for incomplete batches, one-based batches, and the exact three-question ILR 3 Reading failure pattern observed in production.
+- Full automated suite: 239 passing tests; multilingual bank validation, dependency validation, and Gradio smoke tests pass.
+
 ## 1.7.8 — Provider cleanup and first-play performance
 
 - Changes the default Gemini author/verifier preference to `gemini-3.1-flash-lite`, matching the stable low-latency model that the deployed Space actually accepts.

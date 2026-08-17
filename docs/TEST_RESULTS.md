@@ -1,12 +1,14 @@
 # Test Results
 
-Executed for the v1.7.8 provider-cleanup/performance release on 2026-08-08.
+Executed for the v1.7.9 blind-verifier-cardinality recovery release on 2026-08-17.
 
 ## Current release automated suite
 
 ```text
-236 passed
+239 passed
 ```
+
+Version 1.7.9 additionally verifies that incomplete blind-verification batches preserve valid entries and re-verify only missing questions, complete one-based batches are normalized to zero-based indexes without extra provider calls, and the exact three-question ILR 3 Reading failure pattern no longer discards the generated bundle. The full multilingual bank, Space dependency check, and 105-component Gradio smoke test also pass.
 
 Version 1.7.8 additionally verifies shared Gemini runtime model memory across author/verifier adapters, a current `gemini-3.1-flash-lite` default, Groq transport-schema simplification, same-provider JSON-object recovery after a batched-verifier structured-output 400, and immediate prefetch of the selected Training speed for Fresh-AI Listening items.
 

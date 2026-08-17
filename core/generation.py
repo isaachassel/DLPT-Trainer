@@ -373,7 +373,9 @@ class BlindVerification(CandidateModel):
 
 
 class BlindVerificationBatchItem(BlindVerification):
-    question_index: int = Field(ge=0, le=4)
+    # Accept 5 only as a transport-tolerance value so a five-question batch
+    # mistakenly numbered 1..5 can be normalized back to 0..4 locally.
+    question_index: int = Field(ge=0, le=5)
 
 
 class BlindVerificationBatch(CandidateModel):
@@ -1066,7 +1068,7 @@ class HostedProvider(AuthoringProvider):
                 headers={
                     "x-goog-api-key": self.settings.gemini_api_key,
                     "Content-Type": "application/json",
-                    "x-goog-api-client": "dlpt-trainer/1.7.8",
+                    "x-goog-api-client": "dlpt-trainer/1.7.9",
                 },
                 timeout=self.settings.provider_timeout_seconds,
             )
@@ -2323,14 +2325,21 @@ def validate_with_blind_verifier_batch(
     temperature: float = 0.0,
     seed_suffix: str = "primary",
 ) -> list[ValidationReport]:
-    """Blind-verify a complete passage bundle in one provider call.
+    """Blind-verify a passage bundle with targeted recovery for malformed batches.
 
-    The proposed keys are never included. Each question receives a separate,
-    deterministic shuffled order, and the returned indices are mapped back only
-    after the independent provider has answered.
+    Hosted verifiers occasionally return a structurally valid batch that omits one
+    ``question_index``, duplicates an index, or numbers a complete batch 1..N
+    instead of 0..N-1.  Those are transport/cardinality defects rather than item
+    evidence.  Preserve every unambiguous batch result, normalize a complete
+    one-based batch, and re-verify only unresolved questions with the stricter
+    single-question schema.  A good passage is therefore not discarded because
+    one batched verifier object was missing.
+
+    The proposed answer keys remain hidden in both the batch and recovery calls.
     """
     if not questions:
         return []
+
     prepared: list[tuple[QuestionItem, list[tuple[str, str]]]] = []
     items: list[dict[str, Any]] = []
     for question_index, question in enumerate(questions):
@@ -2360,8 +2369,8 @@ def validate_with_blind_verifier_batch(
         )
         batch = BlindVerificationBatch.model_validate(raw)
     except ProviderError as exc:
-        # Backward compatibility for user-supplied v1.1 providers that only
-        # implemented the single-question verifier schema.
+        # Backward compatibility for user-supplied providers that only implement
+        # the single-question verifier schema.
         if "does not support schema BlindVerificationBatch" not in str(exc):
             raise
         return [
@@ -2376,17 +2385,78 @@ def validate_with_blind_verifier_batch(
             for question in questions
         ]
 
-    by_index: dict[int, BlindVerificationBatchItem] = {}
-    for verification in batch.verifications:
-        if verification.question_index in by_index:
-            raise GenerationValidationError("Blind verifier returned a duplicate question_index.")
-        by_index[verification.question_index] = verification
     expected = set(range(len(questions)))
-    if set(by_index) != expected:
-        raise GenerationValidationError("Blind verifier did not return exactly one result for every question.")
+    raw_indices = [verification.question_index for verification in batch.verifications]
 
-    reports: list[ValidationReport] = []
+    # A surprisingly common hosted-model mistake is returning 1..N even though
+    # the prompt and schema request zero-based indices. Normalize only when the
+    # entire returned set is an unambiguous complete one-based sequence.
+    one_based_complete = (
+        len(batch.verifications) == len(questions)
+        and set(raw_indices) == set(range(1, len(questions) + 1))
+        and 0 not in raw_indices
+    )
+    if one_based_complete:
+        batch = BlindVerificationBatch(
+            verifications=[
+                verification.model_copy(update={"question_index": verification.question_index - 1})
+                for verification in batch.verifications
+            ]
+        )
+        LOGGER.info(
+            "Blind verifier batch normalized one-based indices language=%s skill=%s questions=%s",
+            passage.language,
+            passage.skill,
+            len(questions),
+        )
+
+    candidates_by_index: dict[int, list[BlindVerificationBatchItem]] = {}
+    ignored_indices: list[int] = []
+    for verification in batch.verifications:
+        if verification.question_index not in expected:
+            ignored_indices.append(verification.question_index)
+            continue
+        candidates_by_index.setdefault(verification.question_index, []).append(verification)
+
+    # A unique in-range result is safe to use. Missing or duplicate entries are
+    # recovered individually rather than invalidating the entire generated set.
+    by_index: dict[int, BlindVerificationBatchItem] = {
+        index: values[0]
+        for index, values in candidates_by_index.items()
+        if len(values) == 1
+    }
+    unresolved = sorted(
+        index for index in expected
+        if index not in by_index or len(candidates_by_index.get(index, [])) != 1
+    )
+
+    if unresolved or ignored_indices:
+        LOGGER.warning(
+            "Blind verifier batch cardinality recovery language=%s skill=%s expected=%s returned=%s unresolved=%s ignored=%s",
+            passage.language,
+            passage.skill,
+            sorted(expected),
+            raw_indices,
+            unresolved,
+            ignored_indices,
+        )
+
+    reports_by_index: dict[int, ValidationReport] = {}
     for question_index, (question, shuffled) in enumerate(prepared):
+        if question_index in unresolved:
+            recovered = validate_with_blind_verifier(
+                provider,
+                passage,
+                question,
+                max_tokens=max(600, max_tokens // max(1, len(unresolved))),
+                temperature=temperature,
+                seed_suffix=f"{seed_suffix}:batch-recovery:{question_index}",
+            )
+            scores = dict(recovered.validator_scores)
+            scores["batch_recovery_single"] = 1.0
+            reports_by_index[question_index] = recovered.model_copy(update={"validator_scores": scores})
+            continue
+
         verification = by_index[question_index]
         selected_key = shuffled[verification.selected_index][0]
         deterministic = validate_question(question, passage)
@@ -2415,7 +2485,7 @@ def validate_with_blind_verifier_batch(
             passage.passage_ru,
             question.evidence_ru,
         )
-        reports.append(ValidationReport(
+        reports_by_index[question_index] = ValidationReport(
             status="accepted" if not failures and not flags else "rejected",
             deterministic_checks=deterministic.deterministic_checks,
             validator_scores={
@@ -2429,8 +2499,9 @@ def validate_with_blind_verifier_batch(
             failure_reasons=sorted(set(failures)),
             blind_verifier_answer=selected_key,
             proposed_answer=question.correct_key,
-        ))
-    return reports
+        )
+
+    return [reports_by_index[index] for index in range(len(questions))]
 
 
 def _natural_voice_profile(passage: PassageItem, settings: Settings) -> tuple[str, str, str, str]:

@@ -9,7 +9,7 @@ from .languages import language_profile
 
 # Persisted with every newly generated bundle so prompt-policy cohorts remain
 # distinguishable from earlier generated-bank records.
-PROMPT_VERSION = "genai-pipeline-v11"
+PROMPT_VERSION = "genai-pipeline-v12"
 
 
 @dataclass(frozen=True)
@@ -393,6 +393,8 @@ def blind_verification_batch_prompt(*, passage_ru: str, items: list[dict], langu
     tag = source.upper().replace(" ", "_")
     return f"""Blindly verify every comprehension item below. The proposed answers are intentionally hidden.
 Evaluate each item independently from the {source} source alone. Return exactly one verification object for every question_index.
+The required question_index values are exactly: {json.dumps([int(item.get("question_index", index)) for index, item in enumerate(items)])}.
+Do not omit, duplicate, renumber, merge, or invent question_index values.
 
 <{tag}_SOURCE>
 {passage_ru}

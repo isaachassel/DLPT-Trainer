@@ -12,6 +12,7 @@ from core.generation import (
     AuthoringProvider,
     BlindVerification,
     BlindVerificationBatch,
+    BlindVerificationBatchItem,
     CandidatePassageDraft,
     CandidateQuestionSet,
     HostedProvider,
@@ -80,7 +81,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
     forbidden = ["q1=a", "q2=b", "q3=c", "q4=d", '"correct_key": "a"', "correct answer letter"]
     assert all(pattern not in text for pattern in forbidden)
     assert "zero-based index" in text
-    assert PROMPT_VERSION == "genai-pipeline-v11"
+    assert PROMPT_VERSION == "genai-pipeline-v12"
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):
@@ -561,3 +562,125 @@ def test_multispeaker_listening_with_role_and_name_is_segmentable():
     )
     issues = validate_candidate_passage(candidate, skill="listening", requested_level="2", language="ru")
     assert "multi_speaker_listening_requires_explicit_segmentable_speaker_turns" not in issues
+
+
+class IncompleteBatchRecoveryVerifier(AuthoringProvider):
+    """Mimics the production bug: batch omits one item, single verifier is valid."""
+
+    def __init__(self, correct_by_stem: dict[str, str], evidence_by_stem: dict[str, str]):
+        super().__init__()
+        self.correct_by_stem = correct_by_stem
+        self.evidence_by_stem = evidence_by_stem
+        self.batch_calls = 0
+        self.single_calls = 0
+
+    def _verification_payload(self, stem: str, choices: list[str]) -> dict:
+        selected = choices.index(self.correct_by_stem[stem])
+        return dict(
+            selected_index=selected,
+            second_best_index=-1,
+            confidence=0.97,
+            multiple_plausible=False,
+            requires_outside_knowledge=False,
+            evidence_sufficient=True,
+            reasoning_match=True,
+            answer_leakage=False,
+            evidence_quote_ru=self.evidence_by_stem[stem],
+            explanation="The selected option is directly supported by the source.",
+        )
+
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        self.usage.add(10, 10)
+        if schema is BlindVerificationBatch:
+            self.batch_calls += 1
+            marker = prompt.split("<ITEMS_JSON>", 1)[1].split("</ITEMS_JSON>", 1)[0]
+            items = json.loads(marker.strip())
+            first = items[0]
+            return BlindVerificationBatch(verifications=[
+                BlindVerificationBatchItem(
+                    question_index=first["question_index"],
+                    **self._verification_payload(first["stem_en"], list(first["choices"])),
+                )
+            ])
+        if schema is BlindVerification:
+            self.single_calls += 1
+            stem = prompt.split("<ENGLISH_STEM>", 1)[1].split("</ENGLISH_STEM>", 1)[0].strip()
+            marker = prompt.split("<CHOICES_ZERO_BASED>", 1)[1].split("</CHOICES_ZERO_BASED>", 1)[0]
+            choices = json.loads(marker.strip())
+            return BlindVerification(**self._verification_payload(stem, choices))
+        raise AssertionError(schema)
+
+
+def test_incomplete_blind_batch_recovers_only_missing_question(project_root):
+    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    passage = bank.get_passage("r001")
+    questions = bank.get_questions("r001")[:2]
+    provider = IncompleteBatchRecoveryVerifier(
+        {q.stem_en: q.choices[q.correct_key] for q in questions},
+        {q.stem_en: q.evidence_ru for q in questions},
+    )
+
+    reports = validate_with_blind_verifier_batch(provider, passage, questions)
+
+    assert len(reports) == 2
+    assert all(report.status == "accepted" for report in reports)
+    assert provider.batch_calls == 1
+    assert provider.single_calls == 1
+    assert reports[0].validator_scores.get("batched_verification") == 1.0
+    assert reports[1].validator_scores.get("batch_recovery_single") == 1.0
+
+
+class OneBasedBatchVerifier(IncompleteBatchRecoveryVerifier):
+    def generate_json(self, system, prompt, schema, *, max_tokens=None, temperature=None):
+        self.usage.add(10, 10)
+        if schema is not BlindVerificationBatch:
+            return super().generate_json(system, prompt, schema, max_tokens=max_tokens, temperature=temperature)
+        self.batch_calls += 1
+        marker = prompt.split("<ITEMS_JSON>", 1)[1].split("</ITEMS_JSON>", 1)[0]
+        items = json.loads(marker.strip())
+        return BlindVerificationBatch(verifications=[
+            BlindVerificationBatchItem(
+                question_index=int(item["question_index"]) + 1,
+                **self._verification_payload(item["stem_en"], list(item["choices"])),
+            )
+            for item in items
+        ])
+
+
+def test_complete_one_based_blind_batch_is_normalized_without_extra_calls(project_root):
+    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    passage = bank.get_passage("r001")
+    questions = bank.get_questions("r001")[:2]
+    provider = OneBasedBatchVerifier(
+        {q.stem_en: q.choices[q.correct_key] for q in questions},
+        {q.stem_en: q.evidence_ru for q in questions},
+    )
+
+    reports = validate_with_blind_verifier_batch(provider, passage, questions)
+
+    assert len(reports) == 2
+    assert all(report.status == "accepted" for report in reports)
+    assert provider.batch_calls == 1
+    assert provider.single_calls == 0
+    assert all(report.validator_scores.get("batched_verification") == 1.0 for report in reports)
+
+
+def test_level3_reading_incomplete_batch_verification_does_not_discard_bundle(project_root):
+    """Regression for the deployed 2026-08-17 Level-3 Reading failure."""
+    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    passage = bank.get_passage("r007")
+    questions = bank.get_questions("r007")
+    assert passage.target_ilr == "3"
+    assert len(questions) == 3
+    provider = IncompleteBatchRecoveryVerifier(
+        {q.stem_en: q.choices[q.correct_key] for q in questions},
+        {q.stem_en: q.evidence_ru for q in questions},
+    )
+
+    reports = validate_with_blind_verifier_batch(provider, passage, questions)
+
+    assert len(reports) == 3
+    assert all(report.status == "accepted" for report in reports)
+    assert provider.batch_calls == 1
+    assert provider.single_calls == 2
+    assert sum(report.validator_scores.get("batch_recovery_single", 0.0) for report in reports) == 2.0
