@@ -32,7 +32,7 @@ from ui.callbacks import (
     start_session_callback,
     stop_training_callback,
     sync_generated_bank_callback,
-    submit_passage_callback,
+    submit_passage_stream_callback,
 )
 
 
@@ -449,24 +449,18 @@ def build_app() -> gr.Blocks:
                 outputs=[activity, hint_btn], queue=False, show_progress="hidden",
             )
 
-            submit_prepare = submit_btn.click(
-                lambda: begin_activity("Submitting this passage, updating ability, and saving progress…", "Submitting…"),
-                outputs=[activity, submit_btn],
-                queue=False,
-                show_progress="hidden",
-                trigger_mode="once",
-            )
-            submit_run = submit_prepare.then(
-                submit_passage_callback,
+            # Keep passage submission on one queued event.  A prior two-stage
+            # ``queue=False`` prepare -> ``.then(...)`` chain could silently stall
+            # in the browser after disabling the Submit button, so Python never
+            # received the scoring callback and the Space log stayed completely
+            # quiet.  The streaming callback paints its own busy state immediately
+            # and then performs the real submission in the same event.
+            submit_btn.click(
+                submit_passage_stream_callback,
                 inputs=[state, bundle_state, nonce_state, *answer_radios],
-                outputs=outputs,
+                outputs=[activity, *outputs],
                 show_progress="hidden",
                 trigger_mode="once",
-            )
-            submit_run.then(end_activity, outputs=[activity], queue=False, show_progress="hidden")
-            submit_run.failure(
-                lambda: restore_activity_button("Submit Passage"),
-                outputs=[activity, submit_btn], queue=False, show_progress="hidden",
             )
 
             stop_prepare = stop_training_btn.click(

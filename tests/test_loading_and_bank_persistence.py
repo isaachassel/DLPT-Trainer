@@ -24,15 +24,20 @@ def _settings(tmp_path: Path, **updates) -> Settings:
 
 def test_visible_activity_indicator_and_button_lock_are_wired(project_root):
     source = (project_root / "ui/layout.py").read_text(encoding="utf-8")
+    callbacks = (project_root / "ui/callbacks.py").read_text(encoding="utf-8")
     assert "operation-spinner" in source
-    assert "aria-busy='true'" in (project_root / "ui/callbacks.py").read_text(encoding="utf-8")
+    assert "aria-busy='true'" in callbacks
     assert "Starting session and loading the first passage" in source
     assert "Preparing validated audio playback" in source
-    assert "Submitting this passage" in source
+    # Submission now owns its busy repaint inside one queued generator event,
+    # rather than a fragile queue=False prepare -> .then(...) browser chain.
+    assert "Submitting this passage" in callbacks
+    assert "submit_passage_stream_callback" in source
     assert "interactive=False" in (project_root / "ui/callbacks.py").read_text(encoding="utf-8")
     assert "start_prepare.then" in source
     assert "play_prepare.then" in source
-    assert "submit_prepare.then" in source
+    assert "submit_prepare.then" not in source
+    assert "submit_btn.click(" in source
 
 
 def test_generated_bank_commit_writes_manifest_and_is_immediately_reloadable(project_root, tmp_path):

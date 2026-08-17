@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0 — Submit Passage event reliability
+
+- Fixes a production UI failure where pressing **Submit Passage** could appear to do nothing and produce no Space log entry even though the generated passage itself had completed successfully.
+- Replaces the fragile two-stage Gradio `queue=False` prepare -> `.then(...)` submit chain with one direct queued generator callback.
+- The single callback immediately paints a visible **Submitting…** state, disables only the Submit button, then scores, checkpoints, adapts, and renders the next passage in the same event.
+- The busy repaint uses `gr.skip()` for assessment state, bundle state, nonce, passage text, and answer radios, so it cannot clear selections or mutate the active submission before scoring.
+- Adds an entry log (`Submit passage event received`) before scoring and a completion log afterward, making future browser-to-server submission failures diagnosable instead of silent.
+- Adds defensive wrapper-level recovery that restores the active passage and the learner's selected answers if an unexpected exception occurs outside the normal submission recovery path.
+- Preserves v1.7.9 blind-verifier cardinality recovery, v1.7.8 provider/audio performance behavior, durable bank persistence, and all Russian/Mandarin assessment logic.
+- Full automated suite: 242 passing tests.
+
 ## 1.7.9 — Blind-verifier cardinality recovery
 
 - Fixes Fresh-AI Level 3 Reading bundles being discarded when an otherwise successful `BlindVerificationBatch` omitted, duplicated, or misnumbered one `question_index`.

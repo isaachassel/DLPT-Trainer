@@ -1477,6 +1477,83 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
         return rendered
 
 
+def submit_passage_stream_callback(
+    state: SessionState | None,
+    bundle_data: dict | None,
+    nonce: str | None,
+    a1, a2, a3, a4, a5,
+    progress=gr.Progress(),
+):
+    """Reliable single-event submit wrapper for the Gradio UI.
+
+    Gradio chained ``click(..., queue=False).then(...)`` flows can occasionally
+    stall in the browser after the first stage mutates the same button that
+    owns the chain.  When that happens the scoring callback is never invoked,
+    leaving no server log at all.  Keep submission on one queued Python event
+    instead.  The first generator yield only paints busy UI; it does not mutate
+    session state, radio values, bundle state, or the submission nonce.
+    """
+    question_count = len((bundle_data or {}).get("questions", [])) if isinstance(bundle_data, dict) else 0
+    LOGGER.info(
+        "Submit passage event received session=%s skill=%s passage=%s questions=%s nonce=%s",
+        getattr(state, "session_id", None),
+        getattr(state, "active_skill", None),
+        (bundle_data or {}).get("passage", {}).get("id") if isinstance(bundle_data, dict) else None,
+        question_count,
+        (nonce or "")[:12],
+    )
+
+    # There are 31 normal render outputs in layout.py.  Leave every assessment
+    # value untouched during the busy repaint; change only status + submit button.
+    busy = [gr.skip() for _ in range(10 + MAX_SLOTS * 2 + 11)]
+    if state is not None:
+        busy[3] = gr.update(
+            value=_status_text(state, "Submitting passage… scoring responses and saving progress."),
+            visible=True,
+        )
+    busy[22] = gr.update(value="Submitting…", visible=True, interactive=False)
+    yield [
+        gr.update(
+            value=activity_html("Submitting this passage, updating ability, and saving progress…"),
+            visible=True,
+        ),
+        *busy,
+    ]
+
+    try:
+        result = submit_passage_callback(
+            state, bundle_data, nonce, a1, a2, a3, a4, a5, progress=progress
+        )
+        LOGGER.info(
+            "Submit passage event completed session=%s passage=%s",
+            getattr(state, "session_id", None),
+            (bundle_data or {}).get("passage", {}).get("id") if isinstance(bundle_data, dict) else None,
+        )
+    except Exception as exc:  # defensive: keep the button recoverable even for wrapper-level bugs
+        LOGGER.exception(
+            "Submit passage event failed before normal recovery session=%s error_type=%s",
+            getattr(state, "session_id", None),
+            type(exc).__name__,
+        )
+        if state is not None and isinstance(bundle_data, dict):
+            try:
+                bundle = _bundle_from_dict(bundle_data)
+                result = _test_render(state, bundle, "Recoverable submission issue. Please try Submit Passage again.")
+                # Preserve the learner's current answers after a wrapper-level failure.
+                values = [a1, a2, a3, a4, a5]
+                for index, question in enumerate(bundle.questions):
+                    choices = [(f"{letter}. {question.choices[letter]}", letter) for letter in ["A", "B", "C", "D"]]
+                    result[11 + index * 2] = gr.update(
+                        choices=choices, value=values[index], visible=True, interactive=True,
+                        label=f"Question {index + 1}",
+                    )
+            except Exception:
+                result = _inactive_render(state, "### Submission could not be completed safely\n\nPlease resume the saved session and try again.")
+        else:
+            result = _inactive_render(state, "### No active passage\n\nStart or resume a session.")
+    yield [end_activity(), *result]
+
+
 def stop_training_callback(state: SessionState | None):
     if not state or state.mode != "training":
         return _inactive_render(state, "### Only Training Mode can be stopped with a partial review.")

@@ -14,6 +14,12 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
+## v1.8.0 Submit Passage reliability
+
+The **Submit Passage** action now runs as one direct queued Gradio event. This fixes a production case where the old `queue=False` prepare -> `.then(...)` chain could disable the button but never invoke Python, leaving the UI apparently frozen and the Space log completely silent. The new event emits a visible **Submitting…** state without touching answers or the active nonce, logs receipt before scoring, saves the checkpoint, performs adaptive selection, and renders the next passage from the same callback.
+
+If submission ever fails outside the normal recovery path, the app restores the current passage and selected radio answers rather than leaving the button disabled.
+
 ## v1.7.9 verifier recovery
 
 Fresh-AI passages are no longer discarded solely because a hosted blind verifier returns an incomplete or misnumbered batch. The app preserves valid verification entries, normalizes an unambiguous one-based batch, and independently re-verifies only missing or duplicate indexes with the single-question verifier contract. This specifically fixes the production Level 3 Reading fallback `Blind verifier did not return exactly one result for every question.` while keeping blind answer verification mandatory.

@@ -66,3 +66,44 @@ def test_app_disables_gradio_and_hf_telemetry_before_importing_ui():
         assert source.index(setting) < ui_import_index
     layout_source = (Path(__file__).resolve().parents[1] / "ui" / "layout.py").read_text(encoding="utf-8")
     assert "analytics_enabled=False" in layout_source
+
+
+def test_submit_passage_uses_single_direct_queued_event() -> None:
+    """Regression: do not reintroduce the silent prepare->then submit chain."""
+    source = (Path(__file__).resolve().parents[1] / "ui" / "layout.py").read_text(encoding="utf-8")
+    assert "submit_passage_stream_callback" in source
+    assert "submit_prepare = submit_btn.click" not in source
+    assert "submit_run = submit_prepare.then" not in source
+    assert "outputs=[activity, *outputs]" in source
+
+
+def test_submit_stream_first_yield_only_paints_busy_ui() -> None:
+    from ui.callbacks import submit_passage_stream_callback
+
+    stream = submit_passage_stream_callback(None, None, None, None, None, None, None, None, progress=None)
+    first = next(stream)
+    # activity + the 31 ordinary assessment render outputs
+    assert len(first) == 32
+    # The normal Submit Passage output is index 22, offset by one for activity.
+    submit_update = first[23]
+    assert submit_update.get("value") == "Submitting…"
+    assert submit_update.get("interactive") is False
+    # Session/bundle/nonce outputs are deliberately untouched during the busy repaint.
+    assert first[1].get("__type__") == "update"
+    assert first[1].get("value", object()) is not None or "value" not in first[1]
+    second = next(stream)
+    assert len(second) == 32
+    try:
+        next(stream)
+    except StopIteration:
+        pass
+    else:
+        raise AssertionError("submit stream should emit exactly busy + final renders")
+
+
+def test_submit_stream_logs_entry_before_scoring_source_contract() -> None:
+    source = (Path(__file__).resolve().parents[1] / "ui" / "callbacks.py").read_text(encoding="utf-8")
+    function_start = source.index("def submit_passage_stream_callback")
+    received = source.index("Submit passage event received", function_start)
+    scoring = source.index("result = submit_passage_callback", function_start)
+    assert received < scoring
