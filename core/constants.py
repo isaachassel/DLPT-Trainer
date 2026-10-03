@@ -12,7 +12,7 @@ ILR_THETA = {
 }
 THETA_ILR = tuple((theta, level) for level, theta in ILR_THETA.items())
 SKILLS = ["reading", "listening"]
-MODES = ["training", "diagnostic", "simulation"]
+MODES = ["training", "diagnostic", "simulation", "assessment"]
 QUESTION_TYPES = [
     "main idea",
     "prominent detail",
@@ -35,6 +35,7 @@ SIMULATION_MODE_LABEL = "DLPT-style Adaptive Practice Simulation"
 MODE_LABELS = {
     "Training Mode": "training",
     "Adaptive Diagnostic": "diagnostic",
+    "Adaptive Assessment": "assessment",
     SIMULATION_MODE_LABEL: "simulation",
     # Backward-compatible alias for checkpoints, tests, and bookmarked clients
     # created before the learner-facing name was made more precise.

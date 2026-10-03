@@ -33,13 +33,15 @@ def test_audio_html_uses_gradio_file_route_not_base64(tmp_path: Path) -> None:
 
 def test_gradio_audio_url_is_absolute_and_encoded(tmp_path: Path) -> None:
     audio = tmp_path / "sample clip.mp3"
-    expected_path = str(audio.resolve()).replace(" ", "%20")
-    assert gradio_audio_url(audio) == f"/gradio_api/file={expected_path}"
+    from urllib.parse import unquote
+    assert unquote(gradio_audio_url(audio)) == f"/gradio_api/file={audio.resolve()}"
+    assert "%20" in gradio_audio_url(audio)
 
 
 def test_audio_component_registers_reactive_browser_handler() -> None:
     source = (ROOT / "ui" / "layout.py").read_text(encoding="utf-8")
-    assert "watch('value', bindAudio)" in source
+    assert "new MutationObserver(bindAudio)" in source
+    assert "childList: true, subtree: true" in source
     assert "Press the play button in the player" in source
     assert "audio.controls = false" in source
     assert "audio.dataset.strict === 'true'" in source
