@@ -76,7 +76,11 @@ const bindAudio = () => {
     setStatus('Audio ready. Press the play button in the player.');
   }, { once: true });
 };
-watch('value', bindAudio);
+// Gradio 6.5.1 has no `watch` helper in js_on_load. Rebind when its
+// template replaces the audio node, including on the next passage.
+if (element.dlptAudioObserver) element.dlptAudioObserver.disconnect();
+element.dlptAudioObserver = new MutationObserver(bindAudio);
+element.dlptAudioObserver.observe(element, { childList: true, subtree: true });
 bindAudio();
 """
 
@@ -115,6 +119,8 @@ def build_app() -> gr.Blocks:
                 with gr.Column(elem_classes=["mode-card"]):
                     gr.Markdown("**Adaptive Diagnostic**\n\nIndependent Bayesian Reading and Listening routing. Passages move up or down one adjacent ILR half-step as evidence accumulates.")
                 with gr.Column(elem_classes=["mode-card"]):
+                    gr.Markdown("**Adaptive Assessment**\n\nSeparate reading and listening estimates with uncertainty, complete-passage limits, and answer review only after the assessment ends.")
+                with gr.Column(elem_classes=["mode-card"]):
                     gr.Markdown(f"**{SIMULATION_MODE_LABEL}**\n\nBegins at medium difficulty, adapts after every passage, and preserves strict timing and locked progression without claiming to be the official test.")
 
             state = gr.State(value=None)
@@ -128,13 +134,21 @@ def build_app() -> gr.Blocks:
                         value=LANGUAGES["ru"].label,
                         label="Test language",
                     )
-                    mode = gr.Radio(["Training Mode", "Adaptive Diagnostic", SIMULATION_MODE_LABEL], value="Training Mode", label="Mode")
+                    mode = gr.Radio(["Training Mode", "Adaptive Assessment", "Adaptive Diagnostic", SIMULATION_MODE_LABEL], value="Training Mode", label="Mode")
                     skill = gr.Radio(["Reading", "Listening", "Reading + Listening (separate sections)"], value="Reading", label="Skill selection")
                 with gr.Row():
                     start_level = gr.Dropdown(ILR_LEVELS, value="1+", label="Approximate starting ILR band")
                     target_level = gr.Dropdown(ILR_LEVELS, value="2", label="Target ILR band")
                     length = gr.Dropdown(["Short — 8 questions", "Standard — 16 questions", "Long — 24 questions"], value="Standard — 16 questions", label="Session length")
                     timer_mode = gr.Dropdown(["Off", "Standard count-up", "Strict countdown"], value="Off", label="Timer behavior")
+                with gr.Group(visible=False) as assessment_settings:
+                    gr.Markdown("Assessment uses validated bank passages and a neutral start. Limits apply separately to each skill. "
+                                "Listening uses the saved recording once. Results are provisional practice estimates, not official ODA/DLPT scores.")
+                    with gr.Row():
+                        assessment_min = gr.Number(value=6, minimum=2, maximum=40, precision=0, label="Minimum passages per skill")
+                        assessment_max = gr.Number(value=18, minimum=2, maximum=40, precision=0, label="Maximum passages per skill")
+                        assessment_sd = gr.Slider(0.3, 0.8, value=0.55, step=0.05, label="Uncertainty target (posterior SD)",
+                                                  info="Lower values require more evidence. The bank or passage limit may be reached first.")
                 with gr.Row():
                     adaptive_start = gr.Radio(
                         ["Medium difficulty (recommended)", "Use selected starting ILR band"],
@@ -147,7 +161,7 @@ def build_app() -> gr.Blocks:
                         ILR_LEVELS,
                         value="0",
                         label="Lowest ILR band allowed",
-                        info="Hard eligibility floor for Training and Adaptive Diagnostic item selection.",
+                        info="Hard eligibility floor for Training, Adaptive Diagnostic, and Adaptive Assessment.",
                     )
                     maximum_ilr = gr.Dropdown(
                         ILR_LEVELS,
@@ -242,7 +256,7 @@ def build_app() -> gr.Blocks:
 
             with gr.Row():
                 stop_training_btn = gr.Button("Stop Training & Show Partial Report", visible=False)
-                abandon_btn = gr.Button("Abandon Diagnostic / Simulation", visible=False)
+                abandon_btn = gr.Button("End Assessment / Abandon Diagnostic or Simulation", visible=False)
                 confirm_abandon = gr.Checkbox(label="I understand this abandons the active strict session", visible=False)
 
             report = gr.Markdown(visible=False, elem_classes=["report-panel"])
@@ -268,6 +282,11 @@ def build_app() -> gr.Blocks:
                     length, timer_mode, hints_enabled, transcript_review, voice, speed, feedback_timing,
                     adaptive_start, minimum_ilr, maximum_ilr, start_level, target_level,
                 ],
+            )
+            mode.change(
+                lambda value: (gr.update(visible=value == "Adaptive Assessment"),
+                               gr.update(visible=value != "Adaptive Assessment")),
+                inputs=[mode], outputs=[assessment_settings, content_source], queue=False,
             )
             skill.change(
                 mode_controls,
@@ -313,6 +332,7 @@ def build_app() -> gr.Blocks:
                     mode, skill, start_level, target_level, length, timer_mode, topics, competencies,
                     feedback_timing, hints_enabled, transcript_review, voice, speed, profile_id, content_source,
                     adaptive_start, minimum_ilr, maximum_ilr, language,
+                    assessment_min, assessment_max, assessment_sd,
                 ],
                 outputs=outputs,
                 show_progress="hidden",

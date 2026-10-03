@@ -250,7 +250,7 @@ class ResponseRecord(StrictModel):
     passage_id: str
     question_id: str
     skill: Literal["reading", "listening"]
-    mode: Literal["training", "diagnostic", "simulation"]
+    mode: Literal["training", "diagnostic", "simulation", "assessment"]
     language: str = "ru"
     target_ilr: str
     item_difficulty: float
@@ -295,7 +295,7 @@ class SessionState(StrictModel):
     session_id: str = Field(default_factory=lambda: uuid4().hex[:12])
     profile_id: str | None = None
     language: str = "ru"
-    mode: Literal["training", "diagnostic", "simulation"]
+    mode: Literal["training", "diagnostic", "simulation", "assessment"]
     selected_skills: list[Literal["reading", "listening"]]
     active_skill_index: int = 0
     start_level: str = "1+"
@@ -307,6 +307,10 @@ class SessionState(StrictModel):
     competencies: list[str] = Field(default_factory=list)
     max_questions_per_skill: int = 16
     minimum_questions_per_skill: int = 8
+    assessment_min_passages: int = Field(default=6, ge=2, le=40)
+    assessment_max_passages: int = Field(default=18, ge=2, le=40)
+    assessment_target_sd: float = Field(default=0.55, ge=0.3, le=0.8)
+    assessment_end_reasons: dict[str, str] = Field(default_factory=dict)
     simulation_full: bool = False
     shortened_simulation: bool = False
     timer_mode: Literal["off", "standard", "strict"] = "off"
@@ -356,6 +360,8 @@ class SessionState(StrictModel):
 
     @model_validator(mode="after")
     def validate_adaptive_band_range(self):
+        if self.assessment_min_passages > self.assessment_max_passages:
+            raise ValueError("Minimum assessment passages cannot exceed maximum passages")
         if self.language not in SUPPORTED_LANGUAGE_CODES:
             raise ValueError(f"language must be one of {SUPPORTED_LANGUAGE_CODES}")
         if self.minimum_ilr not in ILR_LEVELS or self.maximum_ilr not in ILR_LEVELS:

@@ -8,6 +8,8 @@ from .languages import language_profile
 from .models import ResponseRecord, SessionState
 from .scoring import accuracy, estimate_label, grouped_accuracy, item_level_label, response_time_summary, strengths_and_weaknesses
 from .storage import export_responses_csv, export_session_json
+from . import assessment
+from .adaptive import nearest_ilr
 
 
 def _format_group(title: str, grouped: dict[str, tuple[int, int, float]]) -> list[str]:
@@ -89,6 +91,8 @@ def _recommendation(records: list[ResponseRecord], estimate_level: str | None, w
 
 
 def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_review: bool = True) -> str:
+    if state.mode == "assessment":
+        return _assessment_report(state, skill, bank, include_review)
     records = state.responses_for(skill)
     estimate = state.ability_for(skill)
     correct, attempted, pct = accuracy(records)
@@ -141,6 +145,8 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
 
 
 def build_full_report(state: SessionState, bank: ItemBank) -> str:
+    if state.mode == "assessment" and state.status == "active":
+        return "Assessment in progress. Results and explanations are withheld until all selected skill sections end."
     lines = [
         "# Session Report",
         f"Language: {language_profile(state.language).label}",
@@ -155,7 +161,60 @@ def build_full_report(state: SessionState, bank: ItemBank) -> str:
     ]
     for skill in state.selected_skills:
         lines.append(build_skill_report(state, skill, bank, include_review=True))
+    if state.mode == "assessment":
+        return "\n\n".join(lines)
     return "\n\n---\n\n".join(lines)
+
+
+def _assessment_report(state: SessionState, skill: str, bank: ItemBank, include_review: bool) -> str:
+    if state.status == "active":
+        return "Assessment in progress. Results and explanations are withheld until all selected skill sections end."
+    estimate = state.ability_for(skill)
+    records = state.responses_for(skill)
+    count = assessment.passage_count(state, skill)
+    reason = state.assessment_end_reasons.get(skill, "abandoned")
+    lines = [f"## {skill.title()} Adaptive Assessment",
+             f"**Why it ended:** {assessment.END_REASONS[reason]}",
+             f"Evidence: **{count} passages / {len(records)} questions**, {sum(r.is_correct for r in records)} correct.",
+             f"Configured limits: {state.assessment_min_passages}–{state.assessment_max_passages} passages; posterior SD target {state.assessment_target_sd:.2f}."]
+    if count < state.assessment_min_passages:
+        lines.append("**Insufficient evidence: no estimated practice ILR level is reported.** The minimum passage count was not reached.")
+    else:
+        probabilities = assessment.band_probabilities(estimate)
+        mass = probabilities[estimate.practice_ilr]
+        lines.append(f"**Estimated practice ILR level: {estimate.practice_ilr} (provisional).** "
+                     f"Model probability in that band: {mass:.0%}.")
+        if not assessment.precision_met(state, skill) or mass < 0.60 or reason == "abandoned":
+            lines.append("**Inconclusive classification:** uncertainty remains too broad or crosses a band boundary. "
+                         "Use the interval rather than treating the point estimate as a settled level.")
+        else:
+            lines.append("The configured evidence target was met; the estimate remains unvalidated practice guidance.")
+    if records:
+        lines.append(f"**90% posterior credible interval:** {estimate.ci_low:.2f} to {estimate.ci_high:.2f} on the internal scale "
+                     f"(approximately practice ILR {nearest_ilr(estimate.ci_low)}–{nearest_ilr(estimate.ci_high)}); "
+                     f"**posterior SD: {estimate.standard_error:.2f}**.")
+        if estimate.ci_low < -2.5 or estimate.ci_high > 2.0:
+            lines.append("The interval extends beyond the bank's ILR 0–3 anchors. Endpoint labels pool the tails; "
+                         "this bank cannot resolve ability beyond those limits.")
+    if state.minimum_ilr != "0" or state.maximum_ilr != "3":
+        lines.append(f"Range-limited assessment: only ILR {state.minimum_ilr}–{state.maximum_ilr} content was eligible.")
+    lines.append("Bayesian passage-testlet model: a 25% guessing allowance for four-choice questions and a shared "
+                 "passage difficulty offset account for related responses. ILR labels and model parameters are provisional. "
+                 "The interval is conditional on these assumptions and excludes unknown systematic labeling error. "
+                 "This does not reproduce the official ODA/DLPT algorithm or provide a validated official score.")
+    if include_review and records:
+        lines.append("### Answer and explanation review")
+        last_passage = None
+        for index, record in enumerate(records, 1):
+            if skill == "listening" and record.passage_id != last_passage:
+                passage = bank.passages.get(record.passage_id)
+                if passage and state.transcript_review_enabled:
+                    lines.append(f"**Listening transcript:** {passage.passage_ru}")
+            last_passage = record.passage_id
+            lines.extend([f"**{index}. {record.stem_en}** — {'Correct' if record.is_correct else 'Incorrect'}",
+                          f"Your answer: {record.selected_key}. Correct answer: {record.correct_key}. {record.choices_snapshot[record.correct_key]}",
+                          f"Explanation: {record.rationale_en}", f"Evidence: {record.evidence_ru}"])
+    return "\n\n".join(lines)
 
 
 def build_exports(state: SessionState, export_dir: str | Path) -> tuple[str, str]:

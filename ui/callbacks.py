@@ -13,6 +13,7 @@ from uuid import uuid4
 import gradio as gr
 
 from core.adaptive import clamp_ilr
+from core import assessment
 from core.audio import (
     DIALOGUE_TTS_ASSET_VERSION,
     DIALOGUE_TTS_CACHE_VERSION,
@@ -317,9 +318,22 @@ def mode_controls(mode_label: str, skill_label: str, language_label: str = "Russ
     language = LANGUAGE_LABEL_TO_CODE.get(language_label, "ru")
     voices = voice_choices(language)
     listening_selected = skill_label != "Reading"
+    if mode == "assessment":
+        return (
+            gr.update(choices=["Complete passages"], value="Complete passages", visible=False),
+            gr.update(choices=["Off"], value="Off", interactive=False),
+            gr.update(visible=False, value=False), gr.update(visible=False, value=True),
+            gr.update(choices=voices, value=language_profile(language).starter_voice_label, visible=False),
+            gr.update(visible=False),
+            gr.update(choices=["End of session"], value="End of session", visible=False),
+            gr.update(value="Medium difficulty (recommended)", visible=False),
+            gr.update(value="0", visible=True, interactive=True),
+            gr.update(value="3", visible=True, interactive=True),
+            gr.update(visible=False), gr.update(visible=False),
+        )
     if mode == "training":
         return (
-            gr.update(choices=list(TRAINING_LENGTHS), value="Standard — 16 questions", label="Session length"),
+            gr.update(choices=list(TRAINING_LENGTHS), value="Standard — 16 questions", label="Session length", visible=True),
             gr.update(choices=["Off", "Standard count-up", "Strict countdown"], value="Off", interactive=True),
             gr.update(visible=True, interactive=True),
             gr.update(visible=listening_selected, interactive=listening_selected),
@@ -334,7 +348,7 @@ def mode_controls(mode_label: str, skill_label: str, language_label: str = "Russ
         )
     if mode == "diagnostic":
         return (
-            gr.update(choices=list(DIAGNOSTIC_LENGTHS), value="Efficient — 12 to 20 questions per skill", label="Diagnostic length"),
+            gr.update(choices=list(DIAGNOSTIC_LENGTHS), value="Efficient — 12 to 20 questions per skill", label="Diagnostic length", visible=True),
             gr.update(choices=["Off", "Standard count-up", "Strict countdown"], value="Standard count-up", interactive=True),
             gr.update(visible=False, value=False),
             gr.update(visible=False, value=True),
@@ -352,6 +366,7 @@ def mode_controls(mode_label: str, skill_label: str, language_label: str = "Russ
             choices=list(SIMULATION_LENGTHS),
             value="Standard practice — 35 questions per skill / up to 3 hours",
             label="Simulation length",
+            visible=True,
         ),
         gr.update(choices=["Strict countdown"], value="Strict countdown", interactive=False),
         gr.update(visible=False, value=False),
@@ -415,7 +430,7 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
         bundle = select_next_bundle(state, BANK, None)
     origin = BANK.origin_for(bundle.passage.id)
     state.last_content_source = "generated_bank" if origin == "generated_bank" else "starter_bank"
-    if bundle.passage.skill == "listening":
+    if bundle.passage.skill == "listening" and state.mode != "assessment":
         _prefetch_selected_playback(state, bundle)
     if not state.last_content_note:
         source_label = (
@@ -608,11 +623,17 @@ const draw=()=>{{const s=Math.max(0,Math.floor((deadline-Date.now())/1000));cons
 
 def _status_text(state: SessionState, extra: str = "") -> str:
     completed = state.completed_count(state.active_skill)
-    mode_name = {"training": "Training Mode", "diagnostic": "Adaptive Diagnostic", "simulation": SIMULATION_MODE_LABEL}[state.mode]
+    mode_name = {"training": "Training Mode", "diagnostic": "Adaptive Diagnostic", "assessment": "Adaptive Assessment", "simulation": SIMULATION_MODE_LABEL}[state.mode]
     lines = [
         f"### {mode_name} — {state.active_skill.title()}",
         f"**Progress:** {completed}/{state.max_questions_per_skill} questions in this skill  |  **Session code:** `{state.session_id}`",
     ]
+    if state.mode == "assessment":
+        count = assessment.passage_count(state, state.active_skill)
+        lines[1] = (f"**Progress:** {count}/{state.assessment_max_passages} passages in this skill "
+                    f"(minimum {state.assessment_min_passages}) | **Session code:** `{state.session_id}`")
+        lines.append("Answers, explanations, and estimates are withheld until the entire assessment ends. "
+                     "Reading and listening are estimated separately; listening allows one playback.")
     if state.mode == "training":
         estimate = state.ability_for(state.active_skill)
         lines.append(
@@ -694,7 +715,7 @@ def _blank_questions():
 
 def _test_render(state: SessionState, bundle: PassageBundle, message: str = ""):
     passage = bundle.passage
-    strict_listening = passage.skill == "listening" and state.mode in {"diagnostic", "simulation"}
+    strict_listening = passage.skill == "listening" and state.mode in {"diagnostic", "simulation", "assessment"}
     play_label = "Play Audio Once" if strict_listening else "Play / Replay Audio"
     play_visible = passage.skill == "listening"
     return [
@@ -713,8 +734,8 @@ def _test_render(state: SessionState, bundle: PassageBundle, message: str = ""):
         gr.update(value="", visible=False),
         gr.update(value="Submit Passage", visible=True, interactive=True),
         gr.update(visible=state.mode == "training"),
-        gr.update(visible=state.mode in {"diagnostic", "simulation"}),
-        gr.update(visible=state.mode in {"diagnostic", "simulation"}, value=False),
+        gr.update(visible=state.mode in {"diagnostic", "simulation", "assessment"}),
+        gr.update(visible=state.mode in {"diagnostic", "simulation", "assessment"}, value=False),
         gr.update(value="", visible=False),
         gr.update(value="", visible=False),
         gr.update(value=None, visible=False),
@@ -751,6 +772,8 @@ def _inactive_render(state: SessionState | None, status: str, report: str = "", 
 
 
 def _length_settings(mode: str, label: str) -> tuple[int, int, bool, bool, int | None]:
+    if mode == "assessment":
+        return 200, 0, False, False, None  # Only passage limits govern assessment.
     if mode == "training":
         max_q = TRAINING_LENGTHS[label]
         return max_q, max_q, False, False, None
@@ -870,6 +893,7 @@ def start_session_callback(
     voice_label, speech_rate_label, profile_id, content_source_label="Validated bank only — fastest",
     adaptive_start_label="Use selected starting ILR band", minimum_ilr="0", maximum_ilr="3",
     language_label="Russian",
+    assessment_min_passages=6, assessment_max_passages=18, assessment_target_sd=0.55,
     progress=gr.Progress(),
 ):
     try:
@@ -884,6 +908,8 @@ def start_session_callback(
             if ILR_LEVELS.index(minimum_ilr) > ILR_LEVELS.index(maximum_ilr):
                 raise ValueError("The lowest allowed ILR band cannot be higher than the highest allowed band.")
             adaptive_start_policy = "selected" if adaptive_start_label.startswith("Use selected") else "medium"
+        if mode == "assessment":
+            adaptive_start_policy = "medium"
         if mode == "training" or adaptive_start_policy == "selected":
             if not ILR_LEVELS.index(minimum_ilr) <= ILR_LEVELS.index(start_level) <= ILR_LEVELS.index(maximum_ilr):
                 raise ValueError("The selected starting ILR band must fall inside the allowed adaptive range.")
@@ -917,16 +943,21 @@ def start_session_callback(
             adaptive_start_policy=adaptive_start_policy,
             minimum_ilr=minimum_ilr,
             maximum_ilr=maximum_ilr,
+            assessment_min_passages=assessment_min_passages if mode == "assessment" else 6,
+            assessment_max_passages=assessment_max_passages if mode == "assessment" else 18,
+            assessment_target_sd=assessment_target_sd if mode == "assessment" else 0.55,
         )
         LOGGER.info(
             "Session audio preference session=%s mode=%s language=%s selected_label=%s speed=%s",
             state.session_id, state.mode, state.language, state.voice_label, state.speech_rate_label,
         )
-        bundle = _select_with_safe_history(state, progress)
+        bundle = _assessment_next_or_end(state) if mode == "assessment" else _select_with_safe_history(state, progress)
+        if bundle is None:
+            return _assessment_finished(state)
         _progress(progress, 0.96, "Saving the initial checkpoint…")
         STORAGE.save_checkpoint(state)
         _progress(progress, 1.0, "Session ready")
-        return _test_render(state, bundle, "Progress is checkpointed after every passage; accepted fresh items become reusable bank content.")
+        return _test_render(state, bundle, "Progress is checkpointed after every passage.")
     except Exception as exc:
         return _inactive_render(None, f"### Session could not start\n\n{html.escape(str(exc))}\n\nThe app did not clear any prior checkpoint.")
 
@@ -935,6 +966,14 @@ def resume_session_callback(session_code: str, progress=gr.Progress()):
     try:
         _progress(progress, 0.15, "Loading and verifying checkpoint…")
         state = STORAGE.load_checkpoint(session_code.strip())
+        if state.mode == "assessment":
+            if state.status != "active":
+                return _assessment_finished(state)
+            bundle = _rebuild_current_bundle(state) if state.current_passage_id else _assessment_next_or_end(state)
+            if bundle is None:
+                return _assessment_finished(state)
+            STORAGE.save_checkpoint(state)
+            return _test_render(state, bundle, "Assessment checkpoint restored.")
         if state.status == "completed":
             _progress(progress, 0.78, "Building the final report and exports…")
             report = build_full_report(state, BANK)
@@ -1200,7 +1239,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
     if not bundle or bundle.passage.skill != "listening":
         return state, gr.update(value="", visible=False), gr.update(visible=False), gr.update()
     try:
-        strict = state.mode in {"diagnostic", "simulation"}
+        strict = state.mode in {"diagnostic", "simulation", "assessment"}
         if strict and state.current_listening_plays >= 1:
             raise SessionFlowError("Replay is disabled in strict listening conditions.")
         _progress(progress, 0.10, "Authorizing browser playback…")
@@ -1272,7 +1311,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                     "Training playback render failed passage=%s selected_label=%s requested_voice=%s reason=%s",
                     bundle.passage.id, state.voice_label, voice, type(selected_exc).__name__,
                 )
-        else:
+        elif state.mode != "assessment":
             # Strict modes use the canonical bank recording. Older assets receive
             # one lazy neural upgrade, but learner voice preferences never affect
             # Diagnostic or Simulation audio.
@@ -1311,7 +1350,7 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         return (
             state,
             gr.update(value=audio_html, visible=True),
-            gr.update(value="Play / Replay Audio", interactive=True, visible=True),
+            gr.update(value="Play Audio Once" if strict else "Play / Replay Audio", interactive=True, visible=True),
             gr.update(value=status),
         )
     except Exception as exc:
@@ -1335,7 +1374,7 @@ def confirm_audio_playback_callback(state: SessionState | None, bundle_data: dic
     try:
         mark_listening_play(state)
         STORAGE.save_checkpoint(state)
-        strict = state.mode in {"diagnostic", "simulation"}
+        strict = state.mode in {"diagnostic", "simulation", "assessment"}
         label = "Audio Started — Replay Disabled" if strict else "Play / Replay Audio"
         return (
             state,
@@ -1402,9 +1441,37 @@ def _passage_feedback(records, passage: PassageItem, state: SessionState) -> str
     return "\n\n".join(lines)
 
 
+def _assessment_finished(state: SessionState):
+    STORAGE.save_checkpoint(state)
+    history = _history_for(state)
+    if history and state.profile_id:
+        # Avoid appending the same records again on report recovery.
+        recorded = {(r.session_id, r.question_id) for r in history.response_records}
+        if any((r.session_id, r.question_id) not in recorded for r in state.responses):
+            STORAGE.save_history(update_history(history, state))
+    paths = build_exports(state, EXPORT_DIR)
+    return _inactive_render(state, "### Adaptive Assessment ended", build_full_report(state, BANK), *paths)
+
+
+def _assessment_next_or_end(state: SessionState) -> PassageBundle | None:
+    while state.status == "active":
+        if skill_is_complete(state):
+            if advance_skill_or_finish(state):
+                return None
+        try:
+            return _bank_bundle(state)
+        except LookupError:
+            state.assessment_end_reasons[state.active_skill] = "content_exhausted"
+            if advance_skill_or_finish(state, force=True):
+                return None
+    return None
+
+
 def submit_passage_callback(state: SessionState | None, bundle_data: dict | None, nonce: str | None, a1, a2, a3, a4, a5, progress=gr.Progress()):
     if not state or not bundle_data or not nonce:
         return _inactive_render(state, "### No active passage\n\nStart or resume a session.")
+    if state.mode == "assessment" and state.status != "active":
+        return _assessment_finished(state)
     bundle = _bundle_from_dict(bundle_data)
     answers_values = [a1, a2, a3, a4, a5]
     answers = {question.id: answers_values[index] for index, question in enumerate(bundle.questions)}
@@ -1414,6 +1481,14 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
             raise SessionFlowError("Play the listening passage once before submitting.")
         _progress(progress, 0.22, "Scoring responses and updating the adaptive estimate…")
         records = submit_current_bundle(state, bundle.passage, bundle.questions, answers, nonce)
+        if state.mode == "assessment":
+            STORAGE.save_checkpoint(state)
+            next_bundle = (_rebuild_current_bundle(state) if state.current_passage_id
+                           else _assessment_next_or_end(state))
+            if next_bundle is None:
+                return _assessment_finished(state)
+            STORAGE.save_checkpoint(state)
+            return _test_render(state, next_bundle, "Passage submitted." if records else "Duplicate submission ignored.")
         if not records:
             current = _rebuild_current_bundle(state)
             return _test_render(state, current, "Duplicate submission ignored; no response was recorded twice.")
@@ -1565,12 +1640,16 @@ def stop_training_callback(state: SessionState | None):
 
 
 def abandon_strict_callback(state: SessionState | None, confirmed: bool):
-    if not state or state.mode not in {"diagnostic", "simulation"}:
+    if not state or state.mode not in {"diagnostic", "simulation", "assessment"}:
         return _inactive_render(state, "### No active strict session to abandon.")
     if not confirmed:
         bundle = _rebuild_current_bundle(state)
         return _test_render(state, bundle, "Check the confirmation box before abandoning this active session.")
     state.status = "stopped"
+    if state.mode == "assessment":
+        for skill in state.selected_skills:
+            state.assessment_end_reasons.setdefault(skill, "abandoned")
+        return _assessment_finished(state)
     STORAGE.save_checkpoint(state)
     json_path, csv_path = build_exports(state, EXPORT_DIR)
     if state.mode == "simulation":

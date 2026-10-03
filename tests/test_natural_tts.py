@@ -349,7 +349,8 @@ def test_training_playback_uses_irina_without_first_rendering_canonical_edge_voi
     result = callbacks.play_audio_callback(state, callbacks._bundle_to_dict(bundle), progress=None)
     assert calls == ["piper:ru_RU-irina-medium"]
     assert "Russian Female — Irina (local Piper)" in result[3]["value"]
-    assert str(rendered.resolve()) in result[1]["value"]
+    from urllib.parse import unquote
+    assert str(rendered.resolve()) in unquote(result[1]["value"])
 
 
 def test_irina_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypatch, bank, tmp_path):
@@ -395,9 +396,12 @@ def test_irina_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypat
     assert "fell back to Russian Female — Svetlana" in result[3]["value"]
 
 
-def test_explicit_dialogue_mode_does_not_silently_replace_failed_segment_voice(tmp_path):
+def test_explicit_dialogue_mode_does_not_silently_replace_failed_segment_voice(tmp_path, monkeypatch):
     import pytest
     from core.audio import VoiceUnavailableError, generate_dialogue_cached_tts
+
+    # This unit test fails during synthesis, before ffmpeg is invoked.
+    monkeypatch.setattr("core.audio.shutil.which", lambda _name: "ffmpeg")
 
     requested: list[str] = []
 

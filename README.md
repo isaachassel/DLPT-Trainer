@@ -14,6 +14,10 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
+## Adaptive Assessment
+
+Select **Adaptive Assessment** for separate reading/listening practice estimates, a 90% uncertainty interval, configurable passage limits, and explicit stopping reasons. The mode accounts for guessing and shared-passage evidence, avoids repeats, and withholds review until the assessment ends. Results use provisional ILR labels and are not official or validated ODA/DLPT scores. See [setup, scoring assumptions, limitations, and verification](docs/ADAPTIVE_ASSESSMENT.md).
+
 ## v1.8.0 Submit Passage reliability
 
 The **Submit Passage** action now runs as one direct queued Gradio event. This fixes a production case where the old `queue=False` prepare -> `.then(...)` chain could disable the button but never invoke Python, leaving the UI apparently frozen and the Space log completely silent. The new event emits a visible **Submitting…** state without touching answers or the active nonce, logs receipt before scoring, saves the checkpoint, performs adaptive selection, and renders the next passage from the same callback.

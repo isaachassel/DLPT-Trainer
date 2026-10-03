@@ -16,6 +16,7 @@ from .adaptive import (
 from .constants import ILR_THETA, SIMULATION_MIN_QUESTIONS
 from .item_bank import ItemBank, shuffled_bundle
 from .models import PassageItem, QuestionItem, ResponseRecord, SessionState, UserHistory
+from . import assessment
 
 
 class SessionFlowError(RuntimeError):
@@ -54,6 +55,9 @@ def create_session(
     minimum_ilr: str = "0",
     maximum_ilr: str = "3",
     language: str = "ru",
+    assessment_min_passages: int = 6,
+    assessment_max_passages: int = 18,
+    assessment_target_sd: float = 0.55,
 ) -> SessionState:
     now = time.time()
     broad = mode != "training"
@@ -65,6 +69,13 @@ def create_session(
         routing_level = clamp_ilr("2", minimum_ilr, maximum_ilr)
     reading = initialize_ability("reading", prior_level, broad=broad, routing_level=routing_level)
     listening = initialize_ability("listening", prior_level, broad=broad, routing_level=routing_level)
+    if mode == "assessment":
+        reading, listening = assessment.initialize("reading"), assessment.initialize("listening")
+        # Assessment uses complete bank passages and a neutral prior, independent
+        # of training preferences or any historical ability estimates.
+        content_source, feedback_mode, timer_mode = "bank_only", "end_only", "off"
+        time_limit_seconds_per_skill = None
+        hints_enabled = replay_allowed = slow_audio_allowed = False
     state = SessionState(
         profile_id=profile_id.strip() if profile_id and profile_id.strip() else None,
         language=language,
@@ -79,6 +90,9 @@ def create_session(
         competencies=competencies,
         max_questions_per_skill=max_questions_per_skill,
         minimum_questions_per_skill=minimum_questions_per_skill,
+        assessment_min_passages=assessment_min_passages,
+        assessment_max_passages=assessment_max_passages,
+        assessment_target_sd=assessment_target_sd,
         simulation_full=simulation_full,
         shortened_simulation=shortened_simulation,
         timer_mode=timer_mode,
@@ -116,6 +130,11 @@ def ensure_not_expired(state: SessionState, now: float | None = None) -> None:
 def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory | None = None) -> PassageBundle:
     ensure_not_expired(state)
     skill = state.active_skill
+    if state.mode == "assessment":
+        if state.status != "active" or assessment.stop_reason(state, skill):
+            raise SessionFlowError("This assessment section has ended")
+        passage, questions = assessment.select(state, bank, history)
+        return activate_bundle(state, passage, shuffled_bundle(questions, seed=f"{state.session_id}:{passage.id}"))
     estimate = state.ability_for(skill)
     history_seen_passages = set(history.seen_passage_ids) if history else set()
     history_seen_questions = set(history.seen_question_ids) if history else set()
@@ -159,7 +178,7 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
             f"Cannot activate a {passage.language} passage in a {state.language} session."
         )
     remaining_target = state.max_questions_per_skill - state.completed_count(skill)
-    if remaining_target > 0 and len(questions) > remaining_target:
+    if state.mode != "assessment" and remaining_target > 0 and len(questions) > remaining_target:
         questions = questions[:remaining_target]
     if not questions:
         raise SessionFlowError("No questions remain in the selected bundle.")
@@ -189,7 +208,7 @@ def record_answer_change(
 def mark_listening_play(state: SessionState) -> None:
     if state.active_skill != "listening":
         return
-    if state.mode in {"diagnostic", "simulation"} and state.current_listening_plays >= 1:
+    if state.mode in {"diagnostic", "simulation", "assessment"} and state.current_listening_plays >= 1:
         raise SessionFlowError("Replay is disabled in strict listening conditions.")
     state.current_listening_plays += 1
 
@@ -207,11 +226,22 @@ def submit_current_bundle(
         ensure_not_expired(state, now)
     if request_nonce in state.handled_nonces:
         return []
+    if state.mode == "assessment":
+        if state.status != "active":
+            raise SessionFlowError("This assessment has ended")
+        if passage.id in state.completed_passage_ids:
+            raise SessionFlowError("This passage was already submitted")
+        if [q.id for q in questions] != state.current_question_ids:
+            raise SessionFlowError("Submit the complete active passage")
+        if passage.skill == "listening" and state.current_listening_plays < 1:
+            raise SessionFlowError("Play the listening passage once before submitting")
     if passage.id != state.current_passage_id:
         raise SessionFlowError("The submitted passage does not match the active session passage.")
     missing = [q.id for q in questions if not answers.get(q.id)]
     if missing:
         raise SessionFlowError("Answer every question on the current passage before advancing.")
+    if any(answers[q.id] not in q.choices for q in questions):
+        raise SessionFlowError("Select a valid answer for every question")
     submitted_at = time.time() if now is None else now
     started_at = state.current_started_at_epoch if state.current_started_at_epoch is not None else submitted_at
     records: list[ResponseRecord] = []
@@ -225,8 +255,8 @@ def submit_current_bundle(
             mode=state.mode,
             language=passage.language,
             target_ilr=question.target_ilr,
-            item_difficulty=question.operational_difficulty,
-            item_discrimination=question.discrimination,
+            item_difficulty=ILR_THETA[question.target_ilr] if state.mode == "assessment" else question.operational_difficulty,
+            item_discrimination=1.0 if state.mode == "assessment" else question.discrimination,
             question_type=question.question_type,
             topic=passage.topic,
             genre=passage.genre,
@@ -246,7 +276,7 @@ def submit_current_bundle(
             ),
             listening_play_count=state.current_listening_plays,
             answer_change_count=state.current_answer_changes.get(question.id, 0),
-            provisional_item=question.calibrated_difficulty is None,
+            provisional_item=state.mode == "assessment" or question.calibrated_difficulty is None,
         )
         records.append(record)
     state.responses.extend(records)
@@ -257,7 +287,13 @@ def submit_current_bundle(
     state.item_exposure[passage.id] = state.item_exposure.get(passage.id, 0) + 1
     for question in questions:
         state.question_type_exposure[question.question_type] = state.question_type_exposure.get(question.question_type, 0) + 1
-    if passage.skill == "reading":
+    if state.mode == "assessment":
+        updated = assessment.update(state.ability_for(passage.skill), records)
+        if passage.skill == "reading":
+            state.reading_ability = updated
+        else:
+            state.listening_ability = updated
+    elif passage.skill == "reading":
         updated = update_ability(state.reading_ability, records)
         state.reading_ability = update_routing_band(updated, records, state.minimum_ilr, state.maximum_ilr)
     else:
@@ -277,6 +313,8 @@ def skill_is_complete(state: SessionState, skill: str | None = None) -> bool:
     skill = skill or state.active_skill
     count = state.completed_count(skill)
     estimate = state.ability_for(skill)
+    if state.mode == "assessment":
+        return assessment.stop_reason(state, skill) is not None
     if state.mode == "diagnostic":
         return should_stop_diagnostic(
             estimate,
@@ -296,6 +334,10 @@ def skill_is_complete(state: SessionState, skill: str | None = None) -> bool:
 def advance_skill_or_finish(state: SessionState, now: float | None = None, force: bool = False) -> bool:
     if not force and not skill_is_complete(state):
         return False
+    if state.mode == "assessment":
+        reason = assessment.stop_reason(state, state.active_skill)
+        if reason:
+            state.assessment_end_reasons.setdefault(state.active_skill, reason)
     if state.active_skill_index + 1 < len(state.selected_skills):
         state.active_skill_index += 1
         current = time.time() if now is None else now
