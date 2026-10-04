@@ -4,9 +4,11 @@
 
 All 51 original starter passages remain **draft/pending review** in `data/assessment/bank.json`, as requested. Their older `validation_status: accepted` is a deterministic practice-bank flag, not curator approval. Existing Training continues to use its original banks. No starter passage has been silently promoted.
 
-The twelve original Russian 0+ listening drafts are in `data/pilots/russian_0plus_dialogues.json`. They contain English questions and explanations, alternating speaker turns, provenance and version information. Seven depict spouses. They have **no recordings yet**. AI-assisted authorship and automated validation do not establish pronunciation quality, naturalness, fairness or ILR suitability.
+The twelve original Russian 0+ listening scripts remain in `data/pilots/russian_0plus_dialogues.json` as authoring templates. The approved versions are now in `data/assessment/bank.json`, with twelve fixed ElevenLabs MP3s in `data/assessment/audio` and 24 English questions. The owner listened to and approved the audio, then authorized full approval for local noncommercial assessment workflow testing. Transcript/question consistency has been checked; the ILR labels remain provisional and uncalibrated.
 
-Consequently, the production diagnostic currently reports insufficient approved content. A useful adaptive bank needs reviewed reading and listening passages across multiple ILR bands in each supported language, not just twelve Russian 0+ dialogues. Tests use explicitly approved local fixtures without changing the production manifest.
+For a local smoke test choose **Adaptive Assessment → Listening**, leave the eligible range at **0–3** (or set both bounds to **0+**), and use **2 minimum / 2 maximum passages**. For all twelve clips use **6 minimum / 12 maximum**. Answers and transcripts appear only in the final report. With the default maximum of 18, the run ends explicitly after twelve passages because the bank is exhausted. No passage repeats. Reading remains unavailable until approved reading content is added.
+
+This narrow bank exercises selection, playback, submission, uncertainty, stopping, review and exports. It cannot test difficulty adaptation across levels. Reports explicitly identify the single tested band and warn that other model-estimated levels are extrapolations. A useful full-range adaptive bank still needs reading and listening passages spanning ILR 0–3.
 
 ## Local preview
 
@@ -91,7 +93,7 @@ Without `--package`, the curator reviews existing starter entries in the preset 
 - [Publishing generated content](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform): free-plan output has noncommercial/attribution restrictions; paid-plan commercial rights depend on the applicable terms and creation-time subscription. Beta-service restrictions can prohibit production/commercial use. Upgrading later does not automatically change rights for earlier free output.
 - [Terms of Use](https://elevenlabs.io/terms-of-use): users must hold necessary input/voice rights and follow applicable service terms. Public availability of a third-party recording is not a reuse license. Record creation-time tier and the curator's dated rights review; check current model status and the user's applicable contract before public redistribution.
 
-Local live verification completed with twelve Russian Eleven v3 dialogues using Jessica and Eric. Account usage was 1,624 input characters against the owner's 2,000-character ceiling. The owner listened to and approved all twelve recordings. Private audio, credentials and the review ledger remain outside source control; no recordings were publicly published or promoted to the assessment bank by this step.
+Local live verification completed with twelve Russian Eleven v3 dialogues using Jessica and Eric. Account usage was 1,624 input characters against the owner's 2,000-character ceiling. The owner approved all twelve recordings and subsequently authorized their promotion for local assessment testing. The approved MP3s are now packaged with the assessment bank using Git LFS; credentials and the private workshop remain excluded from source control. Nothing has been publicly published by this step. See `data/assessment/audio/NOTICE.md` for the audio attribution and Free-plan limitations.
 
 ## Standing audio authorization
 

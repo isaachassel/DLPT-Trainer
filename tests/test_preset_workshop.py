@@ -46,8 +46,16 @@ def pilot(work):
     work.approve_voices()
 
 
-def test_production_all_pending_and_pilots_original():
-    assert {x.review.status for x in read_package(MANIFEST).items} == {"draft"}
+def test_production_pilot_ready_and_original_starter_content_pending():
+    items = read_package(MANIFEST).items
+    pilots = [x for x in items if x.id.startswith("ru_pilot_")]
+    originals = [x for x in items if not x.id.startswith("ru_pilot_")]
+    assert len(originals) == 51 and {x.review.status for x in originals} == {"draft"}
+    assert len(pilots) == 12 and {x.review.status for x in pilots} == {"approved"}
+    bank = PresetBank().load()
+    assert not bank.load_warnings
+    assert len(bank.active_passages("listening", "ru")) == 12
+    assert sum(len(bank.get_questions(p.id)) for p in bank.active_passages("listening", "ru")) == 24
     assert not PresetBank().load().active_passages("reading", "ru")
     package = read_package(PILOTS)
     assert len(package.items) == 12
@@ -57,6 +65,43 @@ def test_production_all_pending_and_pilots_original():
         assert item.passage.target_ilr == "0+" and len(item.questions) == 2
         assert validate_passage(item.passage, item.questions).status == "accepted"
         assert all(validate_question(q, item.passage).status == "accepted" for q in item.questions)
+
+
+@pytest.mark.parametrize("limit,expected,reason", [(2, 2, "maximum"), (18, 12, "content_exhausted")])
+def test_real_pilot_bank_completes_listening_assessment(monkeypatch, tmp_path, limit, expected, reason):
+    from ui import callbacks as cb
+    from core.storage import LocalStorage
+    bank = PresetBank().load()
+    monkeypatch.setattr(cb, "PRESET_BANK", bank)
+    monkeypatch.setattr(cb, "STORAGE", LocalStorage(tmp_path / "sessions", tmp_path / "history"))
+    monkeypatch.setattr(cb, "EXPORT_DIR", tmp_path / "exports")
+    def prohibited(*args, **kwargs):
+        pytest.fail("Preset listening must not generate content or audio")
+    monkeypatch.setattr(cb.GENERATOR, "generate_and_store", prohibited)
+    monkeypatch.setattr(cb, "generate_dialogue_cached_tts", prohibited)
+    rendered = cb.start_session_callback("Adaptive Assessment", "Listening", "0+", "0+", "Complete passages", "Off",
+                                        [], [], "End of session", False, True, "Starter", "Normal", "",
+                                        assessment_min_passages=2, assessment_max_passages=limit)
+    seen = []
+    while rendered[0].status == "active":
+        state, bundle, nonce = rendered[:3]
+        assert bundle["passage"]["target_ilr"] == "0+"
+        seen.append(bundle["passage"]["id"])
+        assert not rendered[27]["visible"]
+        assert bundle["passage"]["passage_ru"] not in json.dumps(rendered[3:], default=str)
+        playback = cb.play_audio_callback(state, bundle)
+        assert "<audio" in playback[1]["value"]
+        cb.confirm_audio_playback_callback(state, bundle)
+        answers = [q["correct_key"] if len(seen) % 2 else next(k for k in q["choices"] if k != q["correct_key"])
+                   for q in bundle["questions"]]
+        rendered = cb.submit_passage_callback(state, bundle, nonce, *(answers + [None] * (5 - len(answers))))
+    assert len(seen) == len(set(seen)) == expected
+    assert len(state.responses) == expected * 2
+    assert state.assessment_end_reasons["listening"] == reason
+    assert "Limited difficulty coverage" in rendered[27]["value"]
+    assert "extrapolation" in rendered[27]["value"]
+    assert "Listening transcript" in rendered[27]["value"]
+    assert list((tmp_path / "exports").glob("*"))
 
 
 def test_only_approved_content_and_separate_skills(approved_bank):
@@ -217,6 +262,7 @@ def test_export_and_session_isolation(workshop, tmp_path, caplog):
 
 
 def test_private_import_cannot_approve_or_read_external_audio(workshop):
+    production_before = MANIFEST.read_bytes()
     pilot(workshop)
     data = workshop.package.model_dump(mode="json")
     data["items"][0]["review"] = {"status": "approved", "reviewer": "Pretend admin", "reviewed_at": "today", "reuse_attested": True}
@@ -225,7 +271,7 @@ def test_private_import_cannot_approve_or_read_external_audio(workshop):
     assert workshop.package.items[0].review.status == "draft"
     assert workshop.package.items[0].audio is None
     assert workshop.ledger["pilot_approval"] is None
-    assert all(x.review.status == "draft" for x in read_package(MANIFEST).items)
+    assert MANIFEST.read_bytes() == production_before
 
 
 def test_regeneration_limit_and_double_click_lock(workshop):
@@ -337,6 +383,7 @@ def test_web_has_no_shared_curator_callback():
 
 
 def test_named_curator_can_approve_fixture_without_touching_production(tmp_path):
+    production_before = MANIFEST.read_bytes()
     from scripts.curate_assessment import promote
     item = next(x for x in read_package(MANIFEST).items if x.passage.skill == "reading")
     package_path = tmp_path / "draft.json"
@@ -349,7 +396,7 @@ def test_named_curator_can_approve_fixture_without_touching_production(tmp_path)
     assert len(shared.active_passages("reading", item.passage.language)) == 1
     with pytest.raises(ValueError, match="higher"):
         promote(package_path, item.id, "TEST reviewer", "TEST-only review", True, manifest, tmp_path)
-    assert all(x.review.status == "draft" for x in read_package(MANIFEST).items)
+    assert MANIFEST.read_bytes() == production_before
 
 
 def test_session_secret_and_secret_metadata_rejected(workshop):
