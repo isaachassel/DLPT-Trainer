@@ -208,6 +208,27 @@ def test_provider_errors_sanitized_without_retry(status, uncertain):
     assert KEY not in str(error.value) and len(calls) == 1
 
 
+def test_catalog_keeps_multilingual_defaults_and_prioritizes_russian():
+    pages = []
+    def handler(request):
+        if request.url.path == "/v1/user/subscription":
+            return httpx.Response(200, json={"tier": "free"})
+        if request.url.path == "/v1/models":
+            return httpx.Response(200, json=[{"model_id": "eleven_v3", "can_do_text_to_speech": True}])
+        assert request.url.path == "/v2/voices"
+        assert "language" not in request.url.params
+        pages.append(request.url.params.get("next_page_token"))
+        if len(pages) == 1:
+            return httpx.Response(200, json={"voices": [
+                {"voice_id": "default", "name": "Default", "category": "premade", "labels": {"language": "en"}},
+                {"voice_id": "clone", "name": "Clone", "category": "cloned"}], "next_page_token": "page2"})
+        return httpx.Response(200, json={"voices": [
+            {"voice_id": "russian", "name": "Russian", "category": "generated", "labels": {"language": "ru"}}]})
+    catalog = ElevenLabs(KEY, httpx.MockTransport(handler)).catalog()
+    assert pages == [None, "page2"]
+    assert [v["voice_id"] for v in catalog["voices"]] == ["russian", "default"]
+
+
 def test_official_dialogue_payload_and_timeout():
     calls = []
     def handler(request):

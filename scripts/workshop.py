@@ -11,6 +11,9 @@ from core.content_workshop import Workshop
 
 
 def main():
+    # Windows redirected stdout may default to cp1252, which cannot print Russian.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="backslashreplace")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["init", "preflight", "generate", "approve-voices", "export"])
     parser.add_argument("--workspace", type=Path, default=Path("storage/workshop/local"))

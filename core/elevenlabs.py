@@ -57,15 +57,19 @@ class ElevenLabs:
         models = self._request("GET", "/v1/models")
         voices, token = [], None
         for _ in range(10):
-            params = {"language": "ru", "page_size": 100}
+            # The language filter matches the voice's label, not all languages
+            # a multilingual model can speak. It hides default voices on new accounts.
+            params = {"page_size": 100}
             if token:
                 params["next_page_token"] = token
             page = self._request("GET", "/v2/voices", params=params)
-            voices.extend({"voice_id": v["voice_id"], "name": v["name"], "category": v.get("category", "")}
+            voices.extend({"voice_id": v["voice_id"], "name": v["name"], "category": v.get("category", ""),
+                           "labels": v.get("labels") or {}}
                           for v in page.get("voices", []) if "cloned" not in v.get("category", "").lower())
             token = page.get("next_page_token")
             if not token:
                 break
+        voices.sort(key=lambda v: v["labels"].get("language") != "ru")
         return {"account": {k: account.get(k) for k in ("tier", "character_count", "character_limit")},
                 "models": [{k: m.get(k) for k in ("model_id", "name", "model_rates")} for m in models
                            if m.get("can_do_text_to_speech")], "voices": voices}
