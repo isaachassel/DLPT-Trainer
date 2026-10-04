@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+storage/workshop/
 storage/sessions/*.json
 storage/history/*.json
 storage/exports/*

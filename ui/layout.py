@@ -123,6 +123,13 @@ def build_app() -> gr.Blocks:
                 with gr.Column(elem_classes=["mode-card"]):
                     gr.Markdown(f"**{SIMULATION_MODE_LABEL}**\n\nBegins at medium difficulty, adapts after every passage, and preserves strict timing and locked progression without claiming to be the official test.")
 
+            from ui.callbacks import PRESET_BANK
+            preset_count = sum(len(PRESET_BANK.active_passages(skill, language))
+                               for skill in ("reading", "listening") for language in ("ru", "zh-CN"))
+            gr.Markdown(f"**Preset assessments:** {preset_count} approved local passages ready. "
+                        f"{PRESET_BANK.pending_count} entries are pending or rejected. "
+                        "Assessments require no generation credentials and never generate content. "
+                        "If coverage is insufficient, a curator must review and package more content.")
             state = gr.State(value=None)
             bundle_state = gr.State(value=None)
             nonce_state = gr.State(value=None)
@@ -142,7 +149,7 @@ def build_app() -> gr.Blocks:
                     length = gr.Dropdown(["Short — 8 questions", "Standard — 16 questions", "Long — 24 questions"], value="Standard — 16 questions", label="Session length")
                     timer_mode = gr.Dropdown(["Off", "Standard count-up", "Strict countdown"], value="Off", label="Timer behavior")
                 with gr.Group(visible=False) as assessment_settings:
-                    gr.Markdown("Assessment uses validated bank passages and a neutral start. Limits apply separately to each skill. "
+                    gr.Markdown("Assessment uses curator-approved local passages and a neutral start. Limits apply separately to each skill. "
                                 "Listening uses the saved recording once. Results are provisional practice estimates, not official ODA/DLPT scores.")
                     with gr.Row():
                         assessment_min = gr.Number(value=6, minimum=2, maximum=40, precision=0, label="Minimum passages per skill")
@@ -189,7 +196,7 @@ def build_app() -> gr.Blocks:
                         CONTENT_SOURCE_CHOICES,
                         value=CONTENT_SOURCE_CHOICES[0],
                         label="Content source",
-                        info="Fresh AI is constrained to assessment authoring, validated before use, saved to the bank, and automatically falls back on any failure.",
+                        info="Training only: fresh AI uses the deployment's text-provider credentials, validates and saves practice content, and falls back to the practice bank on failure.",
                     )
                 provider_icon = "✅" if PROVIDER_READY else "ℹ️"
                 gr.Markdown(f"{provider_icon} **Live generation status:** {PROVIDER_MESSAGE}")
@@ -285,7 +292,7 @@ def build_app() -> gr.Blocks:
             )
             mode.change(
                 lambda value: (gr.update(visible=value == "Adaptive Assessment"),
-                               gr.update(visible=value != "Adaptive Assessment")),
+                               gr.update(visible=value == "Training Mode")),
                 inputs=[mode], outputs=[assessment_settings, content_source], queue=False,
             )
             skill.change(
@@ -531,5 +538,7 @@ def build_app() -> gr.Blocks:
                 outputs=[activity, abandon_btn], queue=False, show_progress="hidden",
             )
 
+        from ui.workshop import build_workshop
+        build_workshop()
         demo.queue(default_concurrency_limit=QUEUE_CONCURRENCY_LIMIT, max_size=32)
     return demo

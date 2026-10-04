@@ -98,7 +98,10 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
     correct, attempted, pct = accuracy(records)
     strongest, weakest = strengths_and_weaknesses(records)
     timing = response_time_summary(records)
-    lines = [f"## {skill.title()} Practice Report", f"**{estimate_label(estimate)}**"]
+    exhausted = state.mode != "training" and state.assessment_end_reasons.get(skill) == "content_exhausted"
+    label = ("Insufficient approved content: no estimated practice ILR level is reported."
+             if exhausted else estimate_label(estimate))
+    lines = [f"## {skill.title()} Practice Report", f"**{label}**"]
     lines.append(f"Evidence: **{attempted} validated practice questions**, {correct} correct ({pct:.0%}).")
     lines.append(f"80% posterior interval (internal scale): **{estimate.ci_low:.2f} to {estimate.ci_high:.2f}**; standard error **{estimate.standard_error:.2f}**.")
     if state.shortened_simulation and state.mode == "simulation":

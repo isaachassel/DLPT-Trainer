@@ -1,0 +1,2681 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "ru_pilot_01",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_01",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Dinner",
+        "subtopic": "Dinner",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Что у нас сегодня на ужин?\nB: Рыба и картошка.\nA: Хорошо. Во сколько будем есть?\nB: В семь. Помой, пожалуйста, помидоры.\nA: Сейчас помою. Сделаем салат?\nB: Да, сделаем.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 31,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_01_q1",
+          "ru_pilot_01_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "359e2443b22edc5b1b0360faa7f8863775a198d34b5a9d388550fd307b7a80ef",
+        "duplicate_detection_hash": "359e2443b22edc5b1b0360faa7f8863775a198d34b5a9d388550fd307b7a80ef"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_01_q1",
+          "passage_id": "ru_pilot_01",
+          "stem_en": "What will they eat for dinner?",
+          "choices": {
+            "A": "Pasta and cheese",
+            "B": "Fish and potatoes",
+            "C": "Chicken and rice",
+            "D": "Soup and bread"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: Fish and potatoes.",
+          "evidence_ru": "Рыба и картошка.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_01_q2",
+          "passage_id": "ru_pilot_01",
+          "stem_en": "When will they eat?",
+          "choices": {
+            "A": "At eight",
+            "B": "At nine",
+            "C": "At seven",
+            "D": "At six"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: At seven.",
+          "evidence_ru": "В семь.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Что у нас сегодня на ужин?"
+        },
+        {
+          "speaker": "B",
+          "text": "Рыба и картошка."
+        },
+        {
+          "speaker": "A",
+          "text": "Хорошо. Во сколько будем есть?"
+        },
+        {
+          "speaker": "B",
+          "text": "В семь. Помой, пожалуйста, помидоры."
+        },
+        {
+          "speaker": "A",
+          "text": "Сейчас помою. Сделаем салат?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, сделаем."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_02",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_02",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Shopping",
+        "subtopic": "Shopping",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Я иду в магазин. Что купить?\nB: Купи молоко и хлеб.\nA: А яйца дома есть?\nB: Да, яйца есть. Возьми ещё два яблока.\nA: Красные или зелёные?\nB: Красные, пожалуйста.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 32,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_02_q1",
+          "ru_pilot_02_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "c32e12dfcf02e907b49dbd7517efc17da27065d18664afc0b75dac72ec6872c1",
+        "duplicate_detection_hash": "c32e12dfcf02e907b49dbd7517efc17da27065d18664afc0b75dac72ec6872c1"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_02_q1",
+          "passage_id": "ru_pilot_02",
+          "stem_en": "What should the shopper buy besides fruit?",
+          "choices": {
+            "A": "Rice and fish",
+            "B": "Tea and sugar",
+            "C": "Milk and bread",
+            "D": "Butter and cheese"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: Milk and bread.",
+          "evidence_ru": "Купи молоко и хлеб.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_02_q2",
+          "passage_id": "ru_pilot_02",
+          "stem_en": "How many apples are requested?",
+          "choices": {
+            "A": "Three",
+            "B": "Four",
+            "C": "Five",
+            "D": "Two"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: Two.",
+          "evidence_ru": "Возьми ещё два яблока.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Я иду в магазин. Что купить?"
+        },
+        {
+          "speaker": "B",
+          "text": "Купи молоко и хлеб."
+        },
+        {
+          "speaker": "A",
+          "text": "А яйца дома есть?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, яйца есть. Возьми ещё два яблока."
+        },
+        {
+          "speaker": "A",
+          "text": "Красные или зелёные?"
+        },
+        {
+          "speaker": "B",
+          "text": "Красные, пожалуйста."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_03",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_03",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Cleaning",
+        "subtopic": "Cleaning",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Давай уберём квартиру.\nB: Хорошо. Я помою пол на кухне.\nA: А я помою посуду.\nB: Где ведро?\nA: В ванной, у двери.\nB: Спасибо, нашёл.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 27,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_03_q1",
+          "ru_pilot_03_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "60978f7d8a406ce5999cdc24fa231ae60355a451cf33b8b788b2d6ec52c9876e",
+        "duplicate_detection_hash": "60978f7d8a406ce5999cdc24fa231ae60355a451cf33b8b788b2d6ec52c9876e"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_03_q1",
+          "passage_id": "ru_pilot_03",
+          "stem_en": "Which room's floor will the husband wash?",
+          "choices": {
+            "A": "The bedroom",
+            "B": "The bathroom",
+            "C": "The living room",
+            "D": "The kitchen"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: The kitchen.",
+          "evidence_ru": "Я помою пол на кухне.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_03_q2",
+          "passage_id": "ru_pilot_03",
+          "stem_en": "Where is the bucket?",
+          "choices": {
+            "A": "In the bathroom",
+            "B": "On the balcony",
+            "C": "In the kitchen",
+            "D": "In the hallway"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: In the bathroom.",
+          "evidence_ru": "В ванной, у двери.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Давай уберём квартиру."
+        },
+        {
+          "speaker": "B",
+          "text": "Хорошо. Я помою пол на кухне."
+        },
+        {
+          "speaker": "A",
+          "text": "А я помою посуду."
+        },
+        {
+          "speaker": "B",
+          "text": "Где ведро?"
+        },
+        {
+          "speaker": "A",
+          "text": "В ванной, у двери."
+        },
+        {
+          "speaker": "B",
+          "text": "Спасибо, нашёл."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_04",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_04",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Weekend",
+        "subtopic": "Weekend",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Что будем делать в субботу?\nB: Поедем к твоей маме?\nA: Давай. Она будет дома.\nB: Поедем утром?\nA: Нет, после обеда, в три.\nB: Хорошо. Купим ей цветы.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 30,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_04_q1",
+          "ru_pilot_04_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "90477bbba408f7d3a1efb08c200cfbfa0d52a33d9d54303556fa690cbdac813e",
+        "duplicate_detection_hash": "90477bbba408f7d3a1efb08c200cfbfa0d52a33d9d54303556fa690cbdac813e"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_04_q1",
+          "passage_id": "ru_pilot_04",
+          "stem_en": "Whom will they visit?",
+          "choices": {
+            "A": "The wife's mother",
+            "B": "The husband's father",
+            "C": "Their neighbour",
+            "D": "Their daughter"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: The wife's mother.",
+          "evidence_ru": "Поедем к твоей маме?",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_04_q2",
+          "passage_id": "ru_pilot_04",
+          "stem_en": "When will they leave?",
+          "choices": {
+            "A": "At seven",
+            "B": "At three",
+            "C": "At one",
+            "D": "At five"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: At three.",
+          "evidence_ru": "Нет, после обеда, в три.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Что будем делать в субботу?"
+        },
+        {
+          "speaker": "B",
+          "text": "Поедем к твоей маме?"
+        },
+        {
+          "speaker": "A",
+          "text": "Давай. Она будет дома."
+        },
+        {
+          "speaker": "B",
+          "text": "Поедем утром?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, после обеда, в три."
+        },
+        {
+          "speaker": "B",
+          "text": "Хорошо. Купим ей цветы."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_05",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_05",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Meeting",
+        "subtopic": "Meeting",
+        "orientation_en": "Listen to a short conversation. Speakers: two friends (A speaks first).",
+        "passage_ru": "A: Привет! Встретимся завтра?\nB: Да. Давай у кафе.\nA: В какое время?\nB: В десять утра.\nA: Хорошо. Я приду пешком.\nB: Тогда до завтра!",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 26,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_05_q1",
+          "ru_pilot_05_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "4b9456a1fe5d6a7728ffbaea75634b5dd48cb9be9b666bf06d1314d00e6e1b45",
+        "duplicate_detection_hash": "4b9456a1fe5d6a7728ffbaea75634b5dd48cb9be9b666bf06d1314d00e6e1b45"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_05_q1",
+          "passage_id": "ru_pilot_05",
+          "stem_en": "Where will the friends meet?",
+          "choices": {
+            "A": "By a bank",
+            "B": "By a cafe",
+            "C": "By a school",
+            "D": "By a pharmacy"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: By a cafe.",
+          "evidence_ru": "Давай у кафе.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_05_q2",
+          "passage_id": "ru_pilot_05",
+          "stem_en": "At what time will they meet?",
+          "choices": {
+            "A": "Six in the evening",
+            "B": "Nine in the evening",
+            "C": "Ten in the morning",
+            "D": "Eight in the morning"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: Ten in the morning.",
+          "evidence_ru": "В десять утра.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Привет! Встретимся завтра?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да. Давай у кафе."
+        },
+        {
+          "speaker": "A",
+          "text": "В какое время?"
+        },
+        {
+          "speaker": "B",
+          "text": "В десять утра."
+        },
+        {
+          "speaker": "A",
+          "text": "Хорошо. Я приду пешком."
+        },
+        {
+          "speaker": "B",
+          "text": "Тогда до завтра!"
+        }
+      ],
+      "speakers": {
+        "A": "First speaker",
+        "B": "Second speaker"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_06",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_06",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Transport",
+        "subtopic": "Transport",
+        "orientation_en": "Listen to a short conversation. Speakers: two neighbours (A speaks first).",
+        "passage_ru": "A: Ты сегодня едешь на работу на машине?\nB: Нет, на автобусе. Машина в ремонте.\nA: Какой автобус тебе нужен?\nB: Номер пять.\nA: Остановка рядом?\nB: Да, напротив магазина.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 30,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_06_q1",
+          "ru_pilot_06_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "23843cf081944a3afb224c00961cbb274414edeb257a394fc2b891a879c26943",
+        "duplicate_detection_hash": "23843cf081944a3afb224c00961cbb274414edeb257a394fc2b891a879c26943"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_06_q1",
+          "passage_id": "ru_pilot_06",
+          "stem_en": "How will the person travel to work?",
+          "choices": {
+            "A": "By train",
+            "B": "By bicycle",
+            "C": "By bus",
+            "D": "By car"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: By bus.",
+          "evidence_ru": "Нет, на автобусе.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_06_q2",
+          "passage_id": "ru_pilot_06",
+          "stem_en": "Which bus is needed?",
+          "choices": {
+            "A": "Number two",
+            "B": "Number eight",
+            "C": "Number ten",
+            "D": "Number five"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: Number five.",
+          "evidence_ru": "Номер пять.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Ты сегодня едешь на работу на машине?"
+        },
+        {
+          "speaker": "B",
+          "text": "Нет, на автобусе. Машина в ремонте."
+        },
+        {
+          "speaker": "A",
+          "text": "Какой автобус тебе нужен?"
+        },
+        {
+          "speaker": "B",
+          "text": "Номер пять."
+        },
+        {
+          "speaker": "A",
+          "text": "Остановка рядом?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, напротив магазина."
+        }
+      ],
+      "speakers": {
+        "A": "First speaker",
+        "B": "Second speaker"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_07",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_07",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Weather",
+        "subtopic": "Weather",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: На улице холодно?\nB: Да, и идёт дождь.\nA: Тогда надену куртку.\nB: Возьми зонт. Он у двери.\nA: Синий?\nB: Да, синий.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 24,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_07_q1",
+          "ru_pilot_07_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "d45114319c78336471dd2c716d36a2d6a832c118bb53c4db15f33a360b3faa12",
+        "duplicate_detection_hash": "d45114319c78336471dd2c716d36a2d6a832c118bb53c4db15f33a360b3faa12"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_07_q1",
+          "passage_id": "ru_pilot_07",
+          "stem_en": "What is the weather like?",
+          "choices": {
+            "A": "Warm and sunny",
+            "B": "Hot and dry",
+            "C": "Cold and snowy",
+            "D": "Cold and rainy"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: Cold and rainy.",
+          "evidence_ru": "Да, и идёт дождь.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_07_q2",
+          "passage_id": "ru_pilot_07",
+          "stem_en": "Where is the umbrella?",
+          "choices": {
+            "A": "By the door",
+            "B": "Under the bed",
+            "C": "On the table",
+            "D": "In the car"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: By the door.",
+          "evidence_ru": "Он у двери.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На улице холодно?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, и идёт дождь."
+        },
+        {
+          "speaker": "A",
+          "text": "Тогда надену куртку."
+        },
+        {
+          "speaker": "B",
+          "text": "Возьми зонт. Он у двери."
+        },
+        {
+          "speaker": "A",
+          "text": "Синий?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, синий."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_08",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_08",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Family routine",
+        "subtopic": "Family routine",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Кто сегодня заберёт сына из школы?\nB: Я заберу. У меня сегодня короткий день.\nA: Уроки заканчиваются в два.\nB: Хорошо. Потом пойдём домой.\nA: Обед в холодильнике.\nB: Спасибо, я разогрею.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 33,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_08_q1",
+          "ru_pilot_08_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "2f81a9b885f23d8804309a6fec673380c005d4ba46c3c93d240479e77a7b84f7",
+        "duplicate_detection_hash": "2f81a9b885f23d8804309a6fec673380c005d4ba46c3c93d240479e77a7b84f7"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_08_q1",
+          "passage_id": "ru_pilot_08",
+          "stem_en": "Who will collect their son?",
+          "choices": {
+            "A": "His father",
+            "B": "His mother",
+            "C": "His grandmother",
+            "D": "His aunt"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: His father.",
+          "evidence_ru": "Я заберу.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_08_q2",
+          "passage_id": "ru_pilot_08",
+          "stem_en": "When do the lessons end?",
+          "choices": {
+            "A": "At four",
+            "B": "At two",
+            "C": "At twelve",
+            "D": "At three"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: At two.",
+          "evidence_ru": "Уроки заканчиваются в два.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Кто сегодня заберёт сына из школы?"
+        },
+        {
+          "speaker": "B",
+          "text": "Я заберу. У меня сегодня короткий день."
+        },
+        {
+          "speaker": "A",
+          "text": "Уроки заканчиваются в два."
+        },
+        {
+          "speaker": "B",
+          "text": "Хорошо. Потом пойдём домой."
+        },
+        {
+          "speaker": "A",
+          "text": "Обед в холодильнике."
+        },
+        {
+          "speaker": "B",
+          "text": "Спасибо, я разогрею."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_09",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_09",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Cafe",
+        "subtopic": "Cafe",
+        "orientation_en": "Listen to a short conversation. Speakers: customer and server (A speaks first).",
+        "passage_ru": "A: Здравствуйте. Можно чай?\nB: Чёрный или зелёный?\nA: Чёрный, пожалуйста, без сахара.\nB: А что-нибудь поесть?\nA: Один пирожок с картошкой.\nB: Хорошо. Садитесь за столик.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 27,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_09_q1",
+          "ru_pilot_09_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "37fb65f4bb503f105de69225cb086a12824d993ad41b5a57f2738d51f0be0fea",
+        "duplicate_detection_hash": "37fb65f4bb503f105de69225cb086a12824d993ad41b5a57f2738d51f0be0fea"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_09_q1",
+          "passage_id": "ru_pilot_09",
+          "stem_en": "Which drink does the customer order?",
+          "choices": {
+            "A": "Apple juice",
+            "B": "Black tea",
+            "C": "Green tea",
+            "D": "Black coffee"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: Black tea.",
+          "evidence_ru": "Чёрный, пожалуйста, без сахара.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_09_q2",
+          "passage_id": "ru_pilot_09",
+          "stem_en": "What filling is in the pastry?",
+          "choices": {
+            "A": "Meat",
+            "B": "Cabbage",
+            "C": "Potato",
+            "D": "Apple"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: Potato.",
+          "evidence_ru": "Один пирожок с картошкой.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Здравствуйте. Можно чай?"
+        },
+        {
+          "speaker": "B",
+          "text": "Чёрный или зелёный?"
+        },
+        {
+          "speaker": "A",
+          "text": "Чёрный, пожалуйста, без сахара."
+        },
+        {
+          "speaker": "B",
+          "text": "А что-нибудь поесть?"
+        },
+        {
+          "speaker": "A",
+          "text": "Один пирожок с картошкой."
+        },
+        {
+          "speaker": "B",
+          "text": "Хорошо. Садитесь за столик."
+        }
+      ],
+      "speakers": {
+        "A": "First speaker",
+        "B": "Second speaker"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_10",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_10",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Keys",
+        "subtopic": "Keys",
+        "orientation_en": "Listen to a short conversation. Speakers: wife and husband (A speaks first).",
+        "passage_ru": "A: Ты не видел мои ключи?\nB: Посмотри на столе.\nA: Здесь только телефон.\nB: Тогда в сумке. Ты вчера положила их туда.\nA: Да, вот они. Спасибо!\nB: Пожалуйста.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 30,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_10_q1",
+          "ru_pilot_10_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "07a99c9e21eee69c8d421f93a1cd62f0cb54d11028ec58d6ef1ee6df459df050",
+        "duplicate_detection_hash": "07a99c9e21eee69c8d421f93a1cd62f0cb54d11028ec58d6ef1ee6df459df050"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_10_q1",
+          "passage_id": "ru_pilot_10",
+          "stem_en": "What is the wife looking for?",
+          "choices": {
+            "A": "Her phone",
+            "B": "Her book",
+            "C": "Her keys",
+            "D": "Her glasses"
+          },
+          "correct_key": "C",
+          "rationale_en": "The dialogue explicitly states: Her keys.",
+          "evidence_ru": "Ты не видел мои ключи?",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_10_q2",
+          "passage_id": "ru_pilot_10",
+          "stem_en": "Where does she find them?",
+          "choices": {
+            "A": "On the table",
+            "B": "In her coat",
+            "C": "By the window",
+            "D": "In her bag"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: In her bag.",
+          "evidence_ru": "Тогда в сумке.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Ты не видел мои ключи?"
+        },
+        {
+          "speaker": "B",
+          "text": "Посмотри на столе."
+        },
+        {
+          "speaker": "A",
+          "text": "Здесь только телефон."
+        },
+        {
+          "speaker": "B",
+          "text": "Тогда в сумке. Ты вчера положила их туда."
+        },
+        {
+          "speaker": "A",
+          "text": "Да, вот они. Спасибо!"
+        },
+        {
+          "speaker": "B",
+          "text": "Пожалуйста."
+        }
+      ],
+      "speakers": {
+        "A": "Wife",
+        "B": "Husband"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_11",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_11",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Library",
+        "subtopic": "Library",
+        "orientation_en": "Listen to a short conversation. Speakers: reader and librarian (A speaks first).",
+        "passage_ru": "A: Здравствуйте. Я хочу вернуть эту книгу.\nB: Пожалуйста, положите её сюда.\nA: Вы завтра работаете?\nB: Да, с девяти до шести.\nA: Спасибо. Я приду утром.\nB: Будем вас ждать.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 31,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_11_q1",
+          "ru_pilot_11_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "bb6f145b12d8ad714f0f184f087dec8abfdb94957fec291b9557443d77073142",
+        "duplicate_detection_hash": "bb6f145b12d8ad714f0f184f087dec8abfdb94957fec291b9557443d77073142"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_11_q1",
+          "passage_id": "ru_pilot_11",
+          "stem_en": "What does the reader want to return?",
+          "choices": {
+            "A": "A ticket",
+            "B": "A newspaper",
+            "C": "A pen",
+            "D": "A book"
+          },
+          "correct_key": "D",
+          "rationale_en": "The dialogue explicitly states: A book.",
+          "evidence_ru": "Я хочу вернуть эту книгу.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_11_q2",
+          "passage_id": "ru_pilot_11",
+          "stem_en": "When does the library open tomorrow?",
+          "choices": {
+            "A": "At nine",
+            "B": "At eight",
+            "C": "At ten",
+            "D": "At eleven"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: At nine.",
+          "evidence_ru": "Да, с девяти до шести.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Здравствуйте. Я хочу вернуть эту книгу."
+        },
+        {
+          "speaker": "B",
+          "text": "Пожалуйста, положите её сюда."
+        },
+        {
+          "speaker": "A",
+          "text": "Вы завтра работаете?"
+        },
+        {
+          "speaker": "B",
+          "text": "Да, с девяти до шести."
+        },
+        {
+          "speaker": "A",
+          "text": "Спасибо. Я приду утром."
+        },
+        {
+          "speaker": "B",
+          "text": "Будем вас ждать."
+        }
+      ],
+      "speakers": {
+        "A": "First speaker",
+        "B": "Second speaker"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    },
+    {
+      "id": "ru_pilot_12",
+      "content_version": 1,
+      "passage": {
+        "id": "ru_pilot_12",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "0+",
+        "provisional_difficulty": -1.75,
+        "calibrated_difficulty": null,
+        "genre": "dialogue",
+        "topic": "Walk",
+        "subtopic": "Walk",
+        "orientation_en": "Listen to a short conversation. Speakers: two friends (A speaks first).",
+        "passage_ru": "A: Пойдём гулять после работы?\nB: Давай. Куда пойдём?\nA: В парк. Там сейчас красиво.\nB: Хорошо. Возьмём собаку?\nA: Конечно. Встретимся у моего дома в шесть.\nB: Договорились.",
+        "source_type": "synthetic",
+        "provenance": {
+          "authoring": "Original AI-assisted draft; pending human review"
+        },
+        "license": "Project-authored synthetic content",
+        "word_count": 29,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru_pilot_12_q1",
+          "ru_pilot_12_q2"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "AI-assisted original draft",
+          "model": "Codex",
+          "model_revision": null,
+          "prompt_version": "russian-dialogue-0plus-v1",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-10-03T20:48:29.212536Z",
+          "authoring_notes": "Original draft; language, audio and ILR review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-10-03T20:48:29.212536Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "e80777c2f7f9753714e63e409c4c439c08c6400087848318d8b8d6052c46ab33",
+        "duplicate_detection_hash": "e80777c2f7f9753714e63e409c4c439c08c6400087848318d8b8d6052c46ab33"
+      },
+      "questions": [
+        {
+          "id": "ru_pilot_12_q1",
+          "passage_id": "ru_pilot_12",
+          "stem_en": "Where will the friends go for a walk?",
+          "choices": {
+            "A": "To the park",
+            "B": "To the river",
+            "C": "To the beach",
+            "D": "To the square"
+          },
+          "correct_key": "A",
+          "rationale_en": "The dialogue explicitly states: To the park.",
+          "evidence_ru": "В парк.",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru_pilot_12_q2",
+          "passage_id": "ru_pilot_12",
+          "stem_en": "Which animal will they take?",
+          "choices": {
+            "A": "A bird",
+            "B": "A dog",
+            "C": "A cat",
+            "D": "A rabbit"
+          },
+          "correct_key": "B",
+          "rationale_en": "The dialogue explicitly states: A dog.",
+          "evidence_ru": "Возьмём собаку?",
+          "question_type": "prominent detail",
+          "target_ilr": "0+",
+          "provisional_difficulty": -1.75,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {},
+          "distractor_quality": {},
+          "generation": {
+            "provider": "AI-assisted original draft",
+            "model": "Codex",
+            "model_revision": null,
+            "prompt_version": "russian-dialogue-0plus-v1",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-10-03T20:48:29.212536Z",
+            "authoring_notes": "Original draft; language, audio and ILR review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-10-03T20:48:29.212536Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Пойдём гулять после работы?"
+        },
+        {
+          "speaker": "B",
+          "text": "Давай. Куда пойдём?"
+        },
+        {
+          "speaker": "A",
+          "text": "В парк. Там сейчас красиво."
+        },
+        {
+          "speaker": "B",
+          "text": "Хорошо. Возьмём собаку?"
+        },
+        {
+          "speaker": "A",
+          "text": "Конечно. Встретимся у моего дома в шесть."
+        },
+        {
+          "speaker": "B",
+          "text": "Договорились."
+        }
+      ],
+      "speakers": {
+        "A": "First speaker",
+        "B": "Second speaker"
+      },
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending pronunciation, naturalness, question and ILR review.",
+        "reuse_attested": false
+      }
+    }
+  ]
+}

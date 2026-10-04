@@ -676,9 +676,15 @@ Version 1.3.3 distinguishes three separate failure stages:
 A message such as `q2:no_near_duplicate_choices` is therefore a question-quality rejection, not an audio failure. The generated bank and Dataset synchronization remain intact.
 
 
+## Preset diagnostic bank and optional ElevenLabs workshop
+
+Adaptive Assessment, Adaptive Diagnostic and Simulation now use only curator-approved local content and fixed audio, with no runtime generation. Existing starter content remains pending review, so these modes explicitly report insufficient approved content until a curator approves material. Training remains available.
+
+The optional private workshop includes twelve original Russian 0+ dialogue drafts, manual editing, BYO ElevenLabs credentials, configurable voices/models, pilot-first paid generation, conservative character budgets, resumable batches and draft export. No new recordings have been generated. See [setup, review workflow, privacy, usage terms and limitations](docs/PRESET_BANK_AND_WORKSHOP.md).
+
 ## Natural listening speech
 
-Version 1.6.0 keeps the no-cost Edge TTS backend and improves generated Russian and Mandarin listening audio through conservative text phrasing, passage-aware voice selection, and small deterministic rate/pitch adjustments. Previously saved AI passages are upgraded lazily when played and then cached, so startup remains fast. The app does not claim human-recorded audio; generated recordings remain synthetic practice material.
+Version 1.6.0 keeps the no-cost Edge TTS backend and improves generated Russian and Mandarin listening audio through conservative text phrasing, passage-aware voice selection, and small deterministic rate/pitch adjustments. In Training, previously saved AI passages may be upgraded lazily when played and then cached. Preset assessment modes always use their fixed reviewed recordings. The app does not claim human-recorded audio; generated recordings remain synthetic practice material.
 
 
 

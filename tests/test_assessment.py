@@ -129,9 +129,10 @@ def test_invalid_limits_rejected(options):
 
 
 @pytest.fixture
-def callbacks(monkeypatch, tmp_path, bank):
+def callbacks(monkeypatch, tmp_path, approved_bank):
     from ui import callbacks as cb
-    monkeypatch.setattr(cb, "BANK", bank)
+    monkeypatch.setattr(cb, "BANK", approved_bank)
+    monkeypatch.setattr(cb, "PRESET_BANK", approved_bank)
     monkeypatch.setattr(cb, "STORAGE", LocalStorage(tmp_path / "sessions", tmp_path / "history"))
     monkeypatch.setattr(cb, "EXPORT_DIR", tmp_path / "exports")
     monkeypatch.setattr(cb, "_prefetch_selected_playback", lambda *a: None)
@@ -152,7 +153,7 @@ def submit_render(cb, rendered, correct=True):
     return cb.submit_passage_callback(state, data, nonce, *(values + [None]*(5-len(values))))
 
 
-def test_ui_assessment_end_review_duplicate_submit_and_checkpoint(callbacks):
+def test_ui_assessment_end_review_duplicate_submit_and_checkpoint(callbacks, monkeypatch):
     cb = callbacks
     rendered = start(cb, assessment_min_passages=2, assessment_max_passages=2)
     state = rendered[0]
@@ -174,8 +175,12 @@ def test_ui_assessment_end_review_duplicate_submit_and_checkpoint(callbacks):
     assert "maximum" in rendered[27]["value"].lower()
     assert explanation in rendered[27]["value"]
     assert "90% posterior" in rendered[27]["value"]
+    def no_rewrite(*args, **kwargs):
+        pytest.fail("Recovering a finished assessment must not rewrite its checkpoint or exports")
+    monkeypatch.setattr(cb.STORAGE, "save_checkpoint", no_rewrite)
+    monkeypatch.setattr(cb, "build_exports", no_rewrite)
     again = cb.resume_session_callback(state.session_id)
-    assert again[27]["value"] == rendered[27]["value"]
+    assert again[27]["value"] == rendered[27]["value"], again[3]
 
 
 @pytest.mark.parametrize("available", [0, 1])

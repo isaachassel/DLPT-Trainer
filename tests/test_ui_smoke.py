@@ -24,7 +24,8 @@ def test_variable_question_bundles_render(bank):
     assert 1 <= visible_questions <= 5
 
 
-def test_strict_mode_does_not_expose_listening_transcript():
+def test_strict_mode_does_not_expose_listening_transcript(monkeypatch, approved_bank):
+    monkeypatch.setattr("ui.callbacks.PRESET_BANK", approved_bank)
     result = start_session_callback(SIMULATION_MODE_LABEL, "Listening", "1+", "2", "Shortened practice — 12 questions per skill / 30 minutes", "Strict countdown", [], [], "End of session", False, True, "Starter-bank eSpeak voice", "Normal", "")
     state, bundle_data = result[0], result[1]
     from ui.callbacks import _bundle_from_dict
