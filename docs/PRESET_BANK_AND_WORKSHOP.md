@@ -2,11 +2,11 @@
 
 ## Current content status
 
-All 51 original starter passages remain **draft/pending review** in `data/assessment/bank.json`, as requested. Their older `validation_status: accepted` is a deterministic practice-bank flag, not curator approval. Existing Training continues to use its original banks. No starter passage has been silently promoted.
+The 51 original starter passages have been removed from the deployed bank. Training and assessments now share the approved bundled content: **66 passages / 156 questions**, with **zero pending entries**. Legacy content is isolated under 	ests/fixtures/legacy for regression tests only and is never served by the app.
 
 The twelve original Russian 0+ listening scripts remain in `data/pilots/russian_0plus_dialogues.json` as authoring templates. The approved versions are now in `data/assessment/bank.json`, with twelve fixed ElevenLabs MP3s in `data/assessment/audio` and 24 English questions. The owner listened to and approved the audio, then authorized full approval for local noncommercial assessment workflow testing. Transcript/question consistency has been checked; the ILR labels remain provisional and uncalibrated.
 
-The October 4 expansion adds fourteen reading passages and twelve listening recordings through ILR 3. The approved Russian bank now contains **14 reading passages / 34 questions** and **24 listening passages / 54 questions**, including the original twelve listening pilots. Every band (0, 0+, 1, 1+, 2, 2+, 3) has at least two passages per skill. All 51 older starter entries remain pending.
+The October 4 expansion adds fourteen reading passages and twelve listening recordings through ILR 3. The approved Russian bank now contains **14 reading passages / 34 questions** and **24 listening passages / 54 questions**, including the original twelve listening pilots. Every band (0, 0+, 1, 1+, 2, 2+, 3) has at least two passages per skill. The older starter entries are removed.
 
 Choose **Adaptive Assessment → Reading**, **Listening**, or **Reading + Listening (separate sections)** with eligibility **0–3** for adaptive routing across the expanded bank. The usual 6–18 passage limits apply separately to each skill; uncertainty can stop a section earlier, and content exhaustion is explicit. For a quick level-3 check set both eligibility bounds to **3** and use **2 minimum / 2 maximum passages**. Answers and transcripts remain withheld until the entire assessment ends. Reports label a single-band run as inconclusive.
 

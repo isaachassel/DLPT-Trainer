@@ -53,7 +53,7 @@ from core.languages import (
 )
 from core.models import PassageItem, QuestionItem, SessionState, UserHistory
 from core.reporting import build_exports, build_full_report
-from core.preset_bank import PresetBank
+from core.preset_bank import PresetBank, PracticeBank
 from core.scoring import item_level_label
 from core.session import (
     PassageBundle,
@@ -78,13 +78,10 @@ LOGGER = logging.getLogger("dlpt.genai")
 ROOT = Path(__file__).resolve().parents[1]
 SETTINGS = get_settings()
 SETTINGS.ensure_directories(ROOT)
-STARTER_BANK_PATH = SETTINGS.starter_bank_runtime_path(ROOT)
-MANDARIN_STARTER_BANK_PATH = SETTINGS.mandarin_starter_bank_runtime_path(ROOT)
 GENERATED_BANK_PATH = SETTINGS.generated_bank_runtime_path(ROOT)
 BANK_PERSISTENCE = GeneratedBankPersistence(SETTINGS, ROOT)
 BANK_BOOTSTRAP_MESSAGE = BANK_PERSISTENCE.bootstrap()
-BANK = ItemBank(
-    [STARTER_BANK_PATH, MANDARIN_STARTER_BANK_PATH, GENERATED_BANK_PATH],
+BANK = PracticeBank(
     writable_path=GENERATED_BANK_PATH,
     on_commit=BANK_PERSISTENCE.after_local_commit,
     audio_available=BANK_PERSISTENCE.audio_available,
@@ -108,22 +105,22 @@ def _skill_bank_line(skill: str, health: dict) -> str:
     if skill == "listening":
         return (
             f"### {label} bank\n"
-            f"- **Built-in validated starter:** {data['starter_passages']} passages / "
+            f"- **Approved bundled content:** {data['starter_passages']} passages / "
             f"{data['starter_questions']} questions.\n"
             f"- **Saved AI-generated:** {data['saved_ai_passages']} passages / "
             f"{data['saved_ai_questions']} questions / {data['saved_ai_audio_assets']} audio files.\n"
-            f"- **Ready to use now (starter + saved AI):** {data['ready_passages']} passages / "
+            f"- **Ready to use now (approved + saved AI):** {data['ready_passages']} passages / "
             f"{data['ready_questions']} questions / {data['ready_audio_assets']} playable audio files.\n"
             f"- **Unavailable because audio is missing or invalid:** {data['missing_or_invalid_audio']} passages.\n"
             f"- **Ready-to-use ILR coverage:** {coverage}."
         )
     return (
         f"### {label} bank\n"
-        f"- **Built-in validated starter:** {data['starter_passages']} passages / "
+        f"- **Approved bundled content:** {data['starter_passages']} passages / "
         f"{data['starter_questions']} questions.\n"
         f"- **Saved AI-generated:** {data['saved_ai_passages']} passages / "
         f"{data['saved_ai_questions']} questions.\n"
-        f"- **Ready to use now (starter + saved AI):** {data['ready_passages']} passages / "
+        f"- **Ready to use now (approved + saved AI):** {data['ready_passages']} passages / "
         f"{data['ready_questions']} questions.\n"
         f"- **Ready-to-use ILR coverage:** {coverage}."
     )
@@ -448,7 +445,7 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
         source_label = (
             "a previously saved and validated AI-generated item"
             if state.last_content_source == "generated_bank"
-            else "a built-in validated starter item"
+            else "an approved bundled item"
         )
         if state.content_source == "bank_only":
             state.last_content_note = (
@@ -684,7 +681,7 @@ def _status_text(state: SessionState, extra: str = "") -> str:
     else:
         lines.append(
             f"**Content:** Validated bank only · selected from {skill_health['ready_passages']} ready-to-use "
-            f"{state.active_skill.title()} passages ({skill_health['starter_passages']} built-in starter + "
+            f"{state.active_skill.title()} passages ({skill_health['starter_passages']} approved bundled + "
             f"{skill_health['saved_ai_passages']} saved AI-generated). **This session does not write new bank records.**"
         )
     if state.last_content_source == "fresh_ai":
@@ -982,7 +979,7 @@ def start_session_callback(
                 "### Assessment unavailable — no questions were started\n\n"
                 f"No eligible, curator-approved passages are available for {html.escape(language_label)} / "
                 f"{html.escape(skill_label)} with these settings. "
-                "Existing starter content is still pending review.\n\n"
+                "No approved content matches these assessment settings.\n\n"
                 "To practise now, select **Training Mode** and click **Begin Session**. "
                 "Assessments become available after a curator approves suitable content and its listening recordings. "
                 "No test result or new checkpoint was created; prior checkpoints remain available.",
@@ -1174,6 +1171,8 @@ def _prefetch_selected_playback(state: SessionState, bundle: PassageBundle) -> N
     if passage.skill != "listening":
         return
     asset = BANK.get_audio(passage.audio_asset_id)
+    if passage.id in PRESET_BANK.passages:
+        return  # Preserve the approved ElevenLabs recording; never prefetch replacement TTS.
     if asset is None:
         return
     BANK_PERSISTENCE.prefetch_audio(asset)
@@ -1292,7 +1291,9 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         audio_note = ""
         cache_dir = SETTINGS.audio_cache_runtime_path(ROOT)
 
-        if state.mode == "training":
+        if bundle.passage.id in PRESET_BANK.passages:
+            audio_note = " Playback uses the approved fixed recording."
+        elif state.mode == "training":
             voice, rate, pitch, volume, requested_display, explicit = _training_audio_profile(state, bundle.passage)
             LOGGER.info(
                 "Training playback TTS requested passage=%s selected_label=%s primary_voice=%s rate=%s",

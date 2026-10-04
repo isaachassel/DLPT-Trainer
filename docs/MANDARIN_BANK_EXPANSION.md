@@ -15,7 +15,7 @@ October 4, 2026. Original AI-assisted fictional scenarios in simplified Chinese,
 | 3 | 2 / 6 | 2 / 6 |
 | Total | 14 / 34 | 14 / 34 |
 
-The original 51 starter passages remain pending. Russian's approved 14 reading and 24 listening passages are preserved. The ten extra Russian 0+ listening passages reflect its earlier twelve-recording pilot; Mandarin begins with two passages per band in both skills.
+The original 51 starter passages were subsequently removed from the deployed bank; legacy test fixtures are isolated from the app. Russian's approved 14 reading and 24 listening passages are preserved. The ten extra Russian 0+ listening passages reflect its earlier twelve-recording pilot; Mandarin begins with two passages per band in both skills.
 
 `scripts/prepare_mandarin_drafts.py` rebuilds the 28 offline drafts in `data/pilots/mandarin_range_expansion.json`; it neither generates nor approves audio. Approved deployment content lives in `data/assessment/bank.json`. MP3s use Git LFS and checksum-linked local paths. The schema retains the historical names `passage_ru` and `evidence_ru` for target-language text; these items explicitly declare `language: zh-CN`.
 

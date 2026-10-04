@@ -8,24 +8,21 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from core.config import get_settings
-from core.item_bank import ItemBank
+from core.preset_bank import PracticeBank, MANIFEST
 from core.validation import answer_length_leakage_summary, answer_position_balance, bank_balance_passes
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate the starter bank plus the generated-bank overlay.")
-    parser.add_argument("--starter", default=None)
-    parser.add_argument("--mandarin", default=None)
+    parser = argparse.ArgumentParser(description="Validate approved bundled content plus the generated-bank overlay.")
+    parser.add_argument("--manifest", default=None)
     parser.add_argument("--generated", default=None)
     args = parser.parse_args()
     settings = get_settings()
-    starter = Path(args.starter) if args.starter else settings.starter_bank_runtime_path(ROOT)
-    mandarin = Path(args.mandarin) if args.mandarin else settings.mandarin_starter_bank_runtime_path(ROOT)
+    manifest = Path(args.manifest) if args.manifest else MANIFEST
     generated = Path(args.generated) if args.generated else settings.generated_bank_runtime_path(ROOT)
-    bank = ItemBank([starter, mandarin, generated], writable_path=generated).load()
-    errors = bank.validate_operational_bank()
-    print(f"Starter bank: {starter}")
-    print(f"Mandarin starter bank: {mandarin}")
+    bank = PracticeBank(writable_path=generated, manifest=manifest).load()
+    errors = bank.validate_operational_bank() + bank.load_warnings
+    print(f"Approved manifest: {manifest}")
     print(f"Generated overlay: {generated}")
     print(f"Passages: {len(bank.passages)}")
     print(f"Questions: {len(bank.questions)}")

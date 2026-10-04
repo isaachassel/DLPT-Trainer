@@ -170,7 +170,7 @@ def test_high_level_mandarin_reading_prompts_cover_both_character_systems():
 
 def test_mandarin_starter_rationales_are_specific(project_root):
     rationales = []
-    for line in (project_root / "data/mandarin_starter_items.jsonl").read_text(encoding="utf-8").splitlines():
+    for line in (project_root / "tests/fixtures/legacy/mandarin_starter_items.jsonl").read_text(encoding="utf-8").splitlines():
         record = json.loads(line)
         if record["kind"] == "question":
             rationales.append(record["data"]["rationale_en"])
@@ -180,7 +180,7 @@ def test_mandarin_starter_rationales_are_specific(project_root):
 
 
 def test_generated_overlay_cannot_overwrite_or_extend_starter_ids(project_root, tmp_path):
-    starter = project_root / "data/starter_items.jsonl"
+    starter = project_root / "tests/fixtures/legacy/starter_items.jsonl"
     original = ItemBank(starter).load().passages["r001"]
     forged_passage = original.model_copy(update={"passage_ru": "Подмененный текст"})
     forged_question = ItemBank(starter).load().questions["r001_q1"].model_copy(

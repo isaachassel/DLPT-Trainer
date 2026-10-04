@@ -26,7 +26,7 @@ def _settings(tmp_path: Path) -> Settings:
 
 def test_live_generated_bundle_is_validated_stored_and_reloadable(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     service = LiveGenerationService(_settings(tmp_path), bank, project_root, provider=MockProvider())
 
     result = service.generate_and_store(
@@ -47,14 +47,14 @@ def test_live_generated_bundle_is_validated_stored_and_reloadable(project_root, 
     counts = answer_position_balance(bank.questions.values())
     assert max(counts.values()) - min(counts.values()) <= 1
 
-    reloaded = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    reloaded = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     assert result.passage.id in reloaded.passages
     assert len(reloaded.get_questions(result.passage.id)) == 2
 
 
 def test_fresh_question_set_is_regenerated_after_repair_exhaustion(project_root, tmp_path, monkeypatch):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     service = LiveGenerationService(_settings(tmp_path), bank, project_root, provider=MockProvider())
     original = service._generate_questions
     calls = 0
@@ -111,7 +111,7 @@ def test_recovered_generation_failure_does_not_expose_internal_validator(monkeyp
 
 def test_duplicate_live_content_is_quarantined_without_polluting_bank(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     service = LiveGenerationService(_settings(tmp_path), bank, project_root, provider=MockProvider())
     service.generate_and_store(
         skill="reading", level="2", mode="training", topics=[], competencies=[], maximum_questions=2
@@ -214,7 +214,7 @@ def test_live_listening_generation_creates_validated_cached_audio(project_root, 
     monkeypatch.setattr(generation, "audio_duration_seconds", lambda path: 24.0)
 
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     service = LiveGenerationService(_settings(tmp_path), bank, project_root, provider=MockProvider())
 
     result = service.generate_and_store(
@@ -233,8 +233,9 @@ def test_live_listening_generation_creates_validated_cached_audio(project_root, 
     assert Path(result.audio_asset.path).stat().st_size > 512
 
 
-def test_fresh_listening_item_immediately_prefetches_selected_training_speed(monkeypatch):
+def test_fresh_listening_item_immediately_prefetches_selected_training_speed(monkeypatch, bank):
     import ui.callbacks as callbacks
+    monkeypatch.setattr(callbacks, "BANK", bank)
 
     state = create_session(
         language="ru",

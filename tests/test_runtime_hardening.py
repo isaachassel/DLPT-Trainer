@@ -14,7 +14,9 @@ def test_hugging_face_launch_explicitly_disables_ssr() -> None:
 def test_only_audio_directories_are_exposed() -> None:
     kwargs = launch_kwargs()
     allowed = {Path(path).resolve() for path in kwargs["allowed_paths"]}
-    assert (ROOT / "data" / "audio").resolve() in allowed
+    assert (ROOT / "data" / "assessment" / "audio").resolve() in allowed
+    assert (ROOT / "tests" / "fixtures" / "legacy" / "audio").resolve() not in allowed
+    assert (ROOT / "data" / "audio").resolve() not in allowed
     assert (ROOT / "storage" / "exports").resolve() in allowed
     assert all(path.name in {"audio", "exports"} for path in allowed)
     assert ROOT.resolve() not in allowed

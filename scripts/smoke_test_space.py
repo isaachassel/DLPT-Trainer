@@ -7,20 +7,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from core.config import get_settings
-from core.item_bank import ItemBank
+from core.preset_bank import PracticeBank
 from ui.layout import build_app
 
 
 def main() -> int:
     settings = get_settings()
-    bank = ItemBank(
-        [
-            settings.starter_bank_runtime_path(ROOT),
-            settings.mandarin_starter_bank_runtime_path(ROOT),
-            settings.generated_bank_runtime_path(ROOT),
-        ],
-        # Both language banks are release-critical; the generated overlay is
-        # loaded last and remains the only writable source.
+    bank = PracticeBank(
         writable_path=settings.generated_bank_runtime_path(ROOT),
     ).load()
     errors = bank.validate_operational_bank()

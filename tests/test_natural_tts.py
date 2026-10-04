@@ -312,6 +312,7 @@ def test_training_audio_profile_honors_explicit_irina_selection():
 
 def test_training_playback_uses_irina_without_first_rendering_canonical_edge_voice(monkeypatch, bank, tmp_path):
     import ui.callbacks as callbacks
+    monkeypatch.setattr(callbacks, "BANK", bank)
     from core.session import create_session, select_next_bundle
 
     state = create_session(
@@ -355,6 +356,7 @@ def test_training_playback_uses_irina_without_first_rendering_canonical_edge_voi
 
 def test_irina_failure_falls_back_to_svetlana_and_reports_actual_voice(monkeypatch, bank, tmp_path):
     import ui.callbacks as callbacks
+    monkeypatch.setattr(callbacks, "BANK", bank)
     from core.session import create_session, select_next_bundle
 
     state = create_session(

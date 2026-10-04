@@ -30,6 +30,6 @@ def project_root():
 @pytest.fixture(scope="session")
 def bank(project_root):
     return ItemBank([
-        project_root / "data/starter_items.jsonl",
-        project_root / "data/mandarin_starter_items.jsonl",
+        project_root / "tests/fixtures/legacy/starter_items.jsonl",
+        project_root / "tests/fixtures/legacy/mandarin_starter_items.jsonl",
     ], writable_path=project_root / "storage/item_bank/generated_items.jsonl").load()

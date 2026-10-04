@@ -15,8 +15,6 @@ class Settings(BaseModel):
     environment: str = "production"
     data_dir: Path = Path("data")
     storage_dir: Path = Path("storage")
-    item_bank_path: Path = Path("data/starter_items.jsonl")
-    mandarin_item_bank_path: Path = Path("data/mandarin_starter_items.jsonl")
     generated_item_bank_path: Path = Path("storage/item_bank/generated_items.jsonl")
     audio_cache_dir: Path = Path("storage/cache/audio")
     session_dir: Path = Path("storage/sessions")
@@ -174,13 +172,6 @@ class Settings(BaseModel):
         if self.persistent_storage_path is not None and persistent_relative:
             return self.persistent_storage_path / persistent_relative
         return project_root / configured
-
-    def starter_bank_runtime_path(self, project_root: Path) -> Path:
-        return self.item_bank_path if self.item_bank_path.is_absolute() else project_root / self.item_bank_path
-
-    def mandarin_starter_bank_runtime_path(self, project_root: Path) -> Path:
-        path = self.mandarin_item_bank_path
-        return path if path.is_absolute() else project_root / path
 
     def generated_bank_runtime_path(self, project_root: Path) -> Path:
         return self.runtime_path(self.generated_item_bank_path, project_root, "item_bank/generated_items.jsonl")
@@ -369,8 +360,6 @@ def get_settings() -> Settings:
         environment=os.getenv("APP_ENV", "production"),
         data_dir=Path(os.getenv("DATA_DIR", "data")),
         storage_dir=Path(os.getenv("STORAGE_DIR", "storage")),
-        item_bank_path=Path(os.getenv("ITEM_BANK_PATH", "data/starter_items.jsonl")),
-        mandarin_item_bank_path=Path(os.getenv("MANDARIN_ITEM_BANK_PATH", "data/mandarin_starter_items.jsonl")),
         generated_item_bank_path=Path(os.getenv("GENERATED_ITEM_BANK_PATH", "storage/item_bank/generated_items.jsonl")),
         audio_cache_dir=Path(os.getenv("AUDIO_CACHE_DIR", "storage/cache/audio")),
         session_dir=Path(os.getenv("SESSION_DIR", "storage/sessions")),

@@ -85,7 +85,7 @@ def test_prompt_source_has_no_fixed_answer_letter_sequence(project_root):
 
 
 def test_blind_verifier_never_receives_proposed_key(project_root):
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r001")
     question = bank.get_questions("r001")[0]
     provider = BlindRecordingProvider(question.choices[question.correct_key], question.evidence_ru)
@@ -100,7 +100,7 @@ def test_blind_verifier_never_receives_proposed_key(project_root):
 
 def test_generation_pipeline_uses_separate_stages_and_verifier(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     author = RecordingMock()
     verifier = RecordingMock()
     service = LiveGenerationService(
@@ -180,7 +180,7 @@ def test_deprecated_groq_model_produces_startup_warning():
 def test_api_secrets_are_redacted_from_quarantine(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
     settings = _settings(tmp_path).model_copy(update={"hf_token": "secret-hf-token"})
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     service = LiveGenerationService(settings, bank, project_root, provider=MockProvider())
     service._quarantine({"error": "Authorization token=secret-hf-token"})
     text = (tmp_path / "quarantine/live_generation_failures.jsonl").read_text(encoding="utf-8")
@@ -225,7 +225,7 @@ class AlwaysFailProvider(AuthoringProvider):
 
 def test_failed_candidate_is_repaired_and_repair_count_is_persisted(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     author = RepairingMock()
     verifier = RecordingMock()
     service = LiveGenerationService(
@@ -243,7 +243,7 @@ def test_failed_candidate_is_repaired_and_repair_count_is_persisted(project_root
 
 def test_smart_audit_skips_only_low_risk_reading_training(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     author = RecordingMock()
     verifier = RecordingMock()
     settings = _settings(tmp_path).model_copy(update={"generation_audit_mode": "smart"})
@@ -280,7 +280,7 @@ def test_provider_attempt_cap_prevents_runaway_fallback_calls(monkeypatch):
 
 def test_failed_provider_calls_are_attached_to_error_and_redacted(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     settings = _settings(tmp_path).model_copy(update={"hf_token": "top-secret-value"})
     service = LiveGenerationService(settings, bank, project_root, provider=AlwaysFailProvider())
 
@@ -336,7 +336,7 @@ class ParaphrasingBatchVerifier(AuthoringProvider):
 
 
 def test_batched_verifier_paraphrase_does_not_discard_supported_questions(project_root):
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r001")
     questions = bank.get_questions("r001")[:2]
 
@@ -355,7 +355,7 @@ def test_batched_verifier_paraphrase_does_not_discard_supported_questions(projec
 
 
 def test_operational_question_evidence_still_requires_exact_passage_support(project_root):
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r001")
     question = bank.get_questions("r001")[0].model_copy(
         update={"evidence_ru": "Этой цитаты в исходном тексте нет."}
@@ -388,7 +388,7 @@ class FullPipelineParaphrasingVerifier(MockProvider):
 def test_full_generation_accepts_supported_bundle_when_verifier_paraphrases_evidence(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path],
         writable_path=generated_path,
     ).load()
     service = LiveGenerationService(
@@ -444,7 +444,7 @@ class TargetedQuestionRepairProvider(MockProvider):
 
 def test_only_failed_question_is_repaired_before_listening_tts(project_root, tmp_path, monkeypatch):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     author = TargetedQuestionRepairProvider()
     verifier = MockProvider()
 
@@ -495,7 +495,7 @@ class HostedSubsetProvider(HostedProvider):
 
 def test_hosted_generation_keeps_valid_question_subset_instead_of_extra_repair(project_root, tmp_path):
     generated_path = tmp_path / "generated.jsonl"
-    bank = ItemBank([project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path).load()
     settings = _settings(tmp_path)
     author = HostedSubsetProvider(settings)
     verifier = MockProvider()
@@ -612,7 +612,7 @@ class IncompleteBatchRecoveryVerifier(AuthoringProvider):
 
 
 def test_incomplete_blind_batch_recovers_only_missing_question(project_root):
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r001")
     questions = bank.get_questions("r001")[:2]
     provider = IncompleteBatchRecoveryVerifier(
@@ -648,7 +648,7 @@ class OneBasedBatchVerifier(IncompleteBatchRecoveryVerifier):
 
 
 def test_complete_one_based_blind_batch_is_normalized_without_extra_calls(project_root):
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r001")
     questions = bank.get_questions("r001")[:2]
     provider = OneBasedBatchVerifier(
@@ -667,7 +667,7 @@ def test_complete_one_based_blind_batch_is_normalized_without_extra_calls(projec
 
 def test_level3_reading_incomplete_batch_verification_does_not_discard_bundle(project_root):
     """Regression for the deployed 2026-08-17 Level-3 Reading failure."""
-    bank = ItemBank([project_root / "data/starter_items.jsonl"]).load()
+    bank = ItemBank([project_root / "tests/fixtures/legacy/starter_items.jsonl"]).load()
     passage = bank.get_passage("r007")
     questions = bank.get_questions("r007")
     assert passage.target_ilr == "3"

@@ -95,7 +95,7 @@ def test_plain_json_parser_does_not_extract_arbitrary_brace_substrings():
 
 
 def test_batched_verifier_hides_proposed_answers(project_root):
-    bank = ItemBank(project_root / "data/starter_items.jsonl").load()
+    bank = ItemBank(project_root / "tests/fixtures/legacy/starter_items.jsonl").load()
     passage = bank.get_passage("r001")
     questions = bank.get_questions("r001")[:2]
 
@@ -272,7 +272,7 @@ def test_full_live_service_accepts_realistic_question_variants_and_persists(proj
         history_dir=tmp_path / "history",
     )
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path], writable_path=generated_path
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path], writable_path=generated_path
     ).load()
     author = HostedProvider(settings, "author")
     fixture = MockProvider()

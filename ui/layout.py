@@ -188,8 +188,9 @@ def build_app() -> gr.Blocks:
                         voice_choices("ru"),
                         value=language_profile("ru").starter_voice_label,
                         label="Training voice preference",
+                        info="Applies to fresh or saved generated practice. Approved bundled passages always use their fixed recording.",
                     )
-                    speed = gr.Dropdown(["Very slow", "Slow", "Normal", "Fast"], value="Normal", label="Training audio speed")
+                    speed = gr.Dropdown(["Very slow", "Slow", "Normal", "Fast"], value="Normal", label="Training audio speed", info="Approved bundled recordings retain their reviewed speed.")
                     profile_id = gr.Textbox(label="Optional local profile ID", placeholder="Used only for history and repeat-exposure control")
                 with gr.Row():
                     content_source = gr.Dropdown(

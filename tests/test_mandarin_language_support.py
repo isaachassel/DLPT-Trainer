@@ -18,8 +18,8 @@ from core.validation import content_hash, normalize_text, target_language_ratio,
 
 def multilingual_bank(project_root) -> ItemBank:
     return ItemBank([
-        project_root / "data" / "starter_items.jsonl",
-        project_root / "data" / "mandarin_starter_items.jsonl",
+        project_root / "tests/fixtures/legacy" / "starter_items.jsonl",
+        project_root / "tests/fixtures/legacy" / "mandarin_starter_items.jsonl",
     ], writable_path=project_root / "storage/item_bank/generated_items.jsonl").load()
 
 
@@ -123,8 +123,8 @@ def test_mock_live_generation_materializes_mandarin(project_root, tmp_path):
     overlay = tmp_path / "generated.jsonl"
     overlay.write_text("", encoding="utf-8")
     bank = ItemBank([
-        project_root / "data" / "starter_items.jsonl",
-        project_root / "data" / "mandarin_starter_items.jsonl",
+        project_root / "tests/fixtures/legacy" / "starter_items.jsonl",
+        project_root / "tests/fixtures/legacy" / "mandarin_starter_items.jsonl",
         overlay,
     ], writable_path=overlay).load()
     settings = Settings(

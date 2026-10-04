@@ -200,3 +200,44 @@ class PresetBank(ItemBank):
 
     def append_validated_bundle(self, *args, **kwargs):
         raise PermissionError("Shared preset content is managed only by the local curator CLI")
+
+
+class PracticeBank(ItemBank):
+    """Approved bundled content plus the optional writable training overlay.
+
+    Legacy JSONL starter banks are never loaded. Keep the historical
+    ``starter_bank`` origin key for compatibility with saved training sessions.
+    """
+
+    def __init__(self, writable_path: Path, *, manifest: Path = MANIFEST,
+                 asset_root: Path = ROOT, **kwargs):
+        super().__init__([manifest, writable_path], writable_path=writable_path, **kwargs)
+        self.manifest = manifest
+        self.asset_root = asset_root
+        self.approved_bank = None
+
+    def load(self):
+        with self._lock:
+            if self._loaded:
+                return self
+            approved = PresetBank(self.manifest, self.asset_root).load()
+            self.approved_bank = approved
+            self.passages.update(approved.passages)
+            self.questions.update(approved.questions)
+            self.audio_assets.update(approved.audio_assets)
+            self.passage_origin.update({pid: "starter_bank" for pid in approved.passages})
+            self.load_warnings.extend(approved.load_warnings)
+            self._load_path(self.writable_path, required=False)
+            self._reindex()
+            self._loaded = True
+        return self
+
+    def active_passages(self, skill, language=None):
+        approved_ids = {p.id for p in self.approved_bank.active_passages(skill, language)}
+        return [p for p in super().active_passages(skill, language)
+                if self.origin_for(p.id) == "generated_bank" or p.id in approved_ids]
+
+    def get_audio(self, audio_id):
+        if audio_id in self.approved_bank.audio_assets:
+            return self.approved_bank.get_audio(audio_id)
+        return super().get_audio(audio_id)

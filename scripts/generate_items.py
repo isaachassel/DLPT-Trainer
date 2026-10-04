@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from core.config import get_settings
 from core.generation import LiveGenerationService
-from core.item_bank import ItemBank
+from core.preset_bank import PracticeBank
 
 
 def main() -> int:
@@ -32,9 +32,8 @@ def main() -> int:
         print(message)
         return 2
 
-    starter = settings.starter_bank_runtime_path(ROOT)
     generated = settings.generated_bank_runtime_path(ROOT)
-    bank = ItemBank([starter, generated], writable_path=generated).load()
+    bank = PracticeBank(writable_path=generated).load()
     service = LiveGenerationService(settings, bank, ROOT)
     maximum = args.max_questions or (5 if args.skill == "reading" else 3)
 

@@ -198,22 +198,25 @@ The bank is the application’s reliability layer and accumulated content memory
 
 See `docs/ADAPTIVE_ROUTING.md` for the routing equations, range behavior, stopping rule, and worked ILR 3 → 2+ → 2 example.
 
-## Starter and generated item banks
+## Approved and generated item banks
 
 The repository ships with:
 
-- 51 starter passages: 24 Reading and 27 Listening;
-- 160 starter questions: 84 Reading and 76 Listening;
-- 27 bundled Listening audio assets;
-- Russian: 27 passages / 88 questions / 15 audio assets;
-- Mandarin: 24 passages / 72 questions / 12 audio assets;
-- balanced starter keys: A=40, B=40, C=40, D=40 before session shuffling.
+- 66 approved passages: 28 Reading and 38 Listening;
+- 156 questions and 38 fixed ElevenLabs recordings;
+- Russian: 38 passages / 88 questions;
+- Mandarin: 28 passages / 68 questions;
+- at least two passages per skill and language at every ILR band from 0 through 3.
 
-Immutable starter bank:
+Training and assessments share this approved bundled bank. The retired 51 starter
+passages are isolated regression-test fixtures, never loaded or served by the app.
+Approved bundled recordings retain their reviewed voices and speed; the Training
+voice/speed controls apply to optional fresh or saved generated practice only.
+
+Immutable approved bank:
 
 ```text
-data/starter_items.jsonl
-data/mandarin_starter_items.jsonl
+data/assessment/bank.json
 ```
 
 Runtime generated overlay (created automatically; it is intentionally not shipped as a blank release file):

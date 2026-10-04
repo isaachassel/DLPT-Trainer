@@ -40,8 +40,8 @@ def test_active_passage_validation_is_cached(monkeypatch, project_root):
 
     bank = ItemBank(
         [
-            project_root / "data/starter_items.jsonl",
-            project_root / "data/mandarin_starter_items.jsonl",
+            project_root / "tests/fixtures/legacy/starter_items.jsonl",
+            project_root / "tests/fixtures/legacy/mandarin_starter_items.jsonl",
         ],
         writable_path=project_root / "storage/item_bank/generated_items.jsonl",
     ).load()
@@ -77,8 +77,8 @@ def test_active_passage_validation_is_cached(monkeypatch, project_root):
 def test_health_summary_cache_returns_an_independent_copy(project_root):
     bank = ItemBank(
         [
-            project_root / "data/starter_items.jsonl",
-            project_root / "data/mandarin_starter_items.jsonl",
+            project_root / "tests/fixtures/legacy/starter_items.jsonl",
+            project_root / "tests/fixtures/legacy/mandarin_starter_items.jsonl",
         ],
         writable_path=project_root / "storage/item_bank/generated_items.jsonl",
     ).load()

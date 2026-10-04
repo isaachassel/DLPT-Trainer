@@ -875,14 +875,9 @@ class GeneratedBankPersistence:
                 # Schema, relationship, audio, and duplicate-ID checks run before
                 # the import can touch the live overlay. This is deterministic
                 # integrity validation, not a human-authenticity gate.
-                from .item_bank import ItemBank
+                from .preset_bank import PracticeBank
 
-                validation_bank = ItemBank(
-                    [
-                        self.settings.starter_bank_runtime_path(self.project_root),
-                        self.settings.mandarin_starter_bank_runtime_path(self.project_root),
-                        normalized_incoming,
-                    ],
+                validation_bank = PracticeBank(
                     writable_path=normalized_incoming,
                 ).load()
                 validation_errors = validation_bank.validate_operational_bank()

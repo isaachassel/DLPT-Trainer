@@ -46,7 +46,7 @@ def test_generated_bank_commit_writes_manifest_and_is_immediately_reloadable(pro
     persistence.bootstrap()
     generated_path = settings.generated_bank_runtime_path(project_root)
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path],
         writable_path=generated_path,
         on_commit=persistence.after_local_commit,
     ).load()
@@ -70,7 +70,7 @@ def test_generated_bank_commit_writes_manifest_and_is_immediately_reloadable(pro
     assert result.passage.id in {item.id for item in bank.active_passages("reading")}
 
     reloaded = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path],
         writable_path=generated_path,
     ).load()
     assert result.passage.id in reloaded.passages
@@ -82,7 +82,7 @@ def test_corrupt_generated_overlay_does_not_disable_starter_bank(project_root, t
     generated_path = tmp_path / "generated.jsonl"
     generated_path.write_text("not json\n{\"kind\": \"question\"}\n", encoding="utf-8")
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path],
         writable_path=generated_path,
     ).load()
     assert bank.load_warnings
@@ -129,7 +129,7 @@ def test_hf_dataset_sync_uploads_bank_manifest_and_audio(monkeypatch, project_ro
     persistence.bootstrap()
     generated_path = settings.generated_bank_runtime_path(project_root)
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", generated_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", generated_path],
         writable_path=generated_path,
         on_commit=persistence.after_local_commit,
     ).load()
@@ -279,7 +279,7 @@ def test_generated_bank_backup_zip_round_trip(project_root, tmp_path):
     source_persistence.bootstrap()
     source_bank_path = source_settings.generated_bank_runtime_path(project_root)
     source_bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", source_bank_path],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", source_bank_path],
         writable_path=source_bank_path,
         on_commit=source_persistence.after_local_commit,
     ).load()
@@ -299,7 +299,7 @@ def test_generated_bank_backup_zip_round_trip(project_root, tmp_path):
     destination_persistence.bootstrap()
     result = destination_persistence.import_backup(backup)
     destination_bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", destination_settings.generated_bank_runtime_path(project_root)],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", destination_settings.generated_bank_runtime_path(project_root)],
         writable_path=destination_settings.generated_bank_runtime_path(project_root),
     ).load()
 

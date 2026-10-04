@@ -30,7 +30,7 @@ def main():
 
         def dialogue(self, turns, voices, model):
             # Existing fixture MP3 for playback only; it does NOT speak the new draft.
-            return (ROOT / "data/audio/l001.mp3").read_bytes()
+            return (ROOT / "tests/fixtures/legacy/audio/l001.mp3").read_bytes()
 
     class MockWorkshop(Workshop):
         def configure(self, key, client_factory=MockProvider):
@@ -55,7 +55,7 @@ def main():
             gr.Markdown("# NONPRODUCTION FIXTURE PREVIEW\nNo provider calls or charges. Review decisions are TEST ONLY. "
                         "Mock audio reuses an existing unrelated fixture and does NOT speak the new dialogue. Do not export or curate mock output.")
         app.launch(server_name="127.0.0.1", server_port=7861, ssr_mode=False, css=CUSTOM_CSS,
-                   allowed_paths=[str(ROOT / "data/audio"), str(cb.EXPORT_DIR)])
+                   allowed_paths=[str(ROOT / "tests/fixtures/legacy/audio"), str(cb.EXPORT_DIR)])
 
 
 if __name__ == "__main__":

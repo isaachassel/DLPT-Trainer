@@ -13,7 +13,7 @@ from ui.callbacks import BANK, TOPICS_BY_SKILL, topic_controls
 def _overlay_bank(project_root: Path, tmp_path: Path) -> ItemBank:
     overlay = tmp_path / "generated_items.jsonl"
     return ItemBank(
-        [project_root / "data/starter_items.jsonl", overlay],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", overlay],
         writable_path=overlay,
     ).load()
 
@@ -213,7 +213,7 @@ def test_bank_only_selection_does_not_write_generated_overlay(project_root, tmp_
     overlay = tmp_path / "generated_items.jsonl"
     overlay.write_text("", encoding="utf-8")
     bank = ItemBank(
-        [project_root / "data/starter_items.jsonl", overlay],
+        [project_root / "tests/fixtures/legacy/starter_items.jsonl", overlay],
         writable_path=overlay,
     ).load()
     monkeypatch.setattr(callbacks, "BANK", bank)
