@@ -189,6 +189,11 @@ def test_sparse_bank_finishes_explicitly(callbacks, monkeypatch, available):
     passages = cb.BANK.active_passages("reading", "ru")[:available]
     monkeypatch.setattr(cb.BANK, "active_passages", lambda *a: passages)
     rendered = start(cb)
+    if not available:
+        assert rendered[0] is None
+        assert "Assessment unavailable" in rendered[3]["value"]
+        assert not rendered[27]["visible"]
+        return
     if available:
         rendered = submit_render(cb, rendered)
     state = rendered[0]

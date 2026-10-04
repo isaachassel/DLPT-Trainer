@@ -975,7 +975,18 @@ def start_session_callback(
         )
         bundle = _assessment_next_or_end(state) if mode == "assessment" else _select_with_safe_history(state, progress)
         if bundle is None:
-            return _assessment_finished(state)
+            # No passage was ever presented. This is a setup availability issue,
+            # not a completed assessment: do not create a checkpoint or report.
+            return _inactive_render(
+                None,
+                "### Assessment unavailable — no questions were started\n\n"
+                f"No eligible, curator-approved passages are available for {html.escape(language_label)} / "
+                f"{html.escape(skill_label)} with these settings. "
+                "Existing starter content is still pending review.\n\n"
+                "To practise now, select **Training Mode** and click **Begin Session**. "
+                "Assessments become available after a curator approves suitable content and its listening recordings. "
+                "No test result or new checkpoint was created; prior checkpoints remain available.",
+            )
         _progress(progress, 0.96, "Saving the initial checkpoint…")
         STORAGE.save_checkpoint(state)
         _progress(progress, 1.0, "Session ready")

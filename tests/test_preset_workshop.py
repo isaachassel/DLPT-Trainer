@@ -336,8 +336,9 @@ def test_audition_is_budgeted_and_cannot_unlock_batch(workshop):
         workshop.preflight("eleven_v3", VOICES, 20000, "batch")
 
 
-@pytest.mark.parametrize("mode", ["Adaptive Diagnostic", "Full CA Simulation"])
-def test_legacy_strict_sparse_bank_finishes_without_level(monkeypatch, approved_bank, tmp_path, mode):
+@pytest.mark.parametrize("mode", ["Adaptive Assessment", "Adaptive Diagnostic", "Full CA Simulation"])
+@pytest.mark.parametrize("skill", ["Reading", "Listening", "Reading + Listening (separate sections)"])
+def test_empty_preset_bank_does_not_start_or_export_a_test(monkeypatch, approved_bank, tmp_path, mode, skill):
     from ui import callbacks as cb
     from core.constants import DIAGNOSTIC_LENGTHS
     from core.storage import LocalStorage
@@ -345,9 +346,16 @@ def test_legacy_strict_sparse_bank_finishes_without_level(monkeypatch, approved_
     monkeypatch.setattr(cb, "STORAGE", LocalStorage(tmp_path / "sessions", tmp_path / "history"))
     monkeypatch.setattr(cb, "EXPORT_DIR", tmp_path / "exports")
     monkeypatch.setattr(approved_bank, "active_passages", lambda *a: [])
-    length = next(iter(DIAGNOSTIC_LENGTHS)) if mode == "Adaptive Diagnostic" else "Shortened practice — 12 questions per skill / 30 minutes"
-    result = cb.start_session_callback(mode, "Reading + Listening (separate sections)", "1+", "2", length,
+    def unexpected_write(*args, **kwargs):
+        pytest.fail("An unavailable assessment must not create a checkpoint or export")
+    monkeypatch.setattr(cb.STORAGE, "save_checkpoint", unexpected_write)
+    monkeypatch.setattr(cb, "build_exports", unexpected_write)
+    length = ("Complete passages" if mode == "Adaptive Assessment" else next(iter(DIAGNOSTIC_LENGTHS))
+              if mode == "Adaptive Diagnostic" else "Shortened practice — 12 questions per skill / 30 minutes")
+    result = cb.start_session_callback(mode, skill, "1+", "2", length,
                                        "Off", [], [], "End of session", False, True, "Starter", "Normal", "")
-    assert result[0].status == "completed"
-    assert result[0].assessment_end_reasons == {"reading": "content_exhausted", "listening": "content_exhausted"}
-    assert "no estimated practice ILR level" in result[27]["value"]
+    assert result[0] is None and result[1] is None
+    assert "Assessment unavailable" in result[3]["value"]
+    assert "Training Mode" in result[3]["value"]
+    assert not result[27]["visible"] and result[27]["value"] == ""
+    assert not result[28]["visible"] and not result[29]["visible"]
