@@ -52,7 +52,7 @@ def build_workshop():
         key = gr.Textbox(label="Your ElevenLabs API key (server session only; cleared after checking)", type="password")
         check = gr.Button("Check credentials and list available voices / models (no audio generation)")
         catalog = gr.JSON(label="Account usage and available voices / models")
-        gr.Markdown("Russian-labeled voices appear first. Other voices can be auditioned with a multilingual model; Russian pronunciation and accent still require review.")
+        gr.Markdown("Import Russian or Mandarin listening scripts in one language per workspace. Multilingual voices can be auditioned; pronunciation and accent still require review. The built-in templates and optional text drafting start in Russian.")
         model = gr.Dropdown(label="Dialogue model (choose one supported by Text to Dialogue)", choices=["eleven_v3"], value="eleven_v3")
         voice_a = gr.Dropdown(label="Voice for A (wife / first speaker)", choices=[])
         voice_b = gr.Dropdown(label="Voice for B (husband / second speaker)", choices=[])
@@ -85,7 +85,8 @@ def build_workshop():
             w = _session(w)
             try:
                 draft = DialogueDraft.model_validate_json(raw)
-                item = materialize(draft, i)
+                prior = next(x for x in w.package.items if x.id == i)
+                item = materialize(draft, i, language=prior.passage.language, target_ilr=prior.passage.target_ilr)
                 data = ContentPackage(items=[item if x.id == i else x for x in w.package.items])
                 w.edit(data.model_dump_json())
                 return w, w.package.model_dump_json(indent=2), "Saved edits; changed audio and pilot approval were invalidated."

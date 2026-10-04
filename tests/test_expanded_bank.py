@@ -10,11 +10,12 @@ from core.validation import choice_length_leakage_flags, near_duplicate, validat
 from tests.test_assessment import state_for, answer
 
 
-def test_both_skills_cover_every_band_with_distinct_validated_content():
+@pytest.mark.parametrize("language,filename", [("ru", "russian_range_expansion.json"), ("zh-CN", "mandarin_range_expansion.json")])
+def test_both_skills_cover_every_band_with_distinct_validated_content(language, filename):
     bank = PresetBank().load()
     assert not bank.load_warnings
     for skill in ("reading", "listening"):
-        passages = bank.active_passages(skill, "ru")
+        passages = bank.active_passages(skill, language)
         counts = Counter(p.target_ilr for p in passages)
         assert set(counts) == set(ILR_LEVELS)
         assert all(counts[level] >= 2 for level in ILR_LEVELS)
@@ -26,16 +27,17 @@ def test_both_skills_cover_every_band_with_distinct_validated_content():
             if p.target_ilr == "3":
                 assert any(q.question_type in {"inference", "relationship of ideas", "meaning from context"}
                            for q in bank.get_questions(p.id))
-    new = read_package(ROOT / "data/pilots/russian_range_expansion.json").items
+    new = read_package(ROOT / "data/pilots" / filename).items
     assert all(not near_duplicate(a.passage.passage_ru, b.passage.passage_ru)
                for n, a in enumerate(new) for b in new[n + 1:])
 
 
 @pytest.mark.parametrize("skill", ["reading", "listening"])
 @pytest.mark.parametrize("strong", [True, False])
-def test_real_expansion_routes_up_and_down_without_repeating(skill, strong):
+@pytest.mark.parametrize("language", ["ru", "zh-CN"])
+def test_real_expansion_routes_up_and_down_without_repeating(skill, strong, language):
     bank = PresetBank().load()
-    state = state_for([skill], assessment_min_passages=12, assessment_max_passages=12)
+    state = state_for([skill], language=language, assessment_min_passages=12, assessment_max_passages=12)
     delivered = []
     while state.status == "active":
         bundle = select_next_bundle(state, bank)
@@ -50,9 +52,10 @@ def test_real_expansion_routes_up_and_down_without_repeating(skill, strong):
     assert "Answer and explanation review" in build_full_report(state, bank)
 
 
-def test_single_band_filter_stays_explicitly_inconclusive():
+@pytest.mark.parametrize("language", ["ru", "zh-CN"])
+def test_single_band_filter_stays_explicitly_inconclusive(language):
     bank = PresetBank().load()
-    state = state_for(["reading"], minimum_ilr="3", maximum_ilr="3",
+    state = state_for(["reading"], language=language, minimum_ilr="3", maximum_ilr="3",
                       assessment_min_passages=2, assessment_max_passages=2)
     while state.status == "active":
         bundle = select_next_bundle(state, bank)

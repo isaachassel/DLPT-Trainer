@@ -49,7 +49,7 @@ def pilot(work):
 def test_production_pilot_ready_and_original_starter_content_pending():
     items = read_package(MANIFEST).items
     pilots = [x for x in items if x.id.startswith("ru_pilot_")]
-    originals = [x for x in items if not x.id.startswith(("ru_pilot_", "ru_expand_"))]
+    originals = [x for x in items if not x.id.startswith(("ru_pilot_", "ru_expand_", "zh_expand_"))]
     assert len(originals) == 51 and {x.review.status for x in originals} == {"draft"}
     assert len(pilots) == 12 and {x.review.status for x in pilots} == {"approved"}
     bank = PresetBank().load()

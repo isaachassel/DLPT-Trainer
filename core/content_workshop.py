@@ -118,7 +118,22 @@ class Workshop:
 
     def _fingerprint(self, item, model, voices):
         data = [item.id, item.content_version, [t.model_dump() for t in item.turns], model, voices]
+        # Preserve existing Russian paid-attempt fingerprints on resume.
+        if item.passage.language != "ru":
+            data.append(item.passage.language)
         return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+    def _language(self):
+        languages = {x.passage.language for x in self.package.items}
+        if len(languages) != 1 or not languages <= {"ru", "zh-CN"}:
+            raise ValueError("Use one supported language per workspace: Russian or Mandarin Chinese")
+        return next(iter(languages))
+
+    def _config(self, model, voices):
+        data = [model, voices]
+        if self._language() != "ru":
+            data.append(self._language())
+        return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
     def preflight(self, model, voices, budget, action="pilot", selected=None, acknowledge_uncertain=False):
         with self.lock:
@@ -137,11 +152,15 @@ class Workshop:
             items = self.package.items
             if not items:
                 raise ValueError("Import at least one dialogue")
-            config = hashlib.sha256(json.dumps([model, voices], sort_keys=True).encode()).hexdigest()
+            language = self._language()
+            model_info = next(m for m in self.catalog["models"] if m["model_id"] == model)
+            if model_info.get("languages") and ("zh" if language == "zh-CN" else language) not in {x["language_id"] for x in model_info["languages"]}:
+                raise ValueError("The selected model does not support this workspace language")
+            config = self._config(model, voices)
             policy = self.ledger.get("automatic_audio_policy", {})
             method_authorized = (policy.get("config") == config
                                  and policy.get("provider") == getattr(self.client, "provider_name", "NONPRODUCTION MOCK")
-                                 and policy.get("language") == "ru")
+                                 and policy.get("language") == language)
             if action == "pilot":
                 candidates = items[:1]
             elif action == "batch":
@@ -160,18 +179,18 @@ class Workshop:
                 sample = materialize(DialogueDraft(
                     topic="Voice audition", orientation_en="Voice audition only; not an assessment item.",
                     speakers={s: s for s in voices},
-                    turns=[Turn(speaker=s, text="Здравствуйте! Сегодня хорошая погода.") for s in voices],
+                    turns=[Turn(speaker=s, text="你好！今天天气很好。" if language == "zh-CN" else "Здравствуйте! Сегодня хорошая погода.") for s in voices],
                     questions=[DraftQuestion(stem_en="What is the weather like today?",
                                              choices={"A": "Good", "B": "Rainy", "C": "Snowy", "D": "Windy"},
                                              correct_key="A", rationale_en="The speakers say the weather is good.",
-                                             evidence_ru="Сегодня хорошая погода.")]), "voice_audition")
+                                             evidence_ru="今天天气很好。" if language == "zh-CN" else "Сегодня хорошая погода.")]), "voice_audition", language=language)
                 candidates = [sample]
             else:
                 raise ValueError("Unknown generation action")
             entries, count = [], 0
             for item in candidates:
-                if item.passage.language != "ru" or item.passage.skill != "listening" or not item.turns:
-                    raise ValueError("The dialogue workshop currently accepts Russian listening items with turns")
+                if item.passage.language != language or item.passage.skill != "listening" or not item.turns:
+                    raise ValueError("The dialogue workshop accepts same-language Russian or Mandarin listening items with turns")
                 if any(t.speaker not in voices for t in item.turns):
                     raise ValueError("Assign a voice to every speaker identifier")
                 chars = sum(len(t.text) for t in item.turns)
@@ -190,8 +209,8 @@ class Workshop:
             if self.ledger["spent_characters"] + count > budget:
                 raise ValueError("Character budget would be exceeded, including prior failed/uncertain reservations")
             self.plan = {"entries": entries, "model": model, "voices": dict(voices), "budget": budget,
-                         "characters": count, "config": config, "action": action}
-            return {"model": model, "voices": voices, "characters_this_run": count,
+                         "characters": count, "config": config, "action": action, "language": language}
+            return {"model": model, "voices": voices, "language": language, "characters_this_run": count,
                     "reserved_so_far": self.ledger["spent_characters"], "total_character_limit": budget,
                     "usage": "Input characters, not a dollar/credit cap. Credits depend on model, voice rates and plan. API regenerations may be charged. Failed/uncertain requests stay reserved.",
                     "scripts": [{"id": e["id"], "turns": [t.model_dump() for t in e["item"].turns]} for e in entries]}
@@ -214,7 +233,8 @@ class Workshop:
                 self.ledger["attempts"][item.id] = attempt
                 self.save()  # reserve durably before sending; crash => uncertain on reload
                 try:
-                    audio = self.client.dialogue(item.turns, plan["voices"], plan["model"])
+                    audio = self.client.dialogue(item.turns, plan["voices"], plan["model"],
+                                                 **({"language": plan["language"]} if plan["language"] != "ru" else {}))
                     digest = hashlib.sha256(audio).hexdigest()
                     name = f"audio/{item.id}-{digest[:16]}.mp3"
                     target = self.directory / name
@@ -266,12 +286,37 @@ class Workshop:
             self.ledger["pilot_approval"] = attempt["config"]
             self.save()
 
-    def authorize_audio_method(self, authorized_by, notes):
-        """Trusted local workflow only, after explicit user standing authorization."""
+    def authorize_audio_method(self, authorized_by, notes, *, model=None, voices=None):
+        """Trusted local workflow only, after explicit user standing authorization.
+
+        Explicit model/voices record owner authorization without claiming a pilot
+        was individually listened to. The web UI does not expose this operation.
+        """
         with self.lock:
             if not authorized_by.strip() or not notes.strip():
                 raise ValueError("Name the authorizer and record their explicit instruction")
             self._check_secret_text(authorized_by + notes)
+            if model is not None or voices is not None:
+                if not self.client or not self.catalog:
+                    raise ValueError("Check your API credentials before authorizing a method")
+                if model not in {m["model_id"] for m in self.catalog["models"]}:
+                    raise ValueError("Choose an available model")
+                available = {v["voice_id"] for v in self.catalog["voices"]}
+                if (not isinstance(voices, dict) or not 1 <= len(voices) <= 10
+                        or any(v not in available for v in voices.values())
+                        or len(set(voices.values())) != len(voices)):
+                    raise ValueError("Choose distinct available voices")
+                self._check_secret_text(json.dumps([model, voices]))
+                self.ledger["automatic_audio_policy"] = {
+                    "authorized_by": authorized_by, "authorized_at": now(), "notes": notes,
+                    "provider": getattr(self.client, "provider_name", "NONPRODUCTION MOCK"),
+                    "model": model, "voices": dict(voices), "language": self._language(),
+                    "config": self._config(model, voices), "basis": "explicit_owner_method_authorization",
+                    "scope": "Audio only; no individual listening review claimed; budget and content review still apply",
+                }
+                self.plan = None
+                self.save()
+                return
             pilot = self.package.items[0]
             attempt = self.ledger["attempts"].get(pilot.id, {})
             if (attempt.get("status") != "succeeded" or not pilot.audio

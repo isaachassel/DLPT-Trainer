@@ -22,7 +22,7 @@ class ElevenLabs:
     def _request(self, method, path, *, body=None, audio=False, params=None):
         # Never include request/response bodies or headers in errors. Do not follow redirects.
         try:
-            with httpx.Client(base_url="https://api.elevenlabs.io", timeout=120,
+            with httpx.Client(base_url="https://api.elevenlabs.io", timeout=httpx.Timeout(240 if audio else 120, connect=20),
                               follow_redirects=False, trust_env=False, transport=self._transport) as client:
                 with client.stream(method, path, headers={"xi-api-key": self._key.get_secret_value()},
                                    json=body, params=params) as response:
@@ -71,12 +71,14 @@ class ElevenLabs:
                 break
         voices.sort(key=lambda v: v["labels"].get("language") != "ru")
         return {"account": {k: account.get(k) for k in ("tier", "character_count", "character_limit")},
-                "models": [{k: m.get(k) for k in ("model_id", "name", "model_rates")} for m in models
+                "models": [{k: m.get(k) for k in ("model_id", "name", "model_rates", "languages")} for m in models
                            if m.get("can_do_text_to_speech")], "voices": voices}
 
-    def dialogue(self, turns, voices, model, seed=None):
+    def dialogue(self, turns, voices, model, seed=None, language="ru"):
+        if language not in {"ru", "zh-CN"}:
+            raise ValueError("Dialogue language must be Russian or Mandarin Chinese")
         body = {"inputs": [{"text": t.text, "voice_id": voices[t.speaker]} for t in turns],
-                "model_id": model, "language_code": "ru"}
+                "model_id": model, "language_code": "zh" if language == "zh-CN" else language}
         if seed is not None:
             body["seed"] = seed
         return self._request("POST", "/v1/text-to-dialogue", body=body, audio=True,

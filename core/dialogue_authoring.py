@@ -4,6 +4,7 @@ from pydantic import Field
 from .models import StrictModel, PassageItem, QuestionItem, GenerationMetadata
 from .preset_bank import ContentItem, Turn
 from .validation import content_hash, target_unit_count
+from .constants import ILR_THETA
 
 
 class DraftQuestion(StrictModel):
@@ -22,16 +23,16 @@ class DialogueDraft(StrictModel):
     questions: list[DraftQuestion] = Field(min_length=1, max_length=3)
 
 
-def materialize(draft, item_id, provider="manual", model="manual"):
+def materialize(draft, item_id, provider="manual", model="manual", language="ru", target_ilr="0+"):
     text = "\n".join(f"{t.speaker}: {t.text}" for t in draft.turns)
-    metadata = GenerationMetadata(provider=provider, model=model, prompt_version="russian-dialogue-0plus-v1",
+    metadata = GenerationMetadata(provider=provider, model=model, prompt_version="russian-dialogue-0plus-v1" if language == "ru" and target_ilr == "0+" else f"{language}-dialogue-{target_ilr}-v1",
                                   authoring_notes="Original draft; language, audio and ILR review pending.")
     questions = [QuestionItem(id=f"{item_id}_q{i}", passage_id=item_id, **q.model_dump(),
-                              question_type="prominent detail", target_ilr="0+", provisional_difficulty=-1.75,
+                              question_type="prominent detail", target_ilr=target_ilr, provisional_difficulty=ILR_THETA[target_ilr],
                               generation=metadata) for i, q in enumerate(draft.questions, 1)]
-    passage = PassageItem(id=item_id, skill="listening", target_ilr="0+", provisional_difficulty=-1.75,
+    passage = PassageItem(id=item_id, language=language, skill="listening", target_ilr=target_ilr, provisional_difficulty=ILR_THETA[target_ilr],
                           genre="dialogue", topic=draft.topic, subtopic=draft.topic, orientation_en=draft.orientation_en,
-                          passage_ru=text, word_count=target_unit_count(text, "ru"), question_ids=[q.id for q in questions],
+                          passage_ru=text, word_count=target_unit_count(text, language), question_ids=[q.id for q in questions],
                           content_hash=content_hash(text), duplicate_detection_hash=content_hash(text), generation=metadata,
                           provenance={"authoring": "Original AI-assisted draft; pending human review"})
     return ContentItem(id=item_id, passage=passage, questions=questions, speakers=draft.speakers, turns=draft.turns)

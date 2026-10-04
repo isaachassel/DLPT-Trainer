@@ -12,6 +12,8 @@ Choose **Adaptive Assessment → Reading**, **Listening**, or **Reading + Listen
 
 Coverage now supports cross-level routing, but two passages per band is a starter bank, not a calibrated proficiency instrument. Selection can exhaust a band and move to the nearest available content. See [the expansion review](RUSSIAN_BANK_EXPANSION.md) for authoring criteria, checks, budget and limitations.
 
+The Mandarin expansion adds **14 reading passages / 34 questions** and **14 listening passages / 34 questions**, with two passages per band from 0 through 3. Choose **Mandarin Chinese** in Session Setup to use it. New audio uses the same Eleven v3 Jessica/Eric dialogue method with Mandarin language routing and a separate owner method authorization; its creation-time account tier is Starter. The earlier Russian recordings retain their Free-plan metadata. See [Mandarin authoring and review](MANDARIN_BANK_EXPANSION.md).
+
 ## Local preview
 
 Use the existing Python 3.12 virtual environment and pinned dependencies:
@@ -43,7 +45,7 @@ The existing [adaptive method](ADAPTIVE_ASSESSMENT.md) is unchanged: a discrete 
 ## Private workshop
 
 1. Open **Optional listening content workshop** and load the twelve drafts. Select and edit a script and its English questions. Save edits before preflight. Complete-package JSON import is also supported; all incoming review decisions are reset to draft and unfamiliar local file references are removed.
-2. Enter **your own** ElevenLabs key. Credential checking reads subscription usage, models and Russian-language voices, with no audio generation. The visible password field is cleared after checking. The server retains the key only for this session. The web workshop never reads `ELEVENLABS_API_KEY` from the host environment.
+2. Enter **your own** ElevenLabs key. Credential checking reads subscription usage, models and available voices, with no audio generation. Complete-package imports can contain Russian or Mandarin listening scripts; use one language per workspace. The visible password field is cleared after checking. The server retains the key only for this session. The web workshop never reads `ELEVENLABS_API_KEY` from the host environment.
 3. Choose an available dialogue model and distinct voices for A and B (or edit the speaker-to-voice JSON for custom speaker IDs). The initial model is `eleven_v3`; model/voice availability depends on the account. This workflow has no voice-cloning endpoint. Voice suitability still needs audition and review.
 4. Set an explicit **total input-character budget**, initially zero. It includes auditions, previous attempts and regenerations. Preflight displays every exact script, model, voice mapping, this-run characters and total reservations. The provider catalog also exposes documented model-rate metadata when available. Character counts are not a dollar or credit cap: account plans, model and voice rates can differ. Configure an account-side spending limit for a financial cap.
 5. Optionally preflight and authorize a short **voice audition**. Then generate **First pilot only**. Play it and explicitly approve its voices before authorizing the remaining eleven. This voice decision does not approve content for the bank.
@@ -102,6 +104,8 @@ The initial twelve Russian Eleven v3 dialogues used 1,624 input characters. The 
 An owner may explicitly waive individual listening review for a demonstrated generation method. The trusted local workflow records this using `Workshop.authorize_audio_method(authorized_by, notes)` after pilot voice approval. The private workspace ledger stores the authorizer, instruction, date, provider, language, model and voice configuration. Future successful recordings matching that method receive an audio-only approval tied to the actual audio checksum, with `basis: standing_authorization`. This is not a claim that a person listened to each generated file.
 
 Authorization persists on resuming that workspace, but is not inherited by other users or private sessions. A changed provider, model or voice configuration does not receive automatic approval. Character ceilings, attempt limits, error handling and separate question, ILR and reuse review remain in force. No audio authorization directly changes the production assessment manifest. Audio-method approval does not itself increase the spending ceiling; additional generation uses a separately recorded owner budget grant.
+
+An explicit owner instruction to extend a demonstrated method can instead be recorded by the trusted local operator with `authorize_audio_method(name, notes, model=..., voices=...)`. This records a new language-specific grant without claiming an individual pilot listening review. It is not exposed by the web UI or inferred from imported content. Language is included in Mandarin generation fingerprints and approval configurations; existing Russian fingerprints remain compatible so resuming does not duplicate paid calls. New requests map project `zh-CN` to the provider's `zh` and preflight rejects models whose advertised languages exclude it. Editing imported drafts retains their language and provisional band.
 
 ## Tests
 
