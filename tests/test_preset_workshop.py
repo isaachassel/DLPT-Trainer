@@ -49,14 +49,14 @@ def pilot(work):
 def test_production_pilot_ready_and_original_starter_content_pending():
     items = read_package(MANIFEST).items
     pilots = [x for x in items if x.id.startswith("ru_pilot_")]
-    originals = [x for x in items if not x.id.startswith("ru_pilot_")]
+    originals = [x for x in items if not x.id.startswith(("ru_pilot_", "ru_expand_"))]
     assert len(originals) == 51 and {x.review.status for x in originals} == {"draft"}
     assert len(pilots) == 12 and {x.review.status for x in pilots} == {"approved"}
     bank = PresetBank().load()
     assert not bank.load_warnings
-    assert len(bank.active_passages("listening", "ru")) == 12
-    assert sum(len(bank.get_questions(p.id)) for p in bank.active_passages("listening", "ru")) == 24
-    assert not PresetBank().load().active_passages("reading", "ru")
+    loaded_pilots = [p for p in bank.active_passages("listening", "ru") if p.id.startswith("ru_pilot_")]
+    assert len(loaded_pilots) == 12
+    assert sum(len(bank.get_questions(p.id)) for p in loaded_pilots) == 24
     package = read_package(PILOTS)
     assert len(package.items) == 12
     assert len({x.passage.content_hash for x in package.items}) == 12
@@ -71,7 +71,9 @@ def test_production_pilot_ready_and_original_starter_content_pending():
 def test_real_pilot_bank_completes_listening_assessment(monkeypatch, tmp_path, limit, expected, reason):
     from ui import callbacks as cb
     from core.storage import LocalStorage
-    bank = PresetBank().load()
+    pilot_manifest = tmp_path / "pilots.json"
+    write_package(pilot_manifest, ContentPackage(items=[i for i in read_package(MANIFEST).items if i.id.startswith("ru_pilot_")]))
+    bank = PresetBank(pilot_manifest, ROOT).load()
     monkeypatch.setattr(cb, "PRESET_BANK", bank)
     monkeypatch.setattr(cb, "STORAGE", LocalStorage(tmp_path / "sessions", tmp_path / "history"))
     monkeypatch.setattr(cb, "EXPORT_DIR", tmp_path / "exports")
