@@ -138,17 +138,21 @@ class Workshop:
             if not items:
                 raise ValueError("Import at least one dialogue")
             config = hashlib.sha256(json.dumps([model, voices], sort_keys=True).encode()).hexdigest()
+            policy = self.ledger.get("automatic_audio_policy", {})
+            method_authorized = (policy.get("config") == config
+                                 and policy.get("provider") == getattr(self.client, "provider_name", "NONPRODUCTION MOCK")
+                                 and policy.get("language") == "ru")
             if action == "pilot":
                 candidates = items[:1]
             elif action == "batch":
-                if self.ledger["pilot_approval"] != config:
+                if self.ledger["pilot_approval"] != config and not method_authorized:
                     raise ValueError("Generate and listen to the pilot, then approve these voices before the batch")
                 candidates = items
             elif action == "selected":
                 candidates = [x for x in items if x.id == selected]
                 if not candidates:
                     raise ValueError("Select an existing item")
-                if candidates[0] is not items[0] and self.ledger["pilot_approval"] != config:
+                if candidates[0] is not items[0] and self.ledger["pilot_approval"] != config and not method_authorized:
                     raise ValueError("Approve the pilot voices before generating other items")
             elif action == "audition":
                 from .preset_bank import Turn
@@ -225,6 +229,20 @@ class Workshop:
                     item.review = Review()
                     item.recording = Recording(provider=provider_name, model=plan["model"], voice_ids=plan["voices"],
                                                generated_at=now(), account_tier=str(self.catalog["account"].get("tier", "unknown")))
+                    # Audio-only standing authorization never approves questions,
+                    # difficulty, reuse rights, or membership in the assessment bank.
+                    reviews = self.ledger.setdefault("audio_reviews", {})
+                    reviews.pop(item.id, None)
+                    policy = self.ledger.get("automatic_audio_policy", {})
+                    if (policy.get("config") == plan["config"]
+                            and policy.get("provider") == provider_name
+                            and policy.get("language") == item.passage.language):
+                        reviews[item.id] = {
+                            "status": "approved", "basis": "standing_authorization",
+                            "authorized_by": policy["authorized_by"], "reviewed_at": now(),
+                            "audio_sha256": digest, "config": plan["config"],
+                            "scope": "Audio only; no individual human listening review claimed",
+                        }
                     if item.id != "voice_audition":
                         self.package.items = [item if x.id == item.id else x for x in self.package.items]
                     attempt.update(status="succeeded", path=name)
@@ -246,6 +264,25 @@ class Workshop:
             if attempt.get("status") != "succeeded" or not pilot.audio:
                 raise ValueError("Generate and listen to the first pilot before approving voices")
             self.ledger["pilot_approval"] = attempt["config"]
+            self.save()
+
+    def authorize_audio_method(self, authorized_by, notes):
+        """Trusted local workflow only, after explicit user standing authorization."""
+        with self.lock:
+            if not authorized_by.strip() or not notes.strip():
+                raise ValueError("Name the authorizer and record their explicit instruction")
+            self._check_secret_text(authorized_by + notes)
+            pilot = self.package.items[0]
+            attempt = self.ledger["attempts"].get(pilot.id, {})
+            if (attempt.get("status") != "succeeded" or not pilot.audio
+                    or self.ledger["pilot_approval"] != attempt.get("config")):
+                raise ValueError("Generate and approve the pilot voices first")
+            self.ledger["automatic_audio_policy"] = {
+                "authorized_by": authorized_by, "authorized_at": now(), "notes": notes,
+                "provider": pilot.recording.provider, "model": pilot.recording.model,
+                "voices": dict(pilot.recording.voice_ids), "language": pilot.passage.language,
+                "config": attempt["config"], "scope": "Audio only; existing budget and content review still apply",
+            }
             self.save()
 
     def preview(self, item_id):

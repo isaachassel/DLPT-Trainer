@@ -125,6 +125,54 @@ def test_pilot_gate_budget_and_no_duplicate_paid_submit(workshop):
     assert len(workshop.client.calls) == 12
 
 
+def test_standing_audio_authorization_survives_restart_without_approving_content(workshop):
+    pilot(workshop)
+    workshop.authorize_audio_method("TEST owner", "Automatically accept this audio method")
+    resumed = Workshop(workshop.directory)
+    resumed.configure(KEY, FakeProvider)
+    data = resumed.package.model_dump(mode="json")
+    data["items"][1]["questions"][0]["stem_en"] += " (updated draft)"
+    resumed.edit(json.dumps(data))
+    assert resumed.ledger["pilot_approval"] is None
+    resumed.preflight("eleven_v3", VOICES, 20000, "selected", "ru_pilot_02")
+    assert "Saved 1" in resumed.generate()
+    item = resumed.package.items[1]
+    review = resumed.ledger["audio_reviews"][item.id]
+    assert review["basis"] == "standing_authorization"
+    assert review["audio_sha256"] == item.audio_sha256
+    assert review["authorized_by"] == "TEST owner"
+    assert item.review.status == "draft" and not item.review.reuse_attested
+    with pytest.raises(ValueError, match="budget"):
+        resumed.preflight("eleven_v3", VOICES, resumed.ledger["spent_characters"], "selected", "ru_pilot_03")
+
+
+@pytest.mark.parametrize("change", ["voices", "model", "provider"])
+def test_standing_audio_authorization_does_not_follow_changed_method(workshop, change):
+    pilot(workshop)
+    workshop.authorize_audio_method("TEST owner", "Automatically accept this audio method")
+    voices, model = dict(VOICES), "eleven_v3"
+    if change == "voices":
+        voices = {"A": VOICES["B"], "B": VOICES["A"]}
+    elif change == "model":
+        model = "different_model"
+        workshop.catalog["models"].append({"model_id": model})
+    else:
+        workshop.client.provider_name = "Different provider"
+    workshop.preflight(model, voices, 20000, "selected", "ru_pilot_01")
+    assert "Saved 1" in workshop.generate()
+    assert "ru_pilot_01" not in workshop.ledger["audio_reviews"]
+
+
+def test_standing_audio_authorization_is_explicit_and_workspace_local(workshop, tmp_path):
+    with pytest.raises(ValueError, match="pilot"):
+        workshop.authorize_audio_method("TEST owner", "Explicit permission")
+    pilot(workshop)
+    with pytest.raises(ValueError, match="authorizer"):
+        workshop.authorize_audio_method("", "Explicit permission")
+    workshop.authorize_audio_method("TEST owner", "Explicit permission")
+    assert "automatic_audio_policy" not in Workshop(tmp_path / "separate").ledger
+
+
 def test_interrupted_batch_preserves_outputs_and_never_blindly_retries(workshop):
     pilot(workshop)
     workshop.client.fail_at = 3

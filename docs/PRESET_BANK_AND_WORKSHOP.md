@@ -91,7 +91,13 @@ Without `--package`, the curator reviews existing starter entries in the preset 
 - [Publishing generated content](https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform): free-plan output has noncommercial/attribution restrictions; paid-plan commercial rights depend on the applicable terms and creation-time subscription. Beta-service restrictions can prohibit production/commercial use. Upgrading later does not automatically change rights for earlier free output.
 - [Terms of Use](https://elevenlabs.io/terms-of-use): users must hold necessary input/voice rights and follow applicable service terms. Public availability of a third-party recording is not a reuse license. Record creation-time tier and the curator's dated rights review; check current model status and the user's applicable contract before public redistribution.
 
-No new ElevenLabs audio has been generated or publicly included. Live authentication, voice availability, pronunciation, account charges and real dialogue output remain unverified until the user supplies credentials, selects voices and explicitly sets/approves a budget.
+Local live verification completed with twelve Russian Eleven v3 dialogues using Jessica and Eric. Account usage was 1,624 input characters against the owner's 2,000-character ceiling. The owner listened to and approved all twelve recordings. Private audio, credentials and the review ledger remain outside source control; no recordings were publicly published or promoted to the assessment bank by this step.
+
+## Standing audio authorization
+
+An owner may explicitly waive individual listening review for a demonstrated generation method. The trusted local workflow records this using `Workshop.authorize_audio_method(authorized_by, notes)` after pilot voice approval. The private workspace ledger stores the authorizer, instruction, date, provider, language, model and voice configuration. Future successful recordings matching that method receive an audio-only approval tied to the actual audio checksum, with `basis: standing_authorization`. This is not a claim that a person listened to each generated file.
+
+Authorization persists on resuming that workspace, but is not inherited by other users or private sessions. A changed provider, model or voice configuration does not receive automatic approval. Character ceilings, attempt limits, error handling and separate question, ILR and reuse review remain in force. No audio authorization directly changes the production assessment manifest. The current owner's authorization covers the demonstrated ElevenLabs method; it does not increase the existing 2,000-character spending ceiling.
 
 ## Tests
 
