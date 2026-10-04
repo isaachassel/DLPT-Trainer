@@ -69,6 +69,8 @@ def create_session(
         routing_level = clamp_ilr("2", minimum_ilr, maximum_ilr)
     reading = initialize_ability("reading", prior_level, broad=broad, routing_level=routing_level)
     listening = initialize_ability("listening", prior_level, broad=broad, routing_level=routing_level)
+    if mode != "training":
+        content_source, feedback_mode = "bank_only", "end_only"
     if mode == "assessment":
         reading, listening = assessment.initialize("reading"), assessment.initialize("listening")
         # Assessment uses complete bank passages and a neutral prior, independent

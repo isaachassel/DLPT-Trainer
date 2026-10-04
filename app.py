@@ -50,6 +50,7 @@ def launch_kwargs() -> dict:
     """Centralized, testable Hugging Face Space launch configuration."""
 
     starter_audio = (ROOT / "data" / "audio").resolve()
+    preset_audio = (ROOT / "data" / "assessment" / "audio").resolve()
     runtime_audio = settings.audio_cache_runtime_path(ROOT).resolve()
     runtime_exports = settings.runtime_path(Path("storage/exports"), ROOT, "exports").resolve()
     starter_audio.mkdir(parents=True, exist_ok=True)
@@ -68,7 +69,7 @@ def launch_kwargs() -> dict:
         # does not need SSR, so use the stable client-rendered path explicitly.
         "ssr_mode": False,
         # Serve only validated starter audio and the controlled TTS cache.
-        "allowed_paths": [str(starter_audio), str(runtime_audio), str(runtime_exports)],
+        "allowed_paths": [str(starter_audio), str(preset_audio), str(runtime_audio), str(runtime_exports)],
     }
 
 

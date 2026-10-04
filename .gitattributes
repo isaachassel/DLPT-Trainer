@@ -58,3 +58,4 @@ storage/cache/audio/l005.mp3 filter=lfs diff=lfs merge=lfs -text
 storage/cache/audio/l009.mp3 filter=lfs diff=lfs merge=lfs -text
 storage/cache/audio/l010.mp3 filter=lfs diff=lfs merge=lfs -text
 storage/cache/audio/l014.mp3 filter=lfs diff=lfs merge=lfs -text
+data/assessment/audio/*.mp3 filter=lfs diff=lfs merge=lfs -text

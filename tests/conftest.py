@@ -9,6 +9,19 @@ sys.path.insert(0, str(ROOT))
 from core.item_bank import ItemBank
 
 
+@pytest.fixture
+def approved_bank(tmp_path, project_root):
+    """Explicit test-only review decisions, never written into production content."""
+    from core.preset_bank import PresetBank, Review, MANIFEST, read_package, write_package
+    package = read_package(MANIFEST)
+    for item in package.items:
+        item.review = Review(status="approved", reviewer="TEST FIXTURE ONLY", reviewed_at="2026-10-03",
+                             notes="Test fixture, not a linguistic review", reuse_attested=True)
+    path = tmp_path / "approved-fixture.json"
+    write_package(path, package)
+    return PresetBank(path, project_root).load()
+
+
 @pytest.fixture(scope="session")
 def project_root():
     return ROOT

@@ -10,6 +10,7 @@ from .scoring import accuracy, estimate_label, grouped_accuracy, item_level_labe
 from .storage import export_responses_csv, export_session_json
 from . import assessment
 from .adaptive import nearest_ilr
+from .constants import ILR_LEVELS
 
 
 def _format_group(title: str, grouped: dict[str, tuple[int, int, float]]) -> list[str]:
@@ -98,7 +99,10 @@ def build_skill_report(state: SessionState, skill: str, bank: ItemBank, include_
     correct, attempted, pct = accuracy(records)
     strongest, weakest = strengths_and_weaknesses(records)
     timing = response_time_summary(records)
-    lines = [f"## {skill.title()} Practice Report", f"**{estimate_label(estimate)}**"]
+    exhausted = state.mode != "training" and state.assessment_end_reasons.get(skill) == "content_exhausted"
+    label = ("Insufficient approved content: no estimated practice ILR level is reported."
+             if exhausted else estimate_label(estimate))
+    lines = [f"## {skill.title()} Practice Report", f"**{label}**"]
     lines.append(f"Evidence: **{attempted} validated practice questions**, {correct} correct ({pct:.0%}).")
     lines.append(f"80% posterior interval (internal scale): **{estimate.ci_low:.2f} to {estimate.ci_high:.2f}**; standard error **{estimate.standard_error:.2f}**.")
     if state.shortened_simulation and state.mode == "simulation":
@@ -190,6 +194,11 @@ def _assessment_report(state: SessionState, skill: str, bank: ItemBank, include_
         else:
             lines.append("The configured evidence target was met; the estimate remains unvalidated practice guidance.")
     if records:
+        tested_bands = sorted({r.target_ilr for r in records}, key=lambda level: ILR_LEVELS.index(level))
+        if len(tested_bands) == 1:
+            lines.append(f"**Limited difficulty coverage:** all answered passages were labeled ILR {tested_bands[0]}. "
+                         "This run checks performance at that provisional band; it cannot establish a full-range proficiency level. "
+                         "Any model estimate outside that band is extrapolation, not demonstrated performance at that level.")
         lines.append(f"**90% posterior credible interval:** {estimate.ci_low:.2f} to {estimate.ci_high:.2f} on the internal scale "
                      f"(approximately practice ILR {nearest_ilr(estimate.ci_low)}–{nearest_ilr(estimate.ci_high)}); "
                      f"**posterior SD: {estimate.standard_error:.2f}**.")

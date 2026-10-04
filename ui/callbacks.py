@@ -53,6 +53,7 @@ from core.languages import (
 )
 from core.models import PassageItem, QuestionItem, SessionState, UserHistory
 from core.reporting import build_exports, build_full_report
+from core.preset_bank import PresetBank
 from core.scoring import item_level_label
 from core.session import (
     PassageBundle,
@@ -89,6 +90,11 @@ BANK = ItemBank(
     audio_available=BANK_PERSISTENCE.audio_available,
 ).load()
 BANK_STATUS_MESSAGE = BANK_PERSISTENCE.status_text()
+PRESET_BANK = PresetBank().load()
+
+
+def _session_bank(state):
+    return BANK if state.mode == "training" else PRESET_BANK
 
 
 def _coverage_text(counts: dict[str, int]) -> str:
@@ -137,6 +143,7 @@ def bank_status_markdown() -> str:
         else ""
     )
     return (
+        "**Training bank only:** the counts below describe practice content, not the curator-approved preset assessment bank.\n\n"
         f"💾 **Saved AI-generated bank status:** {text}{warning}{relation_note}\n\n"
         "**Bank-write rule:** choosing **Validated bank only**, opening a passage, answering it, or "
         "replaying audio does **not** add anything to the saved AI bank. Only an accepted Fresh-AI "
@@ -422,15 +429,20 @@ def _pause_timer_for_loading(state: SessionState, elapsed: float) -> None:
 
 
 def _bank_bundle(state: SessionState) -> PassageBundle:
+    bank = _session_bank(state)
+    if state.mode != "training" and not bank.active_passages(state.active_skill, state.language):
+        raise LookupError("No approved local preset content is available for this language/skill. A curator must review and package content first; live generation is disabled in assessments.")
     history = _history_for(state)
     try:
-        bundle = select_next_bundle(state, BANK, history)
+        bundle = select_next_bundle(state, bank, history)
     except LookupError:
         # Controlled profile-history reuse only after the currently available bank is exhausted.
-        bundle = select_next_bundle(state, BANK, None)
-    origin = BANK.origin_for(bundle.passage.id)
+        bundle = select_next_bundle(state, bank, None)
+    origin = bank.origin_for(bundle.passage.id)
+    if state.mode != "training":
+        state.last_content_note = "Loaded a curator-approved preset passage with fixed local assets. No generation service is used."
     state.last_content_source = "generated_bank" if origin == "generated_bank" else "starter_bank"
-    if bundle.passage.skill == "listening" and state.mode != "assessment":
+    if bundle.passage.skill == "listening" and state.mode == "training":
         _prefetch_selected_playback(state, bundle)
     if not state.last_content_note:
         source_label = (
@@ -475,6 +487,8 @@ def _fresh_generation_audio_preferences(state: SessionState) -> dict[str, str | 
 
 
 def _select_with_safe_history(state: SessionState, progress=None) -> PassageBundle:
+    if state.mode != "training":
+        return _assessment_next_or_end(state)
     state.last_content_note = None
     _progress(progress, 0.18, "Checking content source and reusable bank…")
     if state.content_source == "fresh_ai_preferred":
@@ -586,8 +600,11 @@ def _select_with_safe_history(state: SessionState, progress=None) -> PassageBund
 def _rebuild_current_bundle(state: SessionState) -> PassageBundle:
     if not state.current_passage_id:
         return _select_with_safe_history(state)
-    passage = BANK.get_passage(state.current_passage_id)
-    questions = shuffled_bundle(BANK.get_questions(passage.id), seed=f"{state.session_id}:{passage.id}")
+    bank = _session_bank(state)
+    passage = bank.get_passage(state.current_passage_id)
+    if state.mode != "training" and passage not in bank.active_passages(state.active_skill, state.language):
+        raise ValueError("Checkpoint content is no longer approved or its local asset is missing. Start a new assessment.")
+    questions = shuffled_bundle(bank.get_questions(passage.id), seed=f"{state.session_id}:{passage.id}")
     questions = [question for question in questions if question.id in state.current_question_ids]
     return PassageBundle(passage=passage, questions=questions)
 
@@ -648,9 +665,12 @@ def _status_text(state: SessionState, extra: str = "") -> str:
         lines.append("Adaptive calculations are hidden during strict testing conditions.")
     if state.mode in {"training", "diagnostic"}:
         lines.append(f"**Eligible item range:** ILR {state.minimum_ilr} through ILR {state.maximum_ilr}.")
-    health = BANK.health_summary(state.language)
+    health = _session_bank(state).health_summary(state.language)
     skill_health = health[state.active_skill]
-    if state.content_source == "fresh_ai_preferred":
+    if state.mode != "training":
+        lines.append(f"**Content:** Approved local presets only · {len(_session_bank(state).active_passages(state.active_skill, state.language))} "
+                     f"{state.active_skill.title()} passages currently available. No generation credentials are required.")
+    elif state.content_source == "fresh_ai_preferred":
         audio_note = (
             f" / {skill_health['saved_ai_audio_assets']} audio assets"
             if state.active_skill == "listening"
@@ -855,7 +875,7 @@ def expire_section_callback(
         if history and state.profile_id:
             STORAGE.save_history(update_history(history, state))
         STORAGE.save_checkpoint(state)
-        report = build_full_report(state, BANK)
+        report = build_full_report(state, _session_bank(state))
         json_path, csv_path = build_exports(state, EXPORT_DIR)
         return _inactive_render(
             state,
@@ -866,6 +886,8 @@ def expire_section_callback(
         )
 
     next_bundle = _select_with_safe_history(state)
+    if next_bundle is None:
+        return _assessment_finished(state)
     STORAGE.save_checkpoint(state)
     return _test_render(
         state,
@@ -953,7 +975,18 @@ def start_session_callback(
         )
         bundle = _assessment_next_or_end(state) if mode == "assessment" else _select_with_safe_history(state, progress)
         if bundle is None:
-            return _assessment_finished(state)
+            # No passage was ever presented. This is a setup availability issue,
+            # not a completed assessment: do not create a checkpoint or report.
+            return _inactive_render(
+                None,
+                "### Assessment unavailable — no questions were started\n\n"
+                f"No eligible, curator-approved passages are available for {html.escape(language_label)} / "
+                f"{html.escape(skill_label)} with these settings. "
+                "Existing starter content is still pending review.\n\n"
+                "To practise now, select **Training Mode** and click **Begin Session**. "
+                "Assessments become available after a curator approves suitable content and its listening recordings. "
+                "No test result or new checkpoint was created; prior checkpoints remain available.",
+            )
         _progress(progress, 0.96, "Saving the initial checkpoint…")
         STORAGE.save_checkpoint(state)
         _progress(progress, 1.0, "Session ready")
@@ -968,7 +1001,7 @@ def resume_session_callback(session_code: str, progress=gr.Progress()):
         state = STORAGE.load_checkpoint(session_code.strip())
         if state.mode == "assessment":
             if state.status != "active":
-                return _assessment_finished(state)
+                return _assessment_finished(state, persist=False)
             bundle = _rebuild_current_bundle(state) if state.current_passage_id else _assessment_next_or_end(state)
             if bundle is None:
                 return _assessment_finished(state)
@@ -976,12 +1009,14 @@ def resume_session_callback(session_code: str, progress=gr.Progress()):
             return _test_render(state, bundle, "Assessment checkpoint restored.")
         if state.status == "completed":
             _progress(progress, 0.78, "Building the final report and exports…")
-            report = build_full_report(state, BANK)
+            report = build_full_report(state, _session_bank(state))
             json_path, csv_path = build_exports(state, EXPORT_DIR)
             return _inactive_render(state, "### Completed session restored", report, json_path, csv_path)
         ensure_not_expired(state)
         _progress(progress, 0.65, "Restoring the active passage…")
         bundle = _rebuild_current_bundle(state)
+        if bundle is None:
+            return _assessment_finished(state)
         STORAGE.save_checkpoint(state)
         _progress(progress, 1.0, "Session restored")
         return _test_render(state, bundle, "Session restored from the latest valid checkpoint.")
@@ -1243,12 +1278,13 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
         if strict and state.current_listening_plays >= 1:
             raise SessionFlowError("Replay is disabled in strict listening conditions.")
         _progress(progress, 0.10, "Authorizing browser playback…")
-        asset = BANK.get_audio(bundle.passage.audio_asset_id)
+        asset = _session_bank(state).get_audio(bundle.passage.audio_asset_id)
         if not asset:
             raise AudioError("No validated audio asset is linked to this passage.")
         _progress(progress, 0.24, "Loading validated audio…")
         try:
-            BANK_PERSISTENCE.ensure_audio_available(asset)
+            if state.mode == "training":
+                BANK_PERSISTENCE.ensure_audio_available(asset)
         except FileNotFoundError:
             pass
         validated_bank_path = resolve_audio_path(asset, ROOT)
@@ -1311,30 +1347,6 @@ def play_audio_callback(state: SessionState | None, bundle_data: dict | None, pr
                     "Training playback render failed passage=%s selected_label=%s requested_voice=%s reason=%s",
                     bundle.passage.id, state.voice_label, voice, type(selected_exc).__name__,
                 )
-        elif state.mode != "assessment":
-            # Strict modes use the canonical bank recording. Older assets receive
-            # one lazy neural upgrade, but learner voice preferences never affect
-            # Diagnostic or Simulation audio.
-            if not _asset_is_current_for_passage(asset, bundle.passage):
-                try:
-                    _progress(progress, 0.42, "Preparing the canonical native neural recording…")
-                    voice, rate, pitch, volume = _natural_voice_profile(bundle.passage, SETTINGS)
-                    LOGGER.info(
-                        "Strict playback canonical TTS requested passage=%s primary_voice=%s rate=%s",
-                        bundle.passage.id, voice, rate,
-                    )
-                    path = generate_dialogue_cached_tts(
-                        bundle.passage.passage_ru, cache_dir, voice=voice, rate=rate,
-                        pitch=pitch, volume=volume, language=bundle.passage.language,
-                        engine_version=DIALOGUE_TTS_CACHE_VERSION,
-                        timeout_seconds=SETTINGS.tts_timeout_seconds,
-                        synthesizer=generate_cached_tts,
-                    )
-                    audio_note = " Canonical native neural speech loaded and cached for this passage."
-                except Exception as tts_exc:
-                    path = validated_bank_path
-                    audio_note = f" Neural upgrade was unavailable; the existing validated audio was used ({type(tts_exc).__name__})."
-
         _progress(progress, 0.82, "Preparing browser playback…")
         audio_html = controlled_audio_html(
             str(path),
@@ -1441,16 +1453,25 @@ def _passage_feedback(records, passage: PassageItem, state: SessionState) -> str
     return "\n\n".join(lines)
 
 
-def _assessment_finished(state: SessionState):
-    STORAGE.save_checkpoint(state)
+def _assessment_finished(state: SessionState, persist: bool = True):
+    if persist:
+        STORAGE.save_checkpoint(state)
     history = _history_for(state)
-    if history and state.profile_id:
+    if persist and history and state.profile_id:
         # Avoid appending the same records again on report recovery.
         recorded = {(r.session_id, r.question_id) for r in history.response_records}
         if any((r.session_id, r.question_id) not in recorded for r in state.responses):
             STORAGE.save_history(update_history(history, state))
-    paths = build_exports(state, EXPORT_DIR)
-    return _inactive_render(state, "### Adaptive Assessment ended", build_full_report(state, BANK), *paths)
+    from core.storage import safe_filename
+    # Recovery is read-only when the completed exports already exist. Rewriting
+    # them immediately after completion is unnecessary and can race file readers.
+    suffix = safe_filename(state.session_id)
+    existing = (Path(EXPORT_DIR) / f"session_{suffix}.json", Path(EXPORT_DIR) / f"responses_{suffix}.csv")
+    paths = tuple(str(p) for p in existing) if not persist and all(p.is_file() for p in existing) else build_exports(state, EXPORT_DIR)
+    note = "### Adaptive Assessment ended" if state.mode == "assessment" else "### Preset diagnostic ended"
+    if "content_exhausted" in state.assessment_end_reasons.values():
+        note += "\n\nApproved local content was insufficient. No live generation was attempted. A curator must review and package more content for this language/skill."
+    return _inactive_render(state, note, build_full_report(state, _session_bank(state)), *paths)
 
 
 def _assessment_next_or_end(state: SessionState) -> PassageBundle | None:
@@ -1505,7 +1526,7 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
             if history and state.profile_id:
                 STORAGE.save_history(update_history(history, state))
             STORAGE.save_checkpoint(state)
-            report = build_full_report(state, BANK)
+            report = build_full_report(state, _session_bank(state))
             json_path, csv_path = build_exports(state, EXPORT_DIR)
             return _inactive_render(
                 state,
@@ -1516,6 +1537,8 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
             )
         try:
             next_bundle = _select_with_safe_history(state, progress)
+            if next_bundle is None:
+                return _assessment_finished(state)
         except LookupError:
             if state.mode == "simulation" and state.completed_count(state.active_skill) >= 35:
                 finished = advance_skill_or_finish(state, force=True)
@@ -1524,7 +1547,7 @@ def submit_passage_callback(state: SessionState | None, bundle_data: dict | None
                     if history and state.profile_id:
                         STORAGE.save_history(update_history(history, state))
                     STORAGE.save_checkpoint(state)
-                    report = build_full_report(state, BANK)
+                    report = build_full_report(state, _session_bank(state))
                     json_path, csv_path = build_exports(state, EXPORT_DIR)
                     return _inactive_render(state, "### Session complete\n\nValidated bank exhausted after the full-simulation minimum was satisfied.", report, json_path, csv_path)
                 next_bundle = _select_with_safe_history(state)
@@ -1634,7 +1657,7 @@ def stop_training_callback(state: SessionState | None):
         return _inactive_render(state, "### Only Training Mode can be stopped with a partial review.")
     state.status = "stopped"
     STORAGE.save_checkpoint(state)
-    report = build_full_report(state, BANK)
+    report = build_full_report(state, _session_bank(state))
     json_path, csv_path = build_exports(state, EXPORT_DIR)
     return _inactive_render(state, "### Training stopped\n\nA partial practice report was generated from completed passages.", report, json_path, csv_path)
 
@@ -1644,6 +1667,8 @@ def abandon_strict_callback(state: SessionState | None, confirmed: bool):
         return _inactive_render(state, "### No active strict session to abandon.")
     if not confirmed:
         bundle = _rebuild_current_bundle(state)
+        if bundle is None:
+            return _assessment_finished(state)
         return _test_render(state, bundle, "Check the confirmation box before abandoning this active session.")
     state.status = "stopped"
     if state.mode == "assessment":
@@ -1655,5 +1680,5 @@ def abandon_strict_callback(state: SessionState | None, confirmed: bool):
     if state.mode == "simulation":
         report = "## Simulation abandoned\n\nDetailed answer review is withheld because the strict simulation was not completed. Completed response data are available in the exports."
     else:
-        report = build_full_report(state, BANK)
+        report = build_full_report(state, _session_bank(state))
     return _inactive_render(state, "### Session abandoned after confirmation\n\nCompleted passage data remain checkpointed and exportable.", report, json_path, csv_path)

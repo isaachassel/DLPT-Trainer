@@ -19,7 +19,7 @@ $env:SYNC_GENERATED_BANK_ON_WRITE = 'false'
 .venv/Scripts/python.exe app.py
 ```
 
-Open <http://127.0.0.1:7860>. These environment settings affect the current shell and its child processes. No credentials are needed for assessment. Assessment always uses validated bank content and saved listening recordings; it does not generate or upgrade audio. Existing practice modes retain their provider and TTS behavior. Live generation, remote Dataset synchronization, and fresh neural speech require their usual credentials/network/runtime configuration and were not verified live for this change. Never commit `.env` or credentials.
+Open <http://127.0.0.1:7860>. These environment settings affect the current shell and its child processes. No credentials are needed for assessment. All assessment modes now use only curator-approved preset content and fixed local recordings; they do not generate or upgrade audio. Existing starter content remains pending curator review, so the production assessment reports insufficient approved content until review is complete. Training retains its provider and TTS behavior. See the [preset bank and private workshop guide](PRESET_BANK_AND_WORKSHOP.md) for setup and approval. Never commit `.env` or credentials.
 
 Run tests with `.venv/Scripts/python.exe -m pytest -q -rs`. The five existing audio-generation integration tests require ffmpeg (one also requires ffprobe); cached assessment audio does not.
 
