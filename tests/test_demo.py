@@ -1,9 +1,21 @@
 import time
+import shutil
+import subprocess
+from pathlib import Path
 import pytest
 
 from core.storage import LocalStorage
 from core.session import SessionFlowError, submit_current_bundle, mark_listening_play
 from ui import demo
+
+
+def test_browser_audio_controller_survives_replaced_html_hosts():
+    node = shutil.which('node')
+    if not node:
+        pytest.skip('Node is required for the browser controller lifecycle test')
+    result = subprocess.run([node, '--test', str(Path(__file__).with_name('demo_audio_lifecycle.cjs'))],
+                            capture_output=True, text=True, timeout=20)
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 @pytest.fixture
@@ -110,3 +122,33 @@ def test_demo_setup_has_no_workshop_or_mode_controls():
     assert not {'Mode', 'Skill selection', 'Content source', 'Training voice preference'} & set(labels)
     values = [str(c['props'].get('value', '')) for c in config['components']]
     assert not any('workshop' in v.lower() or 'bank backup' in v.lower() for v in values)
+
+
+def test_resume_preserves_demo_progress_and_completed_listens(local_demo):
+    from types import SimpleNamespace
+    result = listening_result()
+    finish_audio(result)
+    state = result[0]
+    restored = local_demo.restore_demo(SimpleNamespace(query_params={'resume': state.session_id}))
+    assert restored[0].current_passage_id == state.current_passage_id
+    assert restored[0].current_listening_completed == 2
+    assert 'Both listens complete' in restored[7]['value']
+    assert '<audio' not in restored[7]['value']
+    assert restored[-4]['interactive']
+    assert len(local_demo.restore_demo(SimpleNamespace(query_params={}))) == len(restored)
+
+
+def test_second_passage_resets_audio_and_rejects_prior_events(local_demo):
+    result = listening_result()
+    finish_audio(result)
+    state, bundle, nonce = result[:3]
+    previous = f'{state.session_id}|{state.current_passage_id}|'
+    answers = [q['correct_key'] for q in bundle['questions']]
+    advanced = local_demo.submit_demo(state, bundle, nonce, *(answers + [None]*(5-len(answers))))
+    assert advanced[0].current_listening_plays == advanced[0].current_listening_completed == 0
+    assert 'data-round="1"' in advanced[7]['value']
+    for event in ('start1', 'end1', 'start2', 'end2'):
+        local_demo.audio_event(advanced[0], previous+event)
+    assert advanced[0].current_listening_plays == 0
+    finish_audio(advanced)
+    assert advanced[0].current_listening_completed == 2

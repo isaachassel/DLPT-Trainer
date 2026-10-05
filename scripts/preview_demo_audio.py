@@ -28,6 +28,20 @@ def main():
         bundle = activate_bundle(state, passage, bank.get_questions(passage.id))
         return demo.present(demo.cb._test_render(state, bundle))
     demo.start_demo = short_audio
+    submit = demo.submit_demo
+    def next_short_audio(state, bundle, nonce, *answers):
+        previous = state.current_passage_id
+        result = submit(state, bundle, nonce, *answers)
+        if state.status == 'active' and state.current_passage_id != previous:
+            bank = demo.cb.PRESET_BANK
+            available = [p for p in bank.active_passages('listening', state.language)
+                         if p.target_ilr == '0' and p.id not in state.completed_passage_ids]
+            if available:
+                passage = available[0]
+                new_bundle = activate_bundle(state, passage, bank.get_questions(passage.id))
+                return demo.present(demo.cb._test_render(state, new_bundle))
+        return result
+    demo.submit_demo = next_short_audio
     with tempfile.TemporaryDirectory(prefix='dlpt-demo-qa-') as folder:
         demo.cb.STORAGE = LocalStorage(Path(folder) / 'sessions', Path(folder) / 'history')
         demo.cb.EXPORT_DIR = Path(folder) / 'exports'

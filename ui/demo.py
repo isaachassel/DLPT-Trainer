@@ -20,38 +20,43 @@ CUSTOM_CSS = BASE_CSS + """
 AUDIO_JS = Path(__file__).with_name('demo_audio.js').read_text(encoding='utf-8')
 TIMER_JS = r"""
 const bind = () => {
-  const clock = element.querySelector('[data-demo-deadline]');
-  if (!clock || clock.dataset.bound) return;
-  clock.dataset.bound = 'true';
-  if (element.demoTick) clearInterval(element.demoTick);
+  const clock = document.getElementById('demo-section-timer')?.querySelector('[data-demo-deadline]');
+  if (document.demoTimerClock === clock) return;
+  if (document.demoTick) clearInterval(document.demoTick);
+  document.demoTimerClock = clock;
+  if (!clock) return;
   const draw = () => {
-    if (!clock.isConnected) { clearInterval(element.demoTick); return; }
+    if (!clock.isConnected) { clearInterval(document.demoTick); return; }
     const seconds = Math.max(0, Math.ceil((Number(clock.dataset.demoDeadline) - Date.now()) / 1000));
     clock.textContent = `Time remaining: ${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
     if (!seconds && !clock.dataset.sent) {
       clock.dataset.sent = 'true';
-      clearInterval(element.demoTick);
+      clearInterval(document.demoTick);
       const host = document.getElementById('timer-expired-trigger');
       const button = host && (host.querySelector('button') || host);
       if (button) button.click();
     }
   };
-  element.demoTick = setInterval(draw, 1000); draw();
+  document.demoTick = setInterval(draw, 1000); draw();
 };
-if (element.demoTimerObserver) element.demoTimerObserver.disconnect();
-element.demoTimerObserver = new MutationObserver(bind);
-element.demoTimerObserver.observe(element, {childList: true, subtree: true});
+if (document.demoTimerObserver) document.demoTimerObserver.disconnect();
+document.demoTimerObserver = new MutationObserver(bind);
+document.demoTimerObserver.observe(document.body, {childList: true, subtree: true});
 bind();
 """
 TAIL = 10 + cb.MAX_SLOTS * 2
 
 
 def audio_markup(state, bundle):
+    if state.current_listening_completed >= 2:
+        return '<div class="controlled-audio-wrap">Both listens complete. Submit your answers when ready.</div>'
     asset = cb.PRESET_BANK.get_audio(bundle['passage']['audio_asset_id'])
     source = html.escape(gradio_audio_url(asset.path), quote=True)
     return f'''<div class="controlled-audio-wrap demo-audio">
       <audio data-demo-audio="true" data-session="{state.session_id}"
-        data-passage="{state.current_passage_id}" src="{source}" preload="metadata" playsinline></audio>
+        data-passage="{state.current_passage_id}" data-round="{state.current_listening_completed + 1}"
+        data-started="{str(state.current_listening_plays > state.current_listening_completed).lower()}"
+        src="{source}" preload="metadata" playsinline></audio>
       <button type="button" data-demo-play>Play passage · two listens</button>
       <div data-demo-status role="status" aria-live="polite">Listen twice, with a beep between plays.</div>
     </div>'''
@@ -138,6 +143,17 @@ def expire_demo(state, bundle, nonce):
     return present(result, preserve_audio=unchanged)
 
 
+def restore_demo(request: gr.Request):
+    """Optional checkpoint link; keep the ordinary setup language-only."""
+    code = request.query_params.get('resume', '')
+    if not code:
+        return [gr.skip()] * (12 + cb.MAX_SLOTS * 2)
+    saved = cb.STORAGE.load_checkpoint(code)
+    if not saved.demo_mode:
+        raise gr.Error('This checkpoint is not a demo test.')
+    return present(cb.resume_session_callback(code, progress=None))
+
+
 def build_app():
     with gr.Blocks(title='DLPT-style Adaptive Test · Demo', analytics_enabled=False) as app:
         with gr.Column(elem_classes=['app-shell', 'demo-shell']):
@@ -152,10 +168,10 @@ def build_app():
                             'You cannot return to a submitted passage. Results appear at the end.')
                 begin = gr.Button('Begin test', variant='primary')
             status = gr.Markdown(visible=False)
-            timer = gr.HTML(visible=False, js_on_load=TIMER_JS)
+            timer = gr.HTML(visible=False, js_on_load=TIMER_JS, elem_id='demo-section-timer')
             orientation = gr.Markdown(visible=False)
             passage = gr.Markdown(visible=False, elem_classes=['passage-card'])
-            audio = gr.HTML(visible=False, js_on_load=AUDIO_JS)
+            audio = gr.HTML(visible=False, js_on_load=AUDIO_JS, elem_id='demo-audio-player')
             event = gr.Textbox(elem_id='demo-audio-event', elem_classes=['event-bridge'])
             confirm_audio = gr.Button('Audio event', elem_id='demo-audio-confirm', elem_classes=['event-bridge'])
             expired = gr.Button('Timer event', elem_id='timer-expired-trigger', elem_classes=['event-bridge'])
@@ -170,6 +186,7 @@ def build_app():
             outputs = [state, bundle, nonce, status, timer, orientation, passage, audio,
                        *question_outputs, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)
+            app.load(restore_demo, outputs=outputs, **common)
             begin.click(start_demo, [language], outputs, trigger_mode='once', **common)
             submit.click(submit_demo, [state, bundle, nonce, *answers], outputs, trigger_mode='once', **common)
             confirm_audio.click(audio_event, [state, event], [state, submit, status],

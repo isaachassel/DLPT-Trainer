@@ -1,10 +1,23 @@
 const bind = () => {
-  const audio = element.querySelector('audio[data-demo-audio]');
-  const button = element.querySelector('[data-demo-play]');
-  const status = element.querySelector('[data-demo-status]');
-  if (!audio || !button || audio.dataset.bound) return;
-  audio.dataset.bound = 'true';
-  let round = 1, started = false, finished = false, context;
+  // Gradio replaces the HTML component's inner host after a value update.
+  // Resolve the live host instead of observing the detached js_on_load element.
+  const host = document.getElementById('demo-audio-player');
+  const audio = host?.querySelector('audio[data-demo-audio]');
+  const button = host?.querySelector('[data-demo-play]');
+  const status = host?.querySelector('[data-demo-status]');
+  const key = audio && `${audio.dataset.session}|${audio.dataset.passage}`;
+  const prior = document.demoAudioBinding;
+  if (prior?.audio === audio && prior?.button === button && prior?.key === key) return;
+  if (prior) { prior.dispose(); document.demoAudioBinding = null; }
+  if (!audio || !button || !status) return;
+  const controller = new AbortController();
+  const options = {signal: controller.signal};
+  let round = Number(audio.dataset.round || 1), started = audio.dataset.started === 'true';
+  let finished = false, context, nextPlay;
+  document.demoAudioBinding = {audio, button, key, dispose: () => {
+    finished = true; controller.abort(); clearTimeout(nextPlay); audio.pause();
+    if (context) context.close().catch(() => {});
+  }};
   const send = (phase) => {
     if (!audio.isConnected) return;
     const input = document.querySelector('#demo-audio-event textarea, #demo-audio-event input');
@@ -30,16 +43,16 @@ const bind = () => {
       await audio.play();
     } catch (_) { retry(); }
   };
-  button.addEventListener('click', play);
+  button.addEventListener('click', play, options);
   audio.addEventListener('playing', () => {
     button.hidden = true;
     status.textContent = `Listen ${round} of 2`;
     if (!started) { started = true; send(`start${round}`); }
-  });
+  }, options);
   audio.addEventListener('pause', () => {
     if (!audio.ended && !finished) retry();
-  });
-  audio.addEventListener('error', retry);
+  }, options);
+  audio.addEventListener('error', retry, options);
   audio.addEventListener('ended', async () => {
     if (finished) return;
     send(`end${round}`);
@@ -65,15 +78,18 @@ const bind = () => {
     tone.start(at); tone.stop(at + 0.36);
     tone.onended = () => {
       tone.disconnect(); gain.disconnect();
-      setTimeout(() => {
-        if (!audio.isConnected) return;
+      nextPlay = setTimeout(() => {
+        if (finished || !audio.isConnected) return;
         round = 2; started = false; audio.currentTime = 0;
         play();
       }, 500);
     };
-  });
+  }, options);
 };
-if (element.demoObserver) element.demoObserver.disconnect();
-element.demoObserver = new MutationObserver(bind);
-element.demoObserver.observe(element, {childList: true, subtree: true});
+if (document.demoAudioObserver) document.demoAudioObserver.disconnect();
+document.demoAudioObserver = new MutationObserver(bind);
+document.demoAudioObserver.observe(document.body, {
+  childList: true, subtree: true, attributes: true,
+  attributeFilter: ['data-passage', 'data-session']
+});
 bind();
