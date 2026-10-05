@@ -1,13 +1,13 @@
 # Demo branch
 
 `codex/adaptive-demo` starts the demo through the normal `app.py` entry point.
-The feature branch keeps the full application. This demo offers only Russian or
-Chinese and a Begin button. It uses the existing approved bank; no generation
+The feature branch keeps the full application. Choose Russian or Chinese, then
+Reading or Listening and Begin. There is no combined-test option. It uses the existing approved bank; no generation
 credentials, network content generation, new audio purchases or remote bank sync
 are required.
 
-Fixed settings: Reading then Listening, 12 questions per section, 30 minutes per
-section, neutral medium start, ILR 0–3 routing, submitted passages locked, answer
+Fixed settings: one selected skill, 12 questions, 30 minutes,
+neutral medium start, ILR 0–3 routing, submitted passages locked, answer
 review at the end. This is deliberately shortened independent practice, not a
 replica of the official DLPT algorithm or official listening rules.
 
@@ -35,4 +35,8 @@ Earlier checks also covered Chinese reading-to-listening progression and the
 live countdown. For fast manual
 audio checks, `scripts/preview_demo_audio.py` serves a temporary local-only
 fixture on port 7861 using the shortest existing approved recordings. It does
-not change the production demo's Reading-then-Listening flow.
+not change the production demo's selected-skill flow.
+
+Single-skill selection: 29 focused demo/runtime tests passed, including full
+Reading-only and Listening-only runs in both languages with strong, weak, and
+mixed answers. Each run ends after the selected skill and reports 12 responses.

@@ -18,8 +18,8 @@ from core.storage import LocalStorage
 
 def main():
     start = demo.start_demo
-    def short_audio(language):
-        result = start(language)
+    def short_audio(language, skill='Listening'):
+        result = start(language, 'Listening')
         state = result[0]
         state.selected_skills = ['listening']
         state.active_skill_index = 0

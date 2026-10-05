@@ -16,9 +16,9 @@ pinned: false
 
 ## Simplified demo branch
 
-On `codex/adaptive-demo`, `app.py` opens a language-only DLPT-style adaptive demo:
-choose Russian or Chinese, then begin. Reading is followed by Listening, with
-12 questions and a 30-minute limit per section. Each recording plays twice with
+On `codex/adaptive-demo`, `app.py` opens a simple DLPT-style adaptive demo:
+choose Russian or Chinese and either Reading or Listening, then begin. Each test
+has 12 questions in the selected skill and a 30-minute limit. Each recording plays twice with
 a beep between listens. See [demo setup and behavior](docs/DEMO.md).
 The full interface described below remains on `codex/adaptive-assessment`.
 

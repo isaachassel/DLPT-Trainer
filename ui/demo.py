@@ -1,4 +1,4 @@
-"""Language-only demo UI over the existing adaptive simulation engine."""
+"""Simple language and skill selection over the adaptive simulation engine."""
 from pathlib import Path
 import html
 
@@ -88,11 +88,13 @@ def present(result, *, preserve_audio=False):
             gr.update(value='Begin test' if not state else 'Start a new test', interactive=not active)]
 
 
-def start_demo(language):
+def start_demo(language, skill='Reading'):
     if language not in ('Russian', 'Chinese'):
         raise gr.Error('Choose Russian or Chinese.')
+    if skill not in ('Reading', 'Listening'):
+        raise gr.Error('Choose Reading or Listening.')
     result = cb.start_session_callback(
-        SIMULATION_MODE_LABEL, 'Reading + Listening (separate sections)', '1+', '2',
+        SIMULATION_MODE_LABEL, skill, '1+', '2',
         'Shortened practice — 12 questions per skill / 30 minutes', 'Strict countdown',
         [], [], 'End of session', False, False, 'Automatic natural Russian voice', 'Normal', '',
         language_label='Mandarin Chinese' if language == 'Chinese' else 'Russian', progress=None)
@@ -144,7 +146,7 @@ def expire_demo(state, bundle, nonce):
 
 
 def restore_demo(request: gr.Request):
-    """Optional checkpoint link; keep the ordinary setup language-only."""
+    """Optional checkpoint link without extra setup controls."""
     code = request.query_params.get('resume', '')
     if not code:
         return [gr.skip()] * (12 + cb.MAX_SLOTS * 2)
@@ -158,13 +160,14 @@ def build_app():
     with gr.Blocks(title='DLPT-style Adaptive Test · Demo', analytics_enabled=False) as app:
         with gr.Column(elem_classes=['app-shell', 'demo-shell']):
             gr.Markdown('# DLPT-style adaptive test')
-            gr.Markdown('A short demo in reading and listening. Difficulty adapts as you answer.\n\n'
+            gr.Markdown('Choose a reading or listening test. Difficulty adapts as you answer.\n\n'
                         'Independent practice—not an official DLPT or an official score.', elem_classes=['demo-intro'])
             state, bundle, nonce = gr.State(), gr.State(), gr.State()
             with gr.Column() as setup:
                 language = gr.Radio(['Russian', 'Chinese'], value='Russian', label='Choose your language')
-                gr.Markdown('**Reading, then Listening** · 12 questions per section · up to 30 minutes per section.\n\n'
-                            'Each recording plays twice, with a beep between listens. Answer every question, then submit. '
+                skill = gr.Radio(['Reading', 'Listening'], value='Reading', label='Choose your test')
+                gr.Markdown('**One skill per test** · 12 questions · up to 30 minutes.\n\n'
+                            'In Listening, each recording plays twice, with a beep between listens. Answer every question, then submit. '
                             'You cannot return to a submitted passage. Results appear at the end.')
                 begin = gr.Button('Begin test', variant='primary')
             status = gr.Markdown(visible=False)
@@ -187,7 +190,7 @@ def build_app():
                        *question_outputs, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)
             app.load(restore_demo, outputs=outputs, **common)
-            begin.click(start_demo, [language], outputs, trigger_mode='once', **common)
+            begin.click(start_demo, [language, skill], outputs, trigger_mode='once', **common)
             submit.click(submit_demo, [state, bundle, nonce, *answers], outputs, trigger_mode='once', **common)
             confirm_audio.click(audio_event, [state, event], [state, submit, status],
                                 js="(s,e) => [s, document.querySelector('#demo-audio-event textarea, #demo-audio-event input').value]",
