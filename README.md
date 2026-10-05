@@ -14,6 +14,14 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
+## Simplified demo branch
+
+On `codex/adaptive-demo`, `app.py` opens a language-only DLPT-style adaptive demo:
+choose Russian or Chinese, then begin. Reading is followed by Listening, with
+12 questions and a 30-minute limit per section. Each recording plays twice with
+a beep between listens. See [demo setup and behavior](docs/DEMO.md).
+The full interface described below remains on `codex/adaptive-assessment`.
+
 ## Adaptive Assessment
 
 Select **Adaptive Assessment** for separate reading/listening practice estimates, a 90% uncertainty interval, configurable passage limits, and explicit stopping reasons. The mode accounts for guessing and shared-passage evidence, avoids repeats, and withholds review until the assessment ends. Results use provisional ILR labels and are not official or validated ODA/DLPT scores. See [setup, scoring assumptions, limitations, and verification](docs/ADAPTIVE_ASSESSMENT.md).

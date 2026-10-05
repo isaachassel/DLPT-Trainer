@@ -327,6 +327,8 @@ class SessionState(StrictModel):
     # question. Older checkpoints load safely because this field has a default.
     current_answer_timestamps: dict[str, float] = Field(default_factory=dict)
     current_listening_plays: int = 0
+    demo_mode: bool = False
+    current_listening_completed: int = 0
     completed_passage_ids: list[str] = Field(default_factory=list)
     completed_question_ids: list[str] = Field(default_factory=list)
     responses: list[ResponseRecord] = Field(default_factory=list)

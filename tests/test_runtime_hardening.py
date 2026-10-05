@@ -54,14 +54,14 @@ def test_app_disables_hf_xet_before_importing_ui():
 
     source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
     disable_index = source.index('os.environ.setdefault("HF_HUB_DISABLE_XET", "1")')
-    ui_import_index = source.index("from ui.layout import")
+    ui_import_index = source.index("from ui.demo import")
     assert disable_index < ui_import_index
     assert 'os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")' in source
 
 
 def test_app_disables_gradio_and_hf_telemetry_before_importing_ui():
     source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
-    ui_import_index = source.index("from ui.layout import")
+    ui_import_index = source.index("from ui.demo import")
     for setting in (
         'os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")',
         'os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")',

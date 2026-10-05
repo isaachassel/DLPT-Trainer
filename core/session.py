@@ -190,6 +190,7 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
     state.current_answer_changes = {q.id: 0 for q in questions}
     state.current_answer_timestamps = {}
     state.current_listening_plays = 0
+    state.current_listening_completed = 0
     state.current_started_at_epoch = time.time()
     return PassageBundle(passage=passage, questions=questions)
 
@@ -210,7 +211,8 @@ def record_answer_change(
 def mark_listening_play(state: SessionState) -> None:
     if state.active_skill != "listening":
         return
-    if state.mode in {"diagnostic", "simulation", "assessment"} and state.current_listening_plays >= 1:
+    limit = 2 if state.demo_mode else 1
+    if state.mode in {"diagnostic", "simulation", "assessment"} and state.current_listening_plays >= limit:
         raise SessionFlowError("Replay is disabled in strict listening conditions.")
     state.current_listening_plays += 1
 
@@ -228,6 +230,8 @@ def submit_current_bundle(
         ensure_not_expired(state, now)
     if request_nonce in state.handled_nonces:
         return []
+    if state.demo_mode and passage.skill == "listening" and state.current_listening_completed < 2:
+        raise SessionFlowError("Listen to both complete plays before submitting your answers.")
     if state.mode == "assessment":
         if state.status != "active":
             raise SessionFlowError("This assessment has ended")

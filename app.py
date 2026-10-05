@@ -33,7 +33,11 @@ def _dlpt_unraisable_hook(args):
 sys.unraisablehook = _dlpt_unraisable_hook
 
 from core.config import get_settings
-from ui.layout import CUSTOM_CSS, build_app
+# This branch is a self-contained demo: no generation, remote restore or sync.
+for _demo_setting in ("AUTO_PROVISION_DATASET_BANK", "SYNC_GENERATED_BANK_ON_STARTUP", "SYNC_GENERATED_BANK_ON_WRITE"):
+    os.environ[_demo_setting] = "false"
+os.environ["GENERATION_PROVIDER"] = "disabled"
+from ui.demo import CUSTOM_CSS, build_app
 
 logging.basicConfig(
     level=getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO),
@@ -66,6 +70,7 @@ def launch_kwargs() -> dict:
         # proxy can emit /graphql 405s and event-loop finalizer noise. This app
         # does not need SSR, so use the stable client-rendered path explicitly.
         "ssr_mode": False,
+        "footer_links": [],
         # Serve only approved audio and the controlled runtime assets.
         "allowed_paths": [str(preset_audio), str(runtime_audio), str(runtime_exports)],
     }

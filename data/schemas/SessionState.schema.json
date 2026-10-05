@@ -161,7 +161,8 @@
           "enum": [
             "training",
             "diagnostic",
-            "simulation"
+            "simulation",
+            "assessment"
           ],
           "title": "Mode",
           "type": "string"
@@ -312,7 +313,8 @@
       "enum": [
         "training",
         "diagnostic",
-        "simulation"
+        "simulation",
+        "assessment"
       ],
       "title": "Mode",
       "type": "string"
@@ -385,6 +387,34 @@
       "default": 8,
       "title": "Minimum Questions Per Skill",
       "type": "integer"
+    },
+    "assessment_min_passages": {
+      "default": 6,
+      "maximum": 40,
+      "minimum": 2,
+      "title": "Assessment Min Passages",
+      "type": "integer"
+    },
+    "assessment_max_passages": {
+      "default": 18,
+      "maximum": 40,
+      "minimum": 2,
+      "title": "Assessment Max Passages",
+      "type": "integer"
+    },
+    "assessment_target_sd": {
+      "default": 0.55,
+      "maximum": 0.8,
+      "minimum": 0.3,
+      "title": "Assessment Target Sd",
+      "type": "number"
+    },
+    "assessment_end_reasons": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Assessment End Reasons",
+      "type": "object"
     },
     "simulation_full": {
       "default": false,
@@ -501,6 +531,16 @@
     "current_listening_plays": {
       "default": 0,
       "title": "Current Listening Plays",
+      "type": "integer"
+    },
+    "demo_mode": {
+      "default": false,
+      "title": "Demo Mode",
+      "type": "boolean"
+    },
+    "current_listening_completed": {
+      "default": 0,
+      "title": "Current Listening Completed",
       "type": "integer"
     },
     "completed_passage_ids": {

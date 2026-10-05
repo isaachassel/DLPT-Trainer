@@ -27,7 +27,8 @@
           "enum": [
             "training",
             "diagnostic",
-            "simulation"
+            "simulation",
+            "assessment"
           ],
           "title": "Mode",
           "type": "string"
