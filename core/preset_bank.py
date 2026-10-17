@@ -42,6 +42,19 @@ class Turn(StrictModel):
     text: str = Field(min_length=1, max_length=2000)
 
 
+class AudioLicenseReview(StrictModel):
+    reviewed_at: str
+    reviewer: str
+    commercial_use: bool
+    attribution_required: bool
+    model_status: Literal["generally_available", "beta", "unknown"]
+    model_general_availability_date: str = ""
+    creation_time_account_tier: str
+    audio_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sources: list[str]
+    scope: str
+
+
 class Recording(StrictModel):
     provider: str = ""
     model: str = ""
@@ -50,6 +63,7 @@ class Recording(StrictModel):
     generated_at: str = ""
     account_tier: str = "unknown"
     usage_terms: str = "Curator must verify plan, model status, voice/input rights and distribution terms."
+    license_review: AudioLicenseReview | None = None
 
 
 class ContentItem(StrictModel):

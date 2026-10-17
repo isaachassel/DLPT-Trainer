@@ -1,11 +1,41 @@
-# Russian and Mandarin listening practice audio — elevenlabs.io
+# Listening audio provenance and usage
 
-The `ru_pilot_*` and `ru_expand_l_*` MP3s were generated with elevenlabs.io using Eleven v3 and the Jessica/Eric voices on the Free plan. Isaac listened to and approved the twelve initial pilot recordings, authorized the same generation method without individual listening approval, and requested expansion through ILR 3 for local noncommercial practice. The new recordings use that standing authorization; individual human listening review is not claimed for them.
+All 38 active assessment recordings were generated during Isaac's paid
+ElevenLabs Starter subscription using generally available Eleven v3 and the
+Jessica/Eric premade voices. They are synthetic recordings of original
+AI-assisted project scripts, not recordings from an official language test.
 
-These recordings have no commercial-use license from the Free plan. Publication requires the attribution specified by ElevenLabs (elevenlabs.io or 11.ai in the title). Keep the creation-time plan and terms recorded in each item's `recording` metadata. Public distribution or deployment requires a separate review of the intended use and applicable terms.
+On October 6, 2026, the 24 Russian Free-plan recordings were replaced with new
+paid-plan generations. Their old hashes remain in ../audio_license_audit.json
+for provenance; the retired recordings are excluded from the active bank and
+deployment. The 14 Mandarin recordings were already generated on Starter and
+were retained byte-for-byte.
 
-Reference: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform
+Under the standard paid-plan terms reviewed October 6, 2026, these active
+recordings may be used commercially, subject to the provider's applicable terms,
+input/voice rights, and prohibited-use policy. Provider attribution in the demo's
+title or page is not required. This notice is an internal provenance record,
+not a mandatory visitor-facing credit or a transfer of provider rights under
+the code's MIT license. The February 2, 2026 general-availability announcement
+confirms that Eleven v3 was out of Alpha before these paid recordings were made.
 
-The original scripts and English questions are AI-assisted project content. Their practice ILR 0–3 labels are provisional and have not been empirically calibrated. Audio approval does not establish an official DLPT difficulty or score.
+Isaac previously approved the voices and method and explicitly authorized
+automatic audio acceptance, this paid refresh, and deployment. Replacement audio
+uses that standing authorization; no individual human listening or native-speaker
+review of each new recording is claimed. Every active MP3 was fully decoded and
+its content checksum checked. Existing scripts, questions and provisional ILR
+labels were retained. These labels have not been empirically calibrated, and
+the demo does not provide official DLPT scores.
 
-The `zh_expand_l_*` Mandarin recordings were generated after Isaac upgraded to **Starter**, using Eleven v3, Mandarin language routing and the same Jessica/Eric method. Isaac explicitly requested extending the Russian workflow to Mandarin; automatic audio acceptance records that instruction without claiming individual human listening or native-speaker pronunciation review. New files preserve Starter creation-time metadata. ElevenLabs' paid-plan commercial license remains subject to its applicable terms and Beta Services exclusions. No public distribution or deployment is part of this local expansion. The earlier Russian recordings retain their original Free-plan restrictions; the upgrade does not retroactively relicense them.
+Creation-time tier, generation time, voice IDs, model, checksum, approval basis
+and licensing review are recorded in bank.json and the audio audit. Older
+Free-plan files retained in local rollback archives or Git history do not gain
+commercial rights and must not be reintroduced as paid-plan assets.
+
+Sources reviewed:
+- https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform
+- https://elevenlabs.io/blog/eleven-v3-is-now-generally-available
+- https://elevenlabs.io/terms-of-use
+- https://elevenlabs.io/service-specific-terms
+- https://elevenlabs.io/elevenapi-terms
+- https://elevenlabs.io/speech-engine-terms

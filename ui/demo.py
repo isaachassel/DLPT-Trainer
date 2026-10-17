@@ -1,11 +1,14 @@
 """Simple language and skill selection over the adaptive simulation engine."""
 from pathlib import Path
 import html
+import time
 
 import gradio as gr
 
 from core.audio import gradio_audio_url
 from core.constants import SIMULATION_MODE_LABEL
+from core.demo_reporting import build_demo_report
+from core.demo_hosting import is_hosted_demo
 from core.session import mark_listening_play
 from ui import callbacks as cb
 from ui.components import answer_radio
@@ -16,6 +19,19 @@ CUSTOM_CSS = BASE_CSS + """
 .demo-intro {color: #667085; font-size: 1.05rem;}
 .demo-audio button {padding: 12px 22px; border-radius: 9px; border: 1px solid #345995; cursor: pointer; font: inherit;}
 .demo-audio [data-demo-status] {margin-top: 12px;}
+.demo-result {padding: 24px; border: 1px solid var(--border-color-primary); border-radius: 12px;}
+.demo-result p {margin: 12px 0; line-height: 1.55;}
+.demo-result h2 {font-size: 1.4rem; margin-bottom: 20px;}
+.demo-result h3 {font-size: 1.1rem; margin: 20px 0 10px;}
+.demo-result .demo-result-label {margin-bottom: 0;}
+.demo-result .demo-result-level {font-size: 2rem; font-weight: 700; margin-top: 0;}
+.demo-result-confidence {border-left: 4px solid #b88326; padding: 12px 18px; margin: 18px 0; background: var(--background-fill-secondary);}
+.demo-result table {width: 100%; border-collapse: collapse;}
+.demo-result th, .demo-result td {text-align: left; padding: 8px; border-bottom: 1px solid var(--border-color-primary);}
+.demo-result details {border-top: 1px solid var(--border-color-primary); padding: 14px 0;}
+.demo-result summary {cursor: pointer; font-weight: 600;}
+.demo-result h4 {margin-top: 18px; font-weight: 600;}
+.demo-result-note {font-size: .9rem; color: var(--body-text-color-subdued);}
 """
 AUDIO_JS = Path(__file__).with_name('demo_audio.js').read_text(encoding='utf-8')
 TIMER_JS = r"""
@@ -76,6 +92,10 @@ def present(result, *, preserve_audio=False):
         status = gr.update(value=progress, visible=True)
     else:
         status = result[3]
+    finished = bool(state and state.status != 'active')
+    if finished:
+        status = gr.update(value='', visible=False)
+    report = gr.update(value=build_demo_report(state) if finished else '', visible=finished)
     audio = (gr.skip() if preserve_audio else gr.update(
         value=audio_markup(state, bundle) if listening else '', visible=bool(listening)))
     can_submit = active and (not listening or state.current_listening_completed == 2)
@@ -84,7 +104,7 @@ def present(result, *, preserve_audio=False):
     return [state, bundle, nonce, status, timer, result[5], result[6], audio,
             *result[10:TAIL],
             gr.update(value='Submit answers', visible=active, interactive=can_submit),
-            result[TAIL + 7], gr.update(visible=not active),
+            report, gr.update(visible=not active),
             gr.update(value='Begin test' if not state else 'Start a new test', interactive=not active)]
 
 
@@ -140,6 +160,11 @@ def submit_demo(state, bundle, nonce, *answers):
 
 
 def expire_demo(state, bundle, nonce):
+    expired_skill = (state.active_skill if state and state.status == 'active'
+                     and state.skill_deadline_epoch is not None
+                     and time.time() >= state.skill_deadline_epoch else None)
+    if expired_skill:
+        state.assessment_end_reasons[expired_skill] = 'time_limit'
     result = cb.expire_section_callback(state, bundle, nonce)
     unchanged = bool(result[1] and bundle and result[1]['passage']['id'] == bundle['passage']['id'])
     return present(result, preserve_audio=unchanged)
@@ -150,6 +175,8 @@ def restore_demo(request: gr.Request):
     code = request.query_params.get('resume', '')
     if not code:
         return [gr.skip()] * (12 + cb.MAX_SLOTS * 2)
+    if is_hosted_demo():
+        raise gr.Error('Saved-report links are available only in the local demo. Begin a new test here.')
     saved = cb.STORAGE.load_checkpoint(code)
     if not saved.demo_mode:
         raise gr.Error('This checkpoint is not a demo test.')
@@ -162,6 +189,7 @@ def build_app():
             gr.Markdown('# DLPT-style adaptive test')
             gr.Markdown('Choose a reading or listening test. Difficulty adapts as you answer.\n\n'
                         'Independent practice—not an official DLPT or an official score.', elem_classes=['demo-intro'])
+            report = gr.HTML(visible=False)
             state, bundle, nonce = gr.State(), gr.State(), gr.State()
             with gr.Column() as setup:
                 language = gr.Radio(['Russian', 'Chinese'], value='Russian', label='Choose your language')
@@ -185,7 +213,6 @@ def build_app():
                 question_outputs.append(answer)
                 answers.append(answer)
             submit = gr.Button('Submit answers', variant='primary', visible=False)
-            report = gr.Markdown(visible=False)
             outputs = [state, bundle, nonce, status, timer, orientation, passage, audio,
                        *question_outputs, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)

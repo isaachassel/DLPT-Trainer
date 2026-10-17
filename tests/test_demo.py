@@ -64,6 +64,9 @@ def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, ski
     assert len(result[0].responses) == 12
     assert {r.skill for r in result[0].responses} == {skill.lower()}
     assert result[-3]['visible']
+    assert 'Around ILR' in result[-3]['value']
+    assert 'Why the test ended:' in result[-3]['value']
+    assert 'not an official DLPT score' in result[-3]['value']
     assert all(r.listening_play_count == 2 for r in result[0].responses if r.skill == 'listening')
     assert len(set(bands)) > 1
 
@@ -104,6 +107,10 @@ def test_timer_does_not_restart_audio_and_expiry_advances(local_demo):
     ended = local_demo.expire_demo(*result[:3])
     assert ended[0].status == 'completed'
     assert not ended[7]['visible']
+    assert 'time limit' in ended[-3]['value']
+    assert 'Not enough answers' in ended[-3]['value']
+    saved = local_demo.cb.STORAGE.load_checkpoint(ended[0].session_id)
+    assert saved.assessment_end_reasons['listening'] == 'time_limit'
 
 
 def test_missing_answer_keeps_completed_audio(local_demo):

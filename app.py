@@ -33,6 +33,7 @@ def _dlpt_unraisable_hook(args):
 sys.unraisablehook = _dlpt_unraisable_hook
 
 from core.config import get_settings
+from core.demo_hosting import is_hosted_demo
 # This branch is a self-contained demo: no generation, remote restore or sync.
 for _demo_setting in ("AUTO_PROVISION_DATASET_BANK", "SYNC_GENERATED_BANK_ON_STARTUP", "SYNC_GENERATED_BANK_ON_WRITE"):
     os.environ[_demo_setting] = "false"
@@ -58,7 +59,7 @@ def launch_kwargs() -> dict:
     runtime_exports = settings.runtime_path(Path("storage/exports"), ROOT, "exports").resolve()
     runtime_audio.mkdir(parents=True, exist_ok=True)
     runtime_exports.mkdir(parents=True, exist_ok=True)
-    return {
+    kwargs = {
         "server_name": settings.app_host,
         "server_port": settings.app_port,
         # Production users receive sanitized callback messages rather than raw
@@ -74,6 +75,16 @@ def launch_kwargs() -> dict:
         # Serve only approved audio and the controlled runtime assets.
         "allowed_paths": [str(preset_audio), str(runtime_audio), str(runtime_exports)],
     }
+    if is_hosted_demo():
+        # Public demo endpoints serve recordings, never learner checkpoints or
+        # exports. The local resume workflow remains available on this machine.
+        kwargs["allowed_paths"] = [str(preset_audio)]
+        kwargs["blocked_paths"] = [
+            str(ROOT / "storage"), str(ROOT / ".env"), str(ROOT / ".git"),
+            str(settings.session_runtime_path(ROOT)),
+            str(settings.history_runtime_path(ROOT)), str(runtime_exports),
+        ]
+    return kwargs
 
 
 if __name__ == "__main__":

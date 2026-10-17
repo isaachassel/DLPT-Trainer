@@ -1,0 +1,355 @@
+{
+  "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+  "sources": [
+    "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+    "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+    "https://elevenlabs.io/terms-of-use",
+    "https://elevenlabs.io/service-specific-terms",
+    "https://elevenlabs.io/elevenapi-terms",
+    "https://elevenlabs.io/speech-engine-terms"
+  ],
+  "input_characters": 9348,
+  "unique_script_characters": 8712,
+  "uncertain_attempt_characters": 636,
+  "account_before": {
+    "tier": "starter",
+    "character_count": 1353,
+    "character_limit": 31288
+  },
+  "account_after": {
+    "tier": "starter",
+    "character_count": 5091,
+    "character_limit": 31288
+  },
+  "records": [
+    {
+      "id": "ru_pilot_01",
+      "replaced": true,
+      "sha256": "c15ec4940c9645ee520b5e2cad8cb83ca3b4ed1fd97772cf02f9fcc016c77141",
+      "duration_seconds": 12.56,
+      "generated_at": "2026-10-06T11:27:05.985800+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "00f251c617f3dbd2438915162a07bd2edfad6b2a4dd042e323bed8c24272d72f"
+    },
+    {
+      "id": "ru_pilot_02",
+      "replaced": true,
+      "sha256": "38bf383ea56632402703c73a8daaf91579a2a579d5ec0501c4ab484289d6109c",
+      "duration_seconds": 13.12,
+      "generated_at": "2026-10-06T11:27:15.597538+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "b934fea74817368d9868179b8d444c5a708cee7eb6e5a82dc86d244ab9f29c4e"
+    },
+    {
+      "id": "ru_pilot_03",
+      "replaced": true,
+      "sha256": "f8129280b614d518b162871b65fed4cafee002e98caf51e7ebd229237b624769",
+      "duration_seconds": 10.96,
+      "generated_at": "2026-10-06T11:27:22.707052+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "dc69d58485eee93674f9fea51e3ef619c1e1e58c7586caf1d2d1964a1bf06aea"
+    },
+    {
+      "id": "ru_pilot_04",
+      "replaced": true,
+      "sha256": "c67b7aa8c25f59b35062189b5e4a0958eab162efded29da85b8d85ef5a2ffda8",
+      "duration_seconds": 12.48,
+      "generated_at": "2026-10-06T11:27:32.419237+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "03284dbfa215ea536370c1e0d0b016269d8a0cb7a514f51644eab24f56b8f07f"
+    },
+    {
+      "id": "ru_pilot_05",
+      "replaced": true,
+      "sha256": "96a27a5f5956b02eea51b0043fdb187584abffdcfbe1810875fd95eb7dea802f",
+      "duration_seconds": 12.48,
+      "generated_at": "2026-10-06T11:27:39.647436+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "d6d26f127da0e1e9326b37a29edafb5f1325949b58696ead98552b35c13f7a19"
+    },
+    {
+      "id": "ru_pilot_06",
+      "replaced": true,
+      "sha256": "0bf0283945492ce43128cbb29b99d1c266b2fc69d9ec8731144cea20578cf0dd",
+      "duration_seconds": 12.32,
+      "generated_at": "2026-10-06T11:27:47.484448+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "282442da9581c2bab711902fd4e7154ac6707af3adad14743d7f673dc510a17d"
+    },
+    {
+      "id": "ru_pilot_07",
+      "replaced": true,
+      "sha256": "6832f8daa3323d1d35bb1d0e1b5f457e5c927ffa1b43b81f7c977c74877e10a8",
+      "duration_seconds": 9.76,
+      "generated_at": "2026-10-06T11:27:54.253376+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "a7bb31c56b6831f6afa4248292b7eca5ec5a6d22e9ad6790460d14b58c93e7d8"
+    },
+    {
+      "id": "ru_pilot_08",
+      "replaced": true,
+      "sha256": "eef57625f9fae8ae4e97209f08e1dc91fb35a7451d32ced5abb766a0a108ac07",
+      "duration_seconds": 13.12,
+      "generated_at": "2026-10-06T11:28:01.328537+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "679044dbc4fb08dba515a607c5966cd961e96d5f5bbaddfa2921997fff89db8a"
+    },
+    {
+      "id": "ru_pilot_09",
+      "replaced": true,
+      "sha256": "af28eb9ca90ee7813bd71d4417021005fe9895683673d5682bd35bbcc53c8709",
+      "duration_seconds": 12.32,
+      "generated_at": "2026-10-06T11:28:09.409976+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "227e3a395262992094ae065e81ffb04ee9558f435fe8e833ffee508355b52cf4"
+    },
+    {
+      "id": "ru_pilot_10",
+      "replaced": true,
+      "sha256": "b5d296a19d0a605429abfd82bc0090c36eadfd79491a999ff01dc7264d7f60d1",
+      "duration_seconds": 13.12,
+      "generated_at": "2026-10-06T11:28:17.236043+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "40346ebce1f7ead5f73c8272da820c63dfe1eeb7d0930e1739385ff83cec429f"
+    },
+    {
+      "id": "ru_pilot_11",
+      "replaced": true,
+      "sha256": "76bc1d3978cded32af3983c7a2f58c8b5b3e799363e472c4456e10e336902636",
+      "duration_seconds": 13.2,
+      "generated_at": "2026-10-06T11:28:25.695877+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "0edcb2a8fb25f5c449f8b9287993b744d85e69b689d1ed7786e86cdbcb0174c7"
+    },
+    {
+      "id": "ru_pilot_12",
+      "replaced": true,
+      "sha256": "d401261e0194ffb98eaf98b6b97898920893dbc18cac130d4c3c27c625ee00c8",
+      "duration_seconds": 12.8,
+      "generated_at": "2026-10-06T11:28:32.620952+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "b40e43bdd8268a1ed233c1c75b39de218238c21649733609574373892e8fc1bb"
+    },
+    {
+      "id": "ru_expand_l_0_01",
+      "replaced": true,
+      "sha256": "4ea25a75a5316be5e6c717b20f3a5ae167456d778703c45b29a7b38ad2d641bb",
+      "duration_seconds": 2.4,
+      "generated_at": "2026-10-06T11:28:35.777190+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "cfdf8f75f82cae4e26c75ea20a45693848a62d717d4e94048ef1a33468387106"
+    },
+    {
+      "id": "ru_expand_l_0_02",
+      "replaced": true,
+      "sha256": "fd6d095aeeeeb1b6d24479d64aaf1db95d63ccddabae94cf6b07243a2f64e40b",
+      "duration_seconds": 2.96,
+      "generated_at": "2026-10-06T11:28:39.289320+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "1ff52592f922b7089497dc3cde1c569b789189c2b581c7096edf97475f17b08f"
+    },
+    {
+      "id": "ru_expand_l_1_03",
+      "replaced": true,
+      "sha256": "758277be5c732e80aa6b92d5e17eee49fda35647f88e0eae2b1205ff6788c593",
+      "duration_seconds": 22.16,
+      "generated_at": "2026-10-06T11:28:52.162598+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "a1728f704869a4e6e63fe0c55aebc468bd04c201cc542b5202be72fc3b928eb9"
+    },
+    {
+      "id": "ru_expand_l_1_04",
+      "replaced": true,
+      "sha256": "b83e48ae0dd1aa77aaf935c0e484cd1c450379c162b67c66b586379597a14a14",
+      "duration_seconds": 18.64,
+      "generated_at": "2026-10-06T11:29:01.316663+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "bc6e78793f8fd777d0f177af34cd95f9db45b8e6368a90dd45eb501edfeca13e"
+    },
+    {
+      "id": "ru_expand_l_1p_05",
+      "replaced": true,
+      "sha256": "dbccdbac242af27deddaf56e94eabaed9ed4bda22c0165fbe7bb69c5ec08efe8",
+      "duration_seconds": 28.8,
+      "generated_at": "2026-10-06T11:29:17.442744+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "fee7a5b4b5f2087f6208911a86efd9d8f03c4320fdee83d13e3fd1b3192b32d0"
+    },
+    {
+      "id": "ru_expand_l_1p_06",
+      "replaced": true,
+      "sha256": "5605cac4eb0096f47c3eac2e5cf95a5fea4962cab316479dc72a999c4096cc2f",
+      "duration_seconds": 28.72,
+      "generated_at": "2026-10-06T11:29:33.594572+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "72a7e50be99b969f66f90a18e723a0143efec00929edc1ed9d49f04940b16cb9"
+    },
+    {
+      "id": "ru_expand_l_2_07",
+      "replaced": true,
+      "sha256": "c5064bf2611600661b1b2e85a949a3d740821211db31a8d8e77546788cc55d06",
+      "duration_seconds": 38.56,
+      "generated_at": "2026-10-06T11:29:47.450637+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "1aa4dfcb3ef750d468f0dc7cde9092e42bfd33eac581aa0070f113f8ad95a48f"
+    },
+    {
+      "id": "ru_expand_l_2_08",
+      "replaced": true,
+      "sha256": "621652417b207264526c6bcb58a32ecd03be53db5e82ea1183f2e4732fa844ad",
+      "duration_seconds": 45.04,
+      "generated_at": "2026-10-06T12:52:49.359100+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "b314b66970e1121b2eb0a2cf9e555dc559284af35fe5b1882f49fbda2596a1f9"
+    },
+    {
+      "id": "ru_expand_l_2p_09",
+      "replaced": true,
+      "sha256": "0a192dbf19f84715e9519eae6d22dfe455f6c989bd960212593dae481b45f25c",
+      "duration_seconds": 63.04,
+      "generated_at": "2026-10-06T12:53:14.055122+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "f4234cce5c68d5c64e14ec4aba2198ac3dc443bcb24b15a1c19259421717d3e7"
+    },
+    {
+      "id": "ru_expand_l_2p_10",
+      "replaced": true,
+      "sha256": "2fa080d45f1c606da26399f08060272b952dfbbe33b01db522f16927875cb3c5",
+      "duration_seconds": 58.0,
+      "generated_at": "2026-10-06T12:53:33.796525+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "cf8fa2982e073f29999d64067c050bc46b547744670744b425ba71888a411424"
+    },
+    {
+      "id": "ru_expand_l_3_11",
+      "replaced": true,
+      "sha256": "cc781b7f799a7decc18e4731976d59cfd4f13abd1648a4665f0da08a68598521",
+      "duration_seconds": 100.72,
+      "generated_at": "2026-10-06T12:54:10.091746+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "be52b8819b7d4791c1b7ce7a302e048f0c04aaea7d06e3a02dd77b6ca2027560"
+    },
+    {
+      "id": "ru_expand_l_3_12",
+      "replaced": true,
+      "sha256": "3fe991af55ece30caa0072f78799e1f4aa6d7563746bb32ccba6d841297be90a",
+      "duration_seconds": 103.44,
+      "generated_at": "2026-10-06T12:54:42.505274+00:00",
+      "creation_time_account_tier": "starter",
+      "retired_free_sha256": "3ad904ddafd3ab0e993b7a408fdf114cd63afa82d2b8ee6565b3164a3f67458c"
+    },
+    {
+      "id": "zh_expand_l_0_01",
+      "replaced": false,
+      "sha256": "7c15d71dc68915eeebde7b760333bb07a0825168342d6bb2907ce7251786820a",
+      "duration_seconds": 1.6,
+      "generated_at": "2026-10-04T19:09:11.873865+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_0_02",
+      "replaced": false,
+      "sha256": "c9b84735f74ae273da44f4e89925b27d18b66693fa9a910f2d47d877b73368cf",
+      "duration_seconds": 2.8,
+      "generated_at": "2026-10-04T19:09:13.431042+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_0p_03",
+      "replaced": false,
+      "sha256": "ece4fce32b699c368fd7c22ea8cd35382c000c80ae9f675179c949b7db506154",
+      "duration_seconds": 8.08,
+      "generated_at": "2026-10-04T19:09:16.550316+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_0p_04",
+      "replaced": false,
+      "sha256": "b79f40e33ad875d7d2061082b1b7cd39c0a6cd6269568bc2b1f873d4b99380ac",
+      "duration_seconds": 9.44,
+      "generated_at": "2026-10-04T19:09:19.665831+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_1_05",
+      "replaced": false,
+      "sha256": "4e977a6de2162f9cda6e835ecc8257da811d58697aa0c27435cf6f39c486b973",
+      "duration_seconds": 22.96,
+      "generated_at": "2026-10-04T19:09:26.262032+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_1_06",
+      "replaced": false,
+      "sha256": "01429fcfe3fd28d0285a6011fe1518397dce478d6a59c737a477046895ae98e9",
+      "duration_seconds": 23.12,
+      "generated_at": "2026-10-04T19:09:32.987050+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_1p_07",
+      "replaced": false,
+      "sha256": "749a86f8082e153ac2a0cb82efda5fa6063763e2762cd415b6472a56b9f641ef",
+      "duration_seconds": 38.24,
+      "generated_at": "2026-10-04T19:09:43.473869+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_1p_08",
+      "replaced": false,
+      "sha256": "c743255c1b30bd6a71d022fb7238b60719f81d3fe21e6324efd4baa0735233b1",
+      "duration_seconds": 41.76,
+      "generated_at": "2026-10-04T19:09:55.095772+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_2_09",
+      "replaced": false,
+      "sha256": "6ce4a9547880e88d55e6673655ee592325158ec159eb9ceb6fadac7c92599b83",
+      "duration_seconds": 73.2,
+      "generated_at": "2026-10-04T19:10:13.741990+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_2_10",
+      "replaced": false,
+      "sha256": "60eac9caf837e07f52d3152e9495477ebbf0bb2123be03df68b21d0101cd91ce",
+      "duration_seconds": 70.48,
+      "generated_at": "2026-10-04T19:10:32.209786+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_2p_11",
+      "replaced": false,
+      "sha256": "05379c86831b9aed596dfd6df5b5370a58a14877b83116f87bb7e5da7b32dea8",
+      "duration_seconds": 79.68,
+      "generated_at": "2026-10-04T19:10:51.509505+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_2p_12",
+      "replaced": false,
+      "sha256": "360a8edb22decb63c18be3dc9aaa5951e7faca19b57aa9f50c2545830b0985fe",
+      "duration_seconds": 77.76,
+      "generated_at": "2026-10-04T19:11:11.111409+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_3_13",
+      "replaced": false,
+      "sha256": "d962b7440365cf01eafd19f790af387c661c7607ba394092debeb75bf5314fde",
+      "duration_seconds": 135.92,
+      "generated_at": "2026-10-04T19:11:42.514542+00:00",
+      "creation_time_account_tier": "starter"
+    },
+    {
+      "id": "zh_expand_l_3_14",
+      "replaced": false,
+      "sha256": "75cb36b21bc02241361814079dcb282ad69c4ef6ad1125abacaad25a22ed70a8",
+      "duration_seconds": 124.64,
+      "generated_at": "2026-10-04T19:20:02.066949+00:00",
+      "creation_time_account_tier": "starter"
+    }
+  ],
+  "observed_credits_used": 3738
+}

@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "ru_pilot_01",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_01",
         "language": "ru",
@@ -18,12 +18,11 @@
         "passage_ru": "A: Что у нас сегодня на ужин?\nB: Рыба и картошка.\nA: Хорошо. Во сколько будем есть?\nB: В семь. Помой, пожалуйста, помидоры.\nA: Сейчас помою. Сделаем салат?\nB: Да, сделаем.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 31,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.56,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -209,20 +208,20 @@
       "audio": {
         "id": "audio_ru_pilot_01",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_01-00f251c617f3dbd2438915162a07bd2edfad6b2a4dd042e323bed8c24272d72f.mp3",
+        "path": "data/assessment/audio/ru_pilot_01-paid-c15ec4940c9645ee520b5e2cad8cb83ca3b4ed1fd97772cf02f9fcc016c77141.mp3",
         "url": null,
-        "content_hash": "00f251c617f3dbd2438915162a07bd2edfad6b2a4dd042e323bed8c24272d72f",
+        "content_hash": "c15ec4940c9645ee520b5e2cad8cb83ca3b4ed1fd97772cf02f9fcc016c77141",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.56,
         "transcript_hash": "359e2443b22edc5b1b0360faa7f8863775a198d34b5a9d388550fd307b7a80ef",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "00f251c617f3dbd2438915162a07bd2edfad6b2a4dd042e323bed8c24272d72f",
+      "audio_sha256": "c15ec4940c9645ee520b5e2cad8cb83ca3b4ed1fd97772cf02f9fcc016c77141",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -231,21 +230,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:49:07.379074+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:05.985800+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "c15ec4940c9645ee520b5e2cad8cb83ca3b4ed1fd97772cf02f9fcc016c77141",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.234815+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_02",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_02",
         "language": "ru",
@@ -260,12 +278,11 @@
         "passage_ru": "A: Я иду в магазин. Что купить?\nB: Купи молоко и хлеб.\nA: А яйца дома есть?\nB: Да, яйца есть. Возьми ещё два яблока.\nA: Красные или зелёные?\nB: Красные, пожалуйста.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 32,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 13.12,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -451,20 +468,20 @@
       "audio": {
         "id": "audio_ru_pilot_02",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_02-b934fea74817368d9868179b8d444c5a708cee7eb6e5a82dc86d244ab9f29c4e.mp3",
+        "path": "data/assessment/audio/ru_pilot_02-paid-38bf383ea56632402703c73a8daaf91579a2a579d5ec0501c4ab484289d6109c.mp3",
         "url": null,
-        "content_hash": "b934fea74817368d9868179b8d444c5a708cee7eb6e5a82dc86d244ab9f29c4e",
+        "content_hash": "38bf383ea56632402703c73a8daaf91579a2a579d5ec0501c4ab484289d6109c",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 13.12,
         "transcript_hash": "c32e12dfcf02e907b49dbd7517efc17da27065d18664afc0b75dac72ec6872c1",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "b934fea74817368d9868179b8d444c5a708cee7eb6e5a82dc86d244ab9f29c4e",
+      "audio_sha256": "38bf383ea56632402703c73a8daaf91579a2a579d5ec0501c4ab484289d6109c",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -473,21 +490,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:18.785195+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:15.597538+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "38bf383ea56632402703c73a8daaf91579a2a579d5ec0501c4ab484289d6109c",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.271211+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_03",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_03",
         "language": "ru",
@@ -502,12 +538,11 @@
         "passage_ru": "A: Давай уберём квартиру.\nB: Хорошо. Я помою пол на кухне.\nA: А я помою посуду.\nB: Где ведро?\nA: В ванной, у двери.\nB: Спасибо, нашёл.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 27,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 10.96,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -693,20 +728,20 @@
       "audio": {
         "id": "audio_ru_pilot_03",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_03-dc69d58485eee93674f9fea51e3ef619c1e1e58c7586caf1d2d1964a1bf06aea.mp3",
+        "path": "data/assessment/audio/ru_pilot_03-paid-f8129280b614d518b162871b65fed4cafee002e98caf51e7ebd229237b624769.mp3",
         "url": null,
-        "content_hash": "dc69d58485eee93674f9fea51e3ef619c1e1e58c7586caf1d2d1964a1bf06aea",
+        "content_hash": "f8129280b614d518b162871b65fed4cafee002e98caf51e7ebd229237b624769",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 10.96,
         "transcript_hash": "60978f7d8a406ce5999cdc24fa231ae60355a451cf33b8b788b2d6ec52c9876e",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "dc69d58485eee93674f9fea51e3ef619c1e1e58c7586caf1d2d1964a1bf06aea",
+      "audio_sha256": "f8129280b614d518b162871b65fed4cafee002e98caf51e7ebd229237b624769",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -715,21 +750,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:22.960187+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:22.707052+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "f8129280b614d518b162871b65fed4cafee002e98caf51e7ebd229237b624769",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.349015+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_04",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_04",
         "language": "ru",
@@ -744,12 +798,11 @@
         "passage_ru": "A: Что будем делать в субботу?\nB: Поедем к твоей маме?\nA: Давай. Она будет дома.\nB: Поедем утром?\nA: Нет, после обеда, в три.\nB: Хорошо. Купим ей цветы.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 30,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.48,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -935,20 +988,20 @@
       "audio": {
         "id": "audio_ru_pilot_04",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_04-03284dbfa215ea536370c1e0d0b016269d8a0cb7a514f51644eab24f56b8f07f.mp3",
+        "path": "data/assessment/audio/ru_pilot_04-paid-c67b7aa8c25f59b35062189b5e4a0958eab162efded29da85b8d85ef5a2ffda8.mp3",
         "url": null,
-        "content_hash": "03284dbfa215ea536370c1e0d0b016269d8a0cb7a514f51644eab24f56b8f07f",
+        "content_hash": "c67b7aa8c25f59b35062189b5e4a0958eab162efded29da85b8d85ef5a2ffda8",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.48,
         "transcript_hash": "90477bbba408f7d3a1efb08c200cfbfa0d52a33d9d54303556fa690cbdac813e",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "03284dbfa215ea536370c1e0d0b016269d8a0cb7a514f51644eab24f56b8f07f",
+      "audio_sha256": "c67b7aa8c25f59b35062189b5e4a0958eab162efded29da85b8d85ef5a2ffda8",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -957,21 +1010,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:27.526712+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:32.419237+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "c67b7aa8c25f59b35062189b5e4a0958eab162efded29da85b8d85ef5a2ffda8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.397566+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_05",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_05",
         "language": "ru",
@@ -986,12 +1058,11 @@
         "passage_ru": "A: Привет! Встретимся завтра?\nB: Да. Давай у кафе.\nA: В какое время?\nB: В десять утра.\nA: Хорошо. Я приду пешком.\nB: Тогда до завтра!",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 26,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.48,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -1177,20 +1248,20 @@
       "audio": {
         "id": "audio_ru_pilot_05",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_05-d6d26f127da0e1e9326b37a29edafb5f1325949b58696ead98552b35c13f7a19.mp3",
+        "path": "data/assessment/audio/ru_pilot_05-paid-96a27a5f5956b02eea51b0043fdb187584abffdcfbe1810875fd95eb7dea802f.mp3",
         "url": null,
-        "content_hash": "d6d26f127da0e1e9326b37a29edafb5f1325949b58696ead98552b35c13f7a19",
+        "content_hash": "96a27a5f5956b02eea51b0043fdb187584abffdcfbe1810875fd95eb7dea802f",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.48,
         "transcript_hash": "4b9456a1fe5d6a7728ffbaea75634b5dd48cb9be9b666bf06d1314d00e6e1b45",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "d6d26f127da0e1e9326b37a29edafb5f1325949b58696ead98552b35c13f7a19",
+      "audio_sha256": "96a27a5f5956b02eea51b0043fdb187584abffdcfbe1810875fd95eb7dea802f",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -1199,21 +1270,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:31.652513+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:39.647436+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "96a27a5f5956b02eea51b0043fdb187584abffdcfbe1810875fd95eb7dea802f",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.485828+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_06",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_06",
         "language": "ru",
@@ -1228,12 +1318,11 @@
         "passage_ru": "A: Ты сегодня едешь на работу на машине?\nB: Нет, на автобусе. Машина в ремонте.\nA: Какой автобус тебе нужен?\nB: Номер пять.\nA: Остановка рядом?\nB: Да, напротив магазина.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 30,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.32,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -1419,20 +1508,20 @@
       "audio": {
         "id": "audio_ru_pilot_06",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_06-282442da9581c2bab711902fd4e7154ac6707af3adad14743d7f673dc510a17d.mp3",
+        "path": "data/assessment/audio/ru_pilot_06-paid-0bf0283945492ce43128cbb29b99d1c266b2fc69d9ec8731144cea20578cf0dd.mp3",
         "url": null,
-        "content_hash": "282442da9581c2bab711902fd4e7154ac6707af3adad14743d7f673dc510a17d",
+        "content_hash": "0bf0283945492ce43128cbb29b99d1c266b2fc69d9ec8731144cea20578cf0dd",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.32,
         "transcript_hash": "23843cf081944a3afb224c00961cbb274414edeb257a394fc2b891a879c26943",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "282442da9581c2bab711902fd4e7154ac6707af3adad14743d7f673dc510a17d",
+      "audio_sha256": "0bf0283945492ce43128cbb29b99d1c266b2fc69d9ec8731144cea20578cf0dd",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -1441,21 +1530,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:35.674089+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:47.484448+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "0bf0283945492ce43128cbb29b99d1c266b2fc69d9ec8731144cea20578cf0dd",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.531926+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_07",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_07",
         "language": "ru",
@@ -1470,12 +1578,11 @@
         "passage_ru": "A: На улице холодно?\nB: Да, и идёт дождь.\nA: Тогда надену куртку.\nB: Возьми зонт. Он у двери.\nA: Синий?\nB: Да, синий.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 24,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 9.76,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -1661,20 +1768,20 @@
       "audio": {
         "id": "audio_ru_pilot_07",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_07-a7bb31c56b6831f6afa4248292b7eca5ec5a6d22e9ad6790460d14b58c93e7d8.mp3",
+        "path": "data/assessment/audio/ru_pilot_07-paid-6832f8daa3323d1d35bb1d0e1b5f457e5c927ffa1b43b81f7c977c74877e10a8.mp3",
         "url": null,
-        "content_hash": "a7bb31c56b6831f6afa4248292b7eca5ec5a6d22e9ad6790460d14b58c93e7d8",
+        "content_hash": "6832f8daa3323d1d35bb1d0e1b5f457e5c927ffa1b43b81f7c977c74877e10a8",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 9.76,
         "transcript_hash": "d45114319c78336471dd2c716d36a2d6a832c118bb53c4db15f33a360b3faa12",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "a7bb31c56b6831f6afa4248292b7eca5ec5a6d22e9ad6790460d14b58c93e7d8",
+      "audio_sha256": "6832f8daa3323d1d35bb1d0e1b5f457e5c927ffa1b43b81f7c977c74877e10a8",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -1683,21 +1790,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:39.259231+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:27:54.253376+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "6832f8daa3323d1d35bb1d0e1b5f457e5c927ffa1b43b81f7c977c74877e10a8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.669678+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_08",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_08",
         "language": "ru",
@@ -1712,12 +1838,11 @@
         "passage_ru": "A: Кто сегодня заберёт сына из школы?\nB: Я заберу. У меня сегодня короткий день.\nA: Уроки заканчиваются в два.\nB: Хорошо. Потом пойдём домой.\nA: Обед в холодильнике.\nB: Спасибо, я разогрею.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 33,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 13.12,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -1903,20 +2028,20 @@
       "audio": {
         "id": "audio_ru_pilot_08",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_08-679044dbc4fb08dba515a607c5966cd961e96d5f5bbaddfa2921997fff89db8a.mp3",
+        "path": "data/assessment/audio/ru_pilot_08-paid-eef57625f9fae8ae4e97209f08e1dc91fb35a7451d32ced5abb766a0a108ac07.mp3",
         "url": null,
-        "content_hash": "679044dbc4fb08dba515a607c5966cd961e96d5f5bbaddfa2921997fff89db8a",
+        "content_hash": "eef57625f9fae8ae4e97209f08e1dc91fb35a7451d32ced5abb766a0a108ac07",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 13.12,
         "transcript_hash": "2f81a9b885f23d8804309a6fec673380c005d4ba46c3c93d240479e77a7b84f7",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "679044dbc4fb08dba515a607c5966cd961e96d5f5bbaddfa2921997fff89db8a",
+      "audio_sha256": "eef57625f9fae8ae4e97209f08e1dc91fb35a7451d32ced5abb766a0a108ac07",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -1925,21 +2050,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:44.269349+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:01.328537+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "eef57625f9fae8ae4e97209f08e1dc91fb35a7451d32ced5abb766a0a108ac07",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.782598+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_09",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_09",
         "language": "ru",
@@ -1954,12 +2098,11 @@
         "passage_ru": "A: Здравствуйте. Можно чай?\nB: Чёрный или зелёный?\nA: Чёрный, пожалуйста, без сахара.\nB: А что-нибудь поесть?\nA: Один пирожок с картошкой.\nB: Хорошо. Садитесь за столик.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 27,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.32,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -2145,20 +2288,20 @@
       "audio": {
         "id": "audio_ru_pilot_09",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_09-227e3a395262992094ae065e81ffb04ee9558f435fe8e833ffee508355b52cf4.mp3",
+        "path": "data/assessment/audio/ru_pilot_09-paid-af28eb9ca90ee7813bd71d4417021005fe9895683673d5682bd35bbcc53c8709.mp3",
         "url": null,
-        "content_hash": "227e3a395262992094ae065e81ffb04ee9558f435fe8e833ffee508355b52cf4",
+        "content_hash": "af28eb9ca90ee7813bd71d4417021005fe9895683673d5682bd35bbcc53c8709",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.32,
         "transcript_hash": "37fb65f4bb503f105de69225cb086a12824d993ad41b5a57f2738d51f0be0fea",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "227e3a395262992094ae065e81ffb04ee9558f435fe8e833ffee508355b52cf4",
+      "audio_sha256": "af28eb9ca90ee7813bd71d4417021005fe9895683673d5682bd35bbcc53c8709",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -2167,21 +2310,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:48.762164+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:09.409976+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "af28eb9ca90ee7813bd71d4417021005fe9895683673d5682bd35bbcc53c8709",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.875725+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_10",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_10",
         "language": "ru",
@@ -2196,12 +2358,11 @@
         "passage_ru": "A: Ты не видел мои ключи?\nB: Посмотри на столе.\nA: Здесь только телефон.\nB: Тогда в сумке. Ты вчера положила их туда.\nA: Да, вот они. Спасибо!\nB: Пожалуйста.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 30,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 13.12,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -2387,20 +2548,20 @@
       "audio": {
         "id": "audio_ru_pilot_10",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_10-40346ebce1f7ead5f73c8272da820c63dfe1eeb7d0930e1739385ff83cec429f.mp3",
+        "path": "data/assessment/audio/ru_pilot_10-paid-b5d296a19d0a605429abfd82bc0090c36eadfd79491a999ff01dc7264d7f60d1.mp3",
         "url": null,
-        "content_hash": "40346ebce1f7ead5f73c8272da820c63dfe1eeb7d0930e1739385ff83cec429f",
+        "content_hash": "b5d296a19d0a605429abfd82bc0090c36eadfd79491a999ff01dc7264d7f60d1",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 13.12,
         "transcript_hash": "07a99c9e21eee69c8d421f93a1cd62f0cb54d11028ec58d6ef1ee6df459df050",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "40346ebce1f7ead5f73c8272da820c63dfe1eeb7d0930e1739385ff83cec429f",
+      "audio_sha256": "b5d296a19d0a605429abfd82bc0090c36eadfd79491a999ff01dc7264d7f60d1",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -2409,21 +2570,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:53.201361+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:17.236043+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "b5d296a19d0a605429abfd82bc0090c36eadfd79491a999ff01dc7264d7f60d1",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:48.979340+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_11",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_11",
         "language": "ru",
@@ -2438,12 +2618,11 @@
         "passage_ru": "A: Здравствуйте. Я хочу вернуть эту книгу.\nB: Пожалуйста, положите её сюда.\nA: Вы завтра работаете?\nB: Да, с девяти до шести.\nA: Спасибо. Я приду утром.\nB: Будем вас ждать.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 31,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 13.2,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -2629,20 +2808,20 @@
       "audio": {
         "id": "audio_ru_pilot_11",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_11-0edcb2a8fb25f5c449f8b9287993b744d85e69b689d1ed7786e86cdbcb0174c7.mp3",
+        "path": "data/assessment/audio/ru_pilot_11-paid-76bc1d3978cded32af3983c7a2f58c8b5b3e799363e472c4456e10e336902636.mp3",
         "url": null,
-        "content_hash": "0edcb2a8fb25f5c449f8b9287993b744d85e69b689d1ed7786e86cdbcb0174c7",
+        "content_hash": "76bc1d3978cded32af3983c7a2f58c8b5b3e799363e472c4456e10e336902636",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 13.2,
         "transcript_hash": "bb6f145b12d8ad714f0f184f087dec8abfdb94957fec291b9557443d77073142",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "0edcb2a8fb25f5c449f8b9287993b744d85e69b689d1ed7786e86cdbcb0174c7",
+      "audio_sha256": "76bc1d3978cded32af3983c7a2f58c8b5b3e799363e472c4456e10e336902636",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -2651,21 +2830,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:58:57.963884+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:25.695877+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "76bc1d3978cded32af3983c7a2f58c8b5b3e799363e472c4456e10e336902636",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:49.074103+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_pilot_12",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_pilot_12",
         "language": "ru",
@@ -2680,12 +2878,11 @@
         "passage_ru": "A: Пойдём гулять после работы?\nB: Давай. Куда пойдём?\nA: В парк. Там сейчас красиво.\nB: Хорошо. Возьмём собаку?\nA: Конечно. Встретимся у моего дома в шесть.\nB: Договорились.",
         "source_type": "synthetic",
         "provenance": {
-          "authoring": "Original AI-assisted draft; pending human review",
-          "audio_attribution": "Generated with elevenlabs.io; local noncommercial practice pilot."
+          "authoring": "Original AI-assisted draft; pending human review"
         },
         "license": "Project-authored synthetic content",
         "word_count": 29,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 12.8,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -2871,20 +3068,20 @@
       "audio": {
         "id": "audio_ru_pilot_12",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_pilot_12-b40e43bdd8268a1ed233c1c75b39de218238c21649733609574373892e8fc1bb.mp3",
+        "path": "data/assessment/audio/ru_pilot_12-paid-d401261e0194ffb98eaf98b6b97898920893dbc18cac130d4c3c27c625ee00c8.mp3",
         "url": null,
-        "content_hash": "b40e43bdd8268a1ed233c1c75b39de218238c21649733609574373892e8fc1bb",
+        "content_hash": "d401261e0194ffb98eaf98b6b97898920893dbc18cac130d4c3c27c625ee00c8",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 12.8,
         "transcript_hash": "e80777c2f7f9753714e63e409c4c439c08c6400087848318d8b8d6052c46ab33",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "b40e43bdd8268a1ed233c1c75b39de218238c21649733609574373892e8fc1bb",
+      "audio_sha256": "d401261e0194ffb98eaf98b6b97898920893dbc18cac130d4c3c27c625ee00c8",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -2893,15 +3090,34 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T02:59:03.029728+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:32.620952+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "d401261e0194ffb98eaf98b6b97898920893dbc18cac130d4c3c27c625ee00c8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Isaac (owner approval); Codex (transcript/question checks)",
-        "reviewed_at": "2026-10-04T03:39:49.123123+00:00",
-        "notes": "Owner listened to and approved all audio, then explicitly authorized full approval for local adaptive assessment workflow testing. Transcript/answer-key consistency checked by Codex. ILR 0+ is provisional, not expert-calibrated. Approved for local noncommercial practice under the recorded ElevenLabs Free-plan terms; no commercial or public deployment authorization.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
@@ -3092,7 +3308,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -3289,7 +3506,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -3486,7 +3704,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -3683,7 +3902,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -3880,7 +4100,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -4077,7 +4298,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -4274,7 +4496,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -4471,7 +4694,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -4727,7 +4951,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -4983,7 +5208,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -5239,7 +5465,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -5495,7 +5722,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -5751,7 +5979,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -6007,7 +6236,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -6019,7 +6249,7 @@
     },
     {
       "id": "ru_expand_l_0_01",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_0_01",
         "language": "ru",
@@ -6036,12 +6266,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Floor recognition probes: isolated common nouns rather than connected discourse.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 4,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 2.4,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -6218,20 +6447,20 @@
       "audio": {
         "id": "audio_ru_expand_l_0_01",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_0_01-cfdf8f75f82cae4e26c75ea20a45693848a62d717d4e94048ef1a33468387106.mp3",
+        "path": "data/assessment/audio/ru_expand_l_0_01-paid-4ea25a75a5316be5e6c717b20f3a5ae167456d778703c45b29a7b38ad2d641bb.mp3",
         "url": null,
-        "content_hash": "cfdf8f75f82cae4e26c75ea20a45693848a62d717d4e94048ef1a33468387106",
+        "content_hash": "4ea25a75a5316be5e6c717b20f3a5ae167456d778703c45b29a7b38ad2d641bb",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 2.4,
         "transcript_hash": "f8995531cd065f47a24288660e9b5cba88c3c834045542b07ba1c0e4832f4873",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "cfdf8f75f82cae4e26c75ea20a45693848a62d717d4e94048ef1a33468387106",
+      "audio_sha256": "4ea25a75a5316be5e6c717b20f3a5ae167456d778703c45b29a7b38ad2d641bb",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -6240,21 +6469,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:23.625007+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:35.777190+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "4ea25a75a5316be5e6c717b20f3a5ae167456d778703c45b29a7b38ad2d641bb",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.096077+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_0_02",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_0_02",
         "language": "ru",
@@ -6271,12 +6519,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Floor recognition probes: two isolated color words, not a proficiency claim.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 4,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 2.96,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -6453,20 +6700,20 @@
       "audio": {
         "id": "audio_ru_expand_l_0_02",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_0_02-1ff52592f922b7089497dc3cde1c569b789189c2b581c7096edf97475f17b08f.mp3",
+        "path": "data/assessment/audio/ru_expand_l_0_02-paid-fd6d095aeeeeb1b6d24479d64aaf1db95d63ccddabae94cf6b07243a2f64e40b.mp3",
         "url": null,
-        "content_hash": "1ff52592f922b7089497dc3cde1c569b789189c2b581c7096edf97475f17b08f",
+        "content_hash": "fd6d095aeeeeb1b6d24479d64aaf1db95d63ccddabae94cf6b07243a2f64e40b",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 2.96,
         "transcript_hash": "2de0b7a1605038beadd85f10880d015919e9725faf99081246f0de78b66c0aa8",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "1ff52592f922b7089497dc3cde1c569b789189c2b581c7096edf97475f17b08f",
+      "audio_sha256": "fd6d095aeeeeb1b6d24479d64aaf1db95d63ccddabae94cf6b07243a2f64e40b",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -6475,21 +6722,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:24.895481+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:39.289320+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "fd6d095aeeeeb1b6d24479d64aaf1db95d63ccddabae94cf6b07243a2f64e40b",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.163032+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_1_03",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_1_03",
         "language": "ru",
@@ -6506,12 +6772,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Simple transaction with explicit time, quantity and location information.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 46,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 22.16,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -6704,20 +6969,20 @@
       "audio": {
         "id": "audio_ru_expand_l_1_03",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_1_03-a1728f704869a4e6e63fe0c55aebc468bd04c201cc542b5202be72fc3b928eb9.mp3",
+        "path": "data/assessment/audio/ru_expand_l_1_03-paid-758277be5c732e80aa6b92d5e17eee49fda35647f88e0eae2b1205ff6788c593.mp3",
         "url": null,
-        "content_hash": "a1728f704869a4e6e63fe0c55aebc468bd04c201cc542b5202be72fc3b928eb9",
+        "content_hash": "758277be5c732e80aa6b92d5e17eee49fda35647f88e0eae2b1205ff6788c593",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 22.16,
         "transcript_hash": "f85553b2436d7ba1ac9204547ebbe13732c7770db6ab545256634c14c1242989",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "a1728f704869a4e6e63fe0c55aebc468bd04c201cc542b5202be72fc3b928eb9",
+      "audio_sha256": "758277be5c732e80aa6b92d5e17eee49fda35647f88e0eae2b1205ff6788c593",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -6726,21 +6991,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:31.520436+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:28:52.162598+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "758277be5c732e80aa6b92d5e17eee49fda35647f88e0eae2b1205ff6788c593",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.263615+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_1_04",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_1_04",
         "language": "ru",
@@ -6757,12 +7041,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Short connected exchange about immediate surroundings; common vocabulary and literal details.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 48,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 18.64,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -6955,20 +7238,20 @@
       "audio": {
         "id": "audio_ru_expand_l_1_04",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_1_04-bc6e78793f8fd777d0f177af34cd95f9db45b8e6368a90dd45eb501edfeca13e.mp3",
+        "path": "data/assessment/audio/ru_expand_l_1_04-paid-b83e48ae0dd1aa77aaf935c0e484cd1c450379c162b67c66b586379597a14a14.mp3",
         "url": null,
-        "content_hash": "bc6e78793f8fd777d0f177af34cd95f9db45b8e6368a90dd45eb501edfeca13e",
+        "content_hash": "b83e48ae0dd1aa77aaf935c0e484cd1c450379c162b67c66b586379597a14a14",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 18.64,
         "transcript_hash": "2907952880c29c5ce4adace3384d0158e77023551da5f58b5f6182527dce40da",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "bc6e78793f8fd777d0f177af34cd95f9db45b8e6368a90dd45eb501edfeca13e",
+      "audio_sha256": "b83e48ae0dd1aa77aaf935c0e484cd1c450379c162b67c66b586379597a14a14",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -6977,21 +7260,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:38.860560+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:29:01.316663+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "b83e48ae0dd1aa77aaf935c0e484cd1c450379c162b67c66b586379597a14a14",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.342724+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_1p_05",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_1p_05",
         "language": "ru",
@@ -7008,12 +7310,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Routine message with a changed plan and a sequence of explicitly stated events.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 64,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 28.8,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -7206,20 +7507,20 @@
       "audio": {
         "id": "audio_ru_expand_l_1p_05",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_1p_05-fee7a5b4b5f2087f6208911a86efd9d8f03c4320fdee83d13e3fd1b3192b32d0.mp3",
+        "path": "data/assessment/audio/ru_expand_l_1p_05-paid-dbccdbac242af27deddaf56e94eabaed9ed4bda22c0165fbe7bb69c5ec08efe8.mp3",
         "url": null,
-        "content_hash": "fee7a5b4b5f2087f6208911a86efd9d8f03c4320fdee83d13e3fd1b3192b32d0",
+        "content_hash": "dbccdbac242af27deddaf56e94eabaed9ed4bda22c0165fbe7bb69c5ec08efe8",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 28.8,
         "transcript_hash": "fb35e66ab4df1d6f37795bfdd66514e22d4dae85c03ea75c89e3e44911155e60",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "fee7a5b4b5f2087f6208911a86efd9d8f03c4320fdee83d13e3fd1b3192b32d0",
+      "audio_sha256": "dbccdbac242af27deddaf56e94eabaed9ed4bda22c0165fbe7bb69c5ec08efe8",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -7228,21 +7529,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:47.166522+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:29:17.442744+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "dbccdbac242af27deddaf56e94eabaed9ed4bda22c0165fbe7bb69c5ec08efe8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.420767+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_1p_06",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_1p_06",
         "language": "ru",
@@ -7259,12 +7579,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Familiar work coordination with time constraints and a straightforward contingency.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 67,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 28.72,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -7457,20 +7776,20 @@
       "audio": {
         "id": "audio_ru_expand_l_1p_06",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_1p_06-72a7e50be99b969f66f90a18e723a0143efec00929edc1ed9d49f04940b16cb9.mp3",
+        "path": "data/assessment/audio/ru_expand_l_1p_06-paid-5605cac4eb0096f47c3eac2e5cf95a5fea4962cab316479dc72a999c4096cc2f.mp3",
         "url": null,
-        "content_hash": "72a7e50be99b969f66f90a18e723a0143efec00929edc1ed9d49f04940b16cb9",
+        "content_hash": "5605cac4eb0096f47c3eac2e5cf95a5fea4962cab316479dc72a999c4096cc2f",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 28.72,
         "transcript_hash": "b6b36e9a115937502bc276e1b89b5aeffe2dfbf5c560b5bb50e51d71af59d3a2",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "72a7e50be99b969f66f90a18e723a0143efec00929edc1ed9d49f04940b16cb9",
+      "audio_sha256": "5605cac4eb0096f47c3eac2e5cf95a5fea4962cab316479dc72a999c4096cc2f",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -7479,21 +7798,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:07:57.830328+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:29:33.594572+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "5605cac4eb0096f47c3eac2e5cf95a5fea4962cab316479dc72a999c4096cc2f",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.497396+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_2_07",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_2_07",
         "language": "ru",
@@ -7510,12 +7848,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Factual account of a service trial, complaint, feasibility check and conditional future action.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 86,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 38.56,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -7767,20 +8104,20 @@
       "audio": {
         "id": "audio_ru_expand_l_2_07",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_2_07-1aa4dfcb3ef750d468f0dc7cde9092e42bfd33eac581aa0070f113f8ad95a48f.mp3",
+        "path": "data/assessment/audio/ru_expand_l_2_07-paid-c5064bf2611600661b1b2e85a949a3d740821211db31a8d8e77546788cc55d06.mp3",
         "url": null,
-        "content_hash": "1aa4dfcb3ef750d468f0dc7cde9092e42bfd33eac581aa0070f113f8ad95a48f",
+        "content_hash": "c5064bf2611600661b1b2e85a949a3d740821211db31a8d8e77546788cc55d06",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 38.56,
         "transcript_hash": "2c83c7dcb97f3c1ce8138f70aea159130b6d5e2165f319de31b2d2015694d23a",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "1aa4dfcb3ef750d468f0dc7cde9092e42bfd33eac581aa0070f113f8ad95a48f",
+      "audio_sha256": "c5064bf2611600661b1b2e85a949a3d740821211db31a8d8e77546788cc55d06",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -7789,21 +8126,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:08:10.030384+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T11:29:47.450637+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "c5064bf2611600661b1b2e85a949a3d740821211db31a8d8e77546788cc55d06",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.581131+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_2_08",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_2_08",
         "language": "ru",
@@ -7820,12 +8176,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Everyday organizational process with a past problem, corrective sequence and resource plan.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 92,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 45.04,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -8077,20 +8432,20 @@
       "audio": {
         "id": "audio_ru_expand_l_2_08",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_2_08-b314b66970e1121b2eb0a2cf9e555dc559284af35fe5b1882f49fbda2596a1f9.mp3",
+        "path": "data/assessment/audio/ru_expand_l_2_08-paid-621652417b207264526c6bcb58a32ecd03be53db5e82ea1183f2e4732fa844ad.mp3",
         "url": null,
-        "content_hash": "b314b66970e1121b2eb0a2cf9e555dc559284af35fe5b1882f49fbda2596a1f9",
+        "content_hash": "621652417b207264526c6bcb58a32ecd03be53db5e82ea1183f2e4732fa844ad",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 45.04,
         "transcript_hash": "e024c44e80b209cc506d319f97d92dbdeddf2880f61f62c6d580388351dcab89",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "b314b66970e1121b2eb0a2cf9e555dc559284af35fe5b1882f49fbda2596a1f9",
+      "audio_sha256": "621652417b207264526c6bcb58a32ecd03be53db5e82ea1183f2e4732fa844ad",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -8099,21 +8454,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:08:25.882303+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T12:52:49.359100+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "621652417b207264526c6bcb58a32ecd03be53db5e82ea1183f2e4732fa844ad",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.664769+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_2p_09",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_2p_09",
         "language": "ru",
@@ -8130,12 +8504,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Competing practical interests, qualification and an evaluative distinction between trial evidence and publicity.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 137,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 63.04,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -8387,20 +8760,20 @@
       "audio": {
         "id": "audio_ru_expand_l_2p_09",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_2p_09-f4234cce5c68d5c64e14ec4aba2198ac3dc443bcb24b15a1c19259421717d3e7.mp3",
+        "path": "data/assessment/audio/ru_expand_l_2p_09-paid-0a192dbf19f84715e9519eae6d22dfe455f6c989bd960212593dae481b45f25c.mp3",
         "url": null,
-        "content_hash": "f4234cce5c68d5c64e14ec4aba2198ac3dc443bcb24b15a1c19259421717d3e7",
+        "content_hash": "0a192dbf19f84715e9519eae6d22dfe455f6c989bd960212593dae481b45f25c",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 63.04,
         "transcript_hash": "895e5097a3849cfa06b696de458c55a4df8aba8f786f51dc3a6cb5e495ffd4f0",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "f4234cce5c68d5c64e14ec4aba2198ac3dc443bcb24b15a1c19259421717d3e7",
+      "audio_sha256": "0a192dbf19f84715e9519eae6d22dfe455f6c989bd960212593dae481b45f25c",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -8409,21 +8782,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:08:45.097844+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T12:53:14.055122+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "0a192dbf19f84715e9519eae6d22dfe455f6c989bd960212593dae481b45f25c",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.754620+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_2p_10",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_2p_10",
         "language": "ru",
@@ -8440,12 +8832,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Qualified reasoning about evaluation, an alternative causal explanation and a transparent metaphor.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 129,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 58.0,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -8697,20 +9088,20 @@
       "audio": {
         "id": "audio_ru_expand_l_2p_10",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_2p_10-cf8fa2982e073f29999d64067c050bc46b547744670744b425ba71888a411424.mp3",
+        "path": "data/assessment/audio/ru_expand_l_2p_10-paid-2fa080d45f1c606da26399f08060272b952dfbbe33b01db522f16927875cb3c5.mp3",
         "url": null,
-        "content_hash": "cf8fa2982e073f29999d64067c050bc46b547744670744b425ba71888a411424",
+        "content_hash": "2fa080d45f1c606da26399f08060272b952dfbbe33b01db522f16927875cb3c5",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 58.0,
         "transcript_hash": "d9c7d7b5e307945ad3298cd6afbe2ebe91454edee2b1862bcd769064b9e7253c",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "cf8fa2982e073f29999d64067c050bc46b547744670744b425ba71888a411424",
+      "audio_sha256": "2fa080d45f1c606da26399f08060272b952dfbbe33b01db522f16927875cb3c5",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -8719,21 +9110,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:09:02.492734+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T12:53:33.796525+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "2fa080d45f1c606da26399f08060272b952dfbbe33b01db522f16927875cb3c5",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.836881+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_3_11",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_3_11",
         "language": "ru",
@@ -8750,12 +9160,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Professional argument with concession, unstated opportunity costs, hypothetical alternatives and a qualified view of disagreement.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 204,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 100.72,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -9007,20 +9416,20 @@
       "audio": {
         "id": "audio_ru_expand_l_3_11",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_3_11-be52b8819b7d4791c1b7ce7a302e048f0c04aaea7d06e3a02dd77b6ca2027560.mp3",
+        "path": "data/assessment/audio/ru_expand_l_3_11-paid-cc781b7f799a7decc18e4731976d59cfd4f13abd1648a4665f0da08a68598521.mp3",
         "url": null,
-        "content_hash": "be52b8819b7d4791c1b7ce7a302e048f0c04aaea7d06e3a02dd77b6ca2027560",
+        "content_hash": "cc781b7f799a7decc18e4731976d59cfd4f13abd1648a4665f0da08a68598521",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 100.72,
         "transcript_hash": "7d37e0ab34545375df03b084f7e186fc7554d1e45810d36a39af34a4a0158633",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "be52b8819b7d4791c1b7ce7a302e048f0c04aaea7d06e3a02dd77b6ca2027560",
+      "audio_sha256": "cc781b7f799a7decc18e4731976d59cfd4f13abd1648a4665f0da08a68598521",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -9029,21 +9438,40 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:09:31.672998+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T12:54:10.091746+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "cc781b7f799a7decc18e4731976d59cfd4f13abd1648a4665f0da08a68598521",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.923751+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
     {
       "id": "ru_expand_l_3_12",
-      "content_version": 1,
+      "content_version": 2,
       "passage": {
         "id": "ru_expand_l_3_12",
         "language": "ru",
@@ -9060,12 +9488,11 @@
         "provenance": {
           "authoring": "Original fictional AI-assisted practice material",
           "difficulty_rationale": "Extended professional argument about incentives, concession, metaphor and the limitations of a uniform metric.",
-          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm",
-          "audio_attribution": "Generated with elevenlabs.io under owner standing audio-method authorization."
+          "descriptor_reference": "https://govtilr.org/Skills/Listening.htm"
         },
         "license": "Project-authored synthetic content",
         "word_count": 207,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 103.44,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -9317,20 +9744,20 @@
       "audio": {
         "id": "audio_ru_expand_l_3_12",
         "source_type": "synthetic",
-        "path": "data/assessment/audio/ru_expand_l_3_12-3ad904ddafd3ab0e993b7a408fdf114cd63afa82d2b8ee6565b3164a3f67458c.mp3",
+        "path": "data/assessment/audio/ru_expand_l_3_12-paid-3fe991af55ece30caa0072f78799e1f4aa6d7563746bb32ccba6d841297be90a.mp3",
         "url": null,
-        "content_hash": "3ad904ddafd3ab0e993b7a408fdf114cd63afa82d2b8ee6565b3164a3f67458c",
+        "content_hash": "3fe991af55ece30caa0072f78799e1f4aa6d7563746bb32ccba6d841297be90a",
         "voice": null,
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 103.44,
         "transcript_hash": "93205b417b01d7778afe0ec526f8197ca4f56e23c5d4e289bc55cb79b6fd4353",
-        "license": "ElevenLabs Free-plan generated audio: noncommercial use; publication requires elevenlabs.io or 11.ai title attribution. See recording.usage_terms.",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
-      "audio_sha256": "3ad904ddafd3ab0e993b7a408fdf114cd63afa82d2b8ee6565b3164a3f67458c",
+      "audio_sha256": "3fe991af55ece30caa0072f78799e1f4aa6d7563746bb32ccba6d841297be90a",
       "recording": {
         "provider": "ElevenLabs",
         "model": "eleven_v3",
@@ -9339,15 +9766,34 @@
           "B": "cjVigY5qzO86Huf0OWal"
         },
         "seed": null,
-        "generated_at": "2026-10-04T08:10:00.632490+00:00",
-        "account_tier": "free",
-        "usage_terms": "Generated on the ElevenLabs Free plan: noncommercial use only; publication requires elevenlabs.io or 11.ai attribution in the title. Voice/input rights, model status, pronunciation and ILR review remain pending. Terms: https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "generated_at": "2026-10-06T12:54:42.505274+00:00",
+        "account_tier": "starter",
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "3fe991af55ece30caa0072f78799e1f4aa6d7563746bb32ccba6d841297be90a",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
         "reviewer": "Codex; owner-authorized expansion and audio method",
-        "reviewed_at": "2026-10-04T08:11:59.998931+00:00",
-        "notes": "Approved for local noncommercial practice under owner request to expand through ILR 3. Original fictional transcript; answer support, distractors and provisional difficulty rationale reviewed by Codex. Audio accepted under Isaac standing authorization for the same ElevenLabs method, not individual listening review. No independent expert calibration or official scoring claim. Recorded Free-plan terms apply.",
+        "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+        "notes": "Original scripts/questions retained from the approved bank. Replacement audio approved through Isaac's standing Jessica/Eric Eleven v3 method authorization and explicit 2026-10-06 paid regeneration/public deployment instruction. All MP3 frames decoded and checksums verified. No individual human listening or native-speaker review claimed. ILR labels remain provisional. Paid-plan reuse terms reviewed by Codex.",
         "reuse_attested": true
       }
     },
@@ -9539,7 +9985,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -9737,7 +10184,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -9935,7 +10383,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -10133,7 +10582,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -10331,7 +10781,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -10529,7 +10980,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -10727,7 +11179,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -10925,7 +11378,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -11182,7 +11636,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -11439,7 +11894,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -11696,7 +12152,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -11953,7 +12410,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -12210,7 +12668,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -12467,7 +12926,8 @@
         "seed": null,
         "generated_at": "",
         "account_tier": "unknown",
-        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms."
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
       },
       "review": {
         "status": "approved",
@@ -12501,7 +12961,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 4,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 1.6,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -12689,9 +13149,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 1.6,
         "transcript_hash": "28caf890af654458d7f30c09ca45e68935e070ac38a78928d27da2ae28f6032d",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -12706,7 +13166,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:11.873865+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "7c15d71dc68915eeebde7b760333bb07a0825168342d6bb2907ce7251786820a",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -12740,7 +13219,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 4,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 2.8,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -12928,9 +13407,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 2.8,
         "transcript_hash": "95fa00a48409285e312519c843a187dc2e142d0c1febcc6fb2efb511d3a78067",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -12945,7 +13424,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:13.431042+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "c9b84735f74ae273da44f4e89925b27d18b66693fa9a910f2d47d877b73368cf",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -12979,7 +13477,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 20,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 8.08,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -13175,9 +13673,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 8.08,
         "transcript_hash": "35e40991f6f1ece7f7d43c7789824d87fea187a9f6aec9ac8deb90de029af0c8",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -13192,7 +13690,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:16.550316+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "ece4fce32b699c368fd7c22ea8cd35382c000c80ae9f675179c949b7db506154",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -13226,7 +13743,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 22,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 9.44,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -13422,9 +13939,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 9.44,
         "transcript_hash": "86028c9177b06aafc1ddc7abe57151b4bf2099eff80074a456baa4b5eb6a6e04",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -13439,7 +13956,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:19.665831+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "b79f40e33ad875d7d2061082b1b7cd39c0a6cd6269568bc2b1f873d4b99380ac",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -13473,7 +14009,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 77,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 22.96,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -13677,9 +14213,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 22.96,
         "transcript_hash": "ed850bc8b59827e98610093c2bd1bcd0ddaff095b421445ea19110a118b72df4",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -13694,7 +14230,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:26.262032+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "4e977a6de2162f9cda6e835ecc8257da811d58697aa0c27435cf6f39c486b973",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -13728,7 +14283,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 88,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 23.12,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -13932,9 +14487,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 23.12,
         "transcript_hash": "83d27bf65dbc1aed7890a17e660638e5046c1defbdff7f2471c607b8092ff961",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -13949,7 +14504,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:32.987050+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "01429fcfe3fd28d0285a6011fe1518397dce478d6a59c737a477046895ae98e9",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -13983,7 +14557,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 145,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 38.24,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -14187,9 +14761,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 38.24,
         "transcript_hash": "cd5538ea908a8331a8516f44791c07670175b810a8716e28762a656a6babaaf2",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -14204,7 +14778,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:43.473869+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "749a86f8082e153ac2a0cb82efda5fa6063763e2762cd415b6472a56b9f641ef",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -14238,7 +14831,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 153,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 41.76,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -14442,9 +15035,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 41.76,
         "transcript_hash": "ec3e2da84131e8ebf6c3830f1434e2858812ffbe616a426348a8899c771e2e0b",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -14459,7 +15052,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:09:55.095772+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "c743255c1b30bd6a71d022fb7238b60719f81d3fe21e6324efd4baa0735233b1",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -14493,7 +15105,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 258,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 73.2,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -14756,9 +15368,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 73.2,
         "transcript_hash": "4e73c1e2c2fcb3dcc47f932dad1ecd3cc894c6a806ff03a1ce591022fa5f01e1",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -14773,7 +15385,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:10:13.741990+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "6ce4a9547880e88d55e6673655ee592325158ec159eb9ceb6fadac7c92599b83",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -14807,7 +15438,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 251,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 70.48,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -15070,9 +15701,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 70.48,
         "transcript_hash": "e1335d04e7abbcc8966318935cf464e7298e72b7de5398fb98ce6807488737e6",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -15087,7 +15718,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:10:32.209786+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "60eac9caf837e07f52d3152e9495477ebbf0bb2123be03df68b21d0101cd91ce",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -15121,7 +15771,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 297,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 79.68,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -15384,9 +16034,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 79.68,
         "transcript_hash": "80ed6e59f5feff1964c3103acdb23c5a658e76c46d6cc1653bea46ba7c5356dd",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -15401,7 +16051,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:10:51.509505+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "05379c86831b9aed596dfd6df5b5370a58a14877b83116f87bb7e5da7b32dea8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -15435,7 +16104,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 279,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 77.76,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -15698,9 +16367,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 77.76,
         "transcript_hash": "ad5fa364d9f78043048c4e080d5f0d0dd1140412a26bf9f5ebea817b4b20ea90",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -15715,7 +16384,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:11:11.111409+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "360a8edb22decb63c18be3dc9aaa5951e7faca19b57aa9f50c2545830b0985fe",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -15749,7 +16437,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 494,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 135.92,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -16012,9 +16700,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 135.92,
         "transcript_hash": "03e0087ac3c2e141801d0e69d72fd129fb015c41d58222a4091ab42c016a33fb",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -16029,7 +16717,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:11:42.514542+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "d962b7440365cf01eafd19f790af387c661c7607ba394092debeb75bf5314fde",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",
@@ -16063,7 +16770,7 @@
         },
         "license": "Project-authored synthetic content",
         "word_count": 479,
-        "audio_duration_seconds": null,
+        "audio_duration_seconds": 124.64,
         "segment_count": 1,
         "vocabulary_metadata": {},
         "discourse_metadata": {},
@@ -16326,9 +17033,9 @@
         "rate": null,
         "engine": "ElevenLabs",
         "engine_version": null,
-        "duration_seconds": null,
+        "duration_seconds": 124.64,
         "transcript_hash": "f34cf97b2395dc2ccaf61e92a08c68deb95c410f156efb924efe1b38be191443",
-        "license": "ElevenLabs Starter creation-time terms; local practice; see recording.usage_terms",
+        "license": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
         "synthetic_tts": true,
         "validated": true
       },
@@ -16343,7 +17050,26 @@
         "seed": null,
         "generated_at": "2026-10-04T19:20:02.066949+00:00",
         "account_tier": "starter",
-        "usage_terms": "Created on ElevenLabs Starter on 2026-10-04 using eleven_v3 and preset Jessica/Eric voices. Original project-authored Mandarin scripts. Paid-plan rights subject to applicable ElevenLabs terms and Beta Services exclusions; local practice approved. No individual human listening or independent pronunciation certification claimed. https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform"
+        "usage_terms": "Generated during a paid Starter subscription using generally available Eleven v3. Commercial use permitted and no provider title attribution required under the reviewed standard paid-plan terms, subject to provider terms, input/voice rights and prohibited-use policy. Terms reviewed 2026-10-06. See recording.license_review.",
+        "license_review": {
+          "reviewed_at": "2026-10-06T13:13:43.028906+00:00",
+          "reviewer": "Codex (documented standard plan/model terms)",
+          "commercial_use": true,
+          "attribution_required": false,
+          "model_status": "generally_available",
+          "model_general_availability_date": "2026-02-02",
+          "creation_time_account_tier": "starter",
+          "audio_sha256": "75cb36b21bc02241361814079dcb282ad69c4ef6ad1125abacaad25a22ed70a8",
+          "sources": [
+            "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+            "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+            "https://elevenlabs.io/terms-of-use",
+            "https://elevenlabs.io/service-specific-terms",
+            "https://elevenlabs.io/elevenapi-terms",
+            "https://elevenlabs.io/speech-engine-terms"
+          ],
+          "scope": "Provider rights review, not a representation of empirical ILR calibration or human listening review"
+        }
       },
       "review": {
         "status": "approved",

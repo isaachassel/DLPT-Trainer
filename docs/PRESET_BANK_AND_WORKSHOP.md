@@ -1,5 +1,8 @@
 # Preset diagnostics and private audio authoring
 
+October 6 update: all active recordings now use paid-plan audio. See
+[the paid audio refresh](PAID_AUDIO_REFRESH.md); Free-plan notes below are historical.
+
 ## Current content status
 
 The 51 original starter passages have been removed from the deployed bank. Training and assessments now share the approved bundled content: **66 passages / 156 questions**, with **zero pending entries**. Legacy content is isolated under 	ests/fixtures/legacy for regression tests only and is never served by the app.
