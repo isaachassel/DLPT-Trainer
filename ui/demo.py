@@ -15,7 +15,30 @@ from ui.components import answer_radio
 from ui.layout import CUSTOM_CSS as BASE_CSS
 
 CUSTOM_CSS = BASE_CSS + """
-.demo-shell {max-width: 850px; margin: 30px auto;}
+.demo-shell {max-width: 1180px; margin: 24px auto;}
+.demo-setup {max-width: 760px; width: 100%; margin: 0 auto;}
+.demo-test {border: 2px solid #25256b; border-radius: 4px; overflow: hidden; gap: 0 !important;}
+.demo-test-title {background: #25256b; color: white; padding: 10px 18px; font-weight: 700;}
+.demo-panels {gap: 0 !important; align-items: stretch; background: var(--background-fill-primary);}
+.demo-pane {padding: 20px !important; min-width: 0 !important; flex-wrap: nowrap !important; overflow-anchor: none;}
+.demo-pane > * {flex-shrink: 0 !important; min-width: 0 !important; width: 100%;}
+.demo-reading .demo-pane {height: clamp(380px, 60vh, 680px); overflow-y: auto; scrollbar-gutter: stable;}
+.demo-reading .demo-source {border-right: 2px solid #b5b5ca;}
+.demo-test .passage-card {border: 0; border-radius: 0; padding: 0; line-height: 1.8;}
+.demo-end-marker {border-top: 2px solid #be4b55; padding-top: 8px; margin-top: 18px; color: var(--body-text-color-subdued); font-size: .8rem;}
+.demo-listening .demo-panels {flex-direction: column;}
+.demo-listening .demo-source, .demo-listening .demo-questions {flex-basis: auto !important;}
+.demo-listening .demo-source .demo-end-marker {display: none;}
+.demo-status-bar {border-top: 2px solid #25256b; padding: 12px; align-items: center; gap: 14px; background: var(--background-fill-secondary);}
+.demo-status-bar > * {min-width: 150px !important;}
+.demo-status-bar .timer-card {margin: 0;}
+@media (max-width: 700px) {
+  .demo-shell {margin: 12px auto;}
+  .demo-reading .demo-panels {flex-direction: column;}
+  .demo-reading .demo-pane {height: auto; max-height: none; overflow: visible;}
+  .demo-reading .demo-source {border-right: 0; border-bottom: 2px solid #b5b5ca;}
+  .demo-pane {padding: 14px !important;}
+}
 .demo-intro {color: #667085; font-size: 1.05rem;}
 .demo-audio button {padding: 12px 22px; border-radius: 9px; border: 1px solid #345995; cursor: pointer; font: inherit;}
 .demo-audio [data-demo-status] {margin-top: 12px;}
@@ -37,6 +60,20 @@ AUDIO_JS = Path(__file__).with_name('demo_audio.js').read_text(encoding='utf-8')
 TIMER_JS = r"""
 const bind = () => {
   const clock = document.getElementById('demo-section-timer')?.querySelector('[data-demo-deadline]');
+  if (clock && document.demoPanePassage !== clock.dataset.demoPassage) {
+    // Wait for Gradio's other outputs to settle before resetting their scroll.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!clock.isConnected) return;
+      for (const [id, label] of [['demo-source-pane', 'Passage'], ['demo-question-pane', 'Questions']]) {
+        const pane = document.getElementById(id);
+        if (pane) {
+          pane.scrollTop = 0; pane.scrollLeft = 0;
+          pane.tabIndex = 0; pane.setAttribute('role', 'region'); pane.setAttribute('aria-label', label);
+        }
+      }
+    }));
+    document.demoPanePassage = clock.dataset.demoPassage;
+  }
   if (document.demoTimerClock === clock) return;
   if (document.demoTick) clearInterval(document.demoTick);
   document.demoTimerClock = clock;
@@ -57,7 +94,8 @@ const bind = () => {
 };
 if (document.demoTimerObserver) document.demoTimerObserver.disconnect();
 document.demoTimerObserver = new MutationObserver(bind);
-document.demoTimerObserver.observe(document.body, {childList: true, subtree: true});
+document.demoTimerObserver.observe(document.body, {childList: true, subtree: true,
+  attributes: true, attributeFilter: ['data-demo-passage']});
 bind();
 """
 TAIL = 10 + cb.MAX_SLOTS * 2
@@ -99,10 +137,11 @@ def present(result, *, preserve_audio=False):
     audio = (gr.skip() if preserve_audio else gr.update(
         value=audio_markup(state, bundle) if listening else '', visible=bool(listening)))
     can_submit = active and (not listening or state.current_listening_completed == 2)
-    timer = gr.update(value=(f'<div class="timer-card" data-demo-deadline="{int(state.skill_deadline_epoch * 1000)}" role="timer">Time remaining</div>'
+    timer = gr.update(value=(f'<div class="timer-card" data-demo-passage="{html.escape(state.current_passage_id, quote=True)}" data-demo-deadline="{int(state.skill_deadline_epoch * 1000)}" role="timer">Time remaining</div>'
                              if active else ''), visible=active)
     return [state, bundle, nonce, status, timer, result[5], result[6], audio,
             *result[10:TAIL],
+            gr.update(visible=active, elem_classes=['demo-test', 'demo-listening' if listening else 'demo-reading']),
             gr.update(value='Submit answers', visible=active, interactive=can_submit),
             report, gr.update(visible=not active),
             gr.update(value='Begin test' if not state else 'Start a new test', interactive=not active)]
@@ -122,6 +161,10 @@ def start_demo(language, skill='Reading'):
     if state:
         state.demo_mode = True
         cb.STORAGE.save_checkpoint(state)
+    else:
+        # Setup failures must remain visible while the test panel is hidden.
+        message = result[3].get('value', '') if isinstance(result[3], dict) else str(result[3])
+        raise gr.Error(message or 'Unable to begin a test. Check that approved passages are available.')
     return present(result)
 
 
@@ -174,7 +217,7 @@ def restore_demo(request: gr.Request):
     """Optional checkpoint link without extra setup controls."""
     code = request.query_params.get('resume', '')
     if not code:
-        return [gr.skip()] * (12 + cb.MAX_SLOTS * 2)
+        return [gr.skip()] * (13 + cb.MAX_SLOTS * 2)
     if is_hosted_demo():
         raise gr.Error('Saved-report links are available only in the local demo. Begin a new test here.')
     saved = cb.STORAGE.load_checkpoint(code)
@@ -191,30 +234,39 @@ def build_app():
                         'Independent practice—not an official DLPT or an official score.', elem_classes=['demo-intro'])
             report = gr.HTML(visible=False)
             state, bundle, nonce = gr.State(), gr.State(), gr.State()
-            with gr.Column() as setup:
+            with gr.Column(elem_classes=['demo-setup']) as setup:
                 language = gr.Radio(['Russian', 'Chinese'], value='Russian', label='Choose your language')
                 skill = gr.Radio(['Reading', 'Listening'], value='Reading', label='Choose your test')
                 gr.Markdown('**One skill per test** · 12 questions · up to 30 minutes.\n\n'
                             'In Listening, each recording plays twice, with a beep between listens. Answer every question, then submit. '
                             'You cannot return to a submitted passage. Results appear at the end.')
                 begin = gr.Button('Begin test', variant='primary')
-            status = gr.Markdown(visible=False)
-            timer = gr.HTML(visible=False, js_on_load=TIMER_JS, elem_id='demo-section-timer')
-            orientation = gr.Markdown(visible=False)
-            passage = gr.Markdown(visible=False, elem_classes=['passage-card'])
-            audio = gr.HTML(visible=False, js_on_load=AUDIO_JS, elem_id='demo-audio-player')
+            with gr.Column(visible=False, elem_classes=['demo-test']) as test:
+                gr.HTML('<div class="demo-test-title">Language comprehension · Practice assessment</div>')
+                with gr.Row(elem_classes=['demo-panels']):
+                    with gr.Column(scale=1, min_width=0, elem_classes=['demo-pane', 'demo-source'], elem_id='demo-source-pane'):
+                        orientation = gr.Markdown(visible=False)
+                        passage = gr.Markdown(visible=False, elem_classes=['passage-card'])
+                        audio = gr.HTML(visible=False, js_on_load=AUDIO_JS, elem_id='demo-audio-player')
+                        gr.HTML('<div class="demo-end-marker">End of passage</div>')
+                    with gr.Column(scale=1, min_width=0, elem_classes=['demo-pane', 'demo-questions'], elem_id='demo-question-pane'):
+                        gr.Markdown('### Questions')
+                        question_outputs, answers = [], []
+                        for i in range(cb.MAX_SLOTS):
+                            question_outputs.append(gr.Markdown(visible=False))
+                            answer = answer_radio(visible=False, label=f'Question {i+1}')
+                            question_outputs.append(answer)
+                            answers.append(answer)
+                        gr.HTML('<div class="demo-end-marker">End of questions for this passage</div>')
+                with gr.Row(elem_classes=['demo-status-bar']):
+                    status = gr.Markdown(visible=False)
+                    timer = gr.HTML(visible=False, js_on_load=TIMER_JS, elem_id='demo-section-timer')
+                    submit = gr.Button('Submit answers', variant='primary', visible=False)
             event = gr.Textbox(elem_id='demo-audio-event', elem_classes=['event-bridge'])
             confirm_audio = gr.Button('Audio event', elem_id='demo-audio-confirm', elem_classes=['event-bridge'])
             expired = gr.Button('Timer event', elem_id='timer-expired-trigger', elem_classes=['event-bridge'])
-            question_outputs, answers = [], []
-            for i in range(cb.MAX_SLOTS):
-                question_outputs.append(gr.Markdown(visible=False))
-                answer = answer_radio(visible=False, label=f'Question {i+1}')
-                question_outputs.append(answer)
-                answers.append(answer)
-            submit = gr.Button('Submit answers', variant='primary', visible=False)
             outputs = [state, bundle, nonce, status, timer, orientation, passage, audio,
-                       *question_outputs, submit, report, setup, begin]
+                       *question_outputs, test, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)
             app.load(restore_demo, outputs=outputs, **common)
             begin.click(start_demo, [language, skill], outputs, trigger_mode='once', **common)

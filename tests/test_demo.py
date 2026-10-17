@@ -9,11 +9,12 @@ from core.session import SessionFlowError, submit_current_bundle, mark_listening
 from ui import demo
 
 
-def test_browser_audio_controller_survives_replaced_html_hosts():
+@pytest.mark.parametrize('script', ['demo_audio_lifecycle.cjs', 'demo_timer_lifecycle.cjs'])
+def test_browser_controller_lifecycle(script):
     node = shutil.which('node')
     if not node:
         pytest.skip('Node is required for the browser controller lifecycle test')
-    result = subprocess.run([node, '--test', str(Path(__file__).with_name('demo_audio_lifecycle.cjs'))],
+    result = subprocess.run([node, '--test', str(Path(__file__).with_name(script))],
                             capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, result.stdout + result.stderr
 
@@ -46,6 +47,8 @@ def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, ski
         assert state.timer_mode == 'strict' and state.time_limit_seconds_per_skill == 1800
         assert state.content_source == 'bank_only' and not state.hints_enabled
         assert not result[-3].get('visible')  # no report while active
+        assert result[-5]['visible']
+        assert ('demo-reading' if skill == 'Reading' else 'demo-listening') in result[-5]['elem_classes']
         passage = bundle['passage']
         assert passage['id'] not in seen
         seen.append(passage['id'])
@@ -64,6 +67,7 @@ def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, ski
     assert len(result[0].responses) == 12
     assert {r.skill for r in result[0].responses} == {skill.lower()}
     assert result[-3]['visible']
+    assert not result[-5]['visible']
     assert 'Around ILR' in result[-3]['value']
     assert 'Why the test ended:' in result[-3]['value']
     assert 'not an official DLPT score' in result[-3]['value']
@@ -133,6 +137,14 @@ def test_demo_setup_has_no_workshop_or_mode_controls():
     assert not {'Mode', 'Skill selection', 'Content source', 'Training voice preference'} & set(labels)
     values = [str(c['props'].get('value', '')) for c in config['components']]
     assert not any('workshop' in v.lower() or 'bank backup' in v.lower() for v in values)
+
+
+def test_setup_failure_is_visible_outside_hidden_test_panel(monkeypatch):
+    import gradio as gr
+    monkeypatch.setattr(demo.cb, 'start_session_callback',
+                        lambda *a, **kw: [None, None, None, {'value': 'No approved passages available'}])
+    with pytest.raises(gr.Error, match='No approved passages'):
+        demo.start_demo('Russian')
 
 
 def test_resume_preserves_demo_progress_and_completed_listens(local_demo):

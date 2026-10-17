@@ -1,0 +1,272 @@
+{
+  "$defs": {
+    "IntakeItem": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-zA-Z0-9_-]{1,80}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "ru",
+            "zh-CN"
+          ],
+          "title": "Language",
+          "type": "string"
+        },
+        "skill": {
+          "enum": [
+            "reading",
+            "listening"
+          ],
+          "title": "Skill",
+          "type": "string"
+        },
+        "target_ilr": {
+          "enum": [
+            "0",
+            "0+",
+            "1",
+            "1+",
+            "2",
+            "2+",
+            "3"
+          ],
+          "title": "Target Ilr",
+          "type": "string"
+        },
+        "difficulty_rationale": {
+          "minLength": 1,
+          "title": "Difficulty Rationale",
+          "type": "string"
+        },
+        "genre": {
+          "minLength": 1,
+          "title": "Genre",
+          "type": "string"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        },
+        "orientation_en": {
+          "minLength": 10,
+          "title": "Orientation En",
+          "type": "string"
+        },
+        "text": {
+          "description": "Verbatim passage or listening transcript; preserve paragraphs",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "source_type": {
+          "enum": [
+            "authentic/open-licensed",
+            "transformed/adapted",
+            "synthetic"
+          ],
+          "title": "Source Type",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/IntakeSource"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/IntakeQuestion"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        },
+        "audio_file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional relative audio/ path, retained for review only",
+          "title": "Audio File"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "language",
+        "skill",
+        "target_ilr",
+        "difficulty_rationale",
+        "genre",
+        "topic",
+        "orientation_en",
+        "text",
+        "source_type",
+        "source",
+        "questions"
+      ],
+      "title": "IntakeItem",
+      "type": "object"
+    },
+    "IntakeQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "stem_en": {
+          "minLength": 8,
+          "title": "Stem En",
+          "type": "string"
+        },
+        "choices": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Choices",
+          "type": "object"
+        },
+        "correct_key": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Correct Key",
+          "type": "string"
+        },
+        "rationale_en": {
+          "minLength": 12,
+          "title": "Rationale En",
+          "type": "string"
+        },
+        "evidence": {
+          "description": "Exact short excerpt in the source language",
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        },
+        "question_type": {
+          "enum": [
+            "main idea",
+            "prominent detail",
+            "inference",
+            "speaker/writer intent",
+            "tone or attitude",
+            "reference",
+            "sequence",
+            "cause and effect",
+            "relationship of ideas",
+            "meaning from context"
+          ],
+          "title": "Question Type",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "copied",
+            "adapted",
+            "human-authored",
+            "AI-authored"
+          ],
+          "title": "Origin",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stem_en",
+        "choices",
+        "correct_key",
+        "rationale_en",
+        "evidence",
+        "question_type",
+        "origin"
+      ],
+      "title": "IntakeQuestion",
+      "type": "object"
+    },
+    "IntakeSource": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "creator": {
+          "default": "Unknown",
+          "title": "Creator",
+          "type": "string"
+        },
+        "locator": {
+          "description": "Public URL or source filename plus page/time range",
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "date": {
+          "default": "Unknown",
+          "title": "Date",
+          "type": "string"
+        },
+        "rights": {
+          "description": "Exact license/permission or Unknown; do not infer",
+          "minLength": 1,
+          "title": "Rights",
+          "type": "string"
+        },
+        "attribution": {
+          "default": "Unknown",
+          "title": "Attribution",
+          "type": "string"
+        },
+        "modifications": {
+          "minLength": 1,
+          "title": "Modifications",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "locator",
+        "rights",
+        "modifications"
+      ],
+      "title": "IntakeSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "dlpt-contributor-v1",
+      "default": "dlpt-contributor-v1",
+      "title": "Format",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/IntakeItem"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "IntakePackage",
+  "type": "object"
+}

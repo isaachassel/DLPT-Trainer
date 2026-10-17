@@ -26,7 +26,7 @@ def test_hosted_resume_cannot_read_another_checkpoint(monkeypatch):
     monkeypatch.setattr(demo.cb.STORAGE, 'load_checkpoint', unexpected_read)
     with pytest.raises(gr.Error, match='local demo'):
         demo.restore_demo(SimpleNamespace(query_params={'resume': 'known-session-code'}))
-    assert len(demo.restore_demo(SimpleNamespace(query_params={}))) == 22
+    assert len(demo.restore_demo(SimpleNamespace(query_params={}))) == 23
 
 
 def test_local_preview_keeps_its_existing_behavior(monkeypatch):

@@ -1,5 +1,40 @@
 # Demo branch
 
+## October 17: assessment layout and contributor intake
+
+Reading uses a passage/context pane on the left and questions on the right,
+with independent scrolling, end markers, and a shared bottom progress/timer/submit
+bar. Listening retains the source/audio above its questions. At widths of 700px
+or less the reading panes stack and use normal page scrolling. Panes are keyboard
+focusable and return to the top when a new passage starts. The layout is inspired
+by the owner's public example screenshots, not an official DLPT interface.
+
+The [contributor kit](contributor-kit/README.md) contains a language-neutral JSON
+schema, three examples and a copy-paste Claude Code export prompt. The local
+`scripts/import_contributor.py` CLI writes only new workshop drafts with review
+findings; no bank promotion, audio generation or live changes occur on import.
+Original audio references are retained for later ingestion, not automatically
+served. Existing paid-TTS deployment gates remain unchanged.
+
+Verification: 59 focused tests passed, including full reading/listening runs in
+both languages, report/stopping behavior, playback ordering, a reused-timer-node
+scroll regression, and contributor import rejection/draft isolation. The example
+batch converted to three pending workshop drafts; both reading examples passed
+content checks, and listening correctly reported the need for recording review.
+Browser checks confirmed side-by-side independently scrolling reading panes,
+submission/progression with both panes reset to the top, and a 390px stacked
+layout without horizontal overflow. The temporary viewport override was reset.
+Chinese reading rendering was also checked. A fresh Russian listening browser
+run played both listens and unlocked submission only on completion; its controls
+and questions used the single-column layout with the transcript hidden.
+Preview screenshots and a shareable contributor-kit ZIP are in `storage/exports/`.
+The owner authorized GitHub push and live publication on October 17, 2026.
+Hugging Face deployment commit: `6cfcea1fc65da1aac8bb73b1a3fd8f7b055dc594`.
+Release archive SHA-256:
+`be891a818680e747e0e524a821cbd9655088d43bbe8a74b5a4a480b6ae9f5359`.
+The archive contains 91 files and the same 38 licensed recordings; no new audio
+generation or credits were needed. WordPress uses the existing Space embed.
+
 `codex/adaptive-demo` starts the demo through the normal `app.py` entry point.
 The feature branch keeps the full application. Choose Russian or Chinese, then
 Reading or Listening and Begin. There is no combined-test option. It uses the existing approved bank; no generation

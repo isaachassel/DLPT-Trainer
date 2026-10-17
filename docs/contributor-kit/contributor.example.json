@@ -1,0 +1,164 @@
+{
+  "format": "dlpt-contributor-v1",
+  "items": [
+    {
+      "id": "example_ru_expand_r_1_05",
+      "language": "ru",
+      "skill": "reading",
+      "target_ilr": "1",
+      "difficulty_rationale": "Connected simple sentences about familiar household actions; explicitly stated details.",
+      "genre": "personal note",
+      "topic": "Daily life",
+      "orientation_en": "Read a message left at home.",
+      "text": "Лена, я сегодня работаю до семи. Ужин на кухне, в большой кастрюле. Хлеб лежит в пакете на столе. Пожалуйста, покорми кошку в шесть. Её еда в маленьком шкафу у окна. Я куплю молоко по дороге домой. Миша.",
+      "source_type": "synthetic",
+      "source": {
+        "title": "Project-authored fictional practice example",
+        "creator": "DLPT Trainer project, AI-assisted",
+        "locator": "DLPT-Trainer/data/assessment/bank.json#ru_expand_r_1_05",
+        "date": "2026-10",
+        "rights": "Project-authored example; not third-party authentic material",
+        "attribution": "DLPT Trainer project",
+        "modifications": "None; example text copied from the project bank"
+      },
+      "questions": [
+        {
+          "stem_en": "What does Misha ask Lena to do?",
+          "choices": {
+            "A": "Feed the cat",
+            "B": "Buy some milk",
+            "C": "Cook a meal",
+            "D": "Open the window"
+          },
+          "correct_key": "A",
+          "rationale_en": "Feeding the cat is the direct request addressed to Lena.",
+          "evidence": "Пожалуйста, покорми кошку в шесть",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        },
+        {
+          "stem_en": "Where is the cat's food?",
+          "choices": {
+            "A": "On the kitchen table",
+            "B": "In a small cupboard",
+            "C": "In the large pot",
+            "D": "In the shopping bag"
+          },
+          "correct_key": "B",
+          "rationale_en": "The pronoun refers to the cat, whose food is in the cupboard by the window.",
+          "evidence": "Её еда в маленьком шкафу у окна",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        }
+      ],
+      "audio_file": null,
+      "notes": "FORMAT EXAMPLE ONLY. Replace with your own authorized source and metadata."
+    },
+    {
+      "id": "example_zh_expand_r_1_05",
+      "language": "zh-CN",
+      "skill": "reading",
+      "target_ilr": "1",
+      "difficulty_rationale": "Simple connected household sentences with explicit actions and a basic negative instruction.",
+      "genre": "personal message",
+      "topic": "Daily life",
+      "orientation_en": "Read a message left for a family member.",
+      "text": "小林，我今天下午去看奶奶，六点以前回来。饭在冰箱里，你热一下就能吃。桌上的苹果是给你的。请把阳台上的衣服收进来，今天可能下雨。狗已经吃过饭了，不用再喂。妈妈。",
+      "source_type": "synthetic",
+      "source": {
+        "title": "Project-authored fictional practice example",
+        "creator": "DLPT Trainer project, AI-assisted",
+        "locator": "DLPT-Trainer/data/assessment/bank.json#zh_expand_r_1_05",
+        "date": "2026-10",
+        "rights": "Project-authored example; not third-party authentic material",
+        "attribution": "DLPT Trainer project",
+        "modifications": "None; example text copied from the project bank"
+      },
+      "questions": [
+        {
+          "stem_en": "What does the writer ask Xiaolin to do?",
+          "choices": {
+            "A": "Bring in the clothes",
+            "B": "Feed the dog again",
+            "C": "Buy some apples",
+            "D": "Visit a neighbor"
+          },
+          "correct_key": "A",
+          "rationale_en": "The direct request is to bring the clothes indoors.",
+          "evidence": "请把阳台上的衣服收进来",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        },
+        {
+          "stem_en": "Where is the prepared food?",
+          "choices": {
+            "A": "Beside the front door",
+            "B": "In the refrigerator",
+            "C": "On the balcony",
+            "D": "Inside a schoolbag"
+          },
+          "correct_key": "B",
+          "rationale_en": "The message places the food in the refrigerator.",
+          "evidence": "饭在冰箱里",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        }
+      ],
+      "audio_file": null,
+      "notes": "FORMAT EXAMPLE ONLY. Replace with your own authorized source and metadata."
+    },
+    {
+      "id": "example_ru_expand_l_1_03",
+      "language": "ru",
+      "skill": "listening",
+      "target_ilr": "1",
+      "difficulty_rationale": "Simple transaction with explicit time, quantity and location information.",
+      "genre": "dialogue",
+      "topic": "Commerce",
+      "orientation_en": "Listen to a customer and an employee.",
+      "text": "A: Здравствуйте. Мне нужны два билета на вечерний поезд.\nB: На сегодня? Поезд отправляется в восемь.\nA: Да, на сегодня. Мы хотим сидеть рядом.\nB: Есть два места у окна. Оплатить можно картой.\nA: Хорошо. С какой платформы поезд?\nB: С третьей. Платформа за этим зданием.",
+      "source_type": "synthetic",
+      "source": {
+        "title": "Project-authored fictional practice example",
+        "creator": "DLPT Trainer project, AI-assisted",
+        "locator": "DLPT-Trainer/data/assessment/bank.json#ru_expand_l_1_03",
+        "date": "2026-10",
+        "rights": "Project-authored example; not third-party authentic material",
+        "attribution": "DLPT Trainer project",
+        "modifications": "None; example text copied from the project bank"
+      },
+      "questions": [
+        {
+          "stem_en": "What does the customer want?",
+          "choices": {
+            "A": "Three tickets for next week",
+            "B": "A refund for yesterday's trip",
+            "C": "Two tickets for this evening",
+            "D": "One ticket for tomorrow morning"
+          },
+          "correct_key": "C",
+          "rationale_en": "The request is for two evening-train tickets, confirmed for today.",
+          "evidence": "Мне нужны два билета на вечерний поезд",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        },
+        {
+          "stem_en": "Where does the train depart from?",
+          "choices": {
+            "A": "Platform one",
+            "B": "Platform four",
+            "C": "Platform two",
+            "D": "Platform three"
+          },
+          "correct_key": "D",
+          "rationale_en": "The employee names the third platform.",
+          "evidence": "С третьей",
+          "question_type": "prominent detail",
+          "origin": "AI-authored"
+        }
+      ],
+      "audio_file": null,
+      "notes": "FORMAT EXAMPLE ONLY. Replace with your own authorized source and metadata."
+    }
+  ]
+}
