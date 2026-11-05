@@ -213,3 +213,34 @@ def test_evidence_survives_store_restart(env, catalog):
     second = reopened.login('Learner', 'test-password')
     assert reopened.word_evidence(second, 'reading') == store.word_evidence(token, 'reading')
     assert len(reopened.export(second)['vocabulary_checks']) == 6
+
+
+def test_question_slots_hide_when_filtered_passage_shrinks(env, catalog, monkeypatch):
+    import gradio as gr
+    from ui.vocabulary_check import CheckUI
+    store, token, now = env
+    passages = copy.deepcopy(catalog.checks())[:2]
+    passages[0]['targets'] = passages[0]['targets'][:3]
+    passages[1]['targets'] = passages[1]['targets'][:2]
+    passages[0]['stage'], passages[1]['stage'] = 1, 2
+    monkeypatch.setattr(catalog, 'checks', lambda *args: copy.deepcopy(passages))
+    with gr.Blocks():
+        ui = CheckUI()
+    identifier = store.start_check(token, catalog, FILTERS)
+    for count in (3, 2):
+        state = store.check_state(token, identifier)
+        outputs = ui.present(state)
+        assert len(outputs) == len(ui.outputs)
+        assert f'· {count} words' in outputs[3]
+        for n in range(6):
+            slot, radio, guess = outputs[6 + n * 3:9 + n * 3]
+            assert slot['visible'] is (n < count)
+            assert len(radio['choices']) == (5 if n < count else 0)
+            assert radio['value'] is None and guess['value'] is False
+            assert radio['interactive'] is (n < count)
+        if count == 3:
+            submit(store, token, identifier, correct=3)
+    finished = submit(store, token, identifier, correct=2)
+    assert finished['end_reason'] == 'content_exhausted'
+    assert len(store.word_evidence(token, 'reading')) == 5
+    assert all(ui.present(finished)[6 + n * 3]['visible'] is False for n in range(6))

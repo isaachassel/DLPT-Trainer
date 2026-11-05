@@ -41,24 +41,29 @@ class CheckUI:
                     self.passage = gr.HTML()
                     self.audio = gr.Audio(interactive=False, visible=False, buttons=[], label='Passage recording')
                 with gr.Column(elem_classes=['vocab-check-pane']):
-                    self.choices, self.guesses = [], []
+                    self.slots, self.choices, self.guesses = [], [], []
                     for n in range(6):
-                        self.choices.append(gr.Radio(label=f'Word {n + 1}', visible=False))
-                        self.guesses.append(gr.Checkbox(False, label='That was a guess', visible=False))
+                        # Gradio's auto-grouped form can retain an empty Radio when
+                        # its choices and visibility change together (e.g. 3 -> 2).
+                        # Hide the whole slot instead of toggling individual inputs.
+                        with gr.Column(visible=False, min_width=0, elem_classes=['vocab-question-slot']) as slot:
+                            self.choices.append(gr.Radio(label=f'Word {n + 1}', interactive=True))
+                            self.guesses.append(gr.Checkbox(False, label='That was a guess'))
+                        self.slots.append(slot)
             with gr.Row():
                 self.submit = gr.Button('Submit passage answers', variant='primary')
                 self.stop = gr.Button('End check and see review plan')
         self.report = gr.HTML(visible=False)
         self.focus = gr.Button('Review my weaker words', visible=False, variant='primary')
         self.outputs = [self.identifier, self.nonce, self.panel, self.heading, self.passage, self.audio,
-                        *[c for pair in zip(self.choices, self.guesses) for c in pair], self.report, self.focus]
+                        *[c for triple in zip(self.slots, self.choices, self.guesses) for c in triple], self.report, self.focus]
 
     def present(self, state):
         active = state.get('status') == 'active'
         current = state.get('current') if active else None
         values = [state.get('id', ''), current['nonce'] if current else '', gr.update(visible=active)]
         if current:
-            values += [f'### Passage {len(state["completed"]) + 1} of up to {state["maximum"]} · {state["skill"].title()}\n\n'
+            values += [f'### Passage {len(state["completed"]) + 1} of up to {state["maximum"]} · {state["skill"].title()} · {len(current["targets"])} words\n\n'
                        + current['title'] + '\n\nSelect each meaning. Mark a guess so it can be reviewed. Listening allows replays for this study check.']
             text = escape(current['text']) if state['skill'] == 'reading' else 'Listen to the conversation. The transcript will appear with the review plan.'
             values += [f'<div class="study-card"><div class="russian" lang="ru">{text}</div></div>',
@@ -68,9 +73,10 @@ class CheckUI:
             values += ['', '', gr.update(value=None, visible=False)]
         for n in range(6):
             target = current['targets'][n] if current and n < len(current['targets']) else None
-            values += [gr.update(choices=target['options'] + [UNKNOWN] if target else [], value=None,
-                                 label=f'{n + 1}. What does “{target["target"]}” mean here?' if target else f'Word {n + 1}',
-                                 visible=bool(target)), gr.update(value=False, visible=bool(target))]
+            values += [gr.update(visible=bool(target)),
+                       gr.update(choices=target['options'] + [UNKNOWN] if target else [], value=None,
+                                 label=f'{n + 1}. What does “{target["target"]}” mean here?' if target else '',
+                                 interactive=bool(target)), gr.update(value=False, interactive=bool(target))]
         report = report_html(state) if state.get('status') == 'complete' else ''
         if report and state['skill'] == 'listening':
             for passage in state['completed']:
