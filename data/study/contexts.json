@@ -1,0 +1,1689 @@
+[
+  {
+    "id": "study_r_001",
+    "term": "вода",
+    "sense_hints": [
+      "water"
+    ],
+    "target": "вода",
+    "meaning": "water",
+    "text": "После прогулки я хочу пить. В бутылке ещё есть вода."
+  },
+  {
+    "id": "study_r_002",
+    "term": "дом",
+    "sense_hints": [
+      "house",
+      "home"
+    ],
+    "target": "дом",
+    "meaning": "house",
+    "text": "На этой улице стоит старый дом. В нём живёт моя бабушка."
+  },
+  {
+    "id": "study_r_003",
+    "term": "дома",
+    "sense_hints": [
+      "at home"
+    ],
+    "target": "дома",
+    "meaning": "at home",
+    "text": "Сегодня воскресенье. Я остаюсь дома и читаю книгу."
+  },
+  {
+    "id": "study_r_004",
+    "term": "комната",
+    "sense_hints": [
+      "room"
+    ],
+    "target": "комната",
+    "meaning": "room",
+    "text": "Это моя комната. Здесь стоят кровать и письменный стол."
+  },
+  {
+    "id": "study_r_005",
+    "term": "карта",
+    "sense_hints": [
+      "map"
+    ],
+    "target": "карта",
+    "meaning": "map",
+    "text": "Мы не знаем дорогу. Нам нужна карта города."
+  },
+  {
+    "id": "study_r_006",
+    "term": "класс",
+    "sense_hints": [
+      "class"
+    ],
+    "target": "класс",
+    "meaning": "classroom",
+    "text": "Урок начинается через минуту. Студенты входят в класс."
+  },
+  {
+    "id": "study_r_007",
+    "term": "стол",
+    "sense_hints": [
+      "table",
+      "desk"
+    ],
+    "target": "стол",
+    "meaning": "table",
+    "text": "Обед готов. Поставь тарелки на стол, пожалуйста."
+  },
+  {
+    "id": "study_r_008",
+    "term": "стул",
+    "sense_hints": [
+      "chair"
+    ],
+    "target": "стул",
+    "meaning": "chair",
+    "text": "Гостю негде сидеть. Принеси ещё один стул."
+  },
+  {
+    "id": "study_r_009",
+    "term": "окно",
+    "sense_hints": [
+      "window"
+    ],
+    "target": "окно",
+    "meaning": "window",
+    "text": "В комнате жарко. Открой окно, пожалуйста."
+  },
+  {
+    "id": "study_r_010",
+    "term": "дверь",
+    "sense_hints": [
+      "door"
+    ],
+    "target": "дверь",
+    "meaning": "door",
+    "text": "Кто-то стучит. Я иду открыть дверь."
+  },
+  {
+    "id": "study_r_011",
+    "term": "книга",
+    "sense_hints": [
+      "book"
+    ],
+    "target": "книга",
+    "meaning": "book",
+    "text": "Эта книга о путешествиях. Я читаю её каждый вечер."
+  },
+  {
+    "id": "study_r_012",
+    "term": "газета",
+    "sense_hints": [
+      "newspaper"
+    ],
+    "target": "газета",
+    "meaning": "newspaper",
+    "text": "На столе лежит сегодняшняя газета. В ней есть статья о нашем городе."
+  },
+  {
+    "id": "study_r_013",
+    "term": "письмо",
+    "sense_hints": [
+      "letter"
+    ],
+    "target": "письмо",
+    "meaning": "letter",
+    "text": "Друг живёт далеко. Сегодня от него пришло письмо."
+  },
+  {
+    "id": "study_r_014",
+    "term": "магазин",
+    "sense_hints": [
+      "shop",
+      "store"
+    ],
+    "target": "магазин",
+    "meaning": "shop",
+    "text": "У нас закончился хлеб. Я пойду в магазин после работы."
+  },
+  {
+    "id": "study_r_015",
+    "term": "хлеб",
+    "sense_hints": [
+      "bread"
+    ],
+    "target": "хлеб",
+    "meaning": "bread",
+    "text": "На завтрак я ем хлеб с сыром и пью чай."
+  },
+  {
+    "id": "study_r_016",
+    "term": "молоко",
+    "sense_hints": [
+      "milk"
+    ],
+    "target": "молоко",
+    "meaning": "milk",
+    "text": "Кофе слишком крепкий. Добавь в него молоко."
+  },
+  {
+    "id": "study_r_017",
+    "term": "сыр",
+    "sense_hints": [
+      "cheese"
+    ],
+    "target": "сыр",
+    "meaning": "cheese",
+    "text": "Я делаю бутерброд. Сначала кладу на хлеб сыр."
+  },
+  {
+    "id": "study_r_018",
+    "term": "чай",
+    "sense_hints": [
+      "tea"
+    ],
+    "target": "чай",
+    "meaning": "tea",
+    "text": "На улице холодно. Дома мы пьём горячий чай."
+  },
+  {
+    "id": "study_r_019",
+    "term": "кофе",
+    "sense_hints": [
+      "coffee"
+    ],
+    "target": "кофе",
+    "meaning": "coffee",
+    "text": "Утром Антон обычно пьёт кофе. Он любит его без сахара."
+  },
+  {
+    "id": "study_r_020",
+    "term": "сахар",
+    "sense_hints": [
+      "sugar"
+    ],
+    "target": "сахар",
+    "meaning": "sugar",
+    "text": "Чай недостаточно сладкий. Можно добавить сахар?"
+  },
+  {
+    "id": "study_r_021",
+    "term": "рыба",
+    "sense_hints": [
+      "fish"
+    ],
+    "target": "рыба",
+    "meaning": "fish",
+    "text": "Сегодня на ужин рыба с рисом. Мясо будем готовить завтра."
+  },
+  {
+    "id": "study_r_022",
+    "term": "мясо",
+    "sense_hints": [
+      "meat"
+    ],
+    "target": "мясо",
+    "meaning": "meat",
+    "text": "Оля не ест мясо. Для неё мы приготовили овощи."
+  },
+  {
+    "id": "study_r_023",
+    "term": "суп",
+    "sense_hints": [
+      "soup"
+    ],
+    "target": "суп",
+    "meaning": "soup",
+    "text": "На обед у нас суп. Он ещё горячий, ешь осторожно."
+  },
+  {
+    "id": "study_r_024",
+    "term": "салат",
+    "sense_hints": [
+      "salad"
+    ],
+    "target": "салат",
+    "meaning": "salad",
+    "text": "Я нарезал огурцы и помидоры. Теперь можно приготовить салат."
+  },
+  {
+    "id": "study_r_025",
+    "term": "яблоко",
+    "sense_hints": [
+      "apple"
+    ],
+    "target": "яблоко",
+    "meaning": "apple",
+    "text": "Перед прогулкой ребёнок съел яблоко. Оно было сладкое и сочное."
+  },
+  {
+    "id": "study_r_026",
+    "term": "улица",
+    "sense_hints": [
+      "street"
+    ],
+    "target": "улица",
+    "meaning": "street",
+    "text": "Наша улица очень тихая. По ней редко ездят машины."
+  },
+  {
+    "id": "study_r_027",
+    "term": "город",
+    "sense_hints": [
+      "city",
+      "town"
+    ],
+    "target": "город",
+    "meaning": "city",
+    "text": "Этот город стоит на реке. В центре много старых зданий."
+  },
+  {
+    "id": "study_r_028",
+    "term": "парк",
+    "sense_hints": [
+      "park"
+    ],
+    "target": "парк",
+    "meaning": "park",
+    "text": "После уроков мы идём в парк. Там можно гулять под деревьями."
+  },
+  {
+    "id": "study_r_029",
+    "term": "автобус",
+    "sense_hints": [
+      "bus"
+    ],
+    "target": "автобус",
+    "meaning": "bus",
+    "text": "До работы далеко. Каждое утро я сажусь на автобус."
+  },
+  {
+    "id": "study_r_030",
+    "term": "поезд",
+    "sense_hints": [
+      "train"
+    ],
+    "target": "поезд",
+    "meaning": "train",
+    "text": "Поезд отправляется с третьей платформы. До отправления осталось десять минут."
+  },
+  {
+    "id": "study_r_031",
+    "term": "билет",
+    "sense_hints": [
+      "ticket"
+    ],
+    "target": "билет",
+    "meaning": "ticket",
+    "text": "Без билета нас не пустят в театр. Я куплю ещё один билет для друга."
+  },
+  {
+    "id": "study_r_032",
+    "term": "станция",
+    "sense_hints": [
+      "station"
+    ],
+    "target": "станция",
+    "meaning": "station",
+    "text": "Следующая станция называется «Центральная». Там мы выйдем из поезда."
+  },
+  {
+    "id": "study_r_033",
+    "term": "метро",
+    "sense_hints": [
+      "subway",
+      "metro"
+    ],
+    "target": "метро",
+    "meaning": "metro",
+    "text": "На дорогах большие пробки. Поедем в центр на метро."
+  },
+  {
+    "id": "study_r_034",
+    "term": "аптека",
+    "sense_hints": [
+      "pharmacy",
+      "drugstore"
+    ],
+    "target": "аптека",
+    "meaning": "pharmacy",
+    "text": "Мне нужно купить лекарство. Рядом с больницей есть аптека."
+  },
+  {
+    "id": "study_r_035",
+    "term": "врач",
+    "sense_hints": [
+      "doctor",
+      "physician"
+    ],
+    "target": "врач",
+    "meaning": "doctor",
+    "text": "У меня высокая температура. Врач сказал остаться дома."
+  },
+  {
+    "id": "study_r_036",
+    "term": "больница",
+    "sense_hints": [
+      "hospital"
+    ],
+    "target": "больница",
+    "meaning": "hospital",
+    "text": "Скорая помощь приехала быстро. Больница находится в соседнем районе."
+  },
+  {
+    "id": "study_r_037",
+    "term": "школа",
+    "sense_hints": [
+      "school"
+    ],
+    "target": "школа",
+    "meaning": "school",
+    "text": "Школа открывается в восемь утра. Дети приходят туда перед первым уроком."
+  },
+  {
+    "id": "study_r_038",
+    "term": "урок",
+    "sense_hints": [
+      "lesson",
+      "class"
+    ],
+    "target": "урок",
+    "meaning": "lesson",
+    "text": "Сегодня у нас урок русского языка. Мы будем читать короткий рассказ."
+  },
+  {
+    "id": "study_r_039",
+    "term": "работа",
+    "sense_hints": [
+      "work",
+      "job"
+    ],
+    "target": "работа",
+    "meaning": "work",
+    "text": "Работа сегодня закончилась поздно. Я вернулся домой только в девять."
+  },
+  {
+    "id": "study_r_040",
+    "term": "семья",
+    "sense_hints": [
+      "family"
+    ],
+    "target": "семья",
+    "meaning": "family",
+    "text": "В выходные вся семья собирается за одним столом."
+  },
+  {
+    "id": "study_r_041",
+    "term": "друг",
+    "sense_hints": [
+      "friend"
+    ],
+    "target": "друг",
+    "meaning": "friend",
+    "text": "Мой друг живёт рядом. Мы часто вместе ходим в кино."
+  },
+  {
+    "id": "study_r_042",
+    "term": "сосед",
+    "sense_hints": [
+      "neighbor",
+      "neighbour"
+    ],
+    "target": "сосед",
+    "meaning": "neighbor",
+    "text": "Наш сосед живёт в квартире напротив. Вчера он помог мне нести сумки."
+  },
+  {
+    "id": "study_r_043",
+    "term": "утром",
+    "sense_hints": [
+      "morning"
+    ],
+    "target": "утром",
+    "meaning": "in the morning",
+    "text": "Я встаю рано. Утром я завтракаю и иду на работу."
+  },
+  {
+    "id": "study_r_044",
+    "term": "вечером",
+    "sense_hints": [
+      "evening"
+    ],
+    "target": "вечером",
+    "meaning": "in the evening",
+    "text": "Днём мы работаем. Вечером обычно ужинаем вместе."
+  },
+  {
+    "id": "study_r_045",
+    "term": "завтра",
+    "sense_hints": [
+      "tomorrow"
+    ],
+    "target": "завтра",
+    "meaning": "tomorrow",
+    "text": "Сегодня библиотека закрыта. Я верну книгу завтра."
+  },
+  {
+    "id": "study_r_046",
+    "term": "вчера",
+    "sense_hints": [
+      "yesterday"
+    ],
+    "target": "вчера",
+    "meaning": "yesterday",
+    "text": "Сегодня дождь, а вчера весь день светило солнце."
+  },
+  {
+    "id": "study_r_047",
+    "term": "сейчас",
+    "sense_hints": [
+      "now"
+    ],
+    "target": "сейчас",
+    "meaning": "now",
+    "text": "Не звони ему сейчас. У него идёт важная встреча."
+  },
+  {
+    "id": "study_r_048",
+    "term": "потом",
+    "sense_hints": [
+      "then",
+      "later"
+    ],
+    "target": "потом",
+    "meaning": "afterwards",
+    "text": "Сначала закончим работу, а потом пойдём обедать."
+  },
+  {
+    "id": "study_r_049",
+    "term": "рядом",
+    "sense_hints": [
+      "near",
+      "next",
+      "close"
+    ],
+    "target": "рядом",
+    "meaning": "nearby",
+    "text": "До магазина идти всего минуту. Он совсем рядом."
+  },
+  {
+    "id": "study_r_050",
+    "term": "далеко",
+    "sense_hints": [
+      "far"
+    ],
+    "target": "далеко",
+    "meaning": "far away",
+    "text": "До аэропорта далеко. На машине ехать почти час."
+  },
+  {
+    "id": "study_r_051",
+    "term": "напротив",
+    "sense_hints": [
+      "opposite",
+      "across"
+    ],
+    "target": "напротив",
+    "meaning": "opposite",
+    "text": "Аптека находится напротив школы, на другой стороне улицы."
+  },
+  {
+    "id": "study_r_052",
+    "term": "пешком",
+    "sense_hints": [
+      "foot"
+    ],
+    "target": "пешком",
+    "meaning": "on foot",
+    "text": "Погода хорошая, а идти недалеко. Сегодня доберёмся до работы пешком."
+  },
+  {
+    "id": "study_r_053",
+    "term": "холодно",
+    "sense_hints": [
+      "cold"
+    ],
+    "target": "холодно",
+    "meaning": "cold",
+    "text": "На улице холодно. Надень тёплую куртку."
+  },
+  {
+    "id": "study_r_054",
+    "term": "жарко",
+    "sense_hints": [
+      "hot"
+    ],
+    "target": "жарко",
+    "meaning": "hot",
+    "text": "Сегодня очень жарко. Возьми с собой воду и лёгкую одежду."
+  },
+  {
+    "id": "study_r_055",
+    "term": "дождь",
+    "sense_hints": [
+      "rain"
+    ],
+    "target": "дождь",
+    "meaning": "rain",
+    "text": "Начался дождь. Давай подождём под крышей."
+  },
+  {
+    "id": "study_r_056",
+    "term": "снег",
+    "sense_hints": [
+      "snow"
+    ],
+    "target": "снег",
+    "meaning": "snow",
+    "text": "Ночью выпал снег. Теперь весь двор белый."
+  },
+  {
+    "id": "study_r_057",
+    "term": "зонт",
+    "sense_hints": [
+      "umbrella"
+    ],
+    "target": "зонт",
+    "meaning": "umbrella",
+    "text": "На улице дождь, а мой зонт остался дома."
+  },
+  {
+    "id": "study_r_058",
+    "term": "сумка",
+    "sense_hints": [
+      "bag"
+    ],
+    "target": "сумка",
+    "meaning": "bag",
+    "text": "Эта сумка очень тяжёлая. В ней лежат книги и ноутбук."
+  },
+  {
+    "id": "study_r_059",
+    "term": "телефон",
+    "sense_hints": [
+      "telephone",
+      "phone"
+    ],
+    "target": "телефон",
+    "meaning": "phone",
+    "text": "Мой телефон разрядился. Я не могу сейчас позвонить."
+  },
+  {
+    "id": "study_r_060",
+    "term": "ключ",
+    "sense_hints": [
+      "key"
+    ],
+    "target": "ключ",
+    "meaning": "key",
+    "text": "Дверь заперта. Где ключ от квартиры?"
+  },
+  {
+    "id": "study_r_061",
+    "term": "быстро",
+    "sense_hints": [
+      "quickly",
+      "fast"
+    ],
+    "target": "быстро",
+    "meaning": "quickly",
+    "text": "Мы опаздываем на автобус. Нужно идти быстро."
+  },
+  {
+    "id": "study_r_062",
+    "term": "медленно",
+    "sense_hints": [
+      "slowly"
+    ],
+    "target": "медленно",
+    "meaning": "slowly",
+    "text": "Я ещё плохо понимаю по-русски. Говорите, пожалуйста, медленно."
+  },
+  {
+    "id": "study_r_063",
+    "term": "вместе",
+    "sense_hints": [
+      "together"
+    ],
+    "target": "вместе",
+    "meaning": "together",
+    "text": "Мы живём в одном районе и часто вместе возвращаемся домой."
+  },
+  {
+    "id": "study_r_064",
+    "term": "обычно",
+    "sense_hints": [
+      "usually"
+    ],
+    "target": "обычно",
+    "meaning": "usually",
+    "text": "Обычно я обедаю в столовой, но сегодня принёс еду из дома."
+  },
+  {
+    "id": "study_r_065",
+    "term": "иногда",
+    "sense_hints": [
+      "sometimes"
+    ],
+    "target": "иногда",
+    "meaning": "sometimes",
+    "text": "Я редко смотрю телевизор. Иногда вечером смотрю новости."
+  },
+  {
+    "id": "study_r_066",
+    "term": "часто",
+    "sense_hints": [
+      "often"
+    ],
+    "target": "часто",
+    "meaning": "often",
+    "text": "Библиотека рядом с домом. Я часто беру там книги."
+  },
+  {
+    "id": "study_r_067",
+    "term": "редко",
+    "sense_hints": [
+      "rarely",
+      "seldom"
+    ],
+    "target": "редко",
+    "meaning": "rarely",
+    "text": "Он живёт далеко, поэтому мы редко видимся."
+  },
+  {
+    "id": "study_r_068",
+    "term": "нужно",
+    "sense_hints": [
+      "need",
+      "necessary"
+    ],
+    "target": "нужно",
+    "meaning": "need to",
+    "text": "Завтра рано вставать. Сегодня нужно лечь спать пораньше."
+  },
+  {
+    "id": "study_r_069",
+    "term": "можно",
+    "sense_hints": [
+      "can",
+      "may",
+      "allowed"
+    ],
+    "target": "можно",
+    "meaning": "may; is permitted",
+    "text": "Здесь можно фотографировать, но нельзя пользоваться вспышкой."
+  },
+  {
+    "id": "study_r_070",
+    "term": "нельзя",
+    "sense_hints": [
+      "cannot",
+      "must not",
+      "not permitted",
+      "can not"
+    ],
+    "target": "нельзя",
+    "meaning": "must not; is prohibited",
+    "text": "На красный свет переходить улицу нельзя. Подождём зелёного."
+  },
+  {
+    "id": "study_r_071",
+    "term": "потому что",
+    "sense_hints": [
+      "because"
+    ],
+    "target": "потому что",
+    "meaning": "because",
+    "text": "Мы остались дома, потому что началась сильная гроза."
+  },
+  {
+    "id": "study_r_072",
+    "term": "поэтому",
+    "sense_hints": [
+      "therefore",
+      "that is why",
+      "so"
+    ],
+    "target": "поэтому",
+    "meaning": "therefore",
+    "text": "У меня закончились деньги, поэтому сегодня я ничего не купил."
+  },
+  {
+    "id": "study_r_073",
+    "term": "если",
+    "sense_hints": [
+      "if"
+    ],
+    "target": "если",
+    "meaning": "if",
+    "text": "Если завтра будет тепло, мы поедем на озеро."
+  },
+  {
+    "id": "study_r_074",
+    "term": "хотя",
+    "sense_hints": [
+      "although",
+      "though"
+    ],
+    "target": "хотя",
+    "meaning": "although",
+    "text": "Он пошёл на работу, хотя чувствовал себя плохо."
+  },
+  {
+    "id": "study_r_075",
+    "term": "сначала",
+    "sense_hints": [
+      "first",
+      "at first"
+    ],
+    "target": "сначала",
+    "meaning": "first",
+    "text": "Сначала прочитайте текст, а затем ответьте на вопросы."
+  },
+  {
+    "id": "study_r_076",
+    "term": "вдруг",
+    "sense_hints": [
+      "suddenly"
+    ],
+    "target": "вдруг",
+    "meaning": "suddenly",
+    "text": "Мы спокойно разговаривали. Вдруг в комнате погас свет."
+  },
+  {
+    "id": "study_r_077",
+    "term": "почти",
+    "sense_hints": [
+      "almost"
+    ],
+    "target": "почти",
+    "meaning": "almost",
+    "text": "Я почти закончил работу. Осталось написать только одно предложение."
+  },
+  {
+    "id": "study_r_078",
+    "term": "достаточно",
+    "sense_hints": [
+      "enough",
+      "sufficient"
+    ],
+    "target": "достаточно",
+    "meaning": "enough",
+    "text": "У нас достаточно времени. Поезд отправляется только через час."
+  },
+  {
+    "id": "study_r_079",
+    "term": "срочный",
+    "sense_hints": [
+      "urgent"
+    ],
+    "target": "срочное",
+    "meaning": "urgent",
+    "text": "Это срочное сообщение. Его нужно передать директору немедленно."
+  },
+  {
+    "id": "study_r_080",
+    "term": "заранее",
+    "sense_hints": [
+      "advance",
+      "beforehand"
+    ],
+    "target": "заранее",
+    "meaning": "in advance",
+    "text": "Билеты быстро раскупают. Лучше купить их заранее."
+  },
+  {
+    "id": "study_r_081",
+    "term": "вовремя",
+    "sense_hints": [
+      "on time",
+      "in time"
+    ],
+    "target": "вовремя",
+    "meaning": "on time",
+    "text": "Автобус не задержался. Мы приехали на встречу вовремя."
+  },
+  {
+    "id": "study_r_082",
+    "term": "решение",
+    "sense_hints": [
+      "decision",
+      "solution"
+    ],
+    "target": "решение",
+    "meaning": "decision",
+    "text": "Мы обсудили все варианты. Теперь нужно принять окончательное решение."
+  },
+  {
+    "id": "study_r_083",
+    "term": "причина",
+    "sense_hints": [
+      "reason",
+      "cause"
+    ],
+    "target": "причина",
+    "meaning": "reason",
+    "text": "Поезд задержали на час. Причина задержки пока неизвестна."
+  },
+  {
+    "id": "study_r_084",
+    "term": "результат",
+    "sense_hints": [
+      "result"
+    ],
+    "target": "результат",
+    "meaning": "result",
+    "text": "Мы долго готовились к экзамену. Хороший результат нас очень обрадовал."
+  },
+  {
+    "id": "study_r_085",
+    "term": "условие",
+    "sense_hints": [
+      "condition"
+    ],
+    "target": "условие",
+    "meaning": "condition",
+    "text": "Главное условие участия — заполнить анкету до пятницы."
+  },
+  {
+    "id": "study_r_086",
+    "term": "возможность",
+    "sense_hints": [
+      "opportunity",
+      "possibility"
+    ],
+    "target": "возможность",
+    "meaning": "opportunity",
+    "text": "После лекции у студентов будет возможность задать вопросы."
+  },
+  {
+    "id": "study_r_087",
+    "term": "изменение",
+    "sense_hints": [
+      "change"
+    ],
+    "target": "изменение",
+    "meaning": "change",
+    "text": "В расписании произошло изменение: занятие начнётся на час позже."
+  },
+  {
+    "id": "study_r_088",
+    "term": "объявление",
+    "sense_hints": [
+      "announcement",
+      "notice",
+      "advertisement"
+    ],
+    "target": "объявление",
+    "meaning": "notice",
+    "text": "На двери висит объявление. В нём написано, что магазин сегодня закрыт."
+  },
+  {
+    "id": "study_r_089",
+    "term": "расписание",
+    "sense_hints": [
+      "schedule",
+      "timetable"
+    ],
+    "target": "расписание",
+    "meaning": "schedule",
+    "text": "Проверь расписание перед поездкой. В выходные автобусы ходят реже."
+  },
+  {
+    "id": "study_r_090",
+    "term": "скидка",
+    "sense_hints": [
+      "discount"
+    ],
+    "target": "скидка",
+    "meaning": "discount",
+    "text": "Сегодня на эту куртку скидка. Она стоит на двадцать процентов дешевле."
+  },
+  {
+    "id": "study_r_091",
+    "term": "очередь",
+    "sense_hints": [
+      "queue",
+      "line",
+      "turn"
+    ],
+    "target": "очередь",
+    "meaning": "queue",
+    "text": "У кассы большая очередь. Придётся немного подождать."
+  },
+  {
+    "id": "study_r_092",
+    "term": "договор",
+    "sense_hints": [
+      "contract",
+      "agreement"
+    ],
+    "target": "договор",
+    "meaning": "contract",
+    "text": "Прежде чем подписать договор, внимательно прочитайте все условия."
+  },
+  {
+    "id": "study_r_093",
+    "term": "заявление",
+    "sense_hints": [
+      "application",
+      "statement"
+    ],
+    "target": "заявление",
+    "meaning": "application",
+    "text": "Чтобы получить новый паспорт, нужно подать заявление."
+  },
+  {
+    "id": "study_r_094",
+    "term": "опыт",
+    "sense_hints": [
+      "experience"
+    ],
+    "target": "опыт",
+    "meaning": "experience",
+    "text": "Для этой должности нужен опыт работы с детьми."
+  },
+  {
+    "id": "study_r_095",
+    "term": "срок",
+    "sense_hints": [
+      "deadline",
+      "term",
+      "period"
+    ],
+    "target": "срок",
+    "meaning": "deadline",
+    "text": "Последний срок подачи документов — первое декабря."
+  },
+  {
+    "id": "study_r_096",
+    "term": "доход",
+    "sense_hints": [
+      "income"
+    ],
+    "target": "доход",
+    "meaning": "income",
+    "text": "После смены работы его ежемесячный доход вырос."
+  },
+  {
+    "id": "study_r_097",
+    "term": "расход",
+    "sense_hints": [
+      "expense",
+      "expenditure"
+    ],
+    "target": "расход",
+    "meaning": "expense",
+    "text": "Этот расход не был запланирован. Нам пришлось потратить больше денег."
+  },
+  {
+    "id": "study_r_098",
+    "term": "средство",
+    "sense_hints": [
+      "means",
+      "fund",
+      "resource"
+    ],
+    "target": "средства",
+    "meaning": "funds",
+    "text": "На ремонт школы выделили дополнительные средства из городского бюджета."
+  },
+  {
+    "id": "study_r_099",
+    "term": "поддержка",
+    "sense_hints": [
+      "support"
+    ],
+    "target": "поддержка",
+    "meaning": "support",
+    "text": "Без помощи семьи мне было бы трудно. Их поддержка очень важна для меня."
+  },
+  {
+    "id": "study_r_100",
+    "term": "безопасность",
+    "sense_hints": [
+      "safety",
+      "security"
+    ],
+    "target": "безопасность",
+    "meaning": "safety",
+    "text": "Перед поездкой проверьте тормоза. Безопасность пассажиров зависит от состояния машины."
+  },
+  {
+    "id": "study_r_101",
+    "term": "окружающая среда",
+    "sense_hints": [
+      "environment"
+    ],
+    "target": "окружающей среды",
+    "meaning": "the environment",
+    "text": "Завод установил новые фильтры для защиты окружающей среды."
+  },
+  {
+    "id": "study_r_102",
+    "term": "население",
+    "sense_hints": [
+      "population"
+    ],
+    "target": "население",
+    "meaning": "population",
+    "text": "В городе строят новые дома, и его население постепенно растёт."
+  },
+  {
+    "id": "study_r_103",
+    "term": "развитие",
+    "sense_hints": [
+      "development"
+    ],
+    "target": "развитие",
+    "meaning": "development",
+    "text": "Новая дорога поможет ускорить развитие этого района."
+  },
+  {
+    "id": "study_r_104",
+    "term": "влияние",
+    "sense_hints": [
+      "influence",
+      "impact"
+    ],
+    "target": "влияние",
+    "meaning": "influence",
+    "text": "Погода оказывает сильное влияние на урожай."
+  },
+  {
+    "id": "study_r_105",
+    "term": "отношение",
+    "sense_hints": [
+      "attitude",
+      "relation"
+    ],
+    "target": "отношение",
+    "meaning": "attitude",
+    "text": "После встречи с новым директором её отношение к работе изменилось."
+  },
+  {
+    "id": "study_r_106",
+    "term": "соглашение",
+    "sense_hints": [
+      "agreement"
+    ],
+    "target": "соглашение",
+    "meaning": "agreement",
+    "text": "После долгих переговоров стороны подписали соглашение о сотрудничестве."
+  },
+  {
+    "id": "study_r_107",
+    "term": "сотрудничество",
+    "sense_hints": [
+      "cooperation"
+    ],
+    "target": "сотрудничество",
+    "meaning": "cooperation",
+    "text": "Две школы начали сотрудничество и теперь проводят общие занятия."
+  },
+  {
+    "id": "study_r_108",
+    "term": "польза",
+    "sense_hints": [
+      "benefit",
+      "use"
+    ],
+    "target": "польза",
+    "meaning": "benefit",
+    "text": "От регулярных прогулок есть большая польза для здоровья."
+  },
+  {
+    "id": "study_r_109",
+    "term": "недостаток",
+    "sense_hints": [
+      "shortcoming",
+      "drawback",
+      "disadvantage",
+      "lack"
+    ],
+    "target": "недостаток",
+    "meaning": "drawback",
+    "text": "У этой квартиры один недостаток: окна выходят на шумную дорогу."
+  },
+  {
+    "id": "study_r_110",
+    "term": "преимущество",
+    "sense_hints": [
+      "advantage"
+    ],
+    "target": "преимущество",
+    "meaning": "advantage",
+    "text": "Главное преимущество нового автобуса — низкий пол, удобный для пассажиров."
+  },
+  {
+    "id": "study_ru_pilot_01_1",
+    "term": "ужин",
+    "sense_hints": [
+      "dinner",
+      "supper"
+    ],
+    "target": "ужин",
+    "meaning": "dinner",
+    "passage_id": "ru_pilot_01"
+  },
+  {
+    "id": "study_ru_pilot_01_2",
+    "term": "рыба",
+    "sense_hints": [
+      "fish"
+    ],
+    "target": "Рыба",
+    "meaning": "fish",
+    "passage_id": "ru_pilot_01"
+  },
+  {
+    "id": "study_ru_pilot_01_3",
+    "term": "картошка",
+    "sense_hints": [
+      "potato"
+    ],
+    "target": "картошка",
+    "meaning": "potatoes",
+    "passage_id": "ru_pilot_01"
+  },
+  {
+    "id": "study_ru_pilot_01_4",
+    "term": "салат",
+    "sense_hints": [
+      "salad"
+    ],
+    "target": "салат",
+    "meaning": "salad",
+    "passage_id": "ru_pilot_01"
+  },
+  {
+    "id": "study_ru_pilot_02_1",
+    "term": "магазин",
+    "sense_hints": [
+      "shop",
+      "store"
+    ],
+    "target": "магазин",
+    "meaning": "shop",
+    "passage_id": "ru_pilot_02"
+  },
+  {
+    "id": "study_ru_pilot_02_2",
+    "term": "молоко",
+    "sense_hints": [
+      "milk"
+    ],
+    "target": "молоко",
+    "meaning": "milk",
+    "passage_id": "ru_pilot_02"
+  },
+  {
+    "id": "study_ru_pilot_02_3",
+    "term": "хлеб",
+    "sense_hints": [
+      "bread"
+    ],
+    "target": "хлеб",
+    "meaning": "bread",
+    "passage_id": "ru_pilot_02"
+  },
+  {
+    "id": "study_ru_pilot_02_4",
+    "term": "яблоко",
+    "sense_hints": [
+      "apple"
+    ],
+    "target": "яблока",
+    "meaning": "apples",
+    "passage_id": "ru_pilot_02"
+  },
+  {
+    "id": "study_ru_pilot_03_1",
+    "term": "пол",
+    "sense_hints": [
+      "floor"
+    ],
+    "target": "пол",
+    "meaning": "floor",
+    "passage_id": "ru_pilot_03"
+  },
+  {
+    "id": "study_ru_pilot_03_2",
+    "term": "кухня",
+    "sense_hints": [
+      "kitchen"
+    ],
+    "target": "кухне",
+    "meaning": "kitchen",
+    "passage_id": "ru_pilot_03"
+  },
+  {
+    "id": "study_ru_pilot_03_3",
+    "term": "посуда",
+    "sense_hints": [
+      "dish",
+      "tableware"
+    ],
+    "target": "посуду",
+    "meaning": "dishes",
+    "passage_id": "ru_pilot_03"
+  },
+  {
+    "id": "study_ru_pilot_03_4",
+    "term": "ведро",
+    "sense_hints": [
+      "bucket",
+      "pail"
+    ],
+    "target": "ведро",
+    "meaning": "bucket",
+    "passage_id": "ru_pilot_03"
+  },
+  {
+    "id": "study_ru_pilot_04_1",
+    "term": "суббота",
+    "sense_hints": [
+      "Saturday"
+    ],
+    "target": "субботу",
+    "meaning": "Saturday",
+    "passage_id": "ru_pilot_04"
+  },
+  {
+    "id": "study_ru_pilot_04_2",
+    "term": "утром",
+    "sense_hints": [
+      "morning"
+    ],
+    "target": "утром",
+    "meaning": "in the morning",
+    "passage_id": "ru_pilot_04"
+  },
+  {
+    "id": "study_ru_pilot_04_3",
+    "term": "после",
+    "sense_hints": [
+      "after"
+    ],
+    "target": "после",
+    "meaning": "after",
+    "passage_id": "ru_pilot_04"
+  },
+  {
+    "id": "study_ru_pilot_04_4",
+    "term": "цветок",
+    "sense_hints": [
+      "flower"
+    ],
+    "target": "цветы",
+    "meaning": "flowers",
+    "passage_id": "ru_pilot_04"
+  },
+  {
+    "id": "study_ru_pilot_05_1",
+    "term": "завтра",
+    "sense_hints": [
+      "tomorrow"
+    ],
+    "target": "завтра",
+    "meaning": "tomorrow",
+    "passage_id": "ru_pilot_05"
+  },
+  {
+    "id": "study_ru_pilot_05_2",
+    "term": "пешком",
+    "sense_hints": [
+      "foot"
+    ],
+    "target": "пешком",
+    "meaning": "on foot",
+    "passage_id": "ru_pilot_05"
+  },
+  {
+    "id": "study_ru_pilot_05_3",
+    "term": "кафе",
+    "sense_hints": [
+      "cafe",
+      "café"
+    ],
+    "target": "кафе",
+    "meaning": "cafe",
+    "passage_id": "ru_pilot_05"
+  },
+  {
+    "id": "study_ru_pilot_06_1",
+    "term": "автобус",
+    "sense_hints": [
+      "bus"
+    ],
+    "target": "автобусе",
+    "meaning": "bus",
+    "passage_id": "ru_pilot_06"
+  },
+  {
+    "id": "study_ru_pilot_06_2",
+    "term": "остановка",
+    "sense_hints": [
+      "stop"
+    ],
+    "target": "Остановка",
+    "meaning": "bus stop",
+    "passage_id": "ru_pilot_06"
+  },
+  {
+    "id": "study_ru_pilot_06_3",
+    "term": "напротив",
+    "sense_hints": [
+      "opposite",
+      "across"
+    ],
+    "target": "напротив",
+    "meaning": "opposite",
+    "passage_id": "ru_pilot_06"
+  },
+  {
+    "id": "study_ru_pilot_06_4",
+    "term": "рядом",
+    "sense_hints": [
+      "near",
+      "close",
+      "next"
+    ],
+    "target": "рядом",
+    "meaning": "nearby",
+    "passage_id": "ru_pilot_06"
+  },
+  {
+    "id": "study_ru_pilot_07_1",
+    "term": "холодно",
+    "sense_hints": [
+      "cold"
+    ],
+    "target": "холодно",
+    "meaning": "cold",
+    "passage_id": "ru_pilot_07"
+  },
+  {
+    "id": "study_ru_pilot_07_2",
+    "term": "дождь",
+    "sense_hints": [
+      "rain"
+    ],
+    "target": "дождь",
+    "meaning": "rain",
+    "passage_id": "ru_pilot_07"
+  },
+  {
+    "id": "study_ru_pilot_07_3",
+    "term": "зонт",
+    "sense_hints": [
+      "umbrella"
+    ],
+    "target": "зонт",
+    "meaning": "umbrella",
+    "passage_id": "ru_pilot_07"
+  },
+  {
+    "id": "study_ru_pilot_07_4",
+    "term": "синий",
+    "sense_hints": [
+      "blue"
+    ],
+    "target": "синий",
+    "meaning": "blue",
+    "passage_id": "ru_pilot_07"
+  },
+  {
+    "id": "study_ru_pilot_08_1",
+    "term": "короткий",
+    "sense_hints": [
+      "short"
+    ],
+    "target": "короткий",
+    "meaning": "short",
+    "passage_id": "ru_pilot_08"
+  },
+  {
+    "id": "study_ru_pilot_08_2",
+    "term": "урок",
+    "sense_hints": [
+      "lesson",
+      "class"
+    ],
+    "target": "Уроки",
+    "meaning": "lessons",
+    "passage_id": "ru_pilot_08"
+  },
+  {
+    "id": "study_ru_pilot_08_3",
+    "term": "холодильник",
+    "sense_hints": [
+      "refrigerator",
+      "fridge"
+    ],
+    "target": "холодильнике",
+    "meaning": "refrigerator",
+    "passage_id": "ru_pilot_08"
+  },
+  {
+    "id": "study_ru_pilot_09_1",
+    "term": "чай",
+    "sense_hints": [
+      "tea"
+    ],
+    "target": "чай",
+    "meaning": "tea",
+    "passage_id": "ru_pilot_09"
+  },
+  {
+    "id": "study_ru_pilot_09_2",
+    "term": "чёрный",
+    "sense_hints": [
+      "black"
+    ],
+    "target": "Чёрный",
+    "meaning": "black",
+    "passage_id": "ru_pilot_09"
+  },
+  {
+    "id": "study_ru_pilot_09_3",
+    "term": "сахар",
+    "sense_hints": [
+      "sugar"
+    ],
+    "target": "сахара",
+    "meaning": "sugar",
+    "passage_id": "ru_pilot_09"
+  },
+  {
+    "id": "study_ru_pilot_09_4",
+    "term": "без",
+    "sense_hints": [
+      "without"
+    ],
+    "target": "без",
+    "meaning": "without",
+    "passage_id": "ru_pilot_09"
+  },
+  {
+    "id": "study_ru_pilot_10_1",
+    "term": "ключ",
+    "sense_hints": [
+      "key"
+    ],
+    "target": "ключи",
+    "meaning": "keys",
+    "passage_id": "ru_pilot_10"
+  },
+  {
+    "id": "study_ru_pilot_10_2",
+    "term": "телефон",
+    "sense_hints": [
+      "telephone",
+      "phone"
+    ],
+    "target": "телефон",
+    "meaning": "phone",
+    "passage_id": "ru_pilot_10"
+  },
+  {
+    "id": "study_ru_pilot_10_3",
+    "term": "сумка",
+    "sense_hints": [
+      "bag"
+    ],
+    "target": "сумке",
+    "meaning": "bag",
+    "passage_id": "ru_pilot_10"
+  },
+  {
+    "id": "study_ru_pilot_10_4",
+    "term": "вчера",
+    "sense_hints": [
+      "yesterday"
+    ],
+    "target": "вчера",
+    "meaning": "yesterday",
+    "passage_id": "ru_pilot_10"
+  },
+  {
+    "id": "study_ru_pilot_11_1",
+    "term": "книга",
+    "sense_hints": [
+      "book"
+    ],
+    "target": "книгу",
+    "meaning": "book",
+    "passage_id": "ru_pilot_11"
+  },
+  {
+    "id": "study_ru_pilot_11_2",
+    "term": "сюда",
+    "sense_hints": [
+      "here"
+    ],
+    "target": "сюда",
+    "meaning": "here; to this place",
+    "passage_id": "ru_pilot_11"
+  },
+  {
+    "id": "study_ru_pilot_11_3",
+    "term": "утром",
+    "sense_hints": [
+      "morning"
+    ],
+    "target": "утром",
+    "meaning": "in the morning",
+    "passage_id": "ru_pilot_11"
+  },
+  {
+    "id": "study_ru_pilot_12_1",
+    "term": "парк",
+    "sense_hints": [
+      "park"
+    ],
+    "target": "парк",
+    "meaning": "park",
+    "passage_id": "ru_pilot_12"
+  },
+  {
+    "id": "study_ru_pilot_12_2",
+    "term": "собака",
+    "sense_hints": [
+      "dog"
+    ],
+    "target": "собаку",
+    "meaning": "dog",
+    "passage_id": "ru_pilot_12"
+  },
+  {
+    "id": "study_ru_pilot_12_3",
+    "term": "сейчас",
+    "sense_hints": [
+      "now"
+    ],
+    "target": "сейчас",
+    "meaning": "now",
+    "passage_id": "ru_pilot_12"
+  },
+  {
+    "id": "study_ru_pilot_12_4",
+    "term": "конечно",
+    "sense_hints": [
+      "certainly",
+      "of course"
+    ],
+    "target": "Конечно",
+    "meaning": "of course",
+    "passage_id": "ru_pilot_12"
+  },
+  {
+    "id": "study_ru_expand_l_1_03_1",
+    "term": "билет",
+    "sense_hints": [
+      "ticket"
+    ],
+    "target": "билета",
+    "meaning": "tickets",
+    "passage_id": "ru_expand_l_1_03"
+  },
+  {
+    "id": "study_ru_expand_l_1_03_2",
+    "term": "поезд",
+    "sense_hints": [
+      "train"
+    ],
+    "target": "поезд",
+    "meaning": "train",
+    "passage_id": "ru_expand_l_1_03"
+  },
+  {
+    "id": "study_ru_expand_l_1_03_3",
+    "term": "окно",
+    "sense_hints": [
+      "window"
+    ],
+    "target": "окна",
+    "meaning": "window",
+    "passage_id": "ru_expand_l_1_03"
+  },
+  {
+    "id": "study_ru_expand_l_1_03_4",
+    "term": "платформа",
+    "sense_hints": [
+      "platform"
+    ],
+    "target": "платформы",
+    "meaning": "platform",
+    "passage_id": "ru_expand_l_1_03"
+  },
+  {
+    "id": "study_ru_expand_l_1_04_1",
+    "term": "понедельник",
+    "sense_hints": [
+      "Monday"
+    ],
+    "target": "понедельник",
+    "meaning": "Monday",
+    "passage_id": "ru_expand_l_1_04"
+  },
+  {
+    "id": "study_ru_expand_l_1_04_2",
+    "term": "этаж",
+    "sense_hints": [
+      "floor",
+      "story",
+      "storey"
+    ],
+    "target": "этаже",
+    "meaning": "floor; level of a building",
+    "passage_id": "ru_expand_l_1_04"
+  },
+  {
+    "id": "study_ru_expand_l_1_04_3",
+    "term": "маленький",
+    "sense_hints": [
+      "small",
+      "little"
+    ],
+    "target": "маленький",
+    "meaning": "small",
+    "passage_id": "ru_expand_l_1_04"
+  }
+]

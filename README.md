@@ -14,6 +14,14 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
+## Local Russian vocabulary study
+
+The `codex/russian-vocabulary-study` branch adds local profiles, contextual
+vocabulary practice, and scheduled reading/listening reviews. Run
+`.\.venv\Scripts\python.exe study_app.py` and open <http://127.0.0.1:7864/>.
+See [vocabulary setup, coverage, and scheduling](docs/VOCABULARY_STUDY.md).
+The public demo entry point remains `app.py`.
+
 ## Simplified demo branch
 
 On `codex/adaptive-demo`, `app.py` opens a simple DLPT-style adaptive demo:
