@@ -19,6 +19,9 @@ pinned: false
 The `codex/russian-vocabulary-study` branch adds local profiles, contextual
 vocabulary practice, and scheduled reading/listening reviews. Run
 `.\.venv\Scripts\python.exe study_app.py` and open <http://127.0.0.1:7864/>.
+Start with a **passage vocabulary check** to assess several word meanings at once,
+then select **Review my weaker words** for personalized practice. Reading and
+listening are tracked separately; this does not produce a DLPT score.
 See [vocabulary setup, coverage, and scheduling](docs/VOCABULARY_STUDY.md).
 The public demo entry point remains `app.py`.
 

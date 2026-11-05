@@ -1,0 +1,1085 @@
+{
+  "version": 1,
+  "passages": [
+    {
+      "id": "vocab_family",
+      "stage": 1,
+      "title": "A weekend visit",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В субботу к нам приехали бабушка и дедушка. Они привезли пирог и остались до вечера. После обеда мы вышли во двор. Там играли дети, а родители сидели на скамейке у дерева."
+        },
+        {
+          "speaker": "B",
+          "text": "А вы никуда не ходили? Рядом ведь недавно открылся бассейн."
+        },
+        {
+          "speaker": "A",
+          "text": "Ходили, но только посмотреть расписание. Бабушка задала сотруднику вопрос: можно ли приходить утром? Ответ был простой: да, с восьми часов. Теперь мы хотим пойти туда вместе в следующую субботу. Дедушка уже приготовил полотенце."
+        }
+      ],
+      "targets": [
+        {
+          "id": "family_1",
+          "term": "бабушка",
+          "sense_hints": [
+            "grandmother"
+          ],
+          "target": "бабушка",
+          "meaning": "grandmother",
+          "distractors": [
+            "aunt",
+            "sister",
+            "daughter"
+          ],
+          "review_text": "Моя бабушка живёт за городом. Я звоню ей каждое воскресенье.",
+          "review_target": "бабушка"
+        },
+        {
+          "id": "family_2",
+          "term": "дедушка",
+          "sense_hints": [
+            "grandfather"
+          ],
+          "target": "дедушка",
+          "meaning": "grandfather",
+          "distractors": [
+            "uncle",
+            "brother",
+            "son"
+          ],
+          "review_text": "Дедушка показал внуку старые фотографии. На одной из них он ещё школьник.",
+          "review_target": "дедушка"
+        },
+        {
+          "id": "family_3",
+          "term": "двор",
+          "sense_hints": [
+            "yard"
+          ],
+          "target": "двор",
+          "meaning": "courtyard",
+          "distractors": [
+            "roof",
+            "hallway",
+            "basement"
+          ],
+          "review_text": "Мы оставили велосипеды во дворе. Из окна их хорошо видно.",
+          "review_target": "дворе"
+        },
+        {
+          "id": "family_4",
+          "term": "бассейн",
+          "sense_hints": [
+            "swimming pool"
+          ],
+          "target": "бассейн",
+          "meaning": "swimming pool",
+          "distractors": [
+            "sports field",
+            "library",
+            "playground"
+          ],
+          "review_text": "В новом бассейне есть дорожка для начинающих. Я учусь там плавать.",
+          "review_target": "бассейне"
+        },
+        {
+          "id": "family_5",
+          "term": "вопрос",
+          "sense_hints": [
+            "question"
+          ],
+          "target": "вопрос",
+          "meaning": "question",
+          "distractors": [
+            "invitation",
+            "instruction",
+            "promise"
+          ],
+          "review_text": "У меня есть вопрос о домашнем задании. Можно спросить после урока?",
+          "review_target": "вопрос"
+        },
+        {
+          "id": "family_6",
+          "term": "ответ",
+          "sense_hints": [
+            "answer"
+          ],
+          "target": "Ответ",
+          "meaning": "answer",
+          "distractors": [
+            "request",
+            "complaint",
+            "warning"
+          ],
+          "review_text": "Я отправил письмо в школу. Ответ пришёл на следующий день.",
+          "review_target": "Ответ"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_classroom",
+      "stage": 1,
+      "title": "Preparing for a lesson",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Ты уже подготовился к завтрашнему занятию? Преподаватель попросил принести учебник и тетрадь. Мы будем работать в парах и записывать новые выражения."
+        },
+        {
+          "speaker": "B",
+          "text": "Да, я всё положил в сумку. Ещё взял карандаш, потому что ручка вчера перестала писать. Но последнее упражнение оказалось трудным. Я прочитал текст два раза и всё равно не понял одно предложение."
+        },
+        {
+          "speaker": "A",
+          "text": "Давай посмотрим вместе. Здесь небольшая ошибка: ты пропустил слово «не», поэтому смысл получился другой. Исправь это место, а утром спросим преподавателя, правильно ли мы поняли остальной текст."
+        }
+      ],
+      "targets": [
+        {
+          "id": "classroom_1",
+          "term": "учебник",
+          "sense_hints": [
+            "textbook"
+          ],
+          "target": "учебник",
+          "meaning": "textbook",
+          "distractors": [
+            "dictionary",
+            "newspaper",
+            "novel"
+          ],
+          "review_text": "Я забыл учебник дома. Сегодня мы читаем по книге моего соседа.",
+          "review_target": "учебник"
+        },
+        {
+          "id": "classroom_2",
+          "term": "тетрадь",
+          "sense_hints": [
+            "notebook"
+          ],
+          "target": "тетрадь",
+          "meaning": "notebook",
+          "distractors": [
+            "folder",
+            "envelope",
+            "calendar"
+          ],
+          "review_text": "В этой тетради я записываю новые слова. Для домашних заданий у меня другая тетрадь.",
+          "review_target": "тетрадь"
+        },
+        {
+          "id": "classroom_3",
+          "term": "карандаш",
+          "sense_hints": [
+            "pencil"
+          ],
+          "target": "карандаш",
+          "meaning": "pencil",
+          "distractors": [
+            "ruler",
+            "eraser",
+            "marker"
+          ],
+          "review_text": "Я рисую карту карандашом. Неправильные линии потом можно стереть.",
+          "review_target": "карандашом"
+        },
+        {
+          "id": "classroom_4",
+          "term": "ручка",
+          "sense_hints": [
+            "pen"
+          ],
+          "target": "ручка",
+          "meaning": "pen",
+          "distractors": [
+            "pencil",
+            "brush",
+            "chalk"
+          ],
+          "review_text": "Эта ручка пишет синим цветом. Подпишите ею заявление.",
+          "review_target": "ручка"
+        },
+        {
+          "id": "classroom_5",
+          "term": "упражнение",
+          "sense_hints": [
+            "exercise"
+          ],
+          "target": "упражнение",
+          "meaning": "exercise",
+          "distractors": [
+            "examination",
+            "lecture",
+            "translation"
+          ],
+          "review_text": "Мы делаем упражнение на новые глаголы. Нужно вставить подходящее слово в каждое предложение.",
+          "review_target": "упражнение"
+        },
+        {
+          "id": "classroom_6",
+          "term": "ошибка",
+          "sense_hints": [
+            "mistake"
+          ],
+          "target": "ошибка",
+          "meaning": "mistake",
+          "distractors": [
+            "example",
+            "explanation",
+            "exception"
+          ],
+          "review_text": "В адресе была ошибка. Письмо отправили не на ту улицу.",
+          "review_target": "ошибка"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_clothing",
+      "stage": 1,
+      "title": "Choosing winter clothing",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В магазине сегодня было много людей. Один покупатель искал одежду для поездки на север. Ему понравилась лёгкая куртка, но продавец объяснил, что для сильного холода она не подойдёт."
+        },
+        {
+          "speaker": "B",
+          "text": "И что он выбрал вместо неё? Наверное, там было что-нибудь теплее."
+        },
+        {
+          "speaker": "A",
+          "text": "Ему предложили длинное пальто с поясом. Нужный размер нашёлся только в сером цвете. Покупатель сначала сомневался, но потом примерил его и решил взять. Продавец напомнил, что покупку можно вернуть в течение недели, если сохранить чек и не снимать ярлык. Чёрные вещи уже разобрали утром."
+        }
+      ],
+      "targets": [
+        {
+          "id": "clothing_1",
+          "term": "покупатель",
+          "sense_hints": [
+            "buyer"
+          ],
+          "target": "покупатель",
+          "meaning": "customer",
+          "distractors": [
+            "cashier",
+            "supplier",
+            "manager"
+          ],
+          "review_text": "Покупатель попросил показать другую модель. Эта оказалась слишком дорогой.",
+          "review_target": "покупатель"
+        },
+        {
+          "id": "clothing_2",
+          "term": "куртка",
+          "sense_hints": [
+            "jacket"
+          ],
+          "target": "куртка",
+          "meaning": "jacket",
+          "distractors": [
+            "shirt",
+            "skirt",
+            "scarf"
+          ],
+          "review_text": "На улице ветрено. Мне нужна куртка с капюшоном.",
+          "review_target": "куртка"
+        },
+        {
+          "id": "clothing_3",
+          "term": "продавец",
+          "sense_hints": [
+            "salesman"
+          ],
+          "target": "продавец",
+          "meaning": "sales assistant",
+          "distractors": [
+            "customer",
+            "driver",
+            "security guard"
+          ],
+          "review_text": "Продавец рассказал о разных моделях телефона. Затем он показал, как работает камера.",
+          "review_target": "продавец"
+        },
+        {
+          "id": "clothing_4",
+          "term": "пальто",
+          "sense_hints": [
+            "overcoat"
+          ],
+          "target": "пальто",
+          "meaning": "overcoat",
+          "distractors": [
+            "sweater",
+            "rain boots",
+            "waistcoat"
+          ],
+          "review_text": "После прогулки я повесил пальто в шкаф. Перчатки остались в его кармане.",
+          "review_target": "пальто"
+        },
+        {
+          "id": "clothing_5",
+          "term": "размер",
+          "sense_hints": [
+            "size"
+          ],
+          "target": "размер",
+          "meaning": "size",
+          "distractors": [
+            "price",
+            "colour",
+            "brand"
+          ],
+          "review_text": "Эти ботинки малы. Принесите, пожалуйста, размер побольше.",
+          "review_target": "размер"
+        },
+        {
+          "id": "clothing_6",
+          "term": "покупка",
+          "sense_hints": [
+            "purchase"
+          ],
+          "target": "покупку",
+          "meaning": "purchase",
+          "distractors": [
+            "delivery",
+            "discount",
+            "advertisement"
+          ],
+          "review_text": "Эта покупка была запланирована давно. Мы несколько месяцев откладывали деньги.",
+          "review_target": "покупка"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_travel",
+      "stage": 2,
+      "title": "Changing a journey",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Утром пассажир приехал на вокзал и узнал, что прямой поезд отменили. У него был большой багаж, поэтому он не хотел несколько раз менять транспорт. Сотрудница предложила другой маршрут: сначала поезд до соседнего города, а затем автобус."
+        },
+        {
+          "speaker": "B",
+          "text": "Сколько времени должна была занять пересадка? Если ждать долго, можно опоздать на встречу."
+        },
+        {
+          "speaker": "A",
+          "text": "Всего сорок минут. Но пассажир решил сначала проверить рейсы в аэропорту. Билет на самолёт оказался слишком дорогим, и он вернулся к первому варианту. Касса ещё работала, так что ему успели обменять билет. За багаж дополнительно платить не пришлось."
+        }
+      ],
+      "targets": [
+        {
+          "id": "travel_1",
+          "term": "пассажир",
+          "sense_hints": [
+            "passenger"
+          ],
+          "target": "пассажир",
+          "meaning": "passenger",
+          "distractors": [
+            "conductor",
+            "pilot",
+            "porter"
+          ],
+          "review_text": "Пассажир попросил остановить автобус. Ему нужно выйти у больницы.",
+          "review_target": "пассажир"
+        },
+        {
+          "id": "travel_2",
+          "term": "вокзал",
+          "sense_hints": [
+            "railroad station"
+          ],
+          "target": "вокзал",
+          "meaning": "railway station",
+          "distractors": [
+            "airport",
+            "bus shelter",
+            "harbour"
+          ],
+          "review_text": "Мы встретились на вокзале перед отправлением поезда. До платформы было недалеко.",
+          "review_target": "вокзале"
+        },
+        {
+          "id": "travel_3",
+          "term": "багаж",
+          "sense_hints": [
+            "luggage"
+          ],
+          "target": "багаж",
+          "meaning": "luggage",
+          "distractors": [
+            "ticket",
+            "passport",
+            "cargo fee"
+          ],
+          "review_text": "Мой багаж уже на ленте. Сейчас возьму чемодан и выйду к вам.",
+          "review_target": "багаж"
+        },
+        {
+          "id": "travel_4",
+          "term": "пересадка",
+          "sense_hints": [
+            "transfer"
+          ],
+          "target": "пересадка",
+          "meaning": "transfer between services",
+          "distractors": [
+            "security inspection",
+            "ticket refund",
+            "overnight stay"
+          ],
+          "review_text": "До университета я еду с пересадкой. Сначала на автобусе, потом на метро.",
+          "review_target": "пересадкой"
+        },
+        {
+          "id": "travel_5",
+          "term": "аэропорт",
+          "sense_hints": [
+            "airport"
+          ],
+          "target": "аэропорту",
+          "meaning": "airport",
+          "distractors": [
+            "railway station",
+            "city square",
+            "harbour"
+          ],
+          "review_text": "Самолёт уже приземлился. В аэропорту нас встретит водитель.",
+          "review_target": "аэропорту"
+        },
+        {
+          "id": "travel_6",
+          "term": "касса",
+          "sense_hints": [
+            "cash register"
+          ],
+          "target": "Касса",
+          "meaning": "ticket counter",
+          "distractors": [
+            "platform",
+            "waiting room",
+            "luggage locker"
+          ],
+          "review_text": "В театре касса закрывается в семь. Купим билеты до начала спектакля.",
+          "review_target": "Касса"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_health",
+      "stage": 2,
+      "title": "Arranging a clinic visit",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Вчера я не пошёл на занятия. С утра болело горло, а к обеду поднялась температура. Потом появился кашель, и я позвонил в поликлинику. Мне назначили приём на следующий день."
+        },
+        {
+          "speaker": "B",
+          "text": "Ты уже был у врача? Что он сказал после осмотра?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Он задал несколько вопросов и выписал рецепт. Лекарство я купил в аптеке по дороге домой. Завтра нужно сдать анализ, а результаты будут готовы через два дня. До следующего приёма мне велели отдыхать дома. Я сообщил преподавателю, что пока буду делать задания самостоятельно и пришлю их по электронной почте."
+        }
+      ],
+      "targets": [
+        {
+          "id": "health_1",
+          "term": "горло",
+          "sense_hints": [
+            "throat"
+          ],
+          "target": "горло",
+          "meaning": "throat",
+          "distractors": [
+            "stomach",
+            "shoulder",
+            "knee"
+          ],
+          "review_text": "После концерта у певца болело горло. На следующий день он почти не разговаривал.",
+          "review_target": "горло"
+        },
+        {
+          "id": "health_2",
+          "term": "температура",
+          "sense_hints": [
+            "temperature"
+          ],
+          "target": "температура",
+          "meaning": "body temperature",
+          "distractors": [
+            "blood pressure",
+            "heart rate",
+            "appetite"
+          ],
+          "review_text": "Медсестра измерила температуру. Термометр показал тридцать семь градусов.",
+          "review_target": "температуру"
+        },
+        {
+          "id": "health_3",
+          "term": "кашель",
+          "sense_hints": [
+            "cough"
+          ],
+          "target": "кашель",
+          "meaning": "cough",
+          "distractors": [
+            "headache",
+            "rash",
+            "dizziness"
+          ],
+          "review_text": "Из соседней комнаты послышался кашель. Ребёнок всё ещё не спал.",
+          "review_target": "кашель"
+        },
+        {
+          "id": "health_4",
+          "term": "рецепт",
+          "sense_hints": [
+            "prescription"
+          ],
+          "target": "рецепт",
+          "meaning": "prescription",
+          "distractors": [
+            "medical certificate",
+            "appointment card",
+            "test result"
+          ],
+          "review_text": "Фармацевт попросил рецепт. Без него это лекарство не продают.",
+          "review_target": "рецепт"
+        },
+        {
+          "id": "health_5",
+          "term": "лекарство",
+          "sense_hints": [
+            "medicine"
+          ],
+          "target": "Лекарство",
+          "meaning": "medicine",
+          "distractors": [
+            "bandage",
+            "thermometer",
+            "ointment jar"
+          ],
+          "review_text": "Лекарство лежит в верхнем ящике. На упаковке указано его название.",
+          "review_target": "Лекарство"
+        },
+        {
+          "id": "health_6",
+          "term": "анализ",
+          "sense_hints": [
+            "lab test"
+          ],
+          "target": "анализ",
+          "meaning": "lab test",
+          "distractors": [
+            "operation",
+            "vaccination",
+            "consultation"
+          ],
+          "review_text": "Результат анализа отправили врачу. Он обсудит его с пациентом на приёме.",
+          "review_target": "анализа"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_housing",
+      "stage": 2,
+      "title": "Looking at an apartment",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Мы посмотрели квартиру рядом с работой. Аренда там дороже, чем в нашем районе, зато дорога занимает всего десять минут. В комнате уже стоит мебель: стол, шкаф и широкая кровать. Покупать всё сразу не придётся."
+        },
+        {
+          "speaker": "B",
+          "text": "А расходы на воду и отопление входят в ежемесячную плату? Это лучше выяснить до переезда."
+        },
+        {
+          "speaker": "A",
+          "text": "На воду входят, а за тепло зимой нужно платить отдельно. Хозяин обещал указать это в договоре. Сам договор он пришлёт завтра. Квартира удобная, но мы ещё сравним общие расходы с другим вариантом. Спешить не будем: переезд запланирован только на следующий месяц."
+        }
+      ],
+      "targets": [
+        {
+          "id": "housing_1",
+          "term": "аренда",
+          "sense_hints": [
+            "rent"
+          ],
+          "target": "Аренда",
+          "meaning": "rent",
+          "distractors": [
+            "deposit",
+            "purchase price",
+            "utility bill"
+          ],
+          "review_text": "Аренда этой квартиры стоит меньше, чем соседней. Но до метро отсюда дальше.",
+          "review_target": "Аренда"
+        },
+        {
+          "id": "housing_2",
+          "term": "мебель",
+          "sense_hints": [
+            "furniture"
+          ],
+          "target": "мебель",
+          "meaning": "furniture",
+          "distractors": [
+            "appliances",
+            "curtains",
+            "tools"
+          ],
+          "review_text": "После переезда мы расставили мебель. Стол теперь стоит у окна.",
+          "review_target": "мебель"
+        },
+        {
+          "id": "housing_3",
+          "term": "кровать",
+          "sense_hints": [
+            "bed"
+          ],
+          "target": "кровать",
+          "meaning": "bed",
+          "distractors": [
+            "armchair",
+            "wardrobe",
+            "desk"
+          ],
+          "review_text": "Кровать оказалась слишком широкой. Рядом с ней уже не помещается столик.",
+          "review_target": "кровать"
+        },
+        {
+          "id": "housing_4",
+          "term": "отопление",
+          "sense_hints": [
+            "heating"
+          ],
+          "target": "отопление",
+          "meaning": "heating",
+          "distractors": [
+            "lighting",
+            "water supply",
+            "internet access"
+          ],
+          "review_text": "Осенью в доме включили отопление. В комнатах сразу стало теплее.",
+          "review_target": "отопление"
+        },
+        {
+          "id": "housing_5",
+          "term": "договор",
+          "sense_hints": [
+            "contract"
+          ],
+          "target": "договор",
+          "meaning": "contract",
+          "distractors": [
+            "receipt",
+            "application",
+            "advertisement"
+          ],
+          "review_text": "Мы подписали договор на год. В нём указаны обязанности обеих сторон.",
+          "review_target": "договор"
+        },
+        {
+          "id": "housing_6",
+          "term": "удобный",
+          "sense_hints": [
+            "comfortable"
+          ],
+          "target": "удобная",
+          "meaning": "convenient",
+          "distractors": [
+            "spacious",
+            "inexpensive",
+            "temporary"
+          ],
+          "review_text": "Это удобное место для встречи. Сюда легко доехать из разных районов.",
+          "review_target": "удобное"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_industry",
+      "stage": 3,
+      "title": "A change at a factory",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На окраине города открылся новый завод. Предприятие выпускает детали для сельскохозяйственных машин и рассчитывает продавать их соседним регионам. По словам директора, производство пока работает только в одну смену, поскольку часть заказов ещё обсуждается."
+        },
+        {
+          "speaker": "B",
+          "text": "Местные жители уже могут устроиться туда? Многие раньше ездили на работу в другой город."
+        },
+        {
+          "speaker": "A",
+          "text": "Да, набор продолжается. Каждый новый сотрудник сначала проходит обучение. Опытный рабочий помогает ему освоить операции, а затем проверяет качество первых деталей. Зарплата зависит не только от количества выполненных заказов, но и от квалификации. Вторую смену откроют, если спрос останется высоким до конца года."
+        }
+      ],
+      "targets": [
+        {
+          "id": "industry_1",
+          "term": "завод",
+          "sense_hints": [
+            "factory"
+          ],
+          "target": "завод",
+          "meaning": "factory",
+          "distractors": [
+            "warehouse",
+            "research institute",
+            "shopping centre"
+          ],
+          "review_text": "Этот завод выпускает автобусы. Готовые машины отправляют в разные города.",
+          "review_target": "завод"
+        },
+        {
+          "id": "industry_2",
+          "term": "предприятие",
+          "sense_hints": [
+            "enterprise"
+          ],
+          "target": "Предприятие",
+          "meaning": "enterprise",
+          "distractors": [
+            "municipal council",
+            "trade union",
+            "training course"
+          ],
+          "review_text": "Предприятие заключило новый контракт. Теперь ему нужны дополнительные сотрудники.",
+          "review_target": "Предприятие"
+        },
+        {
+          "id": "industry_3",
+          "term": "производство",
+          "sense_hints": [
+            "production"
+          ],
+          "target": "производство",
+          "meaning": "production",
+          "distractors": [
+            "retail sales",
+            "recruitment",
+            "transportation"
+          ],
+          "review_text": "Производство остановили на два дня. Специалисты заменяют старую линию.",
+          "review_target": "производство"
+        },
+        {
+          "id": "industry_4",
+          "term": "сотрудник",
+          "sense_hints": [
+            "employee"
+          ],
+          "target": "сотрудник",
+          "meaning": "employee",
+          "distractors": [
+            "customer",
+            "investor",
+            "competitor"
+          ],
+          "review_text": "Новый сотрудник пришёл в отдел в понедельник. Коллеги показали ему рабочее место.",
+          "review_target": "сотрудник"
+        },
+        {
+          "id": "industry_5",
+          "term": "рабочий",
+          "sense_hints": [
+            "worker"
+          ],
+          "target": "рабочий",
+          "meaning": "worker",
+          "distractors": [
+            "director",
+            "accountant",
+            "supplier"
+          ],
+          "review_text": "Рабочий проверил станок перед началом смены. Затем он включил оборудование.",
+          "review_target": "рабочий"
+        },
+        {
+          "id": "industry_6",
+          "term": "зарплата",
+          "sense_hints": [
+            "salary"
+          ],
+          "target": "Зарплата",
+          "meaning": "salary",
+          "distractors": [
+            "profit",
+            "tax",
+            "loan"
+          ],
+          "review_text": "Зарплата приходит на карту в конце месяца. Из неё я оплачиваю жильё.",
+          "review_target": "Зарплата"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_government",
+      "stage": 3,
+      "title": "Discussing a public policy",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В университете прошла открытая дискуссия о том, как государственные решения влияют на повседневную жизнь. Один участник заметил, что политика интересует людей особенно сильно, когда меняются расходы семьи или доступность общественных услуг."
+        },
+        {
+          "speaker": "B",
+          "text": "А говорили о том, как население может участвовать в обсуждении решений?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Преподаватель привёл вымышленный пример: правительство предлагает новый закон, а каждый гражданин получает возможность оставить замечания к проекту. Он подчеркнул, что власть должна объяснить, какие предложения были учтены и почему. Само наличие формы для обращений ещё не означает, что мнения действительно повлияли на окончательный текст. Участники согласились, что важна и понятная обратная связь."
+        }
+      ],
+      "targets": [
+        {
+          "id": "government_1",
+          "term": "политика",
+          "sense_hints": [
+            "politics"
+          ],
+          "target": "политика",
+          "meaning": "politics",
+          "distractors": [
+            "economics",
+            "geography",
+            "literature"
+          ],
+          "review_text": "На этой лекции обсуждают политику. Речь идёт о решениях государства и интересах разных групп.",
+          "review_target": "политику"
+        },
+        {
+          "id": "government_2",
+          "term": "население",
+          "sense_hints": [
+            "population"
+          ],
+          "target": "население",
+          "meaning": "population",
+          "distractors": [
+            "electoral commission",
+            "cabinet",
+            "opposition party"
+          ],
+          "review_text": "Население города увеличилось. Теперь здесь строят ещё одну школу.",
+          "review_target": "население"
+        },
+        {
+          "id": "government_3",
+          "term": "правительство",
+          "sense_hints": [
+            "government"
+          ],
+          "target": "правительство",
+          "meaning": "government",
+          "distractors": [
+            "court",
+            "trade union",
+            "news agency"
+          ],
+          "review_text": "Правительство представило план на следующий год. Министры объяснили основные расходы.",
+          "review_target": "правительство"
+        },
+        {
+          "id": "government_4",
+          "term": "закон",
+          "sense_hints": [
+            "law"
+          ],
+          "target": "закон",
+          "meaning": "law",
+          "distractors": [
+            "campaign",
+            "survey",
+            "petition"
+          ],
+          "review_text": "Новый закон вступит в силу в январе. До этого действуют прежние правила.",
+          "review_target": "закон"
+        },
+        {
+          "id": "government_5",
+          "term": "гражданин",
+          "sense_hints": [
+            "citizen"
+          ],
+          "target": "гражданин",
+          "meaning": "citizen",
+          "distractors": [
+            "official",
+            "candidate",
+            "journalist"
+          ],
+          "review_text": "Гражданин обратился в государственное учреждение. Он хотел получить необходимый документ.",
+          "review_target": "гражданин"
+        },
+        {
+          "id": "government_6",
+          "term": "власть",
+          "sense_hints": [
+            "authority"
+          ],
+          "target": "власть",
+          "meaning": "public authority",
+          "distractors": [
+            "public opinion",
+            "private wealth",
+            "personal ambition"
+          ],
+          "review_text": "Местная власть отвечает за работу городских служб. Жители ждут от неё решения проблемы.",
+          "review_target": "власть"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_weather",
+      "stage": 3,
+      "title": "Changing outdoor plans",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Организаторы перенесли начало спортивного праздника. Утренний прогноз обещал резкую перемену погоды: сначала сильный ветер, затем осадки. При этом в низких местах должен был сохраниться туман, который затруднил бы движение автобусов с участниками."
+        },
+        {
+          "speaker": "B",
+          "text": "Но праздник проходит днём. Почему нельзя было просто подождать несколько часов?"
+        },
+        {
+          "speaker": "A",
+          "text": "По уточнённым данным, после обеда ожидалась гроза. Организаторы решили не рисковать и назначили новую дату. На следующей неделе возможен мороз, поэтому маршрут тоже изменят: уберут участок у воды и сократят время ожидания на старте. Участникам уже отправили сообщение с объяснением и попросили следить за обновлениями."
+        }
+      ],
+      "targets": [
+        {
+          "id": "weather_1",
+          "term": "прогноз",
+          "sense_hints": [
+            "forecast"
+          ],
+          "target": "прогноз",
+          "meaning": "forecast",
+          "distractors": [
+            "observation",
+            "measurement",
+            "announcement of results"
+          ],
+          "review_text": "Прогноз на выходные изменился. Теперь синоптики обещают солнечную погоду.",
+          "review_target": "прогноз"
+        },
+        {
+          "id": "weather_2",
+          "term": "ветер",
+          "sense_hints": [
+            "wind"
+          ],
+          "target": "ветер",
+          "meaning": "wind",
+          "distractors": [
+            "humidity",
+            "air pressure",
+            "heatwave"
+          ],
+          "review_text": "Ветер усилился к вечеру. Ветки деревьев качались всё сильнее.",
+          "review_target": "ветер"
+        },
+        {
+          "id": "weather_3",
+          "term": "осадки",
+          "sense_hints": [
+            "precipitation"
+          ],
+          "target": "осадки",
+          "meaning": "precipitation",
+          "distractors": [
+            "air pollution",
+            "sunshine",
+            "ground frost"
+          ],
+          "review_text": "В этом месяце осадки были редкими. Почва остаётся сухой.",
+          "review_target": "осадки"
+        },
+        {
+          "id": "weather_4",
+          "term": "туман",
+          "sense_hints": [
+            "fog"
+          ],
+          "target": "туман",
+          "meaning": "fog",
+          "distractors": [
+            "smoke",
+            "dust",
+            "snowdrift"
+          ],
+          "review_text": "Утром на реке стоял туман. Противоположного берега не было видно.",
+          "review_target": "туман"
+        },
+        {
+          "id": "weather_5",
+          "term": "гроза",
+          "sense_hints": [
+            "thunderstorm"
+          ],
+          "target": "гроза",
+          "meaning": "thunderstorm",
+          "distractors": [
+            "blizzard",
+            "drought",
+            "flood"
+          ],
+          "review_text": "Началась гроза. Мы услышали гром и увидели молнию.",
+          "review_target": "гроза"
+        },
+        {
+          "id": "weather_6",
+          "term": "мороз",
+          "sense_hints": [
+            "freezing temperatures"
+          ],
+          "target": "мороз",
+          "meaning": "freezing temperatures",
+          "distractors": [
+            "a thaw",
+            "a heatwave",
+            "high humidity"
+          ],
+          "review_text": "Ночью ударил мороз. Вода в ведре превратилась в лёд.",
+          "review_target": "мороз"
+        }
+      ],
+      "review_status": "provisional",
+      "authoring": "Original fictional study material; not official test content"
+    }
+  ]
+}

@@ -12,17 +12,19 @@ import time
 import re
 
 from .study_scheduler import day_key, schedule
+from .vocabulary_check import VocabularyCheckMixin, check_tables
 
 
 class StudyError(ValueError):
     pass
 
 
-class StudyStore:
+class StudyStore(VocabularyCheckMixin):
     def __init__(self, path: Path, clock=time.time):
         self.path, self.clock = Path(path), clock
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as db:
+            check_tables(db)
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS profiles (
                     id TEXT PRIMARY KEY, name TEXT NOT NULL, name_key TEXT UNIQUE NOT NULL,
@@ -138,7 +140,7 @@ class StudyStore:
                     db.execute('SELECT * FROM cards WHERE profile_id=?', (p['id'],))}
 
     def next_card(self, token, catalog, *, skill='reading', group='Course modules', module='All',
-                  lesson='All', context_only=True, exclude=()):
+                  lesson='All', context_only=True, exclude=(), focus_only=False):
         eligible = catalog.eligible(skill, group, module, lesson, context_only)
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
@@ -146,12 +148,23 @@ class StudyStore:
             now = self.clock()
             states = {(r['word_id'], r['skill']): json.loads(r['state']) for r in
                       db.execute('SELECT * FROM cards WHERE profile_id=?', (p['id'],))}
+            evidence = self._evidence(db, p['id'], skill)
+            def needs_focus(wid):
+                card = states.get((wid, skill), {})
+                e = evidence.get(wid, {})
+                # A successful later review resolves immediate focus; future due reviews still apply.
+                return (card.get('last_rating') in ('Again', 'Hard') or card.get('diagnostic_focus') or
+                        (e.get('focus', False) and card.get('evidence_reviewed_through', 0) < e.get('last_checked', 0)))
+            if focus_only:
+                eligible = [wid for wid in eligible if needs_focus(wid)]
             today = day_key(now, p['zone'])
             introduced = sum(s['introduced_day'] == today for s in states.values())
             due = [wid for wid in eligible if wid not in exclude and
                    (wid, skill) in states and states[wid, skill]['due'] <= now]
-            due.sort(key=lambda wid: states[wid, skill]['due'])
+            due.sort(key=lambda wid: (not needs_focus(wid), states[wid, skill]['due']))
             new = [wid for wid in eligible if wid not in exclude and (wid, skill) not in states]
+            new.sort(key=lambda wid: (not needs_focus(wid), wid in evidence,
+                                      evidence.get(wid, {}).get('mean', .5)))
             chosen = due[0] if due else (new[0] if new and introduced < p['new_limit'] else None)
             # One active exercise per browser login. Stale submissions cannot alter a new card.
             db.execute("UPDATE attempts SET phase='abandoned' WHERE token_hash=? AND phase IN ('question','revealed')",
@@ -160,6 +173,10 @@ class StudyStore:
                 return None
             previous = states.get((chosen, skill), {})
             context = catalog.context(chosen, skill, previous.get('reviews', 0))
+            if skill == 'reading' and needs_focus(chosen):
+                fresh = [catalog.contexts[c] for c in catalog.by_word[chosen] if c.startswith('short_')]
+                if fresh:
+                    context = fresh[0]
             attempt = secrets.token_urlsafe(24)
             db.execute('''INSERT INTO attempts (id,token_hash,profile_id,word_id,skill,context_id,created,prior_reviews)
                        VALUES (?,?,?,?,?,?,?,?)''', (attempt, self.token_hash(token), p['id'], chosen, skill,
@@ -216,6 +233,7 @@ class StudyStore:
                 if introduced >= p['new_limit']:
                     raise StudyError('Your daily new-word limit was reached in another window. Start another review.')
             new = schedule(previous, rating, now, p['zone'])
+            new['evidence_reviewed_through'] = now
             raw = json.dumps(new)
             db.execute('INSERT OR REPLACE INTO cards VALUES (?,?,?,?)', (p['id'], a['word_id'], a['skill'], raw))
             db.execute('INSERT INTO reviews VALUES (?,?,?,?,?,?,?,?)',
@@ -230,5 +248,7 @@ class StudyStore:
                      for r in db.execute('SELECT * FROM cards WHERE profile_id=?', (p['id'],))]
             history = [{'word_id': r['word_id'], 'skill': r['skill'], 'rating': r['rating'], 'reviewed': r['reviewed']}
                        for r in db.execute('SELECT * FROM reviews WHERE profile_id=? ORDER BY reviewed', (p['id'],))]
-            return {'version': 1, 'profile': {'name': p['name'], 'timezone': p['zone'], 'new_limit': p['new_limit']},
-                    'cards': cards, 'reviews': history}
+            evidence = [dict(word_id=r['word_id'], skill=r['skill'], **json.loads(r['data'])) for r in
+                        db.execute('SELECT * FROM vocabulary_evidence WHERE profile_id=?', (p['id'],))]
+            return {'version': 2, 'profile': {'name': p['name'], 'timezone': p['zone'], 'new_limit': p['new_limit']},
+                    'cards': cards, 'reviews': history, 'vocabulary_checks': evidence}

@@ -42,7 +42,7 @@ def schedule(previous, rating, now, zone='America/Los_Angeles'):
 def mastery(card):
     if not card:
         return 'New'
-    if card['last_rating'] in ('Again', 'Hard'):
+    if card.get('diagnostic_focus') or card['last_rating'] in ('Again', 'Hard'):
         return 'Shaky'
     if card['interval_seconds'] >= 30 * DAY and card['streak'] >= 3:
         return 'Well known'

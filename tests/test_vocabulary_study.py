@@ -264,7 +264,7 @@ def test_real_audio_reuse_has_no_missing_targets_or_unreviewed_assets(tmp_path):
              for i, s in enumerate(build())]
     path = tmp_path / 'vocabulary.json'
     save_vocabulary(dict(version=1, items=words), path)
-    catalog = StudyCatalog(vocabulary_path=path)
+    catalog = StudyCatalog(vocabulary_path=path, contexts_path=Path(__file__).resolve().parents[1] / 'data/study/contexts.json')
     assert len(catalog.contexts) == 162
     assert not catalog.unlinked_contexts
     audio_paths = {c['audio_path'] for c in catalog.contexts.values() if c['audio_path']}

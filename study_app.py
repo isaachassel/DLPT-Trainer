@@ -36,7 +36,7 @@ def build_app(catalog=None, store=None):
 def launch_kwargs(port=7864):
     return dict(server_name='127.0.0.1', server_port=port, share=False, ssr_mode=False,
                 css=CUSTOM_CSS + STUDY_CSS, footer_links=[], show_error=False,
-                allowed_paths=[str(ROOT / 'data/assessment/audio')],
+                allowed_paths=[str(ROOT / 'data/assessment/audio'), str(ROOT / 'data/study/audio')],
                 blocked_paths=[str(ROOT / 'storage/study'), str(ROOT / 'storage/vocabulary'),
                                str(ROOT / '.env'), str(ROOT / '.git')])
 

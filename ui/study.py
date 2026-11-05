@@ -9,6 +9,7 @@ import gradio as gr
 from core.study_scheduler import mastery, due_label, schedule, RATINGS, day_key
 from core.study_store import StudyError
 from core.vocabulary import normalize_ru
+from ui.vocabulary_check import CheckUI
 
 STUDY_CSS = '''
 .study-shell {max-width:1100px;margin:0 auto;padding:18px}
@@ -18,6 +19,12 @@ STUDY_CSS = '''
 .study-card h2 {font-size:1.45rem;margin:0 0 12px}
 .study-card .muted {font-size:.9rem;color:var(--body-text-color-subdued)}
 .study-answer {border-left:4px solid #2c7799;padding:12px 20px}
+.study-card table {width:100%;border-collapse:collapse;font-size:.95rem}
+.study-card th,.study-card td {text-align:left;border-bottom:1px solid #bdcce0;padding:8px}
+@media (min-width:760px) {
+ .vocab-check-pane {max-height:65vh;overflow-y:auto;flex-wrap:nowrap !important}
+ .vocab-check-pane > * {flex-shrink:0}
+}
 '''
 
 
@@ -41,14 +48,18 @@ class StudyPresenter:
         due = sum((wid, skill) in states and states[wid, skill]['due'] <= now for wid in ids)
         today = day_key(now, profile['zone'])
         introduced = sum(s['introduced_day'] == today for s in states.values())
+        evidence = self.store.word_evidence(token, skill)
+        flagged = sum(evidence.get(wid, {}).get('focus', False) and
+                      states.get((wid, skill), {}).get('evidence_reviewed_through', 0) < evidence[wid]['last_checked'] for wid in ids)
         progress = ' · '.join(f"{label}: **{counts[label]}**" for label in ['New', 'Learning', 'Shaky', 'Well known'])
         return (f"### {escape(profile['name'])} · {skill.title()}\n\n"
                 f"**{due} due now** · {len(ids):,} cards match these filters\n\n{progress}\n\n"
-                f"New cards today: {introduced}/{profile['new_limit']} across both skills. "
+                f"Passage-check priorities: **{flagged}**. New cards today: {introduced}/{profile['new_limit']} across both skills. "
                 f"Review day follows {profile['zone']}. Reading and listening progress are separate.")
 
     def word_rows(self, token, skill, group, module, lesson, context_only, search='', status='All'):
         states, now = self.store.states(token), self.store.clock()
+        evidence = self.store.word_evidence(token, skill)
         result = []
         for wid in self.catalog.eligible(skill, group, module, lesson, context_only):
             word, card = self.catalog.words[wid], states.get((wid, skill))
@@ -59,6 +70,8 @@ class StudyPresenter:
                 continue
             result.append([word['russian'], word['english'], label,
                            due_label(card['due'], now) if card else 'Not started',
+                           ('Reviewed since check' if card and card.get('evidence_reviewed_through', 0) >= evidence[wid]['last_checked']
+                            else evidence[wid]['label']) if wid in evidence else 'Not checked',
                            ', '.join(dict.fromkeys(s['group'] + ' / ' + s['lesson'] for s in word['sources']))])
             if len(result) >= 200:
                 break
@@ -132,8 +145,9 @@ def build_study_ui(catalog, store):
             with gr.Row():
                 limit = gr.Number(value=10, minimum=0, maximum=100, precision=0, label='New cards per day (reading + listening)')
                 save_limit = gr.Button('Save daily limit')
-                start = gr.Button('Start review', variant='primary', interactive=bool(total))
+                start = gr.Button('Start review', interactive=bool(total))
             message = gr.Markdown()
+            check = CheckUI()
             with gr.Column(visible=False) as exercise:
                 question = gr.HTML()
                 audio = gr.Audio(type='filepath', visible=False, interactive=False, label='Study recording', buttons=[])
@@ -154,7 +168,7 @@ def build_study_ui(catalog, store):
                     search = gr.Textbox(label='Find a word or meaning')
                     status = gr.Dropdown(['All', 'New', 'Learning', 'Shaky', 'Well known'], value='All', label='Recall')
                     refresh = gr.Button('Refresh list')
-                table = gr.Dataframe(headers=['Russian', 'English', 'Recall', 'Next review', 'Source'], datatype=['str'] * 5,
+                table = gr.Dataframe(headers=['Russian', 'English', 'Recall', 'Next review', 'Passage check', 'Source'], datatype=['str'] * 6,
                                      interactive=False, label='Up to 200 matching entries')
                 export = gr.Button('Show my progress export')
                 exported = gr.Code(language='json', visible=False, label='Copy this JSON to keep a progress record (no password or login tokens)')
@@ -192,10 +206,15 @@ def build_study_ui(catalog, store):
         if len(s['seen']) >= 10:
             return view(t, {**s, 'nonce': None}, f'Session complete. {s["reviewed"]} cards reviewed; progress saved.')
         f = s['filters']
-        nonce = store.next_card(t, catalog, skill=f[0], group=f[1], module=f[2], lesson=f[3], context_only=f[4], exclude=s['seen'])
+        nonce = store.next_card(t, catalog, skill=f[0], group=f[1], module=f[2], lesson=f[3], context_only=f[4],
+                                exclude=s['seen'], focus_only=s.get('focus_only', False))
         note = '' if nonce else (f'Session complete: {s["reviewed"]} cards reviewed. No more due or available new cards match '
                                 'these filters right now. Your daily limit may have been reached. Try another module, '
                                 'enable word reviews for reading, or come back when reviews are due.')
+        if not nonce and s.get('focus_only'):
+            note = (f'Focused review finished: {s["reviewed"]} cards reviewed. No weaker cards are due or available '
+                    'under your daily new-card limit right now. Scheduled words will return when due; '
+                    'Start review lets you study the rest of the collection.')
         return view(t, {**s, 'nonce': nonce}, note)
 
     def authenticate(n, p, z, *f, creating=False):
@@ -222,8 +241,11 @@ def build_study_ui(catalog, store):
         store.set_new_limit(t, value)
         return presenter.dashboard(t, *f)
     save_limit.click(safe(save), [token, limit, *filters], [dashboard], **common)
-    start.click(safe(lambda t, *f: advance(t, {'nonce': None, 'seen': [], 'reviewed': 0, 'filters': list(f)})),
-                [token, *filters], card_outputs, **common)
+    def start_reviews(t, identifier, *f):
+        if identifier:
+            store.cancel_check(t, identifier)
+        return [*advance(t, {'nonce': None, 'seen': [], 'reviewed': 0, 'filters': list(f)}), *check.present({})]
+    start.click(safe(start_reviews), [token, check.identifier, *filters], [*card_outputs, *check.outputs], **common)
     def show_answer(t, s, text, didnt_know=False):
         store.reveal(t, s.get('nonce'), text, didnt_know)
         return view(t, s)
@@ -251,4 +273,9 @@ def build_study_ui(catalog, store):
     finish.click(safe(finish_session), [token, session], card_outputs, **common)
     export.click(safe(lambda t: gr.update(value=json.dumps(store.export(t), ensure_ascii=False, indent=2), visible=True)),
                  [token], [exported], **common)
+    check.bind(token, filters, store, catalog, safe, common, card_outputs, view, advance, dashboard, presenter)
+    # Remove prior profile's check/report from the browser on sign-in/sign-out.
+    clear_check = lambda: check.present({})
+    for button in (login, create, logout):
+        button.click(clear_check, outputs=check.outputs, **common)
     return presenter

@@ -14,6 +14,12 @@ Listening, and select **Start review**. The second tab keeps the existing
 Russian/Chinese adaptive assessment available. Study answers do not affect
 assessment scores or history.
 
+For the new assessment-to-review flow, select **Start vocabulary check** first.
+It checks up to six words in each of 2–5 longer passages (three by default), then
+offers **Review my weaker words**. Use All modules/lessons initially: the pilot
+does not yet have passage checks for every lesson. The existing direct review
+button is still available. Refresh an already open browser tab after updating.
+
 ## What is ready
 
 - Persistent local profiles with salted scrypt password hashes, expiring login
@@ -57,14 +63,17 @@ Current pilot context coverage:
 
 | Collection | Entries with reading context | Entries with listening context |
 |---|---:|---:|
-| Course modules | 120 | 45 |
-| All imported vocabulary | 214 | 77 |
+| Course modules | 175 | 102 |
+| All imported vocabulary | 295 | 160 |
 
-There are 162 authored context exercises. Multiple dictionary entries may share
+There are 270 context exercises: the original 162 plus 54 fresh short reading
+contexts and 54 word links to nine new longer dialogues. Multiple dictionary entries may share
 an exercise, so these are entry counts, not unique headword or passage counts.
-Listening reuses **14 existing approved Russian recordings**, each under 65
-seconds. No audio was generated and no ElevenLabs credits were spent. Study
-allows unlimited replays; the assessment tab retains two listens with a beep.
+Listening uses **14 existing approved Russian recordings** and **nine new paid-plan
+recordings**, each 31–48 seconds. The new batch used 5,208 input characters and
+2,084 settled credits, leaving 54,113 credits at the post-run check. No purchases
+or subscription changes were made. Study allows unlimited replays; the assessment
+tab retains two listens with a beep. See [batch provenance](VOCABULARY_EXPANSION.md).
 
 Coverage is intentionally explicit: only words with context appear by default.
 Uncheck **Only words with context** to use word-only reading reviews from the
@@ -94,6 +103,47 @@ chosen timezone and daylight-saving transitions. A reading card and a listening
 card for the same vocabulary entry each count toward the daily new-card limit.
 These labels summarize self-reported practice, not language proficiency.
 
+## Passage checks and personalized review
+
+Each new dialogue checks six specific meanings with four shuffled choices plus
+**I don't know**. **That was a guess** preserves a correct answer in the raw score
+but puts the word in the review plan. All answers and listening transcripts remain
+hidden until the check ends. Incomplete submissions do not update evidence.
+
+Passages have three provisional study stages, not ILR labels. The check begins at
+stage 1. At least 80% correct without guessing raises the next stage; at most 50%
+lowers it; other performance holds the stage. Within the closest available stage,
+selection prefers previously flagged words, then untested words. No passage
+repeats within a check. It stops at the selected length, at content exhaustion,
+or when the learner ends it; reports distinguish these reasons. Narrow filters
+can leave fewer than two passages or no suitable checks; no missing vocabulary
+is silently scored.
+
+Evidence is stored separately per profile, skill, word sense and passage. A
+uniform grid prior for a word's recognition probability is updated using
+`P(correct | recognition) = 0.25 + 0.75 × recognition`. A correct answer marked as
+a guess contributes one-quarter likelihood weight. The latest observation for
+the same passage replaces the earlier one rather than multiplying evidence.
+The internal mean and 90% interval remain broad after one observation. These
+are heuristic, uncalibrated practice estimates, not validated retention or DLPT
+scores; the interface deliberately uses plain review guidance instead of
+presenting precise-looking word probabilities.
+
+Six words in one passage are six separate word observations; they are not pooled
+as independent evidence of one overall ability. A single correct answer never
+marks an entry Well known. Untested words stay unassessed. Additional independent
+contexts are still needed for stronger conclusions about each word.
+
+Missed/guessed words lead the new-card queue, followed by unchecked words and
+then words answered correctly. Due reviews still precede new cards. A miss on an
+already introduced word makes it due now without deleting prior reviews. The
+focused-review button selects only weaker due/new cards and respects the daily
+new-card allowance. Reading uses a fresh short context; listening can reuse the
+longer recording, so listening follow-up is reinforcement, not an independent
+retest. A successful later self-rated review resolves immediate diagnostic
+priority but preserves the check evidence and future schedule. The answer report
+is cleared when focused review starts.
+
 ## Local data and maintenance
 
 - `storage/vocabulary/course.json`: imported vocabulary, source checksum,
@@ -102,6 +152,17 @@ These labels summarize self-reported practice, not language proficiency.
   hashes, typed guesses, schedules, and review history (ignored by Git).
 - `data/study/contexts.json`: original study contexts and references to approved
   project audio; contains no imported course dictionary.
+- `data/study/passages.json`: nine original passage checks, target senses,
+  distractors and fresh short contexts. It contains no imported workbook file.
+- `data/study/audio.json` and `audio/`: checksum-bound paid-generation provenance
+  and the nine new MP3s. Only these assets are added to the local file allowlist.
+- `scripts/prepare_vocabulary_passages.py`: offline authoring source for the new
+  passages. Rebuild the JSON after edits; changed scripts invalidate old audio.
+- `scripts/generate_study_audio.py`: explicit operator CLI; the web app never
+  generates audio or consumes credits. Without `--generate`, it only preflights.
+  Its ledger reserves spend before each request, skips completed matching assets,
+  refuses uncertain retries, caps the batch at 8,000 input characters and
+  publishes the audio manifest only after all files decode successfully.
 - `scripts/prepare_study_contexts.py`: reproducible offline context builder.
   Append new contexts without renumbering existing IDs. Run the script after
   editing and restart the app. Contexts require a target found in the passage,
@@ -121,7 +182,7 @@ Do not commit the workbook, imported dictionary, database, exports or `.env`.
 ## Verification
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_vocabulary_study.py tests/test_content_intake.py tests/test_demo.py tests/test_demo_hosting.py tests/test_demo_reporting.py tests/test_audio_release.py -q
+.\.venv\Scripts\python.exe -m pytest tests/test_vocabulary_check.py tests/test_vocabulary_study.py tests/test_content_intake.py tests/test_demo.py tests/test_demo_hosting.py tests/test_demo_reporting.py tests/test_audio_release.py -q
 ```
 
 Tests cover workbook deduplication/provenance and formula skipping; Unicode
@@ -137,3 +198,10 @@ transcript reveal, Hard/Again scheduling, next-card progression, session finish,
 and opening an assessment passage from the second tab. Screenshots are saved
 locally under `storage/study/` and excluded from Git. The `Preview check` profile
 contains only disposable verification progress; create your own profile to study.
+
+The expansion adds tests for strong, weak, mixed and borderline routes, guessed
+answers, repeated-context deduplication, word-level uncertainty, missing answers,
+retry safety, profile/skill isolation, sparse banks, stopping, focused reviews,
+daily limits, existing-card history preservation, new audio decoding and checksum
+provenance. Browser checks use a separate `Passage QA` profile and never modify
+the learner's profile. Nothing in this expansion is deployed to the live demo.
