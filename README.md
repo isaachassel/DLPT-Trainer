@@ -19,8 +19,8 @@ pinned: false
 On `codex/sls-assessment-pilot`, the demo offers **Preparation · Level 1+** or
 **Advanced practice · Level 2** as the starting difficulty. Both use the same
 initial ability estimate and adapt up or down from the chosen first passage.
-See [SLS pilot behavior and scope](docs/SLS_ASSESSMENT.md). This feature has not
-yet been published to the live demo.
+See [SLS pilot behavior and scope](docs/SLS_ASSESSMENT.md). The starting-level
+feature was published to the live demo on November 8, 2026.
 
 ## Stable application and development branches
 

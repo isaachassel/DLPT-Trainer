@@ -1,7 +1,9 @@
 # SLS assessment pilot
 
 Development branch: `codex/sls-assessment-pilot`, based on stable `main`.
-This work is not yet published to the live Hugging Face demo or WordPress site.
+The starting-difficulty feature was published to the live Hugging Face demo and
+its existing WordPress embed on November 8, 2026. Later milestones below remain
+unimplemented. The GitHub `main` branch was not changed by this deployment.
 
 ## Starting difficulty
 
@@ -39,7 +41,7 @@ reviewer analytics remain separate work. No supplied SLS items are added to the
 active bank as part of the starting-difficulty change. The existing engine still
 requires multiple questions in a passage before changing its routing band.
 
-Publication remains a separate reviewed release after local verification. No
+Publication is a separate reviewed release after local verification. No
 ElevenLabs generation or credits are needed for this change.
 
 ## Verification
@@ -58,3 +60,29 @@ through all 12 questions and its report. A Chinese Listening test started from
 Advanced practice, played both listens, unlocked submission, and advanced to
 the next passage with playback reset. The setup screenshot is saved locally at
 `storage/exports/sls-starting-level-setup.jpg` (not deployed).
+
+## November 8 deployment
+
+- GitHub source: `0aae10a` on `codex/sls-assessment-pilot`.
+- Hugging Face commit: `357f45f11eea2b2e5befb6ba7487f734f0701a0c`.
+- Archive SHA-256: `5aaaef04fdf23f3aaf8a8f86cb4541c90249399f160ff0fbffe854b3b15ba06c`.
+- Package: 91 allowlisted files, including the same 38 licensed recordings;
+  no profiles, learner sessions, workshop files, vocabulary study data, or secrets.
+- Release checks: 14 packaging, hosted-safeguard, and audio-release tests passed
+  in addition to the 108 feature/regression checks above.
+- Previous Space revision for rollback: `6cfcea1fc65da1aac8bb73b1a3fd8f7b055dc594`.
+  The prior package is also preserved locally in
+  `storage/exports/releases/pre-sls-20261108/`. The new package and manifest are
+  preserved in `storage/exports/releases/sls-starting-level-20261108/`.
+
+The public WordPress page at https://isaachassel.com/language-test/ continues to
+embed the same https://isaachassel-dlpt-adaptive-demo.hf.space app. No WordPress
+content, subscription, visibility setting, or hosting hardware was changed.
+
+Live verification completed a Russian Reading Preparation test through all 12
+questions and the report. In the WordPress embed, Chinese Listening Advanced
+practice completed both plays, unlocked submission, and advanced from 0 to 3
+completed questions with a new passage and playback lock reset. These were
+software checks, not validation of the estimated proficiency levels. The public
+page was left at the fresh setup screen. Screenshot proof is retained locally at
+`storage/exports/sls-starting-level-live.jpg`.
