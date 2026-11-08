@@ -25,13 +25,20 @@ listening are tracked separately; this does not produce a DLPT score.
 See [vocabulary setup, coverage, and scheduling](docs/VOCABULARY_STUDY.md).
 The public demo entry point remains `app.py`.
 
-## Simplified demo branch
+## Stable application and development branches
 
-On `codex/adaptive-demo`, `app.py` opens a simple DLPT-style adaptive demo:
+`main` is the stable project branch. Russian vocabulary study remains on
+`codex/russian-vocabulary-study` with its separate local-only `study_app.py`.
+Deployments are explicit releases; pushing to GitHub does not publish this app.
+See [branch and release policy](docs/BRANCHING.md) for archived milestones and
+local-data preservation. Historical full-app release notes follow below.
+
+On `main`, `app.py` opens the stable DLPT-style adaptive demo:
 choose Russian or Chinese and either Reading or Listening, then begin. Each test
 has 12 questions in the selected skill and a 30-minute limit. Each recording plays twice with
 a beep between listens. See [demo setup and behavior](docs/DEMO.md).
-The full interface described below remains on `codex/adaptive-assessment`.
+The full interface described below is preserved at the
+`archive/adaptive-assessment-20261107` tag; its source also remains in `ui/layout.py`.
 
 ## Adaptive Assessment
 
