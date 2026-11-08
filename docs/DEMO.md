@@ -1,5 +1,13 @@
 # Demo branch
 
+## November 7: stable branch consolidation
+
+`main` now preserves the completed demo source. The former
+`codex/adaptive-demo` tip is retained as `release/demo-20261017`.
+This repository cleanup does not publish a new Space package or change the
+WordPress embed. Historical branch references below describe earlier releases.
+See [branch and release policy](BRANCHING.md) for the current workflow.
+
 ## October 17: assessment layout and contributor intake
 
 Reading uses a passage/context pane on the left and questions on the right,

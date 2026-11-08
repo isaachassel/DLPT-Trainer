@@ -15,3 +15,5 @@ storage/quarantine/*
 storage/item_bank/*.jsonl
 
 storage/item_bank/*.json
+storage/vocabulary/
+storage/study/
