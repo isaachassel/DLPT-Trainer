@@ -55,3 +55,47 @@ def test_exported_json_and_csv_contain_records(tmp_path, bank):
 
 def test_export_filename_is_sanitized():
     assert safe_filename("../../bad name;rm") == "bad_name_rm"
+
+
+@pytest.mark.parametrize('winerror', [5, 32, 33])
+def test_atomic_checkpoint_retries_brief_windows_lock(tmp_path, monkeypatch, winerror):
+    from core import storage
+    path = tmp_path / 'checkpoint.json'
+    path.write_text('old', encoding='utf-8')
+    replace = storage.os.replace
+    calls, waits = [], []
+    def locked_once(source, destination):
+        calls.append(source)
+        assert path.read_text(encoding='utf-8') == 'old'
+        if len(calls) == 1:
+            error = PermissionError('temporary lock')
+            error.winerror = winerror
+            raise error
+        replace(source, destination)
+    monkeypatch.setattr(storage.os, 'replace', locked_once)
+    monkeypatch.setattr(storage.time, 'sleep', waits.append)
+    storage.atomic_write_text(path, 'new')
+    assert path.read_text(encoding='utf-8') == 'new'
+    assert len(calls) == 2 and waits == [0.05]
+    assert not list(tmp_path.glob('*.tmp'))
+
+
+@pytest.mark.parametrize('winerror, attempts', [(32, 4), (None, 1)])
+def test_atomic_checkpoint_preserves_previous_file_on_persistent_failure(tmp_path, monkeypatch, winerror, attempts):
+    from core import storage
+    path = tmp_path / 'checkpoint.json'
+    path.write_text('old', encoding='utf-8')
+    calls = []
+    def locked(source, destination):
+        calls.append(source)
+        error = PermissionError('unwritable')
+        if winerror is not None:
+            error.winerror = winerror
+        raise error
+    monkeypatch.setattr(storage.os, 'replace', locked)
+    monkeypatch.setattr(storage.time, 'sleep', lambda delay: None)
+    with pytest.raises(PermissionError):
+        storage.atomic_write_text(path, 'new')
+    assert path.read_text(encoding='utf-8') == 'old'
+    assert len(calls) == attempts
+    assert not list(tmp_path.glob('*.tmp'))

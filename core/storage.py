@@ -6,6 +6,7 @@ import json
 import os
 import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -30,7 +31,17 @@ def atomic_write_text(path: Path, text: str) -> None:
             handle.write(text)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(tmp_name, path)
+        for attempt in range(4):
+            try:
+                os.replace(tmp_name, path)
+                break
+            except PermissionError as exc:
+                # Windows readers/scanners can briefly lock a checkpoint at
+                # replacement. Retain atomicity and fail normally if the lock
+                # persists or the error is not a Windows access/share lock.
+                if getattr(exc, "winerror", None) not in (5, 32, 33) or attempt == 3:
+                    raise
+                time.sleep(0.05 * (2 ** attempt))
     except Exception:
         try:
             os.unlink(tmp_name)
