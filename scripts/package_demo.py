@@ -64,6 +64,10 @@ Independent Russian and Mandarin reading/listening practice. One skill per test,
 official DLPT scores or reliable predictions. No runtime generation or API keys
 are required. Listening recordings use licensed synthetic voices.
 
+Choose Preparation (start at Level 1+) or Advanced practice (start at Level 2).
+Both adapt up or down and use the same initial ability estimate; your answers
+determine the practice result.
+
 All active recordings were generated during a paid subscription using a
 generally available model. Generation and licensing provenance is retained in
 the bank and `data/assessment/audio/NOTICE.md`. No provider title attribution is
