@@ -26,7 +26,8 @@ On `main`, `app.py` opens the stable DLPT-style adaptive demo:
 choose Russian or Chinese and either Reading or Listening, then begin. Each test
 has 12 questions in the selected skill and a 30-minute limit. Each recording plays twice with
 a beep between listens. See [demo setup and behavior](docs/DEMO.md).
-The full interface described below remains on `codex/adaptive-assessment`.
+The full interface described below is preserved at the
+`archive/adaptive-assessment-20261107` tag; its source also remains in `ui/layout.py`.
 
 ## Adaptive Assessment
 
