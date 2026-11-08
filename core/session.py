@@ -66,7 +66,12 @@ def create_session(
         routing_level = prior_level
     else:
         prior_level = "1+"
-        routing_level = clamp_ilr("2", minimum_ilr, maximum_ilr)
+        # A selected simulation start changes delivery only. It must not confer
+        # a higher ability estimate or narrower uncertainty before any answers.
+        routing_level = clamp_ilr(
+            start_level if mode == "simulation" and adaptive_start_policy == "selected" else "2",
+            minimum_ilr, maximum_ilr,
+        )
     reading = initialize_ability("reading", prior_level, broad=broad, routing_level=routing_level)
     listening = initialize_ability("listening", prior_level, broad=broad, routing_level=routing_level)
     if mode != "training":
@@ -146,6 +151,11 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
     selection_band = estimate.routing_ilr
     if state.mode == "diagnostic" and state.completed_count(skill) >= 4:
         selection_band = diagnostic_probe_band(estimate, state.minimum_ilr, state.maximum_ilr)
+    allowed_bands = set(ilr_range(state.minimum_ilr, state.maximum_ilr))
+    if first_passage and state.mode == "simulation" and state.adaptive_start_policy == "selected":
+        # Honor an explicit starting choice; do not silently substitute a
+        # different level when the selected starting band is unavailable.
+        allowed_bands = {selection_band}
     selection = bank.select(
         language=state.language,
         skill=skill,
@@ -161,7 +171,7 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
         allowed_topics=set(state.topics) if state.topics else None,
         preferred_competencies=set(state.competencies) if state.competencies else None,
         first_passage=first_passage,
-        allowed_ilr_bands=set(ilr_range(state.minimum_ilr, state.maximum_ilr)),
+        allowed_ilr_bands=allowed_bands,
         routing_band=selection_band,
         selection_seed=f"{state.session_id}:{skill}:{state.completed_count(skill)}",
     )

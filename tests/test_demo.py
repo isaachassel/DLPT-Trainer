@@ -1,4 +1,5 @@
 import time
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -36,8 +37,19 @@ def finish_audio(result):
 @pytest.mark.parametrize('language', ['Russian', 'Chinese'])
 @pytest.mark.parametrize('skill', ['Reading', 'Listening'])
 @pytest.mark.parametrize('pattern', ['strong', 'weak', 'mixed'])
-def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, skill, pattern):
-    result = local_demo.start_demo(language, skill)
+@pytest.mark.parametrize('starting_level', ['1+', '2'])
+def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, skill, pattern, starting_level):
+    from core.adaptive import initialize_ability
+    from core.constants import ILR_LEVELS
+    result = local_demo.start_demo(language, skill, starting_level)
+    initial = result[0].ability_for(skill.lower())
+    neutral = initialize_ability(skill.lower(), '1+', broad=True)
+    assert initial.posterior_weights == neutral.posterior_weights
+    assert initial.standard_error == neutral.standard_error
+    assert initial.routing_ilr == starting_level
+    assert result[0].start_level == starting_level
+    assert result[0].adaptive_start_policy == 'selected'
+    assert result[1]['passage']['target_ilr'] == starting_level
     seen, bands = [], []
     while result[0].status == 'active':
         state, bundle, nonce = result[:3]
@@ -73,6 +85,11 @@ def test_demo_completes_only_selected_skill_and_adapts(local_demo, language, ski
     assert 'not an official DLPT score' in result[-3]['value']
     assert all(r.listening_play_count == 2 for r in result[0].responses if r.skill == 'listening')
     assert len(set(bands)) > 1
+    end_route = result[0].ability_for(skill.lower()).routing_ilr
+    if pattern == 'strong':
+        assert ILR_LEVELS.index(end_route) > ILR_LEVELS.index(starting_level)
+    elif pattern == 'weak':
+        assert ILR_LEVELS.index(end_route) < ILR_LEVELS.index(starting_level)
 
 
 def listening_result():
@@ -134,6 +151,9 @@ def test_demo_setup_has_no_workshop_or_mode_controls():
     assert 'Choose your test' in labels
     selector = next(c for c in config['components'] if c['props'].get('label') == 'Choose your test')
     assert [choice[0] for choice in selector['props']['choices']] == ['Reading', 'Listening']
+    start = next(c for c in config['components'] if c['props'].get('label') == 'Choose your starting difficulty')
+    assert start['props']['value'] == '1+'
+    assert [choice[1] for choice in start['props']['choices']] == ['1+', '2']
     assert not {'Mode', 'Skill selection', 'Content source', 'Training voice preference'} & set(labels)
     values = [str(c['props'].get('value', '')) for c in config['components']]
     assert not any('workshop' in v.lower() or 'bank backup' in v.lower() for v in values)
@@ -147,13 +167,18 @@ def test_setup_failure_is_visible_outside_hidden_test_panel(monkeypatch):
         demo.start_demo('Russian')
 
 
-def test_resume_preserves_demo_progress_and_completed_listens(local_demo):
+@pytest.mark.parametrize('starting_level', ['1+', '2'])
+def test_resume_preserves_demo_progress_and_completed_listens(local_demo, starting_level):
     from types import SimpleNamespace
-    result = listening_result()
+    result = local_demo.start_demo('Russian', 'Listening', starting_level)
     finish_audio(result)
     state = result[0]
     restored = local_demo.restore_demo(SimpleNamespace(query_params={'resume': state.session_id}))
     assert restored[0].current_passage_id == state.current_passage_id
+    assert restored[0].start_level == starting_level
+    assert restored[0].adaptive_start_policy == 'selected'
+    assert restored[0].listening_ability == state.listening_ability
+    assert restored[0].skill_deadline_epoch == state.skill_deadline_epoch
     assert restored[0].current_listening_completed == 2
     assert 'Both listens complete' in restored[7]['value']
     assert '<audio' not in restored[7]['value']
@@ -175,3 +200,45 @@ def test_second_passage_resets_audio_and_rejects_prior_events(local_demo):
     assert advanced[0].current_listening_plays == 0
     finish_audio(advanced)
     assert advanced[0].current_listening_completed == 2
+
+
+@pytest.mark.parametrize('value', [None, '', '0', '3', 'Preparation', '<script>'])
+def test_invalid_starting_difficulty_does_not_create_session(local_demo, value):
+    import gradio as gr
+    with pytest.raises(gr.Error, match='Choose Level'):
+        local_demo.start_demo('Russian', 'Reading', value)
+    assert not list(local_demo.cb.STORAGE.session_dir.glob('*.json'))
+
+
+@pytest.mark.parametrize('starting_level', ['1+', '2'])
+def test_missing_starting_band_stays_in_setup(local_demo, monkeypatch, starting_level):
+    import gradio as gr
+    from core.preset_bank import PresetBank
+    original = local_demo.cb.PRESET_BANK
+    bank = PresetBank(original.path, original.asset_root).load()
+    bank.passages = {k: p for k, p in bank.passages.items() if p.target_ilr != starting_level}
+    bank._reindex()
+    monkeypatch.setattr(local_demo.cb, 'PRESET_BANK', bank)
+    with pytest.raises(gr.Error, match=re.escape(f'No approved Level {starting_level} starting passage')):
+        local_demo.start_demo('Russian', 'Reading', starting_level)
+    assert not list(local_demo.cb.STORAGE.session_dir.glob('*.json'))
+
+
+def test_full_app_simulation_and_older_demo_keep_medium_start(local_demo):
+    from types import SimpleNamespace
+    result = local_demo.cb.start_session_callback(
+        demo.SIMULATION_MODE_LABEL, 'Reading', '1+', '2',
+        'Shortened practice — 12 questions per skill / 30 minutes', 'Strict countdown',
+        [], [], 'End of session', False, False, 'Automatic natural Russian voice', 'Normal', '', progress=None)
+    state = result[0]
+    assert state.adaptive_start_policy == 'medium'
+    assert state.start_level == '1+'
+    assert state.reading_ability.routing_ilr == '2'
+    assert result[1]['passage']['target_ilr'] == '2'
+    state.demo_mode = True
+    local_demo.cb.STORAGE.save_checkpoint(state)
+    restored = local_demo.restore_demo(SimpleNamespace(query_params={'resume': state.session_id}))
+    assert restored[0].adaptive_start_policy == 'medium'
+    assert restored[0].reading_ability == state.reading_ability
+    assert restored[0].skill_deadline_epoch == state.skill_deadline_epoch
+    assert restored[1]['passage']['id'] == state.current_passage_id

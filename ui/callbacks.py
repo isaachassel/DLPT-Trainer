@@ -914,15 +914,22 @@ def start_session_callback(
     language_label="Russian",
     assessment_min_passages=6, assessment_max_passages=18, assessment_target_sd=0.55,
     progress=gr.Progress(),
+    *, simulation_start_level: str | None = None,
 ):
     try:
         _progress(progress, 0.04, "Validating session settings…")
         mode = MODE_LABELS[mode_label]
         language = LANGUAGE_LABEL_TO_CODE[language_label]
         skills = SKILL_LABELS[skill_label]
+        if simulation_start_level is not None:
+            if mode != "simulation" or simulation_start_level not in ("1+", "2"):
+                raise ValueError("Choose Level 1+ or Level 2 for the practice test starting difficulty.")
+            start_level = simulation_start_level
         if mode == "simulation":
             minimum_ilr, maximum_ilr = "0", "3"
-            adaptive_start_policy = "medium"
+            # Explicit demo override; the full application's existing simulation
+            # controls continue to use the medium start unless this is supplied.
+            adaptive_start_policy = "selected" if simulation_start_level is not None else "medium"
         else:
             if ILR_LEVELS.index(minimum_ilr) > ILR_LEVELS.index(maximum_ilr):
                 raise ValueError("The lowest allowed ILR band cannot be higher than the highest allowed band.")
@@ -974,6 +981,14 @@ def start_session_callback(
         if bundle is None:
             # No passage was ever presented. This is a setup availability issue,
             # not a completed assessment: do not create a checkpoint or report.
+            if simulation_start_level is not None:
+                return _inactive_render(
+                    None, "### Test unavailable — no questions were started\n\n"
+                    f"No approved Level {simulation_start_level} starting passage is available for "
+                    f"{html.escape(language_label)} / {html.escape(skill_label)}. "
+                    "Choose another starting difficulty or try again after more content is added. "
+                    "No test result was created.",
+                )
             return _inactive_render(
                 None,
                 "### Assessment unavailable — no questions were started\n\n"

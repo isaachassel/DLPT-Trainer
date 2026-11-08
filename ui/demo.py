@@ -147,16 +147,19 @@ def present(result, *, preserve_audio=False):
             gr.update(value='Begin test' if not state else 'Start a new test', interactive=not active)]
 
 
-def start_demo(language, skill='Reading'):
+def start_demo(language, skill='Reading', starting_level='1+'):
     if language not in ('Russian', 'Chinese'):
         raise gr.Error('Choose Russian or Chinese.')
     if skill not in ('Reading', 'Listening'):
         raise gr.Error('Choose Reading or Listening.')
+    if starting_level not in ('1+', '2'):
+        raise gr.Error('Choose Level 1+ or Level 2 as your starting difficulty.')
     result = cb.start_session_callback(
         SIMULATION_MODE_LABEL, skill, '1+', '2',
         'Shortened practice — 12 questions per skill / 30 minutes', 'Strict countdown',
         [], [], 'End of session', False, False, 'Automatic natural Russian voice', 'Normal', '',
-        language_label='Mandarin Chinese' if language == 'Chinese' else 'Russian', progress=None)
+        language_label='Mandarin Chinese' if language == 'Chinese' else 'Russian',
+        simulation_start_level=starting_level, progress=None)
     state = result[0]
     if state:
         state.demo_mode = True
@@ -237,6 +240,11 @@ def build_app():
             with gr.Column(elem_classes=['demo-setup']) as setup:
                 language = gr.Radio(['Russian', 'Chinese'], value='Russian', label='Choose your language')
                 skill = gr.Radio(['Reading', 'Listening'], value='Reading', label='Choose your test')
+                starting_level = gr.Radio(
+                    [('Preparation · Level 1+', '1+'), ('Advanced practice · Level 2', '2')],
+                    value='1+', label='Choose your starting difficulty')
+                gr.Markdown('Difficulty can move up or down from either starting point. '
+                            'Your answers determine your practice estimate.')
                 gr.Markdown('**One skill per test** · 12 questions · up to 30 minutes.\n\n'
                             'In Listening, each recording plays twice, with a beep between listens. Answer every question, then submit. '
                             'You cannot return to a submitted passage. Results appear at the end.')
@@ -269,7 +277,7 @@ def build_app():
                        *question_outputs, test, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)
             app.load(restore_demo, outputs=outputs, **common)
-            begin.click(start_demo, [language, skill], outputs, trigger_mode='once', **common)
+            begin.click(start_demo, [language, skill, starting_level], outputs, trigger_mode='once', **common)
             submit.click(submit_demo, [state, bundle, nonce, *answers], outputs, trigger_mode='once', **common)
             confirm_audio.click(audio_event, [state, event], [state, submit, status],
                                 js="(s,e) => [s, document.querySelector('#demo-audio-event textarea, #demo-audio-event input').value]",

@@ -14,6 +14,14 @@ pinned: false
 
 # Russian & Mandarin Adaptive Proficiency Practice
 
+## SLS assessment development
+
+On `codex/sls-assessment-pilot`, the demo offers **Preparation · Level 1+** or
+**Advanced practice · Level 2** as the starting difficulty. Both use the same
+initial ability estimate and adapt up or down from the chosen first passage.
+See [SLS pilot behavior and scope](docs/SLS_ASSESSMENT.md). This feature has not
+yet been published to the live demo.
+
 ## Stable application and development branches
 
 `main` is the stable project branch. Russian vocabulary study remains on
