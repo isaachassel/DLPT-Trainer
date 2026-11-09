@@ -1080,6 +1080,990 @@
       ],
       "review_status": "provisional",
       "authoring": "Original fictional study material; not official test content"
+    },
+    {
+      "id": "vocab_l32_services",
+      "stage": 1,
+      "title": "Lesson 32 · Visiting a military history exhibition",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В музее открылась выставка «Вооружённые силы». Я думала, что там будут только фотографии армии, но оказалось, что тема гораздо шире. В первом зале показаны военно-воздушные силы: самолёты, форма лётчиков и их письма домой."
+        },
+        {
+          "speaker": "B",
+          "text": "А военно-морской флот тоже представлен? Мой дедушка служил на корабле, и мне было бы интересно посмотреть."
+        },
+        {
+          "speaker": "A",
+          "text": "Да, ему посвящён второй зал. Дальше есть фотографии морской пехоты на берегу и отдельный стенд про воздушно-десантные войска. На нём видны парашюты. Экскурсовод объяснил, что все эти части относятся к общей теме выставки, хотя служба у них разная."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_services_1",
+          "term": "вооружённые силы",
+          "sense_hints": [
+            "Armed Forces"
+          ],
+          "target": "Вооружённые силы",
+          "meaning": "the armed forces as a whole",
+          "distractors": [
+            "only the police",
+            "only naval crews",
+            "only civilian rescue teams"
+          ],
+          "review_text": "В книге описаны вооружённые силы страны: сухопутные, воздушные и морские подразделения.",
+          "review_target": "вооружённые силы"
+        },
+        {
+          "id": "l32_services_2",
+          "term": "армия",
+          "sense_hints": [
+            "Army"
+          ],
+          "target": "армии",
+          "meaning": "the army",
+          "distractors": [
+            "the coast guard",
+            "the police",
+            "the merchant fleet"
+          ],
+          "review_text": "Мой брат служит в армии. Он пишет нам о своей части.",
+          "review_target": "армии"
+        },
+        {
+          "id": "l32_services_3",
+          "term": "военно-воздушные силы",
+          "sense_hints": [
+            "Air Force"
+          ],
+          "target": "военно-воздушные силы",
+          "meaning": "the air force",
+          "distractors": [
+            "the navy",
+            "the border police",
+            "the infantry"
+          ],
+          "review_text": "На выставке военно-воздушные силы представлены фотографиями самолётов и лётчиков.",
+          "review_target": "военно-воздушные силы"
+        },
+        {
+          "id": "l32_services_4",
+          "term": "военно-морской флот",
+          "sense_hints": [
+            "Navy"
+          ],
+          "target": "военно-морской флот",
+          "meaning": "the navy",
+          "distractors": [
+            "the air force",
+            "the army reserve",
+            "the civilian fishing fleet"
+          ],
+          "review_text": "Этот корабль входит в военно-морской флот. Его экипаж вернулся из плавания.",
+          "review_target": "военно-морской флот"
+        },
+        {
+          "id": "l32_services_5",
+          "term": "морская пехота",
+          "sense_hints": [
+            "Marine Corps"
+          ],
+          "target": "морской пехоты",
+          "meaning": "the marine corps",
+          "distractors": [
+            "civilian sailors",
+            "airborne troops",
+            "military doctors"
+          ],
+          "review_text": "У морской пехоты есть своя история. Ей посвящена новая музейная экспозиция.",
+          "review_target": "морской пехоты"
+        },
+        {
+          "id": "l32_services_6",
+          "term": "воздушно-десантные войска",
+          "sense_hints": [
+            "Airborne"
+          ],
+          "target": "воздушно-десантные войска",
+          "meaning": "airborne troops",
+          "distractors": [
+            "naval crews",
+            "railway workers",
+            "aircraft designers"
+          ],
+          "review_text": "На фотографии изображены воздушно-десантные войска. Рядом лежат парашюты.",
+          "review_target": "воздушно-десантные войска"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_museum",
+      "stage": 1,
+      "title": "Lesson 32 · Reading museum labels",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На школьной экскурсии мы рассматривали старую военную технику. У входа стоял бронетранспортёр. На табличке было написано, что на таких машинах перевозили солдат. Дальше начинался зал, посвящённый пехоте."
+        },
+        {
+          "speaker": "B",
+          "text": "Артиллерия была в том же зале? Я видел на сайте фотографию большого орудия."
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, в соседнем. Рядом с орудием лежал учебный снаряд, а в витрине отдельно показывали пулю. Экскурсовод попросил не путать эти слова. Все боеприпасы в музее были обезврежены. Посетители могли читать подписи, но трогать экспонаты запрещалось."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_museum_1",
+          "term": "бронетранспортёр",
+          "sense_hints": [
+            "armored personnel carrier"
+          ],
+          "target": "бронетранспортёр",
+          "meaning": "an armored personnel carrier",
+          "distractors": [
+            "a cargo aircraft",
+            "a patrol boat",
+            "a field ambulance"
+          ],
+          "review_text": "Старый бронетранспортёр теперь стоит в музее. Рядом есть фотография его экипажа.",
+          "review_target": "бронетранспортёр"
+        },
+        {
+          "id": "l32_museum_2",
+          "term": "пехота",
+          "sense_hints": [
+            "infantry"
+          ],
+          "target": "пехоте",
+          "meaning": "infantry",
+          "distractors": [
+            "naval aviation",
+            "military police",
+            "engineering staff"
+          ],
+          "review_text": "Эта глава посвящена пехоте. В ней собраны воспоминания солдат.",
+          "review_target": "пехоте"
+        },
+        {
+          "id": "l32_museum_3",
+          "term": "артиллерия",
+          "sense_hints": [
+            "artillery"
+          ],
+          "target": "Артиллерия",
+          "meaning": "artillery",
+          "distractors": [
+            "infantry",
+            "naval transport",
+            "military medicine"
+          ],
+          "review_text": "Артиллерия занимает отдельный зал музея. Там выставлены старые орудия.",
+          "review_target": "Артиллерия"
+        },
+        {
+          "id": "l32_museum_4",
+          "term": "снаряд",
+          "sense_hints": [
+            "shell"
+          ],
+          "target": "снаряд",
+          "meaning": "an artillery shell",
+          "distractors": [
+            "a rifle bullet",
+            "a fuel container",
+            "a radio battery"
+          ],
+          "review_text": "Этот снаряд давно обезврежен. Он используется только как музейный экспонат.",
+          "review_target": "снаряд"
+        },
+        {
+          "id": "l32_museum_5",
+          "term": "пуля",
+          "sense_hints": [
+            "bullet"
+          ],
+          "target": "пулю",
+          "meaning": "a bullet",
+          "distractors": [
+            "an artillery shell",
+            "a medal",
+            "a cartridge box"
+          ],
+          "review_text": "Посетитель заметил пулю в стеклянной витрине. Под ней стояла подпись.",
+          "review_target": "пулю"
+        },
+        {
+          "id": "l32_museum_6",
+          "term": "боеприпасы",
+          "sense_hints": [
+            "ammunition"
+          ],
+          "target": "боеприпасы",
+          "meaning": "ammunition",
+          "distractors": [
+            "food supplies",
+            "spare uniforms",
+            "medical equipment"
+          ],
+          "review_text": "Боеприпасы на этой фотографии показаны отдельно от продовольствия.",
+          "review_target": "Боеприпасы"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_supplies",
+      "stage": 1,
+      "title": "Lesson 32 · Sorting an archive collection",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Мы готовим школьную выставку о жизни людей в тылу. На одной фотографии виден склад. Перед ним стоят грузовики, а женщины проверяют списки коробок. Подпись почти стёрлась, поэтому сначала было трудно понять, что происходит."
+        },
+        {
+          "speaker": "B",
+          "text": "Что написано в документах рядом? Это продовольствие или медикаменты?"
+        },
+        {
+          "speaker": "A",
+          "text": "Там есть и продукты, и медицинские материалы. В отдельном списке указана техника, которую отправляли в ремонт. Сегодня водитель должен везти копии этих документов в библиотеку. Оригиналы останутся в архиве, потому что они очень старые и требуют бережного обращения."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_supplies_1",
+          "term": "тыл",
+          "sense_hints": [
+            "rear"
+          ],
+          "target": "тылу",
+          "meaning": "the rear, away from the front lines",
+          "distractors": [
+            "the front line",
+            "enemy captivity",
+            "a naval deck"
+          ],
+          "review_text": "В тылу работали заводы и больницы. Об этом рассказывает документальный фильм.",
+          "review_target": "тылу"
+        },
+        {
+          "id": "l32_supplies_2",
+          "term": "склад",
+          "sense_hints": [
+            "warehouse"
+          ],
+          "target": "склад",
+          "meaning": "a warehouse or depot",
+          "distractors": [
+            "a hospital ward",
+            "a railway carriage",
+            "a classroom"
+          ],
+          "review_text": "Новый склад находится за магазином. Там хранят коробки с товарами.",
+          "review_target": "склад"
+        },
+        {
+          "id": "l32_supplies_3",
+          "term": "продовольствие",
+          "sense_hints": [
+            "provisions"
+          ],
+          "target": "продовольствие",
+          "meaning": "food supplies",
+          "distractors": [
+            "medical supplies",
+            "repair tools",
+            "spare clothing"
+          ],
+          "review_text": "Продовольствие доставили утром. Теперь на кухне есть продукты на неделю.",
+          "review_target": "Продовольствие"
+        },
+        {
+          "id": "l32_supplies_4",
+          "term": "медикаменты",
+          "sense_hints": [
+            "medical supplies"
+          ],
+          "target": "медикаменты",
+          "meaning": "medical supplies",
+          "distractors": [
+            "food rations",
+            "engine parts",
+            "official documents"
+          ],
+          "review_text": "В аптеку привезли медикаменты. Сотрудница проверяет названия на упаковках.",
+          "review_target": "медикаменты"
+        },
+        {
+          "id": "l32_supplies_5",
+          "term": "техника",
+          "sense_hints": [
+            "equipment"
+          ],
+          "target": "техника",
+          "meaning": "equipment and machinery",
+          "distractors": [
+            "written orders",
+            "staff members",
+            "daily meals"
+          ],
+          "review_text": "Эта техника требует ремонта. Пока она стоит в мастерской.",
+          "review_target": "техника"
+        },
+        {
+          "id": "l32_supplies_6",
+          "term": "везти",
+          "sense_hints": [
+            "transport"
+          ],
+          "target": "везти",
+          "meaning": "to transport by vehicle on this trip",
+          "distractors": [
+            "to carry on foot repeatedly",
+            "to lead someone on foot",
+            "to wear something"
+          ],
+          "review_text": "Завтра я буду везти книги в школу на машине.",
+          "review_target": "везти"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_movement",
+      "stage": 2,
+      "title": "Lesson 32 · Preparing a school exhibition",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Перед выставкой нам распределили обязанности. Мне нужно вести гостей от входа к большому залу. Обычно я помогаю в библиотеке, но сегодня впервые встречаю посетителей. Антон будет носить коробки из кладовой в зал, пока всё не перенесёт."
+        },
+        {
+          "speaker": "B",
+          "text": "А кто будет возить экспонаты из соседнего здания? Там ведь слишком далеко, чтобы нести тяжёлые вещи в руках."
+        },
+        {
+          "speaker": "A",
+          "text": "Водитель сделает несколько поездок. После открытия экскурсовод начнёт водить группы по выставке каждые полчаса. Нас попросили носить одинаковые значки, чтобы гости сразу узнавали помощников. Главное — не перепутать, кто за что отвечает."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_movement_1",
+          "term": "вести",
+          "sense_hints": [
+            "lead"
+          ],
+          "target": "вести",
+          "meaning": "to lead the guests on foot on this occasion",
+          "distractors": [
+            "to drive the guests repeatedly",
+            "to carry the guests' luggage",
+            "to wear a visitor badge"
+          ],
+          "review_text": "Сегодня мне поручили вести детей от школы к музею пешком.",
+          "review_target": "вести"
+        },
+        {
+          "id": "l32_movement_2",
+          "term": "носить",
+          "sense_hints": [
+            "carry"
+          ],
+          "target": "носить коробки",
+          "meaning": "to carry boxes on repeated trips",
+          "distractors": [
+            "to wear boxes as clothing",
+            "to transport boxes by truck",
+            "to lead visitors past boxes"
+          ],
+          "review_text": "Работник будет носить коробки в соседнюю комнату, пока склад не опустеет.",
+          "review_target": "носить"
+        },
+        {
+          "id": "l32_movement_3",
+          "term": "возить",
+          "sense_hints": [
+            "transport"
+          ],
+          "target": "возить",
+          "meaning": "to transport by vehicle repeatedly",
+          "distractors": [
+            "to lead on foot once",
+            "to carry in one's arms once",
+            "to wear regularly"
+          ],
+          "review_text": "Автобус будет возить гостей от вокзала к гостинице весь день.",
+          "review_target": "возить"
+        },
+        {
+          "id": "l32_movement_4",
+          "term": "нести",
+          "sense_hints": [
+            "carry"
+          ],
+          "target": "нести",
+          "meaning": "to carry on one's person on a particular trip",
+          "distractors": [
+            "to drive back and forth",
+            "to lead a walking group",
+            "to wear a uniform habitually"
+          ],
+          "review_text": "Мне тяжело нести эту сумку до дома. Помоги, пожалуйста.",
+          "review_target": "нести"
+        },
+        {
+          "id": "l32_movement_5",
+          "term": "водить",
+          "sense_hints": [
+            "lead"
+          ],
+          "target": "водить",
+          "meaning": "to lead groups on repeated walking tours",
+          "distractors": [
+            "to carry one box on foot",
+            "to drive one visitor once",
+            "to wear a museum badge"
+          ],
+          "review_text": "Она любит водить друзей по старому городу и показывать знакомые места.",
+          "review_target": "водить"
+        },
+        {
+          "id": "l32_movement_6",
+          "term": "носить",
+          "sense_hints": [
+            "wear"
+          ],
+          "target": "носить одинаковые значки",
+          "meaning": "to wear matching badges",
+          "distractors": [
+            "to carry boxes repeatedly",
+            "to transport visitors by vehicle",
+            "to lead a group once"
+          ],
+          "review_text": "В школе дети должны носить форму. После уроков они переодеваются.",
+          "review_target": "носить"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_orders",
+      "stage": 2,
+      "title": "Lesson 32 · Understanding a historical letter",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В историческом кружке мы читали письмо молодого солдата. Он писал, что получил приказ помочь в восстановлении библиотеки. Его задача состояла в том, чтобы разобрать книги и составить список сохранившихся изданий."
+        },
+        {
+          "speaker": "B",
+          "text": "Но в другом документе упоминается разведка. Это письмо о том же событии?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, это разные материалы. Руководитель кружка попросил сначала проверить сведения: дату, место и имя автора. В письме командир решил приказать солдату закончить список до вечера. Автору удалось выполнить работу вовремя. Мы поняли, что нельзя соединять два документа только потому, что они лежали в одной папке."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_orders_1",
+          "term": "приказ",
+          "sense_hints": [
+            "order"
+          ],
+          "target": "приказ",
+          "meaning": "an order or command",
+          "distractors": [
+            "a personal wish",
+            "a weather forecast",
+            "a shopping receipt"
+          ],
+          "review_text": "Директор подписал приказ. Сотрудники должны ознакомиться с ним сегодня.",
+          "review_target": "приказ"
+        },
+        {
+          "id": "l32_orders_2",
+          "term": "задача",
+          "sense_hints": [
+            "task"
+          ],
+          "target": "задача",
+          "meaning": "an assigned task",
+          "distractors": [
+            "a physical injury",
+            "a rumour",
+            "a military rank"
+          ],
+          "review_text": "Моя задача — проверить список гостей. Остальные готовят зал.",
+          "review_target": "задача"
+        },
+        {
+          "id": "l32_orders_3",
+          "term": "разведка",
+          "sense_hints": [
+            "reconnaissance"
+          ],
+          "target": "разведка",
+          "meaning": "reconnaissance or intelligence work",
+          "distractors": [
+            "medical treatment",
+            "food distribution",
+            "equipment repair"
+          ],
+          "review_text": "В статье упоминается разведка, но имена её сотрудников не названы.",
+          "review_target": "разведка"
+        },
+        {
+          "id": "l32_orders_4",
+          "term": "сведения",
+          "sense_hints": [
+            "information"
+          ],
+          "target": "сведения",
+          "meaning": "information or findings",
+          "distractors": [
+            "weapons",
+            "orders to surrender",
+            "financial losses"
+          ],
+          "review_text": "Эти сведения нужно проверить. В двух источниках указаны разные даты.",
+          "review_target": "сведения"
+        },
+        {
+          "id": "l32_orders_5",
+          "term": "приказать",
+          "sense_hints": [
+            "order"
+          ],
+          "target": "приказать",
+          "meaning": "to give an order",
+          "distractors": [
+            "to make a guess",
+            "to ask permission",
+            "to lose a document"
+          ],
+          "review_text": "Начальник может приказать закрыть здание, если оно небезопасно.",
+          "review_target": "приказать"
+        },
+        {
+          "id": "l32_orders_6",
+          "term": "выполнить",
+          "sense_hints": [
+            "complete"
+          ],
+          "target": "выполнить",
+          "meaning": "to complete or carry out",
+          "distractors": [
+            "to postpone",
+            "to refuse",
+            "to misunderstand"
+          ],
+          "review_text": "Нам удалось выполнить задание до конца урока.",
+          "review_target": "выполнить"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_history",
+      "stage": 3,
+      "title": "Lesson 32 · Comparing two historical accounts",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Я сравниваю два рассказа о вымышленном сражении. В первом сказано, что наступление началось утром, а отступление — уже вечером. Автор объясняет это тем, что противник оказался сильнее, чем ожидали."
+        },
+        {
+          "speaker": "B",
+          "text": "А во втором рассказе тоже говорится о поражении?"
+        },
+        {
+          "speaker": "A",
+          "text": "Не совсем. Там подчёркивается, что оборона позволила выиграть время. Указывается и позиция подразделения у старого моста. Однако ни один автор не пишет, что было полное окружение. На карте оставалась дорога для выхода. Поэтому я не хочу использовать это слово в пересказе: оно изменило бы смысл событий."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_history_1",
+          "term": "наступление",
+          "sense_hints": [
+            "offensive"
+          ],
+          "target": "наступление",
+          "meaning": "an offensive or advance",
+          "distractors": [
+            "a retreat",
+            "a surrender",
+            "a ceasefire"
+          ],
+          "review_text": "Наступление описано в начале главы, а события после него — в следующей.",
+          "review_target": "Наступление"
+        },
+        {
+          "id": "l32_history_2",
+          "term": "отступление",
+          "sense_hints": [
+            "retreat"
+          ],
+          "target": "отступление",
+          "meaning": "a retreat",
+          "distractors": [
+            "an advance",
+            "an enlistment",
+            "a reconnaissance mission"
+          ],
+          "review_text": "Отступление продолжалось до вечера. Затем рассказ в дневнике обрывается.",
+          "review_target": "Отступление"
+        },
+        {
+          "id": "l32_history_3",
+          "term": "противник",
+          "sense_hints": [
+            "adversary"
+          ],
+          "target": "противник",
+          "meaning": "the opposing side",
+          "distractors": [
+            "an allied unit",
+            "a civilian witness",
+            "a medical team"
+          ],
+          "review_text": "Оба автора признают, что противник был хорошо подготовлен.",
+          "review_target": "противник"
+        },
+        {
+          "id": "l32_history_4",
+          "term": "оборона",
+          "sense_hints": [
+            "defense"
+          ],
+          "target": "оборона",
+          "meaning": "defense",
+          "distractors": [
+            "an offensive",
+            "a surrender",
+            "a troop parade"
+          ],
+          "review_text": "Оборона города стала темой исторической выставки.",
+          "review_target": "Оборона"
+        },
+        {
+          "id": "l32_history_5",
+          "term": "позиция",
+          "sense_hints": [
+            "position"
+          ],
+          "target": "позиция",
+          "meaning": "a unit's physical position",
+          "distractors": [
+            "an author's opinion",
+            "a military rank",
+            "a date of enlistment"
+          ],
+          "review_text": "На старой карте отмечена позиция подразделения. Современных улиц там ещё нет.",
+          "review_target": "позиция"
+        },
+        {
+          "id": "l32_history_6",
+          "term": "окружение",
+          "sense_hints": [
+            "encirclement"
+          ],
+          "target": "окружение",
+          "meaning": "encirclement",
+          "distractors": [
+            "reinforcement",
+            "evacuation",
+            "negotiation"
+          ],
+          "review_text": "В воспоминаниях описано окружение: дороги для выхода были закрыты.",
+          "review_target": "окружение"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_hospital",
+      "stage": 2,
+      "title": "Lesson 32 · Checking a family archive",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Я нашла в семейном архиве письмо из больницы. В нём сказано, что мой прадед ранен, но жив. До этого семья несколько недель ничего о нём не знала и очень переживала."
+        },
+        {
+          "speaker": "B",
+          "text": "А в старом списке потерь есть его имя? Иногда документы противоречат друг другу."
+        },
+        {
+          "speaker": "A",
+          "text": "Есть, но там он ошибочно отмечен как убитый. Позже запись исправили. В другой папке оказался рассказ его товарища. Этот бывший пленный провёл несколько месяцев в плену. Это разные судьбы. Мы проверяем каждую запись отдельно, чтобы не приписать одному человеку историю другого."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_hospital_1",
+          "term": "раненый",
+          "sense_hints": [
+            "wounded"
+          ],
+          "target": "ранен",
+          "meaning": "wounded",
+          "distractors": [
+            "killed",
+            "missing without information",
+            "uninjured"
+          ],
+          "review_text": "Раненый солдат написал письмо из больницы. Он надеялся скоро вернуться домой.",
+          "review_target": "Раненый"
+        },
+        {
+          "id": "l32_hospital_2",
+          "term": "живой",
+          "sense_hints": [
+            "alive"
+          ],
+          "target": "жив",
+          "meaning": "alive",
+          "distractors": [
+            "uninjured",
+            "missing",
+            "dead"
+          ],
+          "review_text": "После долгих поисков пришло известие: человек жив, хотя ему нужна помощь врача.",
+          "review_target": "жив"
+        },
+        {
+          "id": "l32_hospital_3",
+          "term": "потери",
+          "sense_hints": [
+            "losses"
+          ],
+          "target": "потерь",
+          "meaning": "losses or casualties",
+          "distractors": [
+            "new recruits",
+            "food deliveries",
+            "military awards"
+          ],
+          "review_text": "В отчёте нет точного числа потерь. Авторы продолжают проверять документы.",
+          "review_target": "потерь"
+        },
+        {
+          "id": "l32_hospital_4",
+          "term": "убитый",
+          "sense_hints": [
+            "killed"
+          ],
+          "target": "убитый",
+          "meaning": "killed",
+          "distractors": [
+            "wounded",
+            "captured",
+            "transferred"
+          ],
+          "review_text": "В списке он значился как убитый, но позднее эту ошибку исправили.",
+          "review_target": "убитый"
+        },
+        {
+          "id": "l32_hospital_5",
+          "term": "пленный",
+          "sense_hints": [
+            "captive"
+          ],
+          "target": "пленный",
+          "meaning": "a prisoner of war",
+          "distractors": [
+            "a volunteer",
+            "a medic",
+            "a refugee"
+          ],
+          "review_text": "Бывший пленный рассказал о своём возвращении домой.",
+          "review_target": "пленный"
+        },
+        {
+          "id": "l32_hospital_6",
+          "term": "плен",
+          "sense_hints": [
+            "captivity"
+          ],
+          "target": "плену",
+          "meaning": "captivity",
+          "distractors": [
+            "hospital care",
+            "military leave",
+            "reserve duty"
+          ],
+          "review_text": "Несколько месяцев он находился в плену. Позже он написал об этом воспоминания.",
+          "review_target": "плену"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
+    },
+    {
+      "id": "vocab_l32_report",
+      "stage": 3,
+      "title": "Lesson 32 · Revising a fictional news summary",
+      "language": "ru",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Для занятия я написал краткий пересказ вымышленной новости. В тексте говорится, что ночью произошёл мощный взрыв в пустом здании. После него часть стены начала падать. Людей внутри не было, поэтому никто не пострадал."
+        },
+        {
+          "speaker": "B",
+          "text": "Ты написал, что здание удалось полностью уничтожить. Разве в исходном сообщении сказано, что от него ничего не осталось?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, ты прав. Там повреждена только одна часть, так что эту фразу нужно убрать. Кроме того, журналист мог потерять важную запись разговора. Его цель сейчас — восстановить точную последовательность событий, а не обвинить кого-то без доказательств. Я исправлю пересказ и отмечу, какие сведения ещё не подтверждены."
+        }
+      ],
+      "targets": [
+        {
+          "id": "l32_report_1",
+          "term": "мощный",
+          "sense_hints": [
+            "powerful"
+          ],
+          "target": "мощный",
+          "meaning": "powerful or strong",
+          "distractors": [
+            "silent",
+            "harmless",
+            "gradual"
+          ],
+          "review_text": "Мощный двигатель помог машине подняться в гору.",
+          "review_target": "Мощный"
+        },
+        {
+          "id": "l32_report_2",
+          "term": "взрыв",
+          "sense_hints": [
+            "explosion"
+          ],
+          "target": "взрыв",
+          "meaning": "an explosion",
+          "distractors": [
+            "a flood",
+            "a power outage",
+            "a routine repair"
+          ],
+          "review_text": "Жители услышали взрыв. Причину происшествия выясняют специалисты.",
+          "review_target": "взрыв"
+        },
+        {
+          "id": "l32_report_3",
+          "term": "падать",
+          "sense_hints": [
+            "fall"
+          ],
+          "target": "падать",
+          "meaning": "to fall",
+          "distractors": [
+            "to rise",
+            "to burn",
+            "to freeze"
+          ],
+          "review_text": "Листья начали падать с деревьев. Дорожка быстро покрылась ими.",
+          "review_target": "падать"
+        },
+        {
+          "id": "l32_report_4",
+          "term": "уничтожить",
+          "sense_hints": [
+            "destroy"
+          ],
+          "target": "уничтожить",
+          "meaning": "to destroy completely",
+          "distractors": [
+            "to repair",
+            "to inspect",
+            "to move to another place"
+          ],
+          "review_text": "Пожар мог уничтожить старые письма, но их успели вынести из дома.",
+          "review_target": "уничтожить"
+        },
+        {
+          "id": "l32_report_5",
+          "term": "потерять",
+          "sense_hints": [
+            "lose"
+          ],
+          "target": "потерять",
+          "meaning": "to lose",
+          "distractors": [
+            "to discover",
+            "to translate",
+            "to publish"
+          ],
+          "review_text": "Я боялся потерять записную книжку, поэтому положил её в карман.",
+          "review_target": "потерять"
+        },
+        {
+          "id": "l32_report_6",
+          "term": "цель",
+          "sense_hints": [
+            "goal"
+          ],
+          "target": "цель",
+          "meaning": "an aim or goal",
+          "distractors": [
+            "a physical weapon target",
+            "a military loss",
+            "a place of storage"
+          ],
+          "review_text": "Моя цель — научиться понимать новости без перевода.",
+          "review_target": "цель"
+        }
+      ],
+      "review_status": "provisional",
+      "lesson": "Lesson 32",
+      "module": "Mod 6",
+      "reference": "Russian Basic Course, 2018 validation edition, Module VI, Lesson 32 glossary, printed pp. 85–88",
+      "authoring": "Original fictional study material; vocabulary alignment only; not official test content"
     }
   ]
 }

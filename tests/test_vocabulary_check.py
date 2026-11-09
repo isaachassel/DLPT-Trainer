@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def catalog(tmp_path):
     words = [dict(id=t['id'], russian=t['term'], english=t['sense_hints'][0], variants=[normalize_ru(t['term'])],
                   sources=[dict(group='Mod ' + str(p['stage']), lesson='1', row=n)])
-             for p in build()['passages'] for n, t in enumerate(p['targets'])]
+             for p in build(include_lesson32=False)['passages'] for n, t in enumerate(p['targets'])]
     path = tmp_path / 'vocabulary.json'
     save_vocabulary(dict(version=1, items=words), path)
     return StudyCatalog(vocabulary_path=path)
@@ -46,19 +46,19 @@ def test_authored_passages_and_short_contexts_link_without_private_workbook(cata
     assert all(len(p['targets']) == 6 for p in catalog.checks())
     assert len(catalog.eligible('listening')) == 54
     assert build() == json.loads((ROOT / 'data/study/passages.json').read_text(encoding='utf-8'))
-    assert all('short_' + t['id'] in catalog.by_word[t['id']] for p in build()['passages'] for t in p['targets'])
+    assert all('short_' + t['id'] in catalog.by_word[t['id']] for p in build(include_lesson32=False)['passages'] for t in p['targets'])
 
 
 def test_new_recordings_have_valid_provenance_and_decode():
     records = json.loads((ROOT / 'data/study/audio.json').read_text())['recordings']
-    assert len(records) == 9
+    assert len(records) == len(build()['passages'])
     for p in build()['passages']:
         r = records[p['id']]
         assert r['script_fingerprint'] == fingerprint(p)
         assert r['commercial_use'] and r['attribution_required'] is False
         assert r['model_status'] == 'generally_available' and r['account_tier'] == 'starter'
         assert abs(decode(ROOT / r['path']) - r['duration_seconds']) < .1
-    assert sum(r['input_characters'] for r in records.values()) == 5208
+    assert sum(records[p['id']]['input_characters'] for p in build(include_lesson32=False)['passages']) == 5208
 
 
 @pytest.mark.parametrize('correct,stages', [(6, [1, 2, 3]), (0, [1, 1, 1]), (4, [1, 1, 1]), (5, [1, 2, 3])])

@@ -14,6 +14,11 @@ Listening, and select **Start review**. The second tab keeps the existing
 Russian/Chinese adaptive assessment available. Study answers do not affect
 assessment scores or history.
 
+**Lesson 32 expansion:** select **Mod 6 → Lesson 32** for eight new dialogue
+checks covering 48 course word senses, with reading and ElevenLabs listening
+practice. See [Lesson 32 setup, coverage and generation notes](LESSON32_STUDY.md).
+The counts below describe the earlier pilot; the linked notes describe this batch.
+
 For the new assessment-to-review flow, select **Start vocabulary check** first.
 It checks up to six words in each of 2–5 longer passages (three by default), then
 offers **Review my weaker words**. Use All modules/lessons initially: the pilot

@@ -107,7 +107,7 @@ SPECS = [
 ''')]
 
 
-def build():
+def build(include_lesson32=True):
     result = []
     forms = {'двор': 'дворе', 'бассейн': 'бассейне', 'карандаш': 'карандашом', 'покупка': 'покупка',
              'вокзал': 'вокзале', 'пересадка': 'пересадкой', 'температура': 'температуру',
@@ -122,10 +122,15 @@ def build():
         result.append(dict(id='vocab_' + name, stage=stage, title=title, language='ru',
                            turns=[dict(speaker=s, text=t) for s, t in turns], targets=targets,
                            review_status='provisional', authoring='Original fictional study material; not official test content'))
+    if include_lesson32:
+        from scripts.lesson32_study import build_lesson32
+        result.extend(build_lesson32())
     return dict(version=1, passages=result)
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.insert(0, str(ROOT))
     data = build()
     path = ROOT / 'data/study/passages.json'
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')

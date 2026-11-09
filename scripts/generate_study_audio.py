@@ -21,6 +21,40 @@ SOURCES = ['https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-conte
            'https://elevenlabs.io/terms-of-use', 'https://elevenlabs.io/service-specific-terms',
            'https://elevenlabs.io/elevenapi-terms', 'https://elevenlabs.io/speech-engine-terms']
 PAID = {'starter', 'creator', 'pro', 'scale', 'business', 'enterprise'}
+BATCHES = {'original': ('vocabulary-expansion-20261104', '2026-11-04'),
+           'lesson32': ('lesson32-20261108', '2026-11-08')}
+
+
+def select_batch(passages, batch):
+    if batch not in BATCHES:
+        raise ValueError('Unknown study audio batch')
+    selected = [p for p in passages if p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]
+    if not selected or len({p['id'] for p in selected}) != len(selected):
+        raise ValueError('Empty batch or duplicate passage IDs')
+    return selected
+
+
+def publish_records(stage, records, root=ROOT):
+    """Validate the complete staged batch before publishing; preserve other batches."""
+    import shutil
+    manifest_path = root / 'data/study/audio.json'
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8')) if manifest_path.exists() else dict(version=1, recordings={})
+    for key, record in records.items():
+        asset = stage / (key + '.mp3')
+        if record['path'] != f'data/study/audio/{key}.mp3' or not key.replace('_', '').isalnum():
+            raise ValueError('Invalid recording path')
+        if hashlib.sha256(asset.read_bytes()).hexdigest() != record['sha256']:
+            raise ValueError('Staged recording checksum changed')
+        decode(asset)
+        existing = manifest['recordings'].get(key)
+        if existing is not None and existing != record:
+            raise ValueError('Refusing to replace an existing recording with different provenance')
+    target = root / 'data/study/audio'
+    target.mkdir(parents=True, exist_ok=True)
+    for key in records:
+        shutil.copyfile(stage / (key + '.mp3'), target / (key + '.mp3'))
+    manifest['recordings'].update(records)
+    atomic_write_text(manifest_path, json.dumps(manifest, indent=2))
 
 
 def fingerprint(p):
@@ -37,12 +71,12 @@ def decode(path):
     return round(duration, 3)
 
 
-def main(generate=False):
+def main(generate=False, batch='original'):
     from dotenv import load_dotenv
     load_dotenv(ROOT / '.env')
     client = ElevenLabs(os.environ.get('ELEVENLABS_API_KEY', ''))
-    passages = json.loads((ROOT / 'data/study/passages.json').read_text(encoding='utf-8'))['passages']
-    stage = ROOT / 'storage/workshop/vocabulary-expansion-20261104'
+    passages = select_batch(json.loads((ROOT / 'data/study/passages.json').read_text(encoding='utf-8'))['passages'], batch)
+    stage = ROOT / 'storage/workshop' / BATCHES[batch][0]
     stage.mkdir(parents=True, exist_ok=True)
     ledger_path = stage / 'ledger.json'
     ledger = json.loads(ledger_path.read_text()) if ledger_path.exists() else {'attempts': {}, 'budget': BUDGET}
@@ -61,11 +95,12 @@ def main(generate=False):
     total = sum(len(t['text']) for p in passages for t in p['turns'])
     if total > BUDGET or any(sum(len(t['text']) for t in p['turns']) > 2000 for p in passages):
         raise ValueError('Script budget exceeded')
-    print(json.dumps({'account': account, 'unique_input_characters': total, 'batch_cap': BUDGET}), flush=True)
+    print(json.dumps({'account': account, 'batch': batch, 'unique_input_characters': total,
+                      'maximum_credits_at_checked_rates': total, 'batch_cap': BUDGET}), flush=True)
     if not generate:
         return
     # Prevent simultaneous invocations from spending the same reservations twice.
-    lock = stage / 'generation.lock'
+    lock = ROOT / 'storage/workshop/study-generation.lock'
     with lock.open('x') as handle:
         handle.write('Generation in progress; inspect ledger before removing a stale lock.')
     try:
@@ -101,7 +136,7 @@ def main(generate=False):
                           duration_seconds=duration, script_fingerprint=digest, generated_at=now,
                           provider='ElevenLabs', model=MODEL, voice_ids=VOICES, account_tier=live['tier'],
                           input_characters=amount, commercial_use=True, attribution_required=False,
-                          model_status='generally_available', terms_checked='2026-11-04', sources=SOURCES,
+                          model_status='generally_available', terms_checked=BATCHES[batch][1], sources=SOURCES,
                           approval='Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed')
             ledger['attempts'][key].update(status='succeeded', record=record)
             save()
@@ -110,12 +145,7 @@ def main(generate=False):
         ledger['account_after'] = {k: after[k] for k in ('tier', 'character_count', 'character_limit')}
         save()
         # Publish only fully decoded, checksum-verified assets after the entire batch succeeds.
-        import shutil
-        target = ROOT / 'data/study/audio'
-        target.mkdir(parents=True, exist_ok=True)
-        for key in records:
-            shutil.copyfile(stage / (key + '.mp3'), target / (key + '.mp3'))
-        atomic_write_text(ROOT / 'data/study/audio.json', json.dumps(dict(version=1, recordings=records), indent=2))
+        publish_records(stage, records)
         print('COMPLETE', json.dumps(ledger['account_after']), flush=True)
     finally:
         lock.unlink()
@@ -124,5 +154,6 @@ def main(generate=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--generate', action='store_true')
+    parser.add_argument('--batch', choices=BATCHES, default='original')
     args = parser.parse_args()
-    main(args.generate)
+    main(args.generate, args.batch)
