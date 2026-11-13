@@ -1,0 +1,799 @@
+{
+  "version": 1,
+  "review_status": "provisional",
+  "authoring": "Author-created competency mappings; not reviewed or endorsed by SLS/DLI.",
+  "lessons": [
+    {
+      "id": "ru-basic-mod6-l32",
+      "language": "ru",
+      "module": "Mod 6",
+      "lesson": "Lesson 32",
+      "title": "Armed forces and military actions",
+      "resource": "Russian Basic Course, Module VI, Lesson 32. Glossary: printed pp. 85–88. Grammar: use the Lesson 32 contents to locate the relevant explanation."
+    }
+  ],
+  "mappings": [
+    {
+      "id": "vocab_family_lexical",
+      "passage_id": "vocab_family",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of бабушка and дедушка",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "family_1_lexical",
+          "prompt": "What does “бабушка” mean in this conversation?",
+          "answer": "grandmother",
+          "distractors": [
+            "aunt",
+            "sister",
+            "daughter"
+          ],
+          "explanation": "Here “бабушка” means grandmother.",
+          "evidence": "бабушка"
+        },
+        {
+          "id": "family_2_lexical",
+          "prompt": "What does “дедушка” mean in this conversation?",
+          "answer": "grandfather",
+          "distractors": [
+            "uncle",
+            "brother",
+            "son"
+          ],
+          "explanation": "Here “дедушка” means grandfather.",
+          "evidence": "дедушка"
+        }
+      ]
+    },
+    {
+      "id": "vocab_classroom_lexical",
+      "passage_id": "vocab_classroom",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of учебник and тетрадь",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "classroom_1_lexical",
+          "prompt": "What does “учебник” mean in this conversation?",
+          "answer": "textbook",
+          "distractors": [
+            "dictionary",
+            "newspaper",
+            "novel"
+          ],
+          "explanation": "Here “учебник” means textbook.",
+          "evidence": "учебник"
+        },
+        {
+          "id": "classroom_2_lexical",
+          "prompt": "What does “тетрадь” mean in this conversation?",
+          "answer": "notebook",
+          "distractors": [
+            "folder",
+            "envelope",
+            "calendar"
+          ],
+          "explanation": "Here “тетрадь” means notebook.",
+          "evidence": "тетрадь"
+        }
+      ]
+    },
+    {
+      "id": "vocab_clothing_lexical",
+      "passage_id": "vocab_clothing",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of покупатель and куртка",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "clothing_1_lexical",
+          "prompt": "What does “покупатель” mean in this conversation?",
+          "answer": "customer",
+          "distractors": [
+            "cashier",
+            "supplier",
+            "manager"
+          ],
+          "explanation": "Here “покупатель” means customer.",
+          "evidence": "покупатель"
+        },
+        {
+          "id": "clothing_2_lexical",
+          "prompt": "What does “куртка” mean in this conversation?",
+          "answer": "jacket",
+          "distractors": [
+            "shirt",
+            "skirt",
+            "scarf"
+          ],
+          "explanation": "Here “куртка” means jacket.",
+          "evidence": "куртка"
+        }
+      ]
+    },
+    {
+      "id": "vocab_travel_lexical",
+      "passage_id": "vocab_travel",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of пассажир and вокзал",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "travel_1_lexical",
+          "prompt": "What does “пассажир” mean in this conversation?",
+          "answer": "passenger",
+          "distractors": [
+            "conductor",
+            "pilot",
+            "porter"
+          ],
+          "explanation": "Here “пассажир” means passenger.",
+          "evidence": "пассажир"
+        },
+        {
+          "id": "travel_2_lexical",
+          "prompt": "What does “вокзал” mean in this conversation?",
+          "answer": "railway station",
+          "distractors": [
+            "airport",
+            "bus shelter",
+            "harbour"
+          ],
+          "explanation": "Here “вокзал” means railway station.",
+          "evidence": "вокзал"
+        }
+      ]
+    },
+    {
+      "id": "vocab_health_lexical",
+      "passage_id": "vocab_health",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of горло and температура",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "health_1_lexical",
+          "prompt": "What does “горло” mean in this conversation?",
+          "answer": "throat",
+          "distractors": [
+            "stomach",
+            "shoulder",
+            "knee"
+          ],
+          "explanation": "Here “горло” means throat.",
+          "evidence": "горло"
+        },
+        {
+          "id": "health_2_lexical",
+          "prompt": "What does “температура” mean in this conversation?",
+          "answer": "body temperature",
+          "distractors": [
+            "blood pressure",
+            "heart rate",
+            "appetite"
+          ],
+          "explanation": "Here “температура” means body temperature.",
+          "evidence": "температура"
+        }
+      ]
+    },
+    {
+      "id": "vocab_housing_lexical",
+      "passage_id": "vocab_housing",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of аренда and мебель",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "housing_1_lexical",
+          "prompt": "What does “Аренда” mean in this conversation?",
+          "answer": "rent",
+          "distractors": [
+            "deposit",
+            "purchase price",
+            "utility bill"
+          ],
+          "explanation": "Here “Аренда” means rent.",
+          "evidence": "Аренда"
+        },
+        {
+          "id": "housing_2_lexical",
+          "prompt": "What does “мебель” mean in this conversation?",
+          "answer": "furniture",
+          "distractors": [
+            "appliances",
+            "curtains",
+            "tools"
+          ],
+          "explanation": "Here “мебель” means furniture.",
+          "evidence": "мебель"
+        }
+      ]
+    },
+    {
+      "id": "vocab_industry_lexical",
+      "passage_id": "vocab_industry",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of завод and предприятие",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "industry_1_lexical",
+          "prompt": "What does “завод” mean in this conversation?",
+          "answer": "factory",
+          "distractors": [
+            "warehouse",
+            "research institute",
+            "shopping centre"
+          ],
+          "explanation": "Here “завод” means factory.",
+          "evidence": "завод"
+        },
+        {
+          "id": "industry_2_lexical",
+          "prompt": "What does “Предприятие” mean in this conversation?",
+          "answer": "enterprise",
+          "distractors": [
+            "municipal council",
+            "trade union",
+            "training course"
+          ],
+          "explanation": "Here “Предприятие” means enterprise.",
+          "evidence": "Предприятие"
+        }
+      ]
+    },
+    {
+      "id": "vocab_government_lexical",
+      "passage_id": "vocab_government",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of политика and население",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "government_1_lexical",
+          "prompt": "What does “политика” mean in this conversation?",
+          "answer": "politics",
+          "distractors": [
+            "economics",
+            "geography",
+            "literature"
+          ],
+          "explanation": "Here “политика” means politics.",
+          "evidence": "политика"
+        },
+        {
+          "id": "government_2_lexical",
+          "prompt": "What does “население” mean in this conversation?",
+          "answer": "population",
+          "distractors": [
+            "electoral commission",
+            "cabinet",
+            "opposition party"
+          ],
+          "explanation": "Here “население” means population.",
+          "evidence": "население"
+        }
+      ]
+    },
+    {
+      "id": "vocab_weather_lexical",
+      "passage_id": "vocab_weather",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of прогноз and ветер",
+      "lesson_id": null,
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "weather_1_lexical",
+          "prompt": "What does “прогноз” mean in this conversation?",
+          "answer": "forecast",
+          "distractors": [
+            "observation",
+            "measurement",
+            "announcement of results"
+          ],
+          "explanation": "Here “прогноз” means forecast.",
+          "evidence": "прогноз"
+        },
+        {
+          "id": "weather_2_lexical",
+          "prompt": "What does “ветер” mean in this conversation?",
+          "answer": "wind",
+          "distractors": [
+            "humidity",
+            "air pressure",
+            "heatwave"
+          ],
+          "explanation": "Here “ветер” means wind.",
+          "evidence": "ветер"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_services_lexical",
+      "passage_id": "vocab_l32_services",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of вооружённые силы and армия",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_services_1_lexical",
+          "prompt": "What does “Вооружённые силы” mean in this conversation?",
+          "answer": "the armed forces as a whole",
+          "distractors": [
+            "only the police",
+            "only naval crews",
+            "only civilian rescue teams"
+          ],
+          "explanation": "Here “Вооружённые силы” means the armed forces as a whole.",
+          "evidence": "Вооружённые силы"
+        },
+        {
+          "id": "l32_services_2_lexical",
+          "prompt": "What does “армии” mean in this conversation?",
+          "answer": "the army",
+          "distractors": [
+            "the coast guard",
+            "the police",
+            "the merchant fleet"
+          ],
+          "explanation": "Here “армии” means the army.",
+          "evidence": "армии"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_museum_lexical",
+      "passage_id": "vocab_l32_museum",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of бронетранспортёр and пехота",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_museum_1_lexical",
+          "prompt": "What does “бронетранспортёр” mean in this conversation?",
+          "answer": "an armored personnel carrier",
+          "distractors": [
+            "a cargo aircraft",
+            "a patrol boat",
+            "a field ambulance"
+          ],
+          "explanation": "Here “бронетранспортёр” means an armored personnel carrier.",
+          "evidence": "бронетранспортёр"
+        },
+        {
+          "id": "l32_museum_2_lexical",
+          "prompt": "What does “пехоте” mean in this conversation?",
+          "answer": "infantry",
+          "distractors": [
+            "naval aviation",
+            "military police",
+            "engineering staff"
+          ],
+          "explanation": "Here “пехоте” means infantry.",
+          "evidence": "пехоте"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_supplies_lexical",
+      "passage_id": "vocab_l32_supplies",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of тыл and склад",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_supplies_1_lexical",
+          "prompt": "What does “тылу” mean in this conversation?",
+          "answer": "the rear, away from the front lines",
+          "distractors": [
+            "the front line",
+            "enemy captivity",
+            "a naval deck"
+          ],
+          "explanation": "Here “тылу” means the rear, away from the front lines.",
+          "evidence": "тылу"
+        },
+        {
+          "id": "l32_supplies_2_lexical",
+          "prompt": "What does “склад” mean in this conversation?",
+          "answer": "a warehouse or depot",
+          "distractors": [
+            "a hospital ward",
+            "a railway carriage",
+            "a classroom"
+          ],
+          "explanation": "Here “склад” means a warehouse or depot.",
+          "evidence": "склад"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_movement_lexical",
+      "passage_id": "vocab_l32_movement",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of вести and носить",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_movement_1_lexical",
+          "prompt": "What does “вести” mean in this conversation?",
+          "answer": "to lead the guests on foot on this occasion",
+          "distractors": [
+            "to drive the guests repeatedly",
+            "to carry the guests' luggage",
+            "to wear a visitor badge"
+          ],
+          "explanation": "Here “вести” means to lead the guests on foot on this occasion.",
+          "evidence": "вести"
+        },
+        {
+          "id": "l32_movement_2_lexical",
+          "prompt": "What does “носить коробки” mean in this conversation?",
+          "answer": "to carry boxes on repeated trips",
+          "distractors": [
+            "to wear boxes as clothing",
+            "to transport boxes by truck",
+            "to lead visitors past boxes"
+          ],
+          "explanation": "Here “носить коробки” means to carry boxes on repeated trips.",
+          "evidence": "носить коробки"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_orders_lexical",
+      "passage_id": "vocab_l32_orders",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of приказ and задача",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_orders_1_lexical",
+          "prompt": "What does “приказ” mean in this conversation?",
+          "answer": "an order or command",
+          "distractors": [
+            "a personal wish",
+            "a weather forecast",
+            "a shopping receipt"
+          ],
+          "explanation": "Here “приказ” means an order or command.",
+          "evidence": "приказ"
+        },
+        {
+          "id": "l32_orders_2_lexical",
+          "prompt": "What does “задача” mean in this conversation?",
+          "answer": "an assigned task",
+          "distractors": [
+            "a physical injury",
+            "a rumour",
+            "a military rank"
+          ],
+          "explanation": "Here “задача” means an assigned task.",
+          "evidence": "задача"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_history_lexical",
+      "passage_id": "vocab_l32_history",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of наступление and отступление",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_history_1_lexical",
+          "prompt": "What does “наступление” mean in this conversation?",
+          "answer": "an offensive or advance",
+          "distractors": [
+            "a retreat",
+            "a surrender",
+            "a ceasefire"
+          ],
+          "explanation": "Here “наступление” means an offensive or advance.",
+          "evidence": "наступление"
+        },
+        {
+          "id": "l32_history_2_lexical",
+          "prompt": "What does “отступление” mean in this conversation?",
+          "answer": "a retreat",
+          "distractors": [
+            "an advance",
+            "an enlistment",
+            "a reconnaissance mission"
+          ],
+          "explanation": "Here “отступление” means a retreat.",
+          "evidence": "отступление"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_hospital_lexical",
+      "passage_id": "vocab_l32_hospital",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of раненый and живой",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_hospital_1_lexical",
+          "prompt": "What does “ранен” mean in this conversation?",
+          "answer": "wounded",
+          "distractors": [
+            "killed",
+            "missing without information",
+            "uninjured"
+          ],
+          "explanation": "Here “ранен” means wounded.",
+          "evidence": "ранен"
+        },
+        {
+          "id": "l32_hospital_2_lexical",
+          "prompt": "What does “жив” mean in this conversation?",
+          "answer": "alive",
+          "distractors": [
+            "uninjured",
+            "missing",
+            "dead"
+          ],
+          "explanation": "Here “жив” means alive.",
+          "evidence": "жив"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_report_lexical",
+      "passage_id": "vocab_l32_report",
+      "category": "lexical",
+      "objective": "Recognize the contextual meanings of мощный and взрыв",
+      "lesson_id": "ru-basic-mod6-l32",
+      "review_guidance": "Review the target word senses, then try them in a fresh context.",
+      "questions": [
+        {
+          "id": "l32_report_1_lexical",
+          "prompt": "What does “мощный” mean in this conversation?",
+          "answer": "powerful or strong",
+          "distractors": [
+            "silent",
+            "harmless",
+            "gradual"
+          ],
+          "explanation": "Here “мощный” means powerful or strong.",
+          "evidence": "мощный"
+        },
+        {
+          "id": "l32_report_2_lexical",
+          "prompt": "What does “взрыв” mean in this conversation?",
+          "answer": "an explosion",
+          "distractors": [
+            "a flood",
+            "a power outage",
+            "a routine repair"
+          ],
+          "explanation": "Here “взрыв” means an explosion.",
+          "evidence": "взрыв"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_movement_structural",
+      "passage_id": "vocab_l32_movement",
+      "category": "structural",
+      "lesson_id": "ru-basic-mod6-l32",
+      "objective": "Distinguish one-time and repeated motion",
+      "review_guidance": "Compare вести/водить, везти/возить, and нести/носить. Identify whether a sentence describes one trip or repeated trips.",
+      "questions": [
+        {
+          "id": "vocab_l32_movement_structural_1",
+          "prompt": "Why is “возить” appropriate for the driver’s work?",
+          "answer": "He will make several trips between buildings.",
+          "distractors": [
+            "He will make only one trip on foot.",
+            "He will wear a badge.",
+            "He will stay in the exhibition hall."
+          ],
+          "explanation": "Возить describes repeated transport by vehicle; the next turn confirms several trips.",
+          "evidence": "Водитель сделает несколько поездок."
+        },
+        {
+          "id": "vocab_l32_movement_structural_2",
+          "prompt": "What does “пока всё не перенесёт” tell us about Anton’s task?",
+          "answer": "He will keep carrying boxes until everything has been moved.",
+          "distractors": [
+            "He must stop before moving any boxes.",
+            "He has already moved everything.",
+            "He will move just one box tomorrow."
+          ],
+          "explanation": "Пока … не with this completed action marks the endpoint: until everything is moved, not a ban on moving it.",
+          "evidence": "пока всё не перенесёт"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_orders_structural",
+      "passage_id": "vocab_l32_orders",
+      "category": "structural",
+      "lesson_id": "ru-basic-mod6-l32",
+      "objective": "Recognize task descriptions and completed actions",
+      "review_guidance": "Compare describing an assigned task with reporting its completion; review удалось + infinitive.",
+      "questions": [
+        {
+          "id": "vocab_l32_orders_structural_1",
+          "prompt": "What does “удалось выполнить” establish?",
+          "answer": "The writer successfully completed the work.",
+          "distractors": [
+            "The writer only intended to start.",
+            "The writer refused the work.",
+            "The writer was still waiting for permission."
+          ],
+          "explanation": "Удалось + perfective выполнить reports successful completion, supported by вовремя.",
+          "evidence": "Автору удалось выполнить работу вовремя."
+        },
+        {
+          "id": "vocab_l32_orders_structural_2",
+          "prompt": "What is the purpose of “чтобы” in the description of his task?",
+          "answer": "It introduces what he was assigned to do.",
+          "distractors": [
+            "It denies that a task existed.",
+            "It compares two soldiers.",
+            "It reports someone else’s exact words."
+          ],
+          "explanation": "Состояла в том, чтобы introduces the content of the task: sorting books and making a list.",
+          "evidence": "Его задача состояла в том, чтобы разобрать книги"
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_history_discourse",
+      "passage_id": "vocab_l32_history",
+      "category": "discourse",
+      "lesson_id": "ru-basic-mod6-l32",
+      "objective": "Compare accounts and distinguish evidence from overstatement",
+      "review_guidance": "Identify contrasts between sources and the evidence supporting or limiting a summary.",
+      "questions": [
+        {
+          "id": "vocab_l32_history_discourse_1",
+          "prompt": "How does the second account differ from the first?",
+          "answer": "It emphasizes time gained through defense rather than just defeat.",
+          "distractors": [
+            "It says no fighting took place.",
+            "It gives an identical explanation of defeat.",
+            "It describes an unrelated museum visit."
+          ],
+          "explanation": "Не совсем introduces a contrast, followed by the defensive benefit emphasized in the second account.",
+          "evidence": "оборона позволила выиграть время"
+        },
+        {
+          "id": "vocab_l32_history_discourse_2",
+          "prompt": "Why does the speaker avoid saying there was complete encirclement?",
+          "answer": "A route out remained, so the claim would overstate the evidence.",
+          "distractors": [
+            "Neither account mentions a location.",
+            "The map proves all roads were blocked.",
+            "The speaker does not know which side retreated."
+          ],
+          "explanation": "The open road is the reason given for rejecting that description.",
+          "evidence": "На карте оставалась дорога для выхода."
+        }
+      ]
+    },
+    {
+      "id": "vocab_l32_report_discourse",
+      "passage_id": "vocab_l32_report",
+      "category": "discourse",
+      "lesson_id": "ru-basic-mod6-l32",
+      "objective": "Track correction and uncertainty in a summary",
+      "review_guidance": "Distinguish confirmed events, a speaker’s correction, and information that remains uncertain.",
+      "questions": [
+        {
+          "id": "vocab_l32_report_discourse_1",
+          "prompt": "What change does the speaker agree to make?",
+          "answer": "Remove the claim that the whole building was destroyed.",
+          "distractors": [
+            "Add that people died inside.",
+            "Say the explosion never happened.",
+            "Blame the journalist for the explosion."
+          ],
+          "explanation": "The speaker concedes that only part was damaged and the stronger claim must be removed.",
+          "evidence": "повреждена только одна часть"
+        },
+        {
+          "id": "vocab_l32_report_discourse_2",
+          "prompt": "What is the main purpose of the final part of the conversation?",
+          "answer": "To make the summary accurate and identify unconfirmed information.",
+          "distractors": [
+            "To accuse a suspect immediately.",
+            "To describe how to demolish a building.",
+            "To advertise a new recording device."
+          ],
+          "explanation": "The ending emphasizes accurate sequence and explicitly marking what is not confirmed.",
+          "evidence": "отмечу, какие сведения ещё не подтверждены"
+        }
+      ]
+    },
+    {
+      "id": "vocab_classroom_sociocultural",
+      "passage_id": "vocab_classroom",
+      "category": "sociocultural",
+      "lesson_id": null,
+      "objective": "Recognize informal peer register and a supportive suggestion",
+      "review_guidance": "Notice ты and давай in a peer conversation. Interpret suggestions in context; these examples do not establish rules for all Russian speakers.",
+      "questions": [
+        {
+          "id": "vocab_classroom_sociocultural_1",
+          "prompt": "What does the opening “Ты уже подготовился…” suggest about the register?",
+          "answer": "The speakers are using informal, familiar address.",
+          "distractors": [
+            "The speaker is using formal plural address.",
+            "It is an impersonal official announcement.",
+            "The speaker is addressing a large public audience."
+          ],
+          "explanation": "Ты is informal singular address. It does not by itself establish the speakers’ exact relationship.",
+          "evidence": "Ты уже подготовился"
+        },
+        {
+          "id": "vocab_classroom_sociocultural_2",
+          "prompt": "What is the speaker doing by saying “Давай посмотрим вместе”?",
+          "answer": "Offering to work through the problem together.",
+          "distractors": [
+            "Ordering the other person to leave.",
+            "Refusing further discussion.",
+            "Demanding that the teacher grade the work immediately."
+          ],
+          "explanation": "Давай with together frames a collaborative suggestion in this conversation.",
+          "evidence": "Давай посмотрим вместе."
+        }
+      ]
+    },
+    {
+      "id": "vocab_clothing_sociocultural",
+      "passage_id": "vocab_clothing",
+      "category": "sociocultural",
+      "lesson_id": null,
+      "objective": "Understand a sales interaction and its stated return conditions",
+      "review_guidance": "Identify the seller’s advice and the conditions stated in this specific transaction. Do not assume these are universal store policies.",
+      "questions": [
+        {
+          "id": "vocab_clothing_sociocultural_1",
+          "prompt": "Why does the salesperson say the light jacket will not do?",
+          "answer": "To advise the customer about suitability for a cold-weather trip.",
+          "distractors": [
+            "To announce that the shop is closed.",
+            "To refuse all service to the customer.",
+            "To demand a receipt before showing any clothing."
+          ],
+          "explanation": "The advice responds to the customer’s destination and the expected cold.",
+          "evidence": "для сильного холода она не подойдёт"
+        },
+        {
+          "id": "vocab_clothing_sociocultural_2",
+          "prompt": "What must the customer do to use the return offer described here?",
+          "answer": "Keep the receipt and leave the tag on, returning within a week.",
+          "distractors": [
+            "Remove the tag and return at any time.",
+            "Wear the coat for a month first.",
+            "Return only if the colour is black."
+          ],
+          "explanation": "These are conditions of this seller’s offer, not a claim about Russian consumer law.",
+          "evidence": "если сохранить чек и не снимать ярлык"
+        }
+      ]
+    }
+  ]
+}

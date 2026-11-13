@@ -13,18 +13,20 @@ import re
 
 from .study_scheduler import day_key, schedule
 from .vocabulary_check import VocabularyCheckMixin, check_tables
+from .lesson_study import LessonStudyMixin, lesson_tables
 
 
 class StudyError(ValueError):
     pass
 
 
-class StudyStore(VocabularyCheckMixin):
+class StudyStore(VocabularyCheckMixin, LessonStudyMixin):
     def __init__(self, path: Path, clock=time.time):
         self.path, self.clock = Path(path), clock
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as db:
             check_tables(db)
+            lesson_tables(db)
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS profiles (
                     id TEXT PRIMARY KEY, name TEXT NOT NULL, name_key TEXT UNIQUE NOT NULL,
@@ -250,5 +252,14 @@ class StudyStore(VocabularyCheckMixin):
                        for r in db.execute('SELECT * FROM reviews WHERE profile_id=? ORDER BY reviewed', (p['id'],))]
             evidence = [dict(word_id=r['word_id'], skill=r['skill'], **json.loads(r['data'])) for r in
                         db.execute('SELECT * FROM vocabulary_evidence WHERE profile_id=?', (p['id'],))]
-            return {'version': 2, 'profile': {'name': p['name'], 'timezone': p['zone'], 'new_limit': p['new_limit']},
-                    'cards': cards, 'reviews': history, 'vocabulary_checks': evidence}
+            lesson_checks = []
+            for row in db.execute('SELECT data FROM lesson_checks WHERE profile_id=?', (p['id'],)):
+                state = json.loads(row['data'])
+                if state['status'] != 'complete':
+                    continue
+                mapping = state['mapping']
+                lesson_checks.append(dict(skill=state['skill'], completed_at=state['completed_at'],
+                    mapping_id=mapping['id'], passage_id=mapping['passage_id'], category=mapping['category'],
+                    lesson_id=mapping['lesson_id'], revision=mapping['revision'], results=state['results']))
+            return {'version': 3, 'profile': {'name': p['name'], 'timezone': p['zone'], 'new_limit': p['new_limit']},
+                    'cards': cards, 'reviews': history, 'vocabulary_checks': evidence, 'lesson_checks': lesson_checks}

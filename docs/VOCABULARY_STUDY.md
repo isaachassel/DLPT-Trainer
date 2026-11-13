@@ -1,5 +1,8 @@
 # Russian vocabulary study (local preview)
 
+The `codex/lesson-study` branch adds [four-category lesson passage practice](LESSON_STUDY.md)
+alongside this vocabulary workflow, reusing the existing recordings.
+
 Branch: `codex/russian-vocabulary-study`, based on the published demo branch.
 The existing `app.py` and public assessment remain unchanged. Start the study
 preview with the project's existing virtual environment:

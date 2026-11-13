@@ -274,6 +274,9 @@ def build_study_ui(catalog, store):
     export.click(safe(lambda t: gr.update(value=json.dumps(store.export(t), ensure_ascii=False, indent=2), visible=True)),
                  [token], [exported], **common)
     check.bind(token, filters, store, catalog, safe, common, card_outputs, view, advance, dashboard, presenter)
+    from ui.lesson_study import build_lesson_ui
+    with workspace:
+        build_lesson_ui(catalog, store, token, skill, module, lesson, safe, common, (login, create, logout))
     # Remove prior profile's check/report from the browser on sign-in/sign-out.
     clear_check = lambda: check.present({})
     for button in (login, create, logout):
