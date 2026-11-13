@@ -5,6 +5,8 @@ from core.vocabulary_check import UNKNOWN
 
 
 def report_html(state):
+    if state.get('status') != 'complete':
+        return ''
     results = [r for p in state['completed'] for r in p['results']]
     focus = [r for r in results if not r['correct'] or r['guessed']]
     reasons = {'planned_length': 'Planned passages completed.',
@@ -12,6 +14,31 @@ def report_html(state):
                'stopped_by_learner': 'You ended the check early.'}
     if not results:
         return '<div class="study-card"><h2>No words assessed yet</h2><p>The check ended before any answers were submitted. Your vocabulary evidence has not changed.</p></div>'
+    if state.get('collection') == 'ales':
+        # One word per row. Any missed/guessed observation in this test needs work.
+        grouped = {}
+        for r in results:
+            previous = grouped.get(r['word_id'])
+            if previous is None or not r['correct'] or r['guessed']:
+                grouped[r['word_id']] = r
+        recognized = [r for r in grouped.values() if r['correct'] and not r['guessed']]
+        review = [r for r in grouped.values() if not r['correct'] or r['guessed']]
+        def section(title, entries):
+            rows = ''.join(f'<tr><td lang="ru">{escape(r["term"])}</td><td>{escape(r["meaning"])}</td>'
+                f'<td>{escape(r["selected"])}</td><td>{"Guessed" if r["guessed"] else "Correct" if r["correct"] else "Missed"}</td></tr>' for r in entries)
+            return (f'<h3>{title} ({len(entries)})</h3><table><thead><tr><th>ALES word</th><th>Meaning here</th>'
+                f'<th>Your answer</th><th>Result</th></tr></thead><tbody>{rows}</tbody></table>' if entries else f'<h3>{title} (0)</h3><p>None in this check.</p>')
+        details = ''.join(f'<li><strong>{escape(r["prompt"] or r["term"])}</strong><p>{escape(r["explanation"] or r["meaning"])}</p>'
+                         f'<p lang="ru">{escape(r["evidence"] or "")}</p></li>' for r in results)
+        return (f'<div class="study-card"><h2>Your ALES study plan</h2><p>{escape(reasons.get(state.get("end_reason"), "Check complete."))}</p>'
+            f'<p><strong>{len(grouped)} distinct word senses checked</strong> in {len(state["completed"])} '
+            f'{"passage" if len(state["completed"]) == 1 else "passages"}. '
+            f'{state["glossary_count"] - len(grouped)} glossary entries were not tested in this check. '
+            f'The current {state["skill"]} passage bank covers {state["covered_count"]} of {state["glossary_count"]} entries.</p>'
+            '<p>Saved to your profile. Review missed and guessed words next. Correct recognition in one context is encouraging; '
+            'it does not establish mastery. Reading and listening progress are separate.</p>'
+            + section('Correctly recognized without guessing', recognized) + section('Words to work on again', review)
+            + f'<details><summary>Question explanations</summary><ol>{details}</ol></details></div>')
     correct = sum(r['correct'] for r in results)
     rows = ''.join(f'<tr><td lang="ru">{escape(r["term"])}</td><td>{escape(r["meaning"])}</td>'
                    f'<td>{escape(r["selected"])}</td><td>{"Review next" if not r["correct"] or r["guessed"] else "Correct; confirm later"}</td></tr>' for r in results)
@@ -32,7 +59,7 @@ class CheckUI:
                         'The next passage adapts to your answers. At the end, review the words you missed or guessed. '
                         'Choose the skill and course filters above. Answers stay hidden until the check ends.')
             with gr.Row():
-                self.length = gr.Dropdown([2, 3, 4, 5], value=3, label='Passages to check')
+                self.length = gr.Dropdown([2, 3, 4, 5, 10, 15], value=3, label='Passages to check')
                 self.begin = gr.Button('Start vocabulary check', variant='primary')
         with gr.Column(visible=False) as self.panel:
             self.heading = gr.Markdown()
@@ -47,7 +74,7 @@ class CheckUI:
                         # its choices and visibility change together (e.g. 3 -> 2).
                         # Hide the whole slot instead of toggling individual inputs.
                         with gr.Column(visible=False, min_width=0, elem_classes=['vocab-question-slot']) as slot:
-                            self.choices.append(gr.Radio(label=f'Word {n + 1}', interactive=True))
+                            self.choices.append(gr.Radio(choices=[UNKNOWN], label=f'Word {n + 1}', interactive=True))
                             self.guesses.append(gr.Checkbox(False, label='That was a guess'))
                         self.slots.append(slot)
             with gr.Row():
@@ -64,7 +91,7 @@ class CheckUI:
         values = [state.get('id', ''), current['nonce'] if current else '', gr.update(visible=active)]
         if current:
             values += [f'### Passage {len(state["completed"]) + 1} of up to {state["maximum"]} · {state["skill"].title()} · {len(current["targets"])} words\n\n'
-                       + current['title'] + '\n\nSelect each meaning. Mark a guess so it can be reviewed. Listening allows replays for this study check.']
+                       + current['title'] + '\n\nAnswer using the passage. Mark a guess so it can be reviewed. Listening allows replays for this study check.']
             text = escape(current['text']) if state['skill'] == 'reading' else 'Listen to the conversation. The transcript will appear with the review plan.'
             values += [f'<div class="study-card"><div class="russian" lang="ru">{text}</div></div>',
                        gr.update(value=current['audio_path'] if state['skill'] == 'listening' else None,
@@ -75,8 +102,8 @@ class CheckUI:
             target = current['targets'][n] if current and n < len(current['targets']) else None
             values += [gr.update(visible=bool(target)),
                        gr.update(choices=target['options'] + [UNKNOWN] if target else [], value=None,
-                                 label=f'{n + 1}. What does “{target["target"]}” mean here?' if target else '',
-                                 interactive=bool(target)), gr.update(value=False, interactive=bool(target))]
+                                 label=f'{n + 1}. ' + target.get('prompt', f'What does “{target["target"]}” mean here?') if target else '',
+                                 visible=bool(target), interactive=bool(target)), gr.update(value=False, interactive=bool(target))]
         report = report_html(state) if state.get('status') == 'complete' else ''
         if report and state['skill'] == 'listening':
             for passage in state['completed']:
@@ -101,7 +128,10 @@ class CheckUI:
             return [*self.present(state), presenter.dashboard(t, *state['filters'])]
         self.submit.click(safe(submit), [token, self.identifier, self.nonce, *self.choices, *self.guesses],
                           [*self.outputs, dashboard], **common)
-        self.stop.click(safe(lambda t, i: self.present(store.cancel_check(t, i))), [token, self.identifier], self.outputs, **common)
+        def stop(t, i):
+            state = store.cancel_check(t, i)
+            return [*self.present(state), presenter.dashboard(t, *state['filters'])]
+        self.stop.click(safe(stop), [token, self.identifier], [*self.outputs, dashboard], **common)
 
         def focus(t, identifier):
             state = store.check_state(t, identifier)

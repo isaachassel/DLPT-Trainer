@@ -22,22 +22,26 @@ SOURCES = ['https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-conte
            'https://elevenlabs.io/elevenapi-terms', 'https://elevenlabs.io/speech-engine-terms']
 PAID = {'starter', 'creator', 'pro', 'scale', 'business', 'enterprise'}
 BATCHES = {'original': ('vocabulary-expansion-20261104', '2026-11-04'),
-           'lesson32': ('lesson32-20261108', '2026-11-08')}
+           'lesson32': ('lesson32-20261108', '2026-11-08'),
+           'ales': ('ales-20261113', '2026-11-13')}
 
 
 def select_batch(passages, batch):
     if batch not in BATCHES:
         raise ValueError('Unknown study audio batch')
-    selected = [p for p in passages if p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]
+    selected = [p for p in passages if p['id'].startswith('ales_')] if batch == 'ales' else [
+        p for p in passages if p['id'].startswith('vocab_') and p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]
     if not selected or len({p['id'] for p in selected}) != len(selected):
         raise ValueError('Empty batch or duplicate passage IDs')
     return selected
 
 
-def publish_records(stage, records, root=ROOT):
+def publish_records(stage, records, root=ROOT, manifest_relative='data/study/audio.json'):
     """Validate the complete staged batch before publishing; preserve other batches."""
     import shutil
-    manifest_path = root / 'data/study/audio.json'
+    if manifest_relative not in {'data/study/audio.json', 'data/study/ales/audio.json'}:
+        raise ValueError('Unknown audio manifest')
+    manifest_path = root / manifest_relative
     manifest = json.loads(manifest_path.read_text(encoding='utf-8')) if manifest_path.exists() else dict(version=1, recordings={})
     for key, record in records.items():
         asset = stage / (key + '.mp3')
@@ -75,7 +79,8 @@ def main(generate=False, batch='original'):
     from dotenv import load_dotenv
     load_dotenv(ROOT / '.env')
     client = ElevenLabs(os.environ.get('ELEVENLABS_API_KEY', ''))
-    passages = select_batch(json.loads((ROOT / 'data/study/passages.json').read_text(encoding='utf-8'))['passages'], batch)
+    source = 'data/study/ales/passages.json' if batch == 'ales' else 'data/study/passages.json'
+    passages = select_batch(json.loads((ROOT / source).read_text(encoding='utf-8'))['passages'], batch)
     stage = ROOT / 'storage/workshop' / BATCHES[batch][0]
     stage.mkdir(parents=True, exist_ok=True)
     ledger_path = stage / 'ledger.json'
@@ -118,7 +123,8 @@ def main(generate=False, batch='original'):
                 records[key] = prior['record']
                 continue
             amount = sum(len(t['text']) for t in p['turns'])
-            reserved = sum(a['input_characters'] for a in ledger['attempts'].values())
+            reserved = sum(a['input_characters'] for a in ledger['attempts'].values()) + sum(
+                a['input_characters'] for a in ledger.get('reviewed_failed_attempts', []))
             if reserved + amount > BUDGET:
                 raise ValueError('Reserved budget exhausted')
             live = client._request('GET', '/v1/user/subscription')
@@ -145,7 +151,7 @@ def main(generate=False, batch='original'):
         ledger['account_after'] = {k: after[k] for k in ('tier', 'character_count', 'character_limit')}
         save()
         # Publish only fully decoded, checksum-verified assets after the entire batch succeeds.
-        publish_records(stage, records)
+        publish_records(stage, records, manifest_relative='data/study/ales/audio.json' if batch == 'ales' else 'data/study/audio.json')
         print('COMPLETE', json.dumps(ledger['account_after']), flush=True)
     finally:
         lock.unlink()

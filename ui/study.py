@@ -52,10 +52,20 @@ class StudyPresenter:
         flagged = sum(evidence.get(wid, {}).get('focus', False) and
                       states.get((wid, skill), {}).get('evidence_reviewed_through', 0) < evidence[wid]['last_checked'] for wid in ids)
         progress = ' · '.join(f"{label}: **{counts[label]}**" for label in ['New', 'Learning', 'Shaky', 'Well known'])
+        ales = ''
+        if group == 'ALES glossary':
+            all_ids = self.catalog.eligible('reading', group, module, lesson, False)
+            checked = [wid for wid in all_ids if wid in evidence]
+            focus = sum(evidence[wid]['focus'] for wid in checked)
+            coverage = {t['word_id'] for p in self.catalog.checks(skill, group, module, lesson) for t in p['targets']}
+            ales = (f'\n\n**ALES recognition history · {skill.title()}**: {len(checked) - focus} recognized without guessing on their latest check · '
+                    f'{focus} missed or guessed · {len(all_ids) - len(checked)} not checked. '
+                    f'Passage coverage: {len(coverage)} of {len(all_ids)} glossary entries. '
+                    'These are recognition results, not proof of mastery. Review schedules above track later recall.')
         return (f"### {escape(profile['name'])} · {skill.title()}\n\n"
                 f"**{due} due now** · {len(ids):,} cards match these filters\n\n{progress}\n\n"
                 f"Passage-check priorities: **{flagged}**. New cards today: {introduced}/{profile['new_limit']} across both skills. "
-                f"Review day follows {profile['zone']}. Reading and listening progress are separate.")
+                f"Review day follows {profile['zone']}. Reading and listening progress are separate." + ales)
 
     def word_rows(self, token, skill, group, module, lesson, context_only, search='', status='All'):
         states, now = self.store.states(token), self.store.clock()
@@ -135,10 +145,12 @@ def build_study_ui(catalog, store):
                 skill = gr.Radio([('Reading', 'reading'), ('Listening', 'listening')], value='reading', label='Study skill')
                 logout = gr.Button('Sign out', size='sm')
             with gr.Row():
-                group = gr.Dropdown(['Course modules', 'Course + ALES + themes', 'All vocabulary'], value='Course modules', label='Vocabulary collection')
+                group = gr.Dropdown(['Course modules', 'ALES glossary', 'Course + ALES + themes', 'All vocabulary'], value='Course modules', label='Vocabulary collection')
                 module = gr.Dropdown(['All'] + sorted({s['group'] for w in catalog.words.values() for s in w['sources']}), value='All', label='Module / group')
                 lesson = gr.Dropdown(['All'] + sorted({s['lesson'] for w in catalog.words.values() for s in w['sources']}), value='All', label='Lesson')
             context_only = gr.Checkbox(True, label='Only words with context (always required for listening)')
+            ales = gr.Button('Study ALES words', variant='secondary', interactive=any(w.get('collection') == 'ales' for w in catalog.words.values()))
+            ales_note = gr.Markdown(visible=False)
             gr.Markdown('Filters choose your next session. Due cards come first; each session has up to 10 cards. '
                         'Uncheck context-only for word reviews from the rest of the workbook.')
             dashboard = gr.Markdown()
@@ -174,6 +186,17 @@ def build_study_ui(catalog, store):
                 exported = gr.Code(language='json', visible=False, label='Copy this JSON to keep a progress record (no password or login tokens)')
 
     filters = [skill, group, module, lesson, context_only]
+    ales.click(lambda: ('ALES glossary', 'All', 'All', True), outputs=[group, module, lesson, context_only], **common)
+    def collection_ui(selected):
+        is_ales = selected == 'ALES glossary'
+        return [gr.update(value='Start ALES assessment' if is_ales else 'Start vocabulary check'),
+                gr.update(visible=is_ales, value='**ALES assessment and study** · Choose Reading or Listening, then a test length below. '
+                    'The final report lists recognized words and words to work on. **Review my weaker words** starts your saved review plan. '
+                    'To study glossary entries without a passage yet, choose Reading, uncheck context-only and select Start review. '
+                    'All ALES entries belong to one study pool; no unit assignment is assumed.'),
+                gr.update(visible=False, value='All') if is_ales else gr.update(visible=True),
+                gr.update(visible=False, value='All') if is_ales else gr.update(visible=True)]
+    group.change(collection_ui, [group], [check.begin, ales_note, module, lesson], **common)
     card_outputs = [session, exercise, question, audio, guess, reveal, unknown, answer, ratings, *rating_buttons, next_button, skip, message]
 
     def safe(fn):

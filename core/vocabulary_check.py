@@ -64,8 +64,8 @@ class VocabularyCheckMixin:
             return self._evidence(db, p['id'], skill)
 
     def start_check(self, token, catalog, filters, maximum=3):
-        if not isinstance(maximum, int) or not 2 <= maximum <= 5:
-            raise ValueError('Choose 2–5 passages for a vocabulary check.')
+        if type(maximum) is not int or not 2 <= maximum <= 15:
+            raise ValueError('Choose 2–15 passages for a vocabulary check.')
         candidates = catalog.checks(*filters)
         if not candidates:
             raise ValueError('No passage check matches these filters. Try All modules/lessons, or Reading. Individual word reviews are still available.')
@@ -83,6 +83,10 @@ class VocabularyCheckMixin:
             state = dict(id=identifier, skill=filters[0], filters=list(filters), maximum=maximum,
                          status='active', stage=1, completed=[], current=None, started_at=self.clock(),
                          candidates=candidates, initial_evidence=evidence)
+            if filters[1] == 'ALES glossary':
+                state['collection'] = 'ales'
+                state['glossary_count'] = len(catalog.eligible('reading', 'ALES glossary', filters[2], filters[3], False))
+                state['covered_count'] = len({t['word_id'] for p in candidates for t in p['targets']})
             self._select_check_passage(state)
             db.execute('INSERT INTO vocabulary_checks VALUES (?,?,?,?)',
                        (identifier, p['id'], self.token_hash(token), json.dumps(state)))
@@ -123,6 +127,36 @@ class VocabularyCheckMixin:
         with self.connect() as db:
             return self._check(db, token, identifier)[1]
 
+    @staticmethod
+    def _save_word_observation(db, profile_id, state, passage_id, result, now):
+        wid = result['word_id']
+        observation = dict(source=passage_id, correct=result['correct'], guessed=result['guessed'],
+                           observed_at=now, check_id=state['id'], selected=result['selected'])
+        # A later-completed check must not be overwritten by an older in-flight one.
+        old = db.execute('SELECT data FROM vocabulary_evidence WHERE profile_id=? AND word_id=? AND skill=? AND source=?',
+                         (profile_id, wid, state['skill'], passage_id)).fetchone()
+        if old and json.loads(old['data'])['observed_at'] > now:
+            return
+        db.execute('INSERT OR REPLACE INTO vocabulary_evidence VALUES (?,?,?,?,?)',
+                   (profile_id, wid, state['skill'], passage_id, json.dumps(observation)))
+        if not result['correct'] or result['guessed']:
+            row = db.execute('SELECT state FROM cards WHERE profile_id=? AND word_id=? AND skill=?',
+                             (profile_id, wid, state['skill'])).fetchone()
+            if row:
+                card = json.loads(row['state'])
+                if card.get('evidence_reviewed_through', 0) < now:
+                    card.update(due=min(card['due'], now), diagnostic_focus=True)
+                    db.execute('UPDATE cards SET state=? WHERE profile_id=? AND word_id=? AND skill=?',
+                               (json.dumps(card), profile_id, wid, state['skill']))
+
+    def _publish_ales_evidence(self, db, profile_id, state):
+        if state.get('collection') != 'ales' or state.get('evidence_published'):
+            return
+        for passage in state['completed']:
+            for result in passage['results']:
+                self._save_word_observation(db, profile_id, state, passage['id'], result, passage['answered_at'])
+        state['evidence_published'] = True
+
     def submit_check(self, token, identifier, nonce, choices, guesses):
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
@@ -137,39 +171,34 @@ class VocabularyCheckMixin:
             targets = current['targets']
             if len(choices) != len(targets) or len(guesses) != len(targets):
                 raise ValueError('Answer every vocabulary question.')
+            if any(type(g) is not bool for g in guesses):
+                raise ValueError('Guess flags must be true or false.')
             if any(c not in t['options'] + [UNKNOWN] for t, c in zip(targets, choices)):
                 raise ValueError('Answer every question, or choose I don’t know.')
             now = self.clock()
             results = []
             for t, selected, guessed in zip(targets, choices, guesses):
                 correct = selected == t['meaning']
-                observation = dict(source=current['id'], correct=correct, guessed=bool(guessed),
-                                   observed_at=now, check_id=identifier, selected=selected)
-                db.execute('INSERT OR REPLACE INTO vocabulary_evidence VALUES (?,?,?,?,?)',
-                           (profile['id'], t['word_id'], state['skill'], current['id'], json.dumps(observation)))
-                # Misses make an already introduced card due immediately, but never erase its history.
-                # A new word remains subject to the ordinary new-card allowance.
-                if not correct or guessed:
-                    row = db.execute('SELECT state FROM cards WHERE profile_id=? AND word_id=? AND skill=?',
-                                     (profile['id'], t['word_id'], state['skill'])).fetchone()
-                    if row:
-                        card = json.loads(row['state'])
-                        card.update(due=min(card['due'], now), diagnostic_focus=True)
-                        db.execute('UPDATE cards SET state=? WHERE profile_id=? AND word_id=? AND skill=?',
-                                   (json.dumps(card), profile['id'], t['word_id'], state['skill']))
                 results.append(dict(word_id=t['word_id'], term=t['term'], target=t['target'], meaning=t['meaning'],
-                                    selected=selected, correct=correct, guessed=bool(guessed)))
-            state['completed'].append({**current, 'results': results})
+                                    selected=selected, correct=correct, guessed=bool(guessed),
+                                    prompt=t.get('prompt'), explanation=t.get('explanation'), evidence=t.get('evidence')))
+                if state.get('collection') != 'ales':
+                    self._save_word_observation(db, profile['id'], state, current['id'], results[-1], now)
+            state['completed'].append({**current, 'results': results, 'answered_at': now})
             secure = sum(r['correct'] and not r['guessed'] for r in results) / len(results)
             state['stage'] = max(1, min(3, current['stage'] + (1 if secure >= .8 else -1 if secure <= .5 else 0)))
             self._select_check_passage(state)
+            if state['status'] == 'complete':
+                self._publish_ales_evidence(db, profile['id'], state)
             db.execute('UPDATE vocabulary_checks SET data=? WHERE id=?', (json.dumps(state), identifier))
             return state
 
     def cancel_check(self, token, identifier):
         with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
             p, state = self._check(db, token, identifier)
             if state['status'] == 'active':
                 state.update(status='complete', current=None, end_reason='stopped_by_learner')
+                self._publish_ales_evidence(db, p['id'], state)
                 db.execute('UPDATE vocabulary_checks SET data=? WHERE id=?', (json.dumps(state), identifier))
             return state

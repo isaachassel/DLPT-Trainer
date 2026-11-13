@@ -3,6 +3,9 @@
 The `codex/lesson-study` branch adds [four-category lesson passage practice](LESSON_STUDY.md)
 alongside this vocabulary workflow, reusing the existing recordings.
 
+The `codex/ales-study` branch adds [ALES assessment and personalized review](ALES_STUDY.md),
+including the CSV glossary import, passage/audio coverage and profile integration.
+
 Branch: `codex/russian-vocabulary-study`, based on the published demo branch.
 The existing `app.py` and public assessment remain unchanged. Start the study
 preview with the project's existing virtual environment:

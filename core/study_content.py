@@ -8,9 +8,13 @@ from .vocabulary import ROOT, load_vocabulary, normalize_ru
 
 
 class StudyCatalog:
-    def __init__(self, vocabulary_path=None, contexts_path=None, bank_path=None, passages_path=None):
+    def __init__(self, vocabulary_path=None, contexts_path=None, bank_path=None, passages_path=None, ales_path=None, ales_passages_path=None):
         raw = load_vocabulary(vocabulary_path) if vocabulary_path else load_vocabulary()
         self.words = {w['id']: w for w in raw['items']}
+        # Explicit custom catalogs stay isolated from a user's local ALES import.
+        from .ales import ALES_PATH
+        if ales_path is not None or vocabulary_path is None:
+            self.words.update({w['id']: w for w in load_vocabulary(ales_path or ALES_PATH)['items']})
         self.report = raw.get('report', {})
         self.contexts = {}
         self.by_word = {wid: [] for wid in self.words}
@@ -19,6 +23,10 @@ class StudyCatalog:
         seeds = json.loads((contexts_path or ROOT / 'data/study/contexts.json').read_text(encoding='utf-8'))
         if passages_path or contexts_path is None:
             source = passages_path or ROOT / 'data/study/passages.json'
+            if source.exists():
+                self._load_passages(source, seeds)
+        if ales_path is not None or vocabulary_path is None:
+            source = ales_passages_path or ROOT / 'data/study/ales/passages.json'
             if source.exists():
                 self._load_passages(source, seeds)
         bank_file = bank_path or ROOT / 'data/assessment/bank.json'
@@ -46,8 +54,9 @@ class StudyCatalog:
             self.contexts[seed['id']] = context
             linked = False
             for word in self.words.values():
-                if (normalize_ru(seed['term']) in word['variants'] and
-                        any(h.casefold() in word['english'].casefold() for h in seed['sense_hints'])):
+                if ((seed.get('word_id') == word['id']) if seed.get('word_id') else
+                        (word.get('collection') != 'ales' and normalize_ru(seed['term']) in word['variants'] and
+                         any(h.casefold() in word['english'].casefold() for h in seed['sense_hints']))):
                     self.by_word[word['id']].append(seed['id'])
                     linked = True
             if not linked:
@@ -63,7 +72,7 @@ class StudyCatalog:
         seen = set()
         for passage in raw['passages']:
             pid = passage['id']
-            if pid in seen or passage['language'] != 'ru' or passage['stage'] not in (1, 2, 3):
+            if pid in seen or pid in self.passages or passage['language'] != 'ru' or passage['stage'] not in (1, 2, 3):
                 raise ValueError('Invalid vocabulary passage identifier, language or stage')
             seen.add(pid)
             passage['text'] = '\n\n'.join(t['speaker'] + ': ' + t['text'] for t in passage['turns'])
@@ -86,6 +95,8 @@ class StudyCatalog:
                     raise ValueError('Each vocabulary question needs four distinct meanings and a unique ID')
                 target_ids.add(t['id'])
                 base = {k: t[k] for k in ('term', 'sense_hints', 'target', 'meaning')}
+                if t.get('word_id'):
+                    base['word_id'] = t['word_id']
                 seeds.append(dict(base, id='short_' + t['id'], target=t['review_target'],
                                   text=t['review_text'], source='New study example; provisional language review'))
                 seeds.append(dict(base, id='long_' + t['id'], text=passage['text'], audio_path=passage['audio_path'],
@@ -118,6 +129,7 @@ class StudyCatalog:
         for word in self.words.values():
             sources = word['sources']
             sources = [s for s in sources if (group == 'All vocabulary' or
+                       (group == 'ALES glossary' and word.get('collection') == 'ales') or
                        (group == 'Course modules' and s['group'].startswith('Mod ')) or
                        (group == 'Course + ALES + themes' and s['group'] != 'Frequency'))]
             if module != 'All':

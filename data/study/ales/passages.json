@@ -1,0 +1,1565 @@
+{
+  "version": 1,
+  "passages": [
+    {
+      "id": "ales_weather",
+      "title": "Planning an outdoor event",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Ты посмотрел прогноз на завтра? Ожидается похолодание, а к вечеру возможны осадки. Утром ветер будет слабым."
+        },
+        {
+          "speaker": "B",
+          "text": "Тогда встречу лучше провести в помещении. А что будет в воскресенье?"
+        },
+        {
+          "speaker": "A",
+          "text": "Обещают переменную облачность. Но прогноз ещё могут изменить, поэтому окончательное решение примем завтра."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_weather_1",
+          "word_id": "ales_8e308be0619f2ae7ada1a69d",
+          "term": "похолодание (холодный 13)",
+          "sense_hints": [
+            "cooling"
+          ],
+          "target": "похолодание",
+          "meaning": "a drop in temperature",
+          "distractors": [
+            "a rise in temperature",
+            "a change in wind direction",
+            "a rise in air pressure"
+          ],
+          "prompt": "What temperature change is expected tomorrow?",
+          "evidence": "Ожидается похолодание, а к вечеру возможны осадки.",
+          "explanation": "“похолодание” means a drop in temperature in this passage.",
+          "review_target": "похолодание",
+          "review_text": "В конце недели начнётся похолодание. Я возьму тёплую куртку."
+        },
+        {
+          "id": "ales_weather_2",
+          "word_id": "ales_a60e1c9b4d5afac60977e264",
+          "term": "осадки",
+          "sense_hints": [
+            "precipitation"
+          ],
+          "target": "осадки",
+          "meaning": "precipitation",
+          "distractors": [
+            "sunshine",
+            "fog",
+            "strong wind"
+          ],
+          "prompt": "What may arrive by evening?",
+          "evidence": "Ожидается похолодание, а к вечеру возможны осадки.",
+          "explanation": "“осадки” means precipitation in this passage.",
+          "review_target": "осадки",
+          "review_text": "В этом районе осадки бывают даже летом."
+        },
+        {
+          "id": "ales_weather_3",
+          "word_id": "ales_aeef9258d9064c4696b05615",
+          "term": "переменная облачность",
+          "sense_hints": [
+            "variable cloudiness"
+          ],
+          "target": "переменную облачность",
+          "meaning": "changing cloud cover",
+          "distractors": [
+            "continuous clear skies",
+            "thick fog throughout the day",
+            "continuous heavy rain"
+          ],
+          "prompt": "What sky conditions are forecast for Sunday?",
+          "evidence": "Обещают переменную облачность.",
+          "explanation": "“переменную облачность” means changing cloud cover in this passage.",
+          "review_target": "переменную облачность",
+          "review_text": "На завтра обещают переменную облачность, а точную температуру назовут позже."
+        },
+        {
+          "id": "ales_weather_4",
+          "word_id": "ales_27af8a2f981c95054a19c1ae",
+          "term": "ожидается (ждать 35)",
+          "sense_hints": [
+            "is expected"
+          ],
+          "target": "Ожидается",
+          "meaning": "is expected",
+          "distractors": [
+            "has ended",
+            "has been ruled out",
+            "has been measured"
+          ],
+          "prompt": "How does the speaker present tomorrow’s cooling?",
+          "evidence": "Ожидается похолодание, а к вечеру возможны осадки.",
+          "explanation": "“Ожидается” means is expected in this passage.",
+          "review_target": "Ожидается",
+          "review_text": "Ожидается новая группа посетителей. Подготовьте для них зал."
+        }
+      ]
+    },
+    {
+      "id": "ales_travel",
+      "title": "Checking a passenger service",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Я уточнил маршрут на завтра. Наш рейс отправляется в девять. Лучше приехать заранее."
+        },
+        {
+          "speaker": "B",
+          "text": "Мы поедем на автобусе или на теплоходе? В расписании не вижу названия транспорта."
+        },
+        {
+          "speaker": "A",
+          "text": "На теплоходе. Друзья пригласили нас на вечернюю встречу, поэтому важно не опоздать. Вечером проверю время отправления."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_travel_1",
+          "word_id": "ales_e8b8ddbd2385f1c2a88c3ed4",
+          "term": "маршрут",
+          "sense_hints": [
+            "route, itinerary"
+          ],
+          "target": "маршрут",
+          "meaning": "route",
+          "distractors": [
+            "fare",
+            "passenger list",
+            "luggage allowance"
+          ],
+          "prompt": "What did the first speaker check for tomorrow?",
+          "evidence": "Я уточнил маршрут на завтра.",
+          "explanation": "“маршрут” means route in this passage.",
+          "review_target": "маршрут",
+          "review_text": "Маршрут изменили после ремонта дороги."
+        },
+        {
+          "id": "ales_travel_2",
+          "word_id": "ales_4baabbdd9cc8e17cc1d67ed1",
+          "term": "рейс",
+          "sense_hints": [
+            "flight, trip, run"
+          ],
+          "target": "рейс",
+          "meaning": "scheduled service",
+          "distractors": [
+            "ticket office",
+            "travel document",
+            "waiting room"
+          ],
+          "prompt": "What leaves at nine?",
+          "evidence": "Наш рейс отправляется в девять.",
+          "explanation": "“рейс” means scheduled service in this passage.",
+          "review_target": "рейс",
+          "review_text": "Этот рейс выполняется только по пятницам."
+        },
+        {
+          "id": "ales_travel_3",
+          "word_id": "ales_5ac34d973291dc48ad6c5a39",
+          "term": "приглашать/пригласить",
+          "sense_hints": [
+            "to invite"
+          ],
+          "target": "пригласили",
+          "meaning": "invited",
+          "distractors": [
+            "warned",
+            "thanked",
+            "accompanied"
+          ],
+          "prompt": "What did the friends do regarding the evening meeting?",
+          "evidence": "Друзья пригласили нас на вечернюю встречу, поэтому важно не опоздать.",
+          "explanation": "“пригласили” means invited in this passage.",
+          "review_target": "пригласили",
+          "review_text": "Нас пригласили на открытие музея."
+        },
+        {
+          "id": "ales_travel_4",
+          "word_id": "ales_c9496bc5cc4c22db0333fa4b",
+          "term": "теплоход",
+          "sense_hints": [
+            "motor ship"
+          ],
+          "target": "теплоходе",
+          "meaning": "motor ship",
+          "distractors": [
+            "electric train",
+            "coach",
+            "passenger aircraft"
+          ],
+          "prompt": "What vehicle will they travel on?",
+          "evidence": "Мы поедем на автобусе или на теплоходе?",
+          "explanation": "“теплоходе” means motor ship in this passage.",
+          "review_target": "теплоходе",
+          "review_text": "На теплоходе открыли небольшое кафе."
+        }
+      ]
+    },
+    {
+      "id": "ales_work",
+      "title": "Discussing a local employment report",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В новом отчёте говорится, что безработица снизилась. Но доход многих семей почти не изменился."
+        },
+        {
+          "speaker": "B",
+          "text": "А на нашем предприятии появились новые места? Я ищу работу с весны."
+        },
+        {
+          "speaker": "A",
+          "text": "Да, сейчас открыта одна должность. Завтра можно позвонить в отдел кадров и узнать подробности."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_work_1",
+          "word_id": "ales_1da1ce347c84a3ed0b906520",
+          "term": "безработица",
+          "sense_hints": [
+            "unemployment"
+          ],
+          "target": "безработица",
+          "meaning": "unemployment",
+          "distractors": [
+            "inflation",
+            "production",
+            "education"
+          ],
+          "prompt": "Which measure decreased in the report?",
+          "evidence": "В новом отчёте говорится, что безработица снизилась.",
+          "explanation": "“безработица” means unemployment in this passage.",
+          "review_target": "безработица",
+          "review_text": "Безработица остаётся главной темой встречи."
+        },
+        {
+          "id": "ales_work_2",
+          "word_id": "ales_bd59921b9627b48b4e33021b",
+          "term": "доход",
+          "sense_hints": [
+            "income"
+          ],
+          "target": "доход",
+          "meaning": "income",
+          "distractors": [
+            "expenses",
+            "savings",
+            "debt"
+          ],
+          "prompt": "What has barely changed for many families?",
+          "evidence": "Но доход многих семей почти не изменился.",
+          "explanation": "“доход” means income in this passage.",
+          "review_target": "доход",
+          "review_text": "Мой доход зависит от количества заказов."
+        },
+        {
+          "id": "ales_work_3",
+          "word_id": "ales_18e3b4b3345095069c776679",
+          "term": "предприятие",
+          "sense_hints": [
+            "enterprise, venture"
+          ],
+          "target": "предприятии",
+          "meaning": "enterprise",
+          "distractors": [
+            "trade union",
+            "employment agency",
+            "municipal council"
+          ],
+          "prompt": "Where does the second speaker ask about jobs?",
+          "evidence": "А на нашем предприятии появились новые места?",
+          "explanation": "“предприятии” means enterprise in this passage.",
+          "review_target": "предприятии",
+          "review_text": "На предприятии сегодня проводят собрание."
+        },
+        {
+          "id": "ales_work_4",
+          "word_id": "ales_779bb85118ac085d3b4d1ec6",
+          "term": "должность",
+          "sense_hints": [
+            "post, position, office"
+          ],
+          "target": "должность",
+          "meaning": "job position",
+          "distractors": [
+            "training course",
+            "work shift",
+            "business contract"
+          ],
+          "prompt": "What is currently available?",
+          "evidence": "Да, сейчас открыта одна должность.",
+          "explanation": "“должность” means job position in this passage.",
+          "review_target": "должность",
+          "review_text": "Эта должность требует знания двух языков."
+        }
+      ]
+    },
+    {
+      "id": "ales_budget",
+      "title": "Revising an operating budget",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "После совещания решили снизить расходы на поездки. Стоимость оборудования пока не обсуждали."
+        },
+        {
+          "speaker": "B",
+          "text": "Значит, закупку отменяют?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет. Оборудование закажут в этом месяце. Сначала бухгалтер подготовит новый расчёт, а потом руководитель его подпишет."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_budget_1",
+          "word_id": "ales_9569fcd0cf4dfc6a7201eff4",
+          "term": "снижать/снизить",
+          "sense_hints": [
+            "to reduce, to decrease"
+          ],
+          "target": "снизить",
+          "meaning": "reduce",
+          "distractors": [
+            "increase",
+            "postpone",
+            "verify"
+          ],
+          "prompt": "What will they do to travel spending?",
+          "evidence": "После совещания решили снизить расходы на поездки.",
+          "explanation": "“снизить” means reduce in this passage.",
+          "review_target": "снизить",
+          "review_text": "Мы решили снизить цену на старую модель."
+        },
+        {
+          "id": "ales_budget_2",
+          "word_id": "ales_95bd73221b3b9c9acde468d7",
+          "term": "расходы",
+          "sense_hints": [
+            "expenses"
+          ],
+          "target": "расходы",
+          "meaning": "expenses",
+          "distractors": [
+            "revenues",
+            "profits",
+            "reserves"
+          ],
+          "prompt": "What will be changed in the travel budget?",
+          "evidence": "После совещания решили снизить расходы на поездки.",
+          "explanation": "“расходы” means expenses in this passage.",
+          "review_target": "расходы",
+          "review_text": "Расходы записаны в отдельной таблице."
+        },
+        {
+          "id": "ales_budget_3",
+          "word_id": "ales_ef472d6f8afe83694f9c631a",
+          "term": "стоимость (стоить 18)",
+          "sense_hints": [
+            "cost"
+          ],
+          "target": "Стоимость",
+          "meaning": "cost",
+          "distractors": [
+            "quality",
+            "availability",
+            "capacity"
+          ],
+          "prompt": "Which aspect of the equipment has not yet been discussed?",
+          "evidence": "Стоимость оборудования пока не обсуждали.",
+          "explanation": "“Стоимость” means cost in this passage.",
+          "review_target": "Стоимость",
+          "review_text": "Стоимость билета зависит от даты поездки."
+        },
+        {
+          "id": "ales_budget_4",
+          "word_id": "ales_2396d459ebb0e5be8fb79bbe",
+          "term": "оборудование",
+          "sense_hints": [
+            "equipment"
+          ],
+          "target": "Оборудование",
+          "meaning": "equipment",
+          "distractors": [
+            "raw materials",
+            "finished products",
+            "office space"
+          ],
+          "prompt": "What will they order this month?",
+          "evidence": "Оборудование закажут в этом месяце.",
+          "explanation": "“Оборудование” means equipment in this passage.",
+          "review_target": "Оборудование",
+          "review_text": "Оборудование привезут после обеда."
+        }
+      ]
+    },
+    {
+      "id": "ales_diplomacy",
+      "title": "Preparing a briefing on a meeting",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Переговоры закончились поздно вечером. Представитель делегации сказал, что стороны продолжат работу на следующей неделе."
+        },
+        {
+          "speaker": "B",
+          "text": "А соглашение уже готово?"
+        },
+        {
+          "speaker": "A",
+          "text": "Документ ещё обсуждают. В сообщении особо отметили сотрудничество в области науки, но подробностей пока нет."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_diplomacy_1",
+          "word_id": "ales_60eaed231604e81753f7abfa",
+          "term": "переговоры",
+          "sense_hints": [
+            "negotiations, talks"
+          ],
+          "target": "Переговоры",
+          "meaning": "negotiations",
+          "distractors": [
+            "elections",
+            "celebrations",
+            "inspections"
+          ],
+          "prompt": "What ended late in the evening?",
+          "evidence": "Переговоры закончились поздно вечером.",
+          "explanation": "“Переговоры” means negotiations in this passage.",
+          "review_target": "Переговоры",
+          "review_text": "Переговоры начнутся после обеда."
+        },
+        {
+          "id": "ales_diplomacy_2",
+          "word_id": "ales_b308cad59a969e2d65960d6e",
+          "term": "представитель",
+          "sense_hints": [
+            "representative"
+          ],
+          "target": "Представитель",
+          "meaning": "representative",
+          "distractors": [
+            "interpreter",
+            "opponent",
+            "observer"
+          ],
+          "prompt": "Who gave the statement for the delegation?",
+          "evidence": "Представитель делегации сказал, что стороны продолжат работу на следующей неделе.",
+          "explanation": "“Представитель” means representative in this passage.",
+          "review_target": "Представитель",
+          "review_text": "Представитель компании ответит на вопросы."
+        },
+        {
+          "id": "ales_diplomacy_3",
+          "word_id": "ales_ea482f4e596d01b0539ba0c8",
+          "term": "соглашение",
+          "sense_hints": [
+            "agreement"
+          ],
+          "target": "соглашение",
+          "meaning": "agreement",
+          "distractors": [
+            "complaint",
+            "invitation",
+            "budget"
+          ],
+          "prompt": "What document does the second speaker ask about?",
+          "evidence": "А соглашение уже готово?",
+          "explanation": "“соглашение” means agreement in this passage.",
+          "review_target": "соглашение",
+          "review_text": "Новое соглашение касается работы музея."
+        },
+        {
+          "id": "ales_diplomacy_4",
+          "word_id": "ales_9bc48d4b53ca23b51a0ea623",
+          "term": "сотрудничество",
+          "sense_hints": [
+            "cooperation"
+          ],
+          "target": "сотрудничество",
+          "meaning": "cooperation",
+          "distractors": [
+            "competition",
+            "independence",
+            "disagreement"
+          ],
+          "prompt": "What relationship in science was highlighted?",
+          "evidence": "В сообщении особо отметили сотрудничество в области науки, но подробностей пока нет.",
+          "explanation": "“сотрудничество” means cooperation in this passage.",
+          "review_target": "сотрудничество",
+          "review_text": "Университет предложил сотрудничество местному музею."
+        }
+      ]
+    },
+    {
+      "id": "ales_research",
+      "title": "Organizing a research project",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На исследование выделили средства из городского бюджета. Первые данные уже поступили, но их ещё нужно проверить."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто будет готовить итоговый доклад?"
+        },
+        {
+          "speaker": "A",
+          "text": "Наша группа. Её основная цель — сравнить результаты за два года. До пятницы нужно составить план работы."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_research_1",
+          "word_id": "ales_d977b4eb37aaaa98bdfe54cf",
+          "term": "исследование",
+          "sense_hints": [
+            "research"
+          ],
+          "target": "исследование",
+          "meaning": "research",
+          "distractors": [
+            "construction",
+            "training",
+            "advertising"
+          ],
+          "prompt": "What activity received funding?",
+          "evidence": "На исследование выделили средства из городского бюджета.",
+          "explanation": "“исследование” means research in this passage.",
+          "review_target": "исследование",
+          "review_text": "Это исследование займёт несколько месяцев."
+        },
+        {
+          "id": "ales_research_2",
+          "word_id": "ales_c98da7ade8617eb6df39b5e9",
+          "term": "выделять/выделить",
+          "sense_hints": [
+            "to allocate, to apportion"
+          ],
+          "target": "выделили",
+          "meaning": "allocated",
+          "distractors": [
+            "borrowed",
+            "returned",
+            "withheld"
+          ],
+          "prompt": "What did the city do with the project funds?",
+          "evidence": "На исследование выделили средства из городского бюджета.",
+          "explanation": "“выделили” means allocated in this passage.",
+          "review_target": "выделили",
+          "review_text": "Для выставки выделили отдельную комнату."
+        },
+        {
+          "id": "ales_research_3",
+          "word_id": "ales_cebe7a577a60267f76bbb750",
+          "term": "данные",
+          "sense_hints": [
+            "data"
+          ],
+          "target": "данные",
+          "meaning": "data",
+          "distractors": [
+            "equipment",
+            "instructions",
+            "invoices"
+          ],
+          "prompt": "What has already arrived and needs checking?",
+          "evidence": "Первые данные уже поступили, но их ещё нужно проверить.",
+          "explanation": "“данные” means data in this passage.",
+          "review_target": "данные",
+          "review_text": "Новые данные изменили наше представление о проблеме."
+        },
+        {
+          "id": "ales_research_4",
+          "word_id": "ales_4c8805e38713b3675409dc36",
+          "term": "цель",
+          "sense_hints": [
+            "aim, goal"
+          ],
+          "target": "цель",
+          "meaning": "goal",
+          "distractors": [
+            "cause",
+            "obstacle",
+            "expense"
+          ],
+          "prompt": "How is comparing the two years described?",
+          "evidence": "Её основная цель — сравнить результаты за два года.",
+          "explanation": "“цель” means goal in this passage.",
+          "review_target": "цель",
+          "review_text": "Наша цель — закончить работу до зимы."
+        }
+      ]
+    },
+    {
+      "id": "ales_elections",
+      "title": "Following a city campaign",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Выборы назначены на осень. Один кандидат уже начал свою кампанию и вчера встретился с жителями района."
+        },
+        {
+          "speaker": "B",
+          "text": "Какой лозунг он использует? Я видел плакат, но не успел прочитать."
+        },
+        {
+          "speaker": "A",
+          "text": "На нём было написано: «Город для всех». Пока трудно сказать, насколько велика поддержка этого кандидата."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_elections_1",
+          "word_id": "ales_9392f1f3fe67b36ce7957308",
+          "term": "выборы",
+          "sense_hints": [
+            "elections"
+          ],
+          "target": "Выборы",
+          "meaning": "elections",
+          "distractors": [
+            "negotiations",
+            "appointments",
+            "inspections"
+          ],
+          "prompt": "What is scheduled for autumn?",
+          "evidence": "Выборы назначены на осень.",
+          "explanation": "“Выборы” means elections in this passage.",
+          "review_target": "Выборы",
+          "review_text": "Выборы состоятся в следующем месяце."
+        },
+        {
+          "id": "ales_elections_2",
+          "word_id": "ales_5ad54e1bb2bc6677f68a2056",
+          "term": "кампания",
+          "sense_hints": [
+            "campaign"
+          ],
+          "target": "кампанию",
+          "meaning": "campaign",
+          "distractors": [
+            "company",
+            "coalition",
+            "committee"
+          ],
+          "prompt": "What has the candidate started?",
+          "evidence": "Один кандидат уже начал свою кампанию и вчера встретился с жителями района.",
+          "explanation": "“кампанию” means campaign in this passage.",
+          "review_target": "кампанию",
+          "review_text": "Редакция обсуждает новую кампанию в городе."
+        },
+        {
+          "id": "ales_elections_3",
+          "word_id": "ales_24cf8b72a22e7c1454abaa3c",
+          "term": "лозунг",
+          "sense_hints": [
+            "slogan"
+          ],
+          "target": "лозунг",
+          "meaning": "slogan",
+          "distractors": [
+            "signature",
+            "address",
+            "schedule"
+          ],
+          "prompt": "What does the second speaker ask about on the poster?",
+          "evidence": "Какой лозунг он использует?",
+          "explanation": "“лозунг” means slogan in this passage.",
+          "review_target": "лозунг",
+          "review_text": "Этот лозунг появился на нескольких плакатах."
+        },
+        {
+          "id": "ales_elections_4",
+          "word_id": "ales_3c1d0d8f2256c6509e2ba545",
+          "term": "поддержка",
+          "sense_hints": [
+            "support"
+          ],
+          "target": "поддержка",
+          "meaning": "support",
+          "distractors": [
+            "opposition",
+            "experience",
+            "responsibility"
+          ],
+          "prompt": "What is still difficult to gauge about the candidate?",
+          "evidence": "Пока трудно сказать, насколько велика поддержка этого кандидата.",
+          "explanation": "“поддержка” means support in this passage.",
+          "review_target": "поддержка",
+          "review_text": "Поддержка жителей помогла сохранить библиотеку."
+        }
+      ]
+    },
+    {
+      "id": "ales_rules",
+      "title": "Reading a notice about new rules",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Вчера опубликовали новые правила работы центра. Один пункт запрещает проводить мероприятия после десяти вечера."
+        },
+        {
+          "speaker": "B",
+          "text": "Это уже действует? У нас встреча в пятницу."
+        },
+        {
+          "speaker": "A",
+          "text": "Правила вступают в силу в понедельник. В письме также говорится, кто несёт ответственность за их выполнение. Я пришлю тебе полный текст."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_rules_1",
+          "word_id": "ales_617bcf5f8076afa30911e74e",
+          "term": "опубликовать",
+          "sense_hints": [
+            "to publish"
+          ],
+          "target": "опубликовали",
+          "meaning": "published",
+          "distractors": [
+            "repealed",
+            "drafted",
+            "translated"
+          ],
+          "prompt": "What happened to the new rules yesterday?",
+          "evidence": "Вчера опубликовали новые правила работы центра.",
+          "explanation": "“опубликовали” means published in this passage.",
+          "review_target": "опубликовали",
+          "review_text": "В газете опубликовали интервью с директором."
+        },
+        {
+          "id": "ales_rules_2",
+          "word_id": "ales_1e59c48702b34b3f726661ac",
+          "term": "запрещать/запретить",
+          "sense_hints": [
+            "to ban, to prohibit"
+          ],
+          "target": "запрещает",
+          "meaning": "prohibits",
+          "distractors": [
+            "recommends",
+            "permits",
+            "requires"
+          ],
+          "prompt": "What does the rule do regarding late events?",
+          "evidence": "Один пункт запрещает проводить мероприятия после десяти вечера.",
+          "explanation": "“запрещает” means prohibits in this passage.",
+          "review_target": "запрещает",
+          "review_text": "Это правило запрещает оставлять дверь открытой."
+        },
+        {
+          "id": "ales_rules_3",
+          "word_id": "ales_ac47db43c3f7ba427e5a0ffe",
+          "term": "вступать в силу",
+          "sense_hints": [
+            "to become effective"
+          ],
+          "target": "вступают в силу",
+          "meaning": "become effective",
+          "distractors": [
+            "are discussed",
+            "expire",
+            "are rewritten"
+          ],
+          "prompt": "What happens to the rules on Monday?",
+          "evidence": "Правила вступают в силу в понедельник.",
+          "explanation": "“вступают в силу” means become effective in this passage.",
+          "review_target": "вступают в силу",
+          "review_text": "Новые условия вступают в силу завтра."
+        },
+        {
+          "id": "ales_rules_4",
+          "word_id": "ales_dc356bd03adebff33ea3bc61",
+          "term": "ответственность",
+          "sense_hints": [
+            "responsibility"
+          ],
+          "target": "ответственность",
+          "meaning": "responsibility",
+          "distractors": [
+            "permission",
+            "payment",
+            "priority"
+          ],
+          "prompt": "What does the letter assign for carrying out the rules?",
+          "evidence": "В письме также говорится, кто несёт ответственность за их выполнение.",
+          "explanation": "“ответственность” means responsibility in this passage.",
+          "review_target": "ответственность",
+          "review_text": "Ответственность за ключи лежит на дежурном."
+        }
+      ]
+    },
+    {
+      "id": "ales_relief",
+      "title": "Coordinating a relief response",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "После землетрясения к нам приехал доброволец из соседнего города. Он предложил помочь в центре, где принимают заявки."
+        },
+        {
+          "speaker": "B",
+          "text": "Что нужно привезти в первую очередь?"
+        },
+        {
+          "speaker": "A",
+          "text": "Продовольствие. Сейчас на складе его мало. О разрушениях ещё собирают сведения, поэтому список нуждающихся будут дополнять."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_relief_1",
+          "word_id": "ales_3b1e1a02eb1a33ab33bb02d4",
+          "term": "землетрясение",
+          "sense_hints": [
+            "earthquake"
+          ],
+          "target": "землетрясения",
+          "meaning": "earthquake",
+          "distractors": [
+            "flood",
+            "storm",
+            "fire"
+          ],
+          "prompt": "Which event prompted the response?",
+          "evidence": "После землетрясения к нам приехал доброволец из соседнего города.",
+          "explanation": "“землетрясения” means earthquake in this passage.",
+          "review_target": "землетрясения",
+          "review_text": "После землетрясения школу временно закрыли."
+        },
+        {
+          "id": "ales_relief_2",
+          "word_id": "ales_165c70940e4a631228b7117c",
+          "term": "доброволец",
+          "sense_hints": [
+            "volunteer"
+          ],
+          "target": "доброволец",
+          "meaning": "volunteer",
+          "distractors": [
+            "inspector",
+            "contractor",
+            "journalist"
+          ],
+          "prompt": "Who offered to help at the center?",
+          "evidence": "После землетрясения к нам приехал доброволец из соседнего города.",
+          "explanation": "“доброволец” means volunteer in this passage.",
+          "review_target": "доброволец",
+          "review_text": "Новый доброволец будет работать по субботам."
+        },
+        {
+          "id": "ales_relief_3",
+          "word_id": "ales_3e6e597a92006f29bbbcbfd2",
+          "term": "продовольствие",
+          "sense_hints": [
+            "provisions"
+          ],
+          "target": "Продовольствие",
+          "meaning": "food supplies",
+          "distractors": [
+            "building materials",
+            "medical equipment",
+            "fuel"
+          ],
+          "prompt": "What is needed first?",
+          "evidence": "Продовольствие.",
+          "explanation": "“Продовольствие” means food supplies in this passage.",
+          "review_target": "Продовольствие",
+          "review_text": "Продовольствие доставили на двух машинах."
+        },
+        {
+          "id": "ales_relief_4",
+          "word_id": "ales_f0df9ecec6467fc60e9790c5",
+          "term": "разрушение",
+          "sense_hints": [
+            "destruction"
+          ],
+          "target": "разрушениях",
+          "meaning": "destruction",
+          "distractors": [
+            "recoveries",
+            "evacuations",
+            "deliveries"
+          ],
+          "prompt": "What are they still collecting information about?",
+          "evidence": "О разрушениях ещё собирают сведения, поэтому список нуждающихся будут дополнять.",
+          "explanation": "“разрушениях” means destruction in this passage.",
+          "review_target": "разрушениях",
+          "review_text": "О разрушениях сообщили в вечернем выпуске."
+        }
+      ]
+    },
+    {
+      "id": "ales_aviation",
+      "title": "Clarifying an airport update",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сообщении указано, что взлёт отложили из-за неполадок. Экипаж остаётся на месте и ждёт решения специалистов."
+        },
+        {
+          "speaker": "B",
+          "text": "Пассажирам уже объяснили причину задержки?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да, но точное время пока не назвали. Заодно проверят запас горючего. Следующее сообщение обещают через полчаса."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_aviation_1",
+          "word_id": "ales_799698763656038a7b998658",
+          "term": "взлёт",
+          "sense_hints": [
+            "take off"
+          ],
+          "target": "взлёт",
+          "meaning": "takeoff",
+          "distractors": [
+            "landing",
+            "boarding",
+            "inspection"
+          ],
+          "prompt": "What was postponed?",
+          "evidence": "В сообщении указано, что взлёт отложили из-за неполадок.",
+          "explanation": "“взлёт” means takeoff in this passage.",
+          "review_target": "взлёт",
+          "review_text": "Сегодня взлёт наблюдали с балкона аэропорта."
+        },
+        {
+          "id": "ales_aviation_2",
+          "word_id": "ales_0dc04d96e677658cb01b056c",
+          "term": "неполадки",
+          "sense_hints": [
+            "flaw, defect, trouble"
+          ],
+          "target": "неполадок",
+          "meaning": "technical faults",
+          "distractors": [
+            "weather conditions",
+            "staff shortages",
+            "route changes"
+          ],
+          "prompt": "What caused the postponement?",
+          "evidence": "В сообщении указано, что взлёт отложили из-за неполадок.",
+          "explanation": "“неполадок” means technical faults in this passage.",
+          "review_target": "неполадок",
+          "review_text": "Из-за неполадок лифт временно не работает."
+        },
+        {
+          "id": "ales_aviation_3",
+          "word_id": "ales_11f56e96a5095e426eb68c95",
+          "term": "экипаж",
+          "sense_hints": [
+            "crew"
+          ],
+          "target": "Экипаж",
+          "meaning": "crew",
+          "distractors": [
+            "passengers",
+            "ground technicians",
+            "airport management"
+          ],
+          "prompt": "Who is waiting on site for the specialists’ decision?",
+          "evidence": "Экипаж остаётся на месте и ждёт решения специалистов.",
+          "explanation": "“Экипаж” means crew in this passage.",
+          "review_target": "Экипаж",
+          "review_text": "Экипаж готовится к следующему рейсу."
+        },
+        {
+          "id": "ales_aviation_4",
+          "word_id": "ales_7c20e4419935b552bf33a135",
+          "term": "горючее",
+          "sense_hints": [
+            "fuel"
+          ],
+          "target": "горючего",
+          "meaning": "fuel",
+          "distractors": [
+            "drinking water",
+            "spare parts",
+            "oxygen"
+          ],
+          "prompt": "Which supply will also be checked?",
+          "evidence": "Заодно проверят запас горючего.",
+          "explanation": "“горючего” means fuel in this passage.",
+          "review_target": "горючего",
+          "review_text": "Запаса горючего хватит на всю поездку."
+        }
+      ]
+    },
+    {
+      "id": "ales_shipping",
+      "title": "Arranging a delivery by water",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Судно задерживается у входа в пролив. Диспетчер пока не сообщил, когда оно сможет продолжить путь."
+        },
+        {
+          "speaker": "B",
+          "text": "На борту наш товар? Покупатель спрашивает о сроках."
+        },
+        {
+          "speaker": "A",
+          "text": "Да. После прибытия его нужно перевезти на склад. Я предупрежу покупателя и уточню, когда будет свободна машина."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_shipping_1",
+          "word_id": "ales_e64f97977bacc505efabdbca",
+          "term": "судно (pl. суда)",
+          "sense_hints": [
+            "ship, vessel"
+          ],
+          "target": "Судно",
+          "meaning": "vessel",
+          "distractors": [
+            "train",
+            "aircraft",
+            "truck"
+          ],
+          "prompt": "What is delayed?",
+          "evidence": "Судно задерживается у входа в пролив.",
+          "explanation": "“Судно” means vessel in this passage.",
+          "review_target": "Судно",
+          "review_text": "Судно вышло из порта утром."
+        },
+        {
+          "id": "ales_shipping_2",
+          "word_id": "ales_aac4aed8c60584aff1635ea2",
+          "term": "пролив",
+          "sense_hints": [
+            "strait, channel"
+          ],
+          "target": "пролив",
+          "meaning": "strait",
+          "distractors": [
+            "harbor",
+            "canal lock",
+            "lake"
+          ],
+          "prompt": "What water feature is the vessel approaching?",
+          "evidence": "Судно задерживается у входа в пролив.",
+          "explanation": "“пролив” means strait in this passage.",
+          "review_target": "пролив",
+          "review_text": "Этот пролив часто упоминают в морских прогнозах."
+        },
+        {
+          "id": "ales_shipping_3",
+          "word_id": "ales_36c02af1e4e62746223a8505",
+          "term": "товар",
+          "sense_hints": [
+            "commodity, merchandise, goods"
+          ],
+          "target": "товар",
+          "meaning": "merchandise",
+          "distractors": [
+            "crew",
+            "fuel",
+            "mail"
+          ],
+          "prompt": "What is on board for the buyer?",
+          "evidence": "На борту наш товар?",
+          "explanation": "“товар” means merchandise in this passage.",
+          "review_target": "товар",
+          "review_text": "Этот товар привезли из другого города."
+        },
+        {
+          "id": "ales_shipping_4",
+          "word_id": "ales_332c9b6a7c766aec013b2883",
+          "term": "перевозить/перевезти (возить 32)",
+          "sense_hints": [
+            "to carry over, to transport"
+          ],
+          "target": "перевезти",
+          "meaning": "transport",
+          "distractors": [
+            "inspect",
+            "sell",
+            "repackage"
+          ],
+          "prompt": "What must happen to the goods after arrival?",
+          "evidence": "После прибытия его нужно перевезти на склад.",
+          "explanation": "“перевезти” means transport in this passage.",
+          "review_target": "перевезти",
+          "review_text": "Нужно перевезти столы в соседнее здание."
+        }
+      ]
+    },
+    {
+      "id": "ales_justice",
+      "title": "Checking a court report",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Суд объявил приговор вчера вечером. В редакции хотят опубликовать короткую заметку, но сначала проверят все формулировки."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто объяснит нам юридические детали?"
+        },
+        {
+          "speaker": "A",
+          "text": "Юрист, который следил за делом. В заметке также упомянут расследование, начатое в прошлом году. Пока текст не готов."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_justice_1",
+          "word_id": "ales_de548d5dee4dabb264f77e38",
+          "term": "суд",
+          "sense_hints": [
+            "court (of law)"
+          ],
+          "target": "Суд",
+          "meaning": "court",
+          "distractors": [
+            "prosecution",
+            "police force",
+            "prison administration"
+          ],
+          "prompt": "Which body made yesterday’s announcement?",
+          "evidence": "Суд объявил приговор вчера вечером.",
+          "explanation": "“Суд” means court in this passage.",
+          "review_target": "Суд",
+          "review_text": "Суд рассмотрит документы на следующей неделе."
+        },
+        {
+          "id": "ales_justice_2",
+          "word_id": "ales_3c21c941898524e001f3ee33",
+          "term": "приговор",
+          "sense_hints": [
+            "sentence, verdict"
+          ],
+          "target": "приговор",
+          "meaning": "verdict",
+          "distractors": [
+            "charge",
+            "appeal",
+            "testimony"
+          ],
+          "prompt": "What did that body announce?",
+          "evidence": "Суд объявил приговор вчера вечером.",
+          "explanation": "“приговор” means verdict in this passage.",
+          "review_target": "приговор",
+          "review_text": "Приговор зачитали после перерыва."
+        },
+        {
+          "id": "ales_justice_3",
+          "word_id": "ales_c0d2c95369433426928754e7",
+          "term": "юрист",
+          "sense_hints": [
+            "lawyer"
+          ],
+          "target": "Юрист",
+          "meaning": "lawyer",
+          "distractors": [
+            "witness",
+            "investigator",
+            "juror"
+          ],
+          "prompt": "Who will explain the legal details?",
+          "evidence": "Юрист, который следил за делом.",
+          "explanation": "“Юрист” means lawyer in this passage.",
+          "review_target": "Юрист",
+          "review_text": "Юрист попросил прислать копию договора."
+        },
+        {
+          "id": "ales_justice_4",
+          "word_id": "ales_90a179032a233db0d6f4840c",
+          "term": "расследование",
+          "sense_hints": [
+            "investigation"
+          ],
+          "target": "расследование",
+          "meaning": "investigation",
+          "distractors": [
+            "trial",
+            "arrest",
+            "imprisonment"
+          ],
+          "prompt": "What began last year and will be mentioned?",
+          "evidence": "В заметке также упомянут расследование, начатое в прошлом году.",
+          "explanation": "“расследование” means investigation in this passage.",
+          "review_target": "расследование",
+          "review_text": "Расследование ещё не закончено."
+        }
+      ]
+    },
+    {
+      "id": "ales_science",
+      "title": "Preparing an exhibition label",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На выставке покажут новое устройство. Его изобретатель приедет в пятницу и ответит на вопросы посетителей."
+        },
+        {
+          "speaker": "B",
+          "text": "Испытание уже закончилось? Нам нужны сведения для стенда."
+        },
+        {
+          "speaker": "A",
+          "text": "Да, вчера. Точный результат сообщат завтра. Пока на стенде будут только название и краткая история проекта."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_science_1",
+          "word_id": "ales_f9a6bd8521b6093e5ff8301a",
+          "term": "устройство",
+          "sense_hints": [
+            "device, mechanism"
+          ],
+          "target": "устройство",
+          "meaning": "device",
+          "distractors": [
+            "method",
+            "material",
+            "building"
+          ],
+          "prompt": "What will be shown at the exhibition?",
+          "evidence": "На выставке покажут новое устройство.",
+          "explanation": "“устройство” means device in this passage.",
+          "review_target": "устройство",
+          "review_text": "Это устройство помогает измерять влажность."
+        },
+        {
+          "id": "ales_science_2",
+          "word_id": "ales_4d6374c1473aa433e989493e",
+          "term": "изобретатель",
+          "sense_hints": [
+            "inventor"
+          ],
+          "target": "изобретатель",
+          "meaning": "inventor",
+          "distractors": [
+            "buyer",
+            "reviewer",
+            "supplier"
+          ],
+          "prompt": "Who will visit on Friday?",
+          "evidence": "Его изобретатель приедет в пятницу и ответит на вопросы посетителей.",
+          "explanation": "“изобретатель” means inventor in this passage.",
+          "review_target": "изобретатель",
+          "review_text": "Изобретатель рассказал о своей первой работе."
+        },
+        {
+          "id": "ales_science_3",
+          "word_id": "ales_b077080afd0d0c29da1b8b24",
+          "term": "испытание",
+          "sense_hints": [
+            "test"
+          ],
+          "target": "Испытание",
+          "meaning": "test",
+          "distractors": [
+            "production",
+            "registration",
+            "delivery"
+          ],
+          "prompt": "Which process has finished?",
+          "evidence": "Испытание уже закончилось?",
+          "explanation": "“Испытание” means test in this passage.",
+          "review_target": "Испытание",
+          "review_text": "Испытание проведут в другой комнате."
+        },
+        {
+          "id": "ales_science_4",
+          "word_id": "ales_3fa9898122a5c2ea79a41461",
+          "term": "точный",
+          "sense_hints": [
+            "exact, precise"
+          ],
+          "target": "Точный",
+          "meaning": "precise",
+          "distractors": [
+            "preliminary",
+            "expected",
+            "disputed"
+          ],
+          "prompt": "What kind of result will be announced tomorrow?",
+          "evidence": "Точный результат сообщат завтра.",
+          "explanation": "“Точный” means precise in this passage.",
+          "review_target": "Точный",
+          "review_text": "Точный адрес указан в приглашении."
+        }
+      ]
+    },
+    {
+      "id": "ales_sport",
+      "title": "Reviewing a sports bulletin",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Вчера закончилось соревнование. Один легкоатлет получил специальную награду, а имена остальных победителей назовут сегодня."
+        },
+        {
+          "speaker": "B",
+          "text": "Ты видел утреннюю встречу двух команд?"
+        },
+        {
+          "speaker": "A",
+          "text": "Только последние минуты. В итоге была ничья. Полную запись обещают показать вечером."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_sport_1",
+          "word_id": "ales_7d901588e0add7d0758873ef",
+          "term": "соревнование",
+          "sense_hints": [
+            "competition"
+          ],
+          "target": "соревнование",
+          "meaning": "competition",
+          "distractors": [
+            "training session",
+            "selection meeting",
+            "opening ceremony"
+          ],
+          "prompt": "What ended yesterday?",
+          "evidence": "Вчера закончилось соревнование.",
+          "explanation": "“соревнование” means competition in this passage.",
+          "review_target": "соревнование",
+          "review_text": "Это соревнование проводят каждый год."
+        },
+        {
+          "id": "ales_sport_2",
+          "word_id": "ales_476778c6c1eef55e011fb47d",
+          "term": "легкоатлет",
+          "sense_hints": [
+            "(track and field) athlete"
+          ],
+          "target": "легкоатлет",
+          "meaning": "track-and-field athlete",
+          "distractors": [
+            "swimmer",
+            "cyclist",
+            "skater"
+          ],
+          "prompt": "What type of athlete received special recognition?",
+          "evidence": "Один легкоатлет получил специальную награду, а имена остальных победителей назовут сегодня.",
+          "explanation": "“легкоатлет” means track-and-field athlete in this passage.",
+          "review_target": "легкоатлет",
+          "review_text": "Этот легкоатлет тренируется в нашем городе."
+        },
+        {
+          "id": "ales_sport_3",
+          "word_id": "ales_f0af0961daed47fad2b58de9",
+          "term": "награда",
+          "sense_hints": [
+            "award"
+          ],
+          "target": "награду",
+          "meaning": "award",
+          "distractors": [
+            "invitation",
+            "contract",
+            "penalty"
+          ],
+          "prompt": "What did the athlete receive?",
+          "evidence": "Один легкоатлет получил специальную награду, а имена остальных победителей назовут сегодня.",
+          "explanation": "“награду” means award in this passage.",
+          "review_target": "награду",
+          "review_text": "Она получила награду за свою работу."
+        },
+        {
+          "id": "ales_sport_4",
+          "word_id": "ales_cee19cfb6983247a56ad7d3a",
+          "term": "ничья",
+          "sense_hints": [
+            "tie"
+          ],
+          "target": "ничья",
+          "meaning": "a draw",
+          "distractors": [
+            "a home-team victory",
+            "an away-team victory",
+            "a cancellation"
+          ],
+          "prompt": "How did the two teams’ meeting end?",
+          "evidence": "В итоге была ничья.",
+          "explanation": "“ничья” means a draw in this passage.",
+          "review_target": "ничья",
+          "review_text": "После трудной игры снова была ничья."
+        }
+      ]
+    },
+    {
+      "id": "ales_press",
+      "title": "Editing an international news brief",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Источник подтвердил сообщение о встрече. Но редактор просит не указывать её продолжительность: эту деталь ещё проверяют."
+        },
+        {
+          "speaker": "B",
+          "text": "В заметке будет цитата из выступления?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Гость подчеркнул, что нынешний проект отличается от предыдущего. Остальные подробности появятся в вечернем выпуске."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_press_1",
+          "word_id": "ales_29391965759dc434b5bd2049",
+          "term": "источник",
+          "sense_hints": [
+            "source"
+          ],
+          "target": "Источник",
+          "meaning": "source",
+          "distractors": [
+            "editor",
+            "translator",
+            "publisher"
+          ],
+          "prompt": "Who or what confirmed the report?",
+          "evidence": "Источник подтвердил сообщение о встрече.",
+          "explanation": "“Источник” means source in this passage.",
+          "review_target": "Источник",
+          "review_text": "Источник этой информации пока не назван."
+        },
+        {
+          "id": "ales_press_2",
+          "word_id": "ales_3770d2445920f65bb380baca",
+          "term": "продолжительность",
+          "sense_hints": [
+            "length"
+          ],
+          "target": "продолжительность",
+          "meaning": "duration",
+          "distractors": [
+            "location",
+            "purpose",
+            "attendance"
+          ],
+          "prompt": "Which detail should be left out for now?",
+          "evidence": "Но редактор просит не указывать её продолжительность: эту деталь ещё проверяют.",
+          "explanation": "“продолжительность” means duration in this passage.",
+          "review_target": "продолжительность",
+          "review_text": "Продолжительность поездки зависит от погоды."
+        },
+        {
+          "id": "ales_press_3",
+          "word_id": "ales_d073b73b721d6ccdd80df721",
+          "term": "подчёркивать/подчеркнуть",
+          "sense_hints": [
+            "to underline, to emphasize"
+          ],
+          "target": "подчеркнул",
+          "meaning": "emphasized",
+          "distractors": [
+            "denied",
+            "doubted",
+            "concealed"
+          ],
+          "prompt": "What did the guest do with the comparison of the projects?",
+          "evidence": "Гость подчеркнул, что нынешний проект отличается от предыдущего.",
+          "explanation": "“подчеркнул” means emphasized in this passage.",
+          "review_target": "подчеркнул",
+          "review_text": "Он подчеркнул важность этой встречи."
+        },
+        {
+          "id": "ales_press_4",
+          "word_id": "ales_9677918e14749452d3ca12b8",
+          "term": "нынешний",
+          "sense_hints": [
+            "present"
+          ],
+          "target": "нынешний",
+          "meaning": "current",
+          "distractors": [
+            "previous",
+            "planned",
+            "canceled"
+          ],
+          "prompt": "Which project is being compared with the earlier one?",
+          "evidence": "Гость подчеркнул, что нынешний проект отличается от предыдущего.",
+          "explanation": "“нынешний” means current in this passage.",
+          "review_target": "нынешний",
+          "review_text": "Наш нынешний руководитель хорошо знает город."
+        }
+      ]
+    }
+  ]
+}
