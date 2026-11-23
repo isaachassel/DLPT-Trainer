@@ -27,15 +27,17 @@ computer; this does not introduce cloud account synchronization.
 
 The supplied CSV imported **474 rows / 474 distinct headword-sense entries**.
 All entries are available for reading word review: uncheck context-only and use
-**Start review**. The initial authored passage bank contains **15 dialogues,
-60 comprehension questions and 60 fresh short review contexts**, covering
-**60 of 474 entries** in both reading and listening. The remaining **414 entries
+**Start review**. The expanded authored passage bank contains **35 dialogues,
+140 comprehension questions and 140 fresh short review contexts**, covering
+**140 of 474 entries** in both reading and listening. The remaining **334 entries
 do not yet have authored passage/audio coverage**. Coverage counts are shown
 in the interface and report. Completing every current passage does not test the
 entire glossary. No unit assignments are guessed or used to organize ALES study.
 
 Topics include weather, travel, employment, budgets, diplomacy, research,
 elections, rules, relief, aviation, shipping, courts, science, sport and news.
+The second batch adds museum visits, youth programs, rail services, housing,
+manufacturing, financial reporting, education, environmental surveys and more.
 These are original synthetic learning materials, not authentic SLS/DLI items.
 Language, distractors and pronunciation remain provisional pending instructor
 review. Each target is linked by exact source headword AND English sense.
@@ -68,6 +70,10 @@ Self-rated later reviews preserve their history and scheduling.
 .venv/Scripts/python.exe scripts/generate_study_audio.py --batch ales
 ```
 
+The `ales` audio batch selects only the original 15 dialogues. Use `--batch ales2`
+to preflight the 20-dialogue expansion; append `--generate` only when authorized
+to spend provider credits. Separate ledgers keep the original batch unchanged.
+
 The importer reads UTF-8 CSV (with or without BOM) using the five original
 column names. It preserves supplied source metadata but never fills blank item,
 lesson or unit values from neighboring rows. Russian + English sense determine
@@ -80,7 +86,8 @@ need to import their own copy. Profile databases, generation ledgers and `.env`
 also remain ignored. Only authored passages/questions, generated recordings and
 their internal provenance are versioned.
 
-Add original passage specs to `scripts/prepare_ales_passages.py`. Each target
+Add original passage specs to `scripts/prepare_ales_passages.py` or its imported
+`scripts/ales_expansion.py` batch. Each target
 needs the exact CSV entry/sense, a spoken form occurring in the dialogue, one
 correct contextual answer, three distinct plausible alternatives, a comprehension
 question and a separate short review sentence. Avoid questions solvable from
@@ -110,16 +117,43 @@ status were checked against the official
 and [Eleven v3 general availability announcement](https://elevenlabs.io/blog/eleven-v3-is-now-generally-available).
 No claim of individual human listening review is made.
 
+## Audio expansion, 2026-11-22
+
+Added 20 dialogues and recordings for 80 previously uncovered senses, retaining
+the original 15 passages and recording records unchanged. The new batch uses
+the same approved Jessica/Eric voices and generally available `eleven_v3` model
+under Starter. It consumed **5,033 unique input characters**, below its separate
+8,000-character reservation cap, with no failed requests or retries. All 20
+recordings decoded and matched their script fingerprints before local publication.
+
+The provider counter was **5,494 before generation** and **7,507 at the later
+verification**, an observed increase of **2,013 credits**, leaving **48,690 of
+56,197**. The immediate post-generation counter was lower; provider counters can
+settle asynchronously. These are observed account snapshots, not guaranteed
+per-request prices. No purchase, upgrade or live deployment was performed.
+Detailed reservations and account snapshots remain in the ignored
+`storage/workshop/ales-20261122/ledger.json`; recording provenance is versioned
+in `data/study/ales/audio.json`.
+
 ## Verification
 
-70 focused tests passed (16 ALES tests plus 54 existing study regressions).
+73 focused tests passed (19 ALES tests plus 54 existing study regressions).
 They cover import validation and sense identity, all authored links,
-strong/weak/mixed/guessed performance, all 15 passages without repeats, sparse
+strong/weak/mixed/guessed performance, maximum-length 15-passage tests without repeats, sparse
 banks, early stopping, hidden pending results, retries, profile/skill isolation,
 review scheduling, persistence/export, audio provenance and decoding. Existing
 vocabulary, Lesson 32 and competency-mapping regression tests also pass.
+Every new passage is separately scored with mixed answers in both modalities,
+checking distinct word evidence, weaker-word priorities and skill isolation.
 
 Browser checks use a disposable local QA profile. They verify reading passage
 progression, report grouping, profile counts, a weaker-word review and saved
 rating, plus listening playback and withheld transcripts. Screenshot evidence is
 stored locally in `storage/exports/ales-study-report.jpg` and is not committed.
+The expansion browser check completed two new listening passages (housing and
+museum), observed a recording play through, and confirmed six recognized words
+plus two missed/guessed words saved to the QA profile. A new weaker word then
+opened in review and saved a ten-minute retry schedule. The transcript stayed
+hidden until completion. New proof is in
+`storage/exports/ales-expansion-preview.jpg`. These technical checks do not
+replace a fluent instructor's language/pronunciation review.

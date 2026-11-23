@@ -12,6 +12,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from core.ales import ales_id
+from scripts.ales_expansion import SPECS as EXPANSION_SPECS
 
 SPECS = [
 ('weather', 1, 'Planning an outdoor event', [
@@ -152,9 +153,9 @@ SPECS = [
 ]
 
 
-def build():
+def build(include_expansion=True):
     passages = []
-    for key, stage, title, turns, lines in SPECS:
+    for key, stage, title, turns, lines in SPECS + (EXPANSION_SPECS if include_expansion else []):
         targets = []
         text = '\n'.join(text for _, text in turns)
         for n, line in enumerate(lines.strip().splitlines(), 1):
@@ -181,4 +182,4 @@ if __name__ == '__main__':
     path = ROOT / 'data/study/ales/passages.json'
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(build(), ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print(f'Built {len(SPECS)} ALES passages.')
+    print(f'Built {len(build()["passages"])} ALES passages.')

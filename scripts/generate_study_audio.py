@@ -23,14 +23,19 @@ SOURCES = ['https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-conte
 PAID = {'starter', 'creator', 'pro', 'scale', 'business', 'enterprise'}
 BATCHES = {'original': ('vocabulary-expansion-20261104', '2026-11-04'),
            'lesson32': ('lesson32-20261108', '2026-11-08'),
-           'ales': ('ales-20261113', '2026-11-13')}
+           'ales': ('ales-20261113', '2026-11-13'),
+           'ales2': ('ales-20261122', '2026-11-22')}
 
 
 def select_batch(passages, batch):
     if batch not in BATCHES:
         raise ValueError('Unknown study audio batch')
-    selected = [p for p in passages if p['id'].startswith('ales_')] if batch == 'ales' else [
-        p for p in passages if p['id'].startswith('vocab_') and p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]
+    if batch in {'ales', 'ales2'}:
+        selected = [p for p in passages if p['id'].startswith('ales_')
+                    and p['id'].startswith('ales_e2_') == (batch == 'ales2')]
+    else:
+        selected = [p for p in passages if p['id'].startswith('vocab_')
+                    and p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]
     if not selected or len({p['id'] for p in selected}) != len(selected):
         raise ValueError('Empty batch or duplicate passage IDs')
     return selected
@@ -79,7 +84,7 @@ def main(generate=False, batch='original'):
     from dotenv import load_dotenv
     load_dotenv(ROOT / '.env')
     client = ElevenLabs(os.environ.get('ELEVENLABS_API_KEY', ''))
-    source = 'data/study/ales/passages.json' if batch == 'ales' else 'data/study/passages.json'
+    source = 'data/study/ales/passages.json' if batch.startswith('ales') else 'data/study/passages.json'
     passages = select_batch(json.loads((ROOT / source).read_text(encoding='utf-8'))['passages'], batch)
     stage = ROOT / 'storage/workshop' / BATCHES[batch][0]
     stage.mkdir(parents=True, exist_ok=True)
@@ -131,7 +136,8 @@ def main(generate=False, batch='original'):
             if live['tier'] not in PAID or live['character_limit'] - live['character_count'] < amount:
                 raise ValueError('Insufficient existing paid credits; no purchase or overage attempted')
             now = datetime.now(timezone.utc).isoformat()
-            ledger['attempts'][key] = dict(status='reserved', fingerprint=digest, input_characters=amount, started_at=now)
+            ledger['attempts'][key] = dict(status='reserved', fingerprint=digest, input_characters=amount, started_at=now,
+                account_before={k: live[k] for k in ('tier', 'character_count', 'character_limit')})
             save()  # Reserve before request. Interrupted/uncertain requests never automatically repeat.
             print(key, 'generating', amount, 'characters', flush=True)
             raw = client.dialogue([SimpleNamespace(**t) for t in p['turns']], VOICES, MODEL)
@@ -151,7 +157,7 @@ def main(generate=False, batch='original'):
         ledger['account_after'] = {k: after[k] for k in ('tier', 'character_count', 'character_limit')}
         save()
         # Publish only fully decoded, checksum-verified assets after the entire batch succeeds.
-        publish_records(stage, records, manifest_relative='data/study/ales/audio.json' if batch == 'ales' else 'data/study/audio.json')
+        publish_records(stage, records, manifest_relative='data/study/ales/audio.json' if batch.startswith('ales') else 'data/study/audio.json')
         print('COMPLETE', json.dumps(ledger['account_after']), flush=True)
     finally:
         lock.unlink()
