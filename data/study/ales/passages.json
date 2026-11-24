@@ -5720,6 +5720,2086 @@
           "review_text": "Согласно расписанию, поезд придёт вечером."
         }
       ]
+    },
+    {
+      "id": "ales_e4_visit",
+      "title": "Remembering a visit",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Вчера мы успели побывать у Анны. Её супруг открыл дверь и пригласил нас в гостиную."
+        },
+        {
+          "speaker": "B",
+          "text": "Вы раньше встречались?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, но он сразу подошёл пожать руку. Благодаря Анне мы нашли общий язык очень быстро. Потом она показала нам фотографии и предложила чай."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_visit_1",
+          "word_id": "ales_531573eb8eea7da232e60570",
+          "term": "побывать",
+          "sense_hints": [
+            "to visit"
+          ],
+          "target": "побывать",
+          "meaning": "visit",
+          "distractors": [
+            "move in",
+            "work",
+            "stay overnight"
+          ],
+          "prompt": "What did the speakers manage to do at Anna’s home?",
+          "evidence": "Вчера мы успели побывать у Анны.",
+          "explanation": "“побывать” means visit in this passage.",
+          "review_target": "побывать",
+          "review_text": "Я хочу побывать в этом музее."
+        },
+        {
+          "id": "ales_e4_visit_2",
+          "word_id": "ales_ad5f1fc6aad3b43c89b1c392",
+          "term": "супруг",
+          "sense_hints": [
+            "spouse"
+          ],
+          "target": "супруг",
+          "meaning": "husband",
+          "distractors": [
+            "brother",
+            "father",
+            "neighbor"
+          ],
+          "prompt": "Who opened the door?",
+          "evidence": "Её супруг открыл дверь и пригласил нас в гостиную.",
+          "explanation": "“супруг” means husband in this passage.",
+          "review_target": "супруг",
+          "review_text": "Её супруг работает в библиотеке."
+        },
+        {
+          "id": "ales_e4_visit_3",
+          "word_id": "ales_e445ddab0b8fced581bc6e16",
+          "term": "пожимать/пожать руку",
+          "sense_hints": [
+            "to shake hands"
+          ],
+          "target": "пожать руку",
+          "meaning": "shake hands",
+          "distractors": [
+            "give a hug",
+            "take a coat",
+            "offer a seat"
+          ],
+          "prompt": "What did the man approach the visitors to do?",
+          "evidence": "Нет, но он сразу подошёл пожать руку.",
+          "explanation": "“пожать руку” means shake hands in this passage.",
+          "review_target": "пожать руку",
+          "review_text": "После встречи я хотел пожать руку тренеру."
+        },
+        {
+          "id": "ales_e4_visit_4",
+          "word_id": "ales_6523929d9d1d8bfea7d2d8ac",
+          "term": "благодаря",
+          "sense_hints": [
+            "because of, thanks to"
+          ],
+          "target": "Благодаря",
+          "meaning": "thanks to",
+          "distractors": [
+            "despite",
+            "instead of",
+            "without"
+          ],
+          "prompt": "How does the speaker describe Anna’s role in helping them get along?",
+          "evidence": "Благодаря Анне мы нашли общий язык очень быстро.",
+          "explanation": "“Благодаря” means thanks to in this passage.",
+          "review_target": "Благодаря",
+          "review_text": "Благодаря карте мы быстро нашли дом."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_walk",
+      "title": "Planning a forest outing",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В программе завтра ходьба. Для неё выделили целый день, поэтому лучше взять еду с собой."
+        },
+        {
+          "speaker": "B",
+          "text": "Мы пойдём вдоль дороги?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, маршрут уходит вглубь леса. Когда начнём приближаться к озеру, сделаем остановку. Руководитель пришлёт карту сегодня вечером."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_walk_1",
+          "word_id": "ales_8ac4be452c68caaffd7c27ad",
+          "term": "ходьба (ходить 11)",
+          "sense_hints": [
+            "walk"
+          ],
+          "target": "ходьба",
+          "meaning": "walking",
+          "distractors": [
+            "running",
+            "cycling",
+            "climbing"
+          ],
+          "prompt": "What activity is on tomorrow’s program?",
+          "evidence": "В программе завтра ходьба.",
+          "explanation": "“ходьба” means walking in this passage.",
+          "review_target": "ходьба",
+          "review_text": "Быстрая ходьба помогает мне проснуться."
+        },
+        {
+          "id": "ales_e4_walk_2",
+          "word_id": "ales_4967f87529b91ca44433cc10",
+          "term": "целый",
+          "sense_hints": [
+            "whole, entire"
+          ],
+          "target": "целый",
+          "meaning": "a whole day",
+          "distractors": [
+            "half a day",
+            "an extra day",
+            "the following day"
+          ],
+          "prompt": "How much of the day has been allocated?",
+          "evidence": "Для неё выделили целый день, поэтому лучше взять еду с собой.",
+          "explanation": "“целый” means a whole day in this passage.",
+          "review_target": "целый",
+          "review_text": "На дорогу ушёл целый день."
+        },
+        {
+          "id": "ales_e4_walk_3",
+          "word_id": "ales_2524e2495eead5544ffa3a7c",
+          "term": "вглубь",
+          "sense_hints": [
+            "deep into"
+          ],
+          "target": "вглубь",
+          "meaning": "deeper into",
+          "distractors": [
+            "along the edge of",
+            "around",
+            "away from"
+          ],
+          "prompt": "Where does the route lead relative to the forest?",
+          "evidence": "Нет, маршрут уходит вглубь леса.",
+          "explanation": "“вглубь” means deeper into in this passage.",
+          "review_target": "вглубь",
+          "review_text": "Тропа ведёт вглубь долины."
+        },
+        {
+          "id": "ales_e4_walk_4",
+          "word_id": "ales_295da5298218cceee5ca29f9",
+          "term": "приближаться (близко 6)",
+          "sense_hints": [
+            "to draw near, to approach"
+          ],
+          "target": "приближаться",
+          "meaning": "approach",
+          "distractors": [
+            "leave",
+            "circle",
+            "cross"
+          ],
+          "prompt": "What will the group be doing in relation to the lake when it stops?",
+          "evidence": "Когда начнём приближаться к озеру, сделаем остановку.",
+          "explanation": "“приближаться” means approach in this passage.",
+          "review_target": "приближаться",
+          "review_text": "Поезд начал приближаться к станции."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_chess",
+      "title": "Discussing a chess evening",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Наша партия закончилась поздно. Я выбрал смелый ход, хотя долго не мог решиться."
+        },
+        {
+          "speaker": "B",
+          "text": "Твой соперник удивился?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, у него был уверенный вид. В итоге мне удалось превзойти его результат в прошлом турнире. Завтра я попрошу тренера разобрать последние ходы."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_chess_1",
+          "word_id": "ales_e7e5c20512a345c039bac9c7",
+          "term": "партия",
+          "sense_hints": [
+            "game"
+          ],
+          "target": "партия",
+          "meaning": "a game",
+          "distractors": [
+            "a political party",
+            "a team",
+            "a shipment"
+          ],
+          "prompt": "What finished late that evening?",
+          "evidence": "Наша партия закончилась поздно.",
+          "explanation": "“партия” means a game in this passage.",
+          "review_target": "партия",
+          "review_text": "Эта партия длилась почти час."
+        },
+        {
+          "id": "ales_e4_chess_2",
+          "word_id": "ales_66b0f71f39bce201772fb9c0",
+          "term": "смелый",
+          "sense_hints": [
+            "bold, courageous"
+          ],
+          "target": "смелый",
+          "meaning": "bold",
+          "distractors": [
+            "cautious",
+            "ordinary",
+            "forced"
+          ],
+          "prompt": "How does the speaker describe the chosen move?",
+          "evidence": "Я выбрал смелый ход, хотя долго не мог решиться.",
+          "explanation": "“смелый” means bold in this passage.",
+          "review_target": "смелый",
+          "review_text": "Это смелый план для маленькой команды."
+        },
+        {
+          "id": "ales_e4_chess_3",
+          "word_id": "ales_8fa39a07938b1cdfc92284ab",
+          "term": "уверенный",
+          "sense_hints": [
+            "sure, confident"
+          ],
+          "target": "уверенный",
+          "meaning": "confident",
+          "distractors": [
+            "confused",
+            "angry",
+            "exhausted"
+          ],
+          "prompt": "How did the opponent look?",
+          "evidence": "Нет, у него был уверенный вид.",
+          "explanation": "“уверенный” means confident in this passage.",
+          "review_target": "уверенный",
+          "review_text": "У него был уверенный голос."
+        },
+        {
+          "id": "ales_e4_chess_4",
+          "word_id": "ales_5fdb1883695e094a3155b316",
+          "term": "превосходить/превзойти",
+          "sense_hints": [
+            "to exceed, to surpass"
+          ],
+          "target": "превзойти",
+          "meaning": "surpass",
+          "distractors": [
+            "equal",
+            "repeat",
+            "fall short of"
+          ],
+          "prompt": "What did the speaker manage to do relative to the opponent’s earlier result?",
+          "evidence": "В итоге мне удалось превзойти его результат в прошлом турнире.",
+          "explanation": "“превзойти” means surpass in this passage.",
+          "review_target": "превзойти",
+          "review_text": "Она смогла превзойти собственный рекорд."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_racing",
+      "title": "Preparing coverage of a sporting event",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Завтра начнутся гонки. Трасса уже готова, но журналистам пока не разрешают выходить на неё."
+        },
+        {
+          "speaker": "B",
+          "text": "Какие данные нужны для заметки?"
+        },
+        {
+          "speaker": "A",
+          "text": "Средний результат участников и точность измерений. Организаторы обещали прислать таблицу. Без неё я не буду указывать числа в тексте."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_racing_1",
+          "word_id": "ales_ef7dfd5b0fec27cbfcc866a3",
+          "term": "гонки",
+          "sense_hints": [
+            "races"
+          ],
+          "target": "гонки",
+          "meaning": "races",
+          "distractors": [
+            "practice sessions",
+            "qualifying interviews",
+            "award ceremonies"
+          ],
+          "prompt": "What starts tomorrow?",
+          "evidence": "Завтра начнутся гонки.",
+          "explanation": "“гонки” means races in this passage.",
+          "review_target": "гонки",
+          "review_text": "Гонки показали по телевидению."
+        },
+        {
+          "id": "ales_e4_racing_2",
+          "word_id": "ales_c6682afe38489532772ab70c",
+          "term": "трасса",
+          "sense_hints": [
+            "route; path; road"
+          ],
+          "target": "Трасса",
+          "meaning": "the course",
+          "distractors": [
+            "the grandstand",
+            "the parking area",
+            "the equipment room"
+          ],
+          "prompt": "What is ready but still off limits to journalists?",
+          "evidence": "Трасса уже готова, но журналистам пока не разрешают выходить на неё.",
+          "explanation": "“Трасса” means the course in this passage.",
+          "review_target": "Трасса",
+          "review_text": "Трасса проходит рядом с лесом."
+        },
+        {
+          "id": "ales_e4_racing_3",
+          "word_id": "ales_8ace8486c62311cf2d075b0a",
+          "term": "средний",
+          "sense_hints": [
+            "average, middle, mean"
+          ],
+          "target": "Средний",
+          "meaning": "average",
+          "distractors": [
+            "best",
+            "worst",
+            "latest"
+          ],
+          "prompt": "Which result statistic is needed?",
+          "evidence": "Средний результат участников и точность измерений.",
+          "explanation": "“Средний” means average in this passage.",
+          "review_target": "Средний",
+          "review_text": "Средний возраст группы — двадцать лет."
+        },
+        {
+          "id": "ales_e4_racing_4",
+          "word_id": "ales_705f1f472b9ff11d68199d55",
+          "term": "точность",
+          "sense_hints": [
+            "precision"
+          ],
+          "target": "точность",
+          "meaning": "precision",
+          "distractors": [
+            "cost",
+            "frequency",
+            "duration"
+          ],
+          "prompt": "Which property of the measurements is requested?",
+          "evidence": "Средний результат участников и точность измерений.",
+          "explanation": "“точность” means precision in this passage.",
+          "review_target": "точность",
+          "review_text": "Точность этого прибора проверяют каждый год."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_panel",
+      "title": "Organizing a panel session",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Завтра будет выступать глава комиссии. Мы оставили для него время в начале программы."
+        },
+        {
+          "speaker": "B",
+          "text": "А кто ответит на вопросы после перерыва?"
+        },
+        {
+          "speaker": "A",
+          "text": "Один член рабочей группы. Полный состав комиссии напечатают на отдельном листе. Этот лист раздадут всем у входа, чтобы не читать фамилии вслух."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_panel_1",
+          "word_id": "ales_68fb711e1b8e2282a50476a5",
+          "term": "выступать/выступить",
+          "sense_hints": [
+            "to speak"
+          ],
+          "target": "выступать",
+          "meaning": "speak",
+          "distractors": [
+            "observe",
+            "translate",
+            "register"
+          ],
+          "prompt": "What will the official do tomorrow?",
+          "evidence": "Завтра будет выступать глава комиссии.",
+          "explanation": "“выступать” means speak in this passage.",
+          "review_target": "выступать",
+          "review_text": "На открытии будет выступать наш преподаватель."
+        },
+        {
+          "id": "ales_e4_panel_2",
+          "word_id": "ales_70ae12dd5aefa89ad919a80c",
+          "term": "глава",
+          "sense_hints": [
+            "head"
+          ],
+          "target": "глава",
+          "meaning": "head",
+          "distractors": [
+            "secretary",
+            "adviser",
+            "spokesperson"
+          ],
+          "prompt": "What position does the first scheduled person hold?",
+          "evidence": "Завтра будет выступать глава комиссии.",
+          "explanation": "“глава” means head in this passage.",
+          "review_target": "глава",
+          "review_text": "Глава делегации приехал вечером."
+        },
+        {
+          "id": "ales_e4_panel_3",
+          "word_id": "ales_f737170833338c2819af178d",
+          "term": "член",
+          "sense_hints": [
+            "member"
+          ],
+          "target": "член",
+          "meaning": "a member",
+          "distractors": [
+            "a visitor",
+            "a critic",
+            "a sponsor"
+          ],
+          "prompt": "What is the question responder’s relationship to the working group?",
+          "evidence": "Один член рабочей группы.",
+          "explanation": "“член” means a member in this passage.",
+          "review_target": "член",
+          "review_text": "Каждый член клуба получил письмо."
+        },
+        {
+          "id": "ales_e4_panel_4",
+          "word_id": "ales_84763c4d812fdfac19ed4ba8",
+          "term": "состав",
+          "sense_hints": [
+            "composition"
+          ],
+          "target": "состав",
+          "meaning": "membership",
+          "distractors": [
+            "agenda",
+            "budget",
+            "history"
+          ],
+          "prompt": "What information about the commission will be printed separately?",
+          "evidence": "Полный состав комиссии напечатают на отдельном листе.",
+          "explanation": "“состав” means membership in this passage.",
+          "review_target": "состав",
+          "review_text": "Состав команды изменился в этом году."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_options",
+      "title": "Choosing a plan for a group",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Я хочу предложить другой маршрут. Моё предложение уже лежит в общей папке."
+        },
+        {
+          "speaker": "B",
+          "text": "Когда нужно решить, какой вариант выбрать?"
+        },
+        {
+          "speaker": "A",
+          "text": "До вечера. Я буду стараться закончить расчёты к обеду, чтобы у всех осталось время их посмотреть. Если увидишь ошибку, сразу напиши мне."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_options_1",
+          "word_id": "ales_a49d683a90e4ebbfa642ee38",
+          "term": "предлагать/предложить",
+          "sense_hints": [
+            "to offer, to suggest, to propose"
+          ],
+          "target": "предложить",
+          "meaning": "propose",
+          "distractors": [
+            "reject",
+            "inspect",
+            "remember"
+          ],
+          "prompt": "What does the first speaker want to do with another route?",
+          "evidence": "Я хочу предложить другой маршрут.",
+          "explanation": "“предложить” means propose in this passage.",
+          "review_target": "предложить",
+          "review_text": "Можно предложить новую тему для встречи."
+        },
+        {
+          "id": "ales_e4_options_2",
+          "word_id": "ales_e1c4642ce9a8a462f2cbe808",
+          "term": "предложение",
+          "sense_hints": [
+            "offer, suggestion; sentence"
+          ],
+          "target": "предложение",
+          "meaning": "a suggestion",
+          "distractors": [
+            "a sentence",
+            "a complaint",
+            "a contract"
+          ],
+          "prompt": "What is in the shared folder in this context?",
+          "evidence": "Моё предложение уже лежит в общей папке.",
+          "explanation": "“предложение” means a suggestion in this passage.",
+          "review_target": "предложение",
+          "review_text": "Это предложение мы обсудим завтра."
+        },
+        {
+          "id": "ales_e4_options_3",
+          "word_id": "ales_2c8424872d06f216086b2bca",
+          "term": "решать/решить",
+          "sense_hints": [
+            "to solve, to decide"
+          ],
+          "target": "решить",
+          "meaning": "decide",
+          "distractors": [
+            "announce",
+            "check",
+            "forget"
+          ],
+          "prompt": "What must the group do by evening?",
+          "evidence": "Когда нужно решить, какой вариант выбрать?",
+          "explanation": "“решить” means decide in this passage.",
+          "review_target": "решить",
+          "review_text": "Нам нужно решить, где встретиться."
+        },
+        {
+          "id": "ales_e4_options_4",
+          "word_id": "ales_7ac138a69380ead8009a1b5d",
+          "term": "стараться/постараться",
+          "sense_hints": [
+            "to try, to attempt, to strive"
+          ],
+          "target": "стараться",
+          "meaning": "try",
+          "distractors": [
+            "refuse",
+            "pretend",
+            "be obliged"
+          ],
+          "prompt": "What attitude does the speaker express toward finishing the calculations?",
+          "evidence": "Я буду стараться закончить расчёты к обеду, чтобы у всех осталось время их посмотреть.",
+          "explanation": "“стараться” means try in this passage.",
+          "review_target": "стараться",
+          "review_text": "Я буду стараться приходить вовремя."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_design",
+      "title": "Planning a digital resource",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Мы решили создать электронный каталог. Его основу составят записи из старого архива."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто будет разрабатывать программу?"
+        },
+        {
+          "speaker": "A",
+          "text": "Небольшая команда из университета. Разработка займёт несколько месяцев. До этого нам нужно проверить названия и убрать повторяющиеся записи."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_design_1",
+          "word_id": "ales_8e5eb810ff876a2ca3c3169e",
+          "term": "создавать/создать",
+          "sense_hints": [
+            "to create"
+          ],
+          "target": "создать",
+          "meaning": "create",
+          "distractors": [
+            "sell",
+            "close",
+            "copy"
+          ],
+          "prompt": "What has the group decided to do with an electronic catalog?",
+          "evidence": "Мы решили создать электронный каталог.",
+          "explanation": "“создать” means create in this passage.",
+          "review_target": "создать",
+          "review_text": "Студенты хотят создать свой журнал."
+        },
+        {
+          "id": "ales_e4_design_2",
+          "word_id": "ales_27198c25cc6168c550419ede",
+          "term": "основа",
+          "sense_hints": [
+            "basis, foundation"
+          ],
+          "target": "основу",
+          "meaning": "basis",
+          "distractors": [
+            "appendix",
+            "exception",
+            "obstacle"
+          ],
+          "prompt": "What role will the old archive records play?",
+          "evidence": "Его основу составят записи из старого архива.",
+          "explanation": "“основу” means basis in this passage.",
+          "review_target": "основу",
+          "review_text": "За основу взяли прошлогодний план."
+        },
+        {
+          "id": "ales_e4_design_3",
+          "word_id": "ales_6ab67a00f5c760fdbf249854",
+          "term": "разрабатывать/разработать",
+          "sense_hints": [
+            "to develop"
+          ],
+          "target": "разрабатывать",
+          "meaning": "develop",
+          "distractors": [
+            "translate",
+            "advertise",
+            "purchase"
+          ],
+          "prompt": "What work on the software does the second speaker ask about?",
+          "evidence": "Кто будет разрабатывать программу?",
+          "explanation": "“разрабатывать” means develop in this passage.",
+          "review_target": "разрабатывать",
+          "review_text": "Специалисты будут разрабатывать новый проект."
+        },
+        {
+          "id": "ales_e4_design_4",
+          "word_id": "ales_7534022e6706e18d161be889",
+          "term": "разработка",
+          "sense_hints": [
+            "development"
+          ],
+          "target": "Разработка",
+          "meaning": "development",
+          "distractors": [
+            "delivery",
+            "training",
+            "maintenance"
+          ],
+          "prompt": "Which process will take several months?",
+          "evidence": "Разработка займёт несколько месяцев.",
+          "explanation": "“Разработка” means development in this passage.",
+          "review_target": "Разработка",
+          "review_text": "Разработка устройства ещё не закончена."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_machine",
+      "title": "Preparing a workshop demonstration",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В мастерскую привезли мощный станок. Это крупный заказ, и для него освободили место у стены."
+        },
+        {
+          "speaker": "B",
+          "text": "Когда его можно запускать?"
+        },
+        {
+          "speaker": "A",
+          "text": "После проверки. Мы собираемся использовать его на занятиях, но сначала инженер объяснит правила. Пока я только фотографирую упаковку и записываю номер."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_machine_1",
+          "word_id": "ales_f298740f497f4b4b004ac8a7",
+          "term": "мощный",
+          "sense_hints": [
+            "powerful"
+          ],
+          "target": "мощный",
+          "meaning": "powerful",
+          "distractors": [
+            "portable",
+            "quiet",
+            "inexpensive"
+          ],
+          "prompt": "What characteristic of the machine is mentioned?",
+          "evidence": "В мастерскую привезли мощный станок.",
+          "explanation": "“мощный” means powerful in this passage.",
+          "review_target": "мощный",
+          "review_text": "Для этой работы нужен мощный насос."
+        },
+        {
+          "id": "ales_e4_machine_2",
+          "word_id": "ales_46c88bb1b4babafd2686ecf5",
+          "term": "крупный",
+          "sense_hints": [
+            "large"
+          ],
+          "target": "крупный",
+          "meaning": "large",
+          "distractors": [
+            "urgent",
+            "unusual",
+            "overdue"
+          ],
+          "prompt": "How is the order described?",
+          "evidence": "Это крупный заказ, и для него освободили место у стены.",
+          "explanation": "“крупный” means large in this passage.",
+          "review_target": "крупный",
+          "review_text": "Это крупный проект для нашего отдела."
+        },
+        {
+          "id": "ales_e4_machine_3",
+          "word_id": "ales_bbe241becd978d1cbf29fa63",
+          "term": "запускать/запустить",
+          "sense_hints": [
+            "to launch"
+          ],
+          "target": "запускать",
+          "meaning": "start up",
+          "distractors": [
+            "unpack",
+            "move",
+            "return"
+          ],
+          "prompt": "What action involving the machine does the second speaker ask about?",
+          "evidence": "Когда его можно запускать?",
+          "explanation": "“запускать” means start up in this passage.",
+          "review_target": "запускать",
+          "review_text": "Систему нельзя запускать без проверки."
+        },
+        {
+          "id": "ales_e4_machine_4",
+          "word_id": "ales_bbd1040ccdb4a2f227ce3ec5",
+          "term": "использовать",
+          "sense_hints": [
+            "to use"
+          ],
+          "target": "использовать",
+          "meaning": "use",
+          "distractors": [
+            "sell",
+            "store",
+            "replace"
+          ],
+          "prompt": "What do the speakers plan to do with the machine during lessons?",
+          "evidence": "Мы собираемся использовать его на занятиях, но сначала инженер объяснит правила.",
+          "explanation": "“использовать” means use in this passage.",
+          "review_target": "использовать",
+          "review_text": "На уроке можно использовать словарь."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_supplies",
+      "title": "Checking supplies for a school project",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Для занятий нужно закупить материалы. Количество указано в таблице, которую я прислал утром."
+        },
+        {
+          "speaker": "B",
+          "text": "Разве у нас ничего не осталось?"
+        },
+        {
+          "speaker": "A",
+          "text": "Некоторые материалы имеются на складе. Остальное оплатят за счёт фонда. Я сначала сверю список, чтобы не заказать лишнего."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_supplies_1",
+          "word_id": "ales_5b5d1c177086633c683562a8",
+          "term": "закупать/закупить (купить 17)",
+          "sense_hints": [
+            "to purchase"
+          ],
+          "target": "закупить",
+          "meaning": "purchase",
+          "distractors": [
+            "borrow",
+            "distribute",
+            "return"
+          ],
+          "prompt": "What must be done with materials for the lessons?",
+          "evidence": "Для занятий нужно закупить материалы.",
+          "explanation": "“закупить” means purchase in this passage.",
+          "review_target": "закупить",
+          "review_text": "Нужно закупить бумагу на весь месяц."
+        },
+        {
+          "id": "ales_e4_supplies_2",
+          "word_id": "ales_c698e5c5ecb5bfc95b6752c4",
+          "term": "количество",
+          "sense_hints": [
+            "number, quantity"
+          ],
+          "target": "Количество",
+          "meaning": "quantity",
+          "distractors": [
+            "supplier",
+            "price",
+            "delivery date"
+          ],
+          "prompt": "Which detail is given in the table?",
+          "evidence": "Количество указано в таблице, которую я прислал утром.",
+          "explanation": "“Количество” means quantity in this passage.",
+          "review_target": "Количество",
+          "review_text": "Количество мест ограничено."
+        },
+        {
+          "id": "ales_e4_supplies_3",
+          "word_id": "ales_eaf75affcab6957397a8b505",
+          "term": "имеются",
+          "sense_hints": [
+            "there are"
+          ],
+          "target": "имеются",
+          "meaning": "are available",
+          "distractors": [
+            "are ordered",
+            "are missing",
+            "are reserved"
+          ],
+          "prompt": "What is said about some materials at the warehouse?",
+          "evidence": "Некоторые материалы имеются на складе.",
+          "explanation": "“имеются” means are available in this passage.",
+          "review_target": "имеются",
+          "review_text": "В библиотеке имеются старые карты."
+        },
+        {
+          "id": "ales_e4_supplies_4",
+          "word_id": "ales_09ba67c404f12414710faa1d",
+          "term": "за счёт (счёт 23)",
+          "sense_hints": [
+            "at the expense"
+          ],
+          "target": "за счёт",
+          "meaning": "at the expense of",
+          "distractors": [
+            "instead of",
+            "in addition to",
+            "without involving"
+          ],
+          "prompt": "How will the fund be involved in paying for the rest?",
+          "evidence": "Остальное оплатят за счёт фонда.",
+          "explanation": "“за счёт” means at the expense of in this passage.",
+          "review_target": "за счёт",
+          "review_text": "Поездку оплатили за счёт школы."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_exhibit",
+      "title": "Choosing photographs for an exhibition",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Государственный музей прислал фотографии. Один местный художник помог выбрать снимки для нашего зала."
+        },
+        {
+          "speaker": "B",
+          "text": "Они относятся к новому проекту?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, это минувший сезон. Прежний организатор оставил подробные подписи. Я проверю их по каталогу, а потом передам дизайнеру."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_exhibit_1",
+          "word_id": "ales_4bac105471dc410edaacb8a3",
+          "term": "государственный",
+          "sense_hints": [
+            "national, state (attr.)"
+          ],
+          "target": "Государственный",
+          "meaning": "state-run",
+          "distractors": [
+            "privately owned",
+            "university-run",
+            "municipal"
+          ],
+          "prompt": "How is the museum described?",
+          "evidence": "Государственный музей прислал фотографии.",
+          "explanation": "“Государственный” means state-run in this passage.",
+          "review_target": "Государственный",
+          "review_text": "Государственный архив открыт по будням."
+        },
+        {
+          "id": "ales_e4_exhibit_2",
+          "word_id": "ales_2cbbc0b81452993b4fb36cda",
+          "term": "местный (место 13)",
+          "sense_hints": [
+            "local"
+          ],
+          "target": "местный",
+          "meaning": "local",
+          "distractors": [
+            "foreign",
+            "famous",
+            "retired"
+          ],
+          "prompt": "How is the artist who helped described?",
+          "evidence": "Один местный художник помог выбрать снимки для нашего зала.",
+          "explanation": "“местный” means local in this passage.",
+          "review_target": "местный",
+          "review_text": "Местный житель показал нам дорогу."
+        },
+        {
+          "id": "ales_e4_exhibit_3",
+          "word_id": "ales_326fc3b0ed22d8654bef7966",
+          "term": "минувший",
+          "sense_hints": [
+            "last, past"
+          ],
+          "target": "минувший",
+          "meaning": "past",
+          "distractors": [
+            "coming",
+            "current",
+            "extended"
+          ],
+          "prompt": "Which season do the photographs represent?",
+          "evidence": "Нет, это минувший сезон.",
+          "explanation": "“минувший” means past in this passage.",
+          "review_target": "минувший",
+          "review_text": "В газете обсуждали минувший год."
+        },
+        {
+          "id": "ales_e4_exhibit_4",
+          "word_id": "ales_30859b4c9066e2eaa3ffbaff",
+          "term": "прежний",
+          "sense_hints": [
+            "former, previous"
+          ],
+          "target": "Прежний",
+          "meaning": "previous",
+          "distractors": [
+            "current",
+            "temporary",
+            "deputy"
+          ],
+          "prompt": "Which organizer left the captions?",
+          "evidence": "Прежний организатор оставил подробные подписи.",
+          "explanation": "“Прежний” means previous in this passage.",
+          "review_target": "Прежний",
+          "review_text": "Прежний владелец дома посадил этот сад."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_restoration",
+      "title": "Discussing an old building",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Город хочет восстановить старый театр. Состояние здания описано в отчёте, который появился вчера."
+        },
+        {
+          "speaker": "B",
+          "text": "Работы проведут сразу во всех помещениях?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет, план предусматривает постепенный переход от одного зала к другому. Часть росписи сохранилась, поэтому её сначала покажут специалистам."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_restoration_1",
+          "word_id": "ales_5fd2a6d6ad48e99e3349273c",
+          "term": "восстанавливать/восстановить",
+          "sense_hints": [
+            "to restore"
+          ],
+          "target": "восстановить",
+          "meaning": "restore",
+          "distractors": [
+            "demolish",
+            "sell",
+            "relocate"
+          ],
+          "prompt": "What does the city want to do with the theater?",
+          "evidence": "Город хочет восстановить старый театр.",
+          "explanation": "“восстановить” means restore in this passage.",
+          "review_target": "восстановить",
+          "review_text": "Мастер обещал восстановить старую мебель."
+        },
+        {
+          "id": "ales_e4_restoration_2",
+          "word_id": "ales_02aeed9595d2515b1728e539",
+          "term": "состояние",
+          "sense_hints": [
+            "condition"
+          ],
+          "target": "Состояние",
+          "meaning": "condition",
+          "distractors": [
+            "ownership",
+            "location",
+            "value"
+          ],
+          "prompt": "Which aspect of the building does the report describe?",
+          "evidence": "Состояние здания описано в отчёте, который появился вчера.",
+          "explanation": "“Состояние” means condition in this passage.",
+          "review_target": "Состояние",
+          "review_text": "Состояние дороги проверят утром."
+        },
+        {
+          "id": "ales_e4_restoration_3",
+          "word_id": "ales_25b78b42aacd5ea420ea5164",
+          "term": "постепенный",
+          "sense_hints": [
+            "gradual"
+          ],
+          "target": "постепенный",
+          "meaning": "gradual",
+          "distractors": [
+            "immediate",
+            "temporary",
+            "unexpected"
+          ],
+          "prompt": "How is the transition between halls planned?",
+          "evidence": "Нет, план предусматривает постепенный переход от одного зала к другому.",
+          "explanation": "“постепенный” means gradual in this passage.",
+          "review_target": "постепенный",
+          "review_text": "Нужен постепенный переход к новому расписанию."
+        },
+        {
+          "id": "ales_e4_restoration_4",
+          "word_id": "ales_1d8ffd3dbb4ac87f8a511286",
+          "term": "сохраняться/сохраниться",
+          "sense_hints": [
+            "to keep, to remain"
+          ],
+          "target": "сохранилась",
+          "meaning": "has survived",
+          "distractors": [
+            "has faded",
+            "has been copied",
+            "has been removed"
+          ],
+          "prompt": "What is said about part of the wall painting?",
+          "evidence": "Часть росписи сохранилась, поэтому её сначала покажут специалистам.",
+          "explanation": "“сохранилась” means has survived in this passage.",
+          "review_target": "сохранилась",
+          "review_text": "В архиве сохранилась старая фотография."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_waterway",
+      "title": "Checking a river service notice",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В заметке говорится про сообщение между двумя городами. Корабль выйдет утром, если расписание не изменится."
+        },
+        {
+          "speaker": "B",
+          "text": "Это тот судоходный канал, который мы видели на карте?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Связь с диспетчером уже установили. Он обещал уточнить время вечером, поэтому билеты пока оставим у себя."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_waterway_1",
+          "word_id": "ales_ffad769d4db1481e577ea779",
+          "term": "сообщение (между А и Б)",
+          "sense_hints": [
+            "communication, connection"
+          ],
+          "target": "сообщение",
+          "meaning": "transport connection",
+          "distractors": [
+            "written announcement",
+            "radio signal",
+            "news article"
+          ],
+          "prompt": "What is the subject linking the two cities in this context?",
+          "evidence": "В заметке говорится про сообщение между двумя городами.",
+          "explanation": "“сообщение” means transport connection in this passage.",
+          "review_target": "сообщение",
+          "review_text": "Регулярное сообщение между островами возобновили."
+        },
+        {
+          "id": "ales_e4_waterway_2",
+          "word_id": "ales_558eb2f49cb5c41981a66fa8",
+          "term": "корабль",
+          "sense_hints": [
+            "ship, craft"
+          ],
+          "target": "Корабль",
+          "meaning": "a ship",
+          "distractors": [
+            "a train",
+            "a bus",
+            "an aircraft"
+          ],
+          "prompt": "What is scheduled to depart in the morning?",
+          "evidence": "Корабль выйдет утром, если расписание не изменится.",
+          "explanation": "“Корабль” means a ship in this passage.",
+          "review_target": "Корабль",
+          "review_text": "Корабль стоит у причала."
+        },
+        {
+          "id": "ales_e4_waterway_3",
+          "word_id": "ales_3b9ec4c49a4c266c00a22ae4",
+          "term": "судоходный",
+          "sense_hints": [
+            "shipping"
+          ],
+          "target": "судоходный",
+          "meaning": "navigable",
+          "distractors": [
+            "irrigation-only",
+            "underground",
+            "dried-up"
+          ],
+          "prompt": "What kind of canal does the second speaker refer to?",
+          "evidence": "Это тот судоходный канал, который мы видели на карте?",
+          "explanation": "“судоходный” means navigable in this passage.",
+          "review_target": "судоходный",
+          "review_text": "Этот судоходный канал открыли давно."
+        },
+        {
+          "id": "ales_e4_waterway_4",
+          "word_id": "ales_510e042d72e0e90026ddb419",
+          "term": "связь",
+          "sense_hints": [
+            "connection, link, contact"
+          ],
+          "target": "Связь",
+          "meaning": "contact",
+          "distractors": [
+            "an agreement",
+            "a dispute",
+            "a meeting"
+          ],
+          "prompt": "What has already been established with the dispatcher?",
+          "evidence": "Связь с диспетчером уже установили.",
+          "explanation": "“Связь” means contact in this passage.",
+          "review_target": "Связь",
+          "review_text": "Связь с островом восстановили вечером."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_maritime",
+      "title": "Planning a museum interview",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Новый раздел музея называется «Оборона побережья». На первой фотографии — подводная лодка."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто расскажет о коллекции?"
+        },
+        {
+          "speaker": "A",
+          "text": "Военнослужащий, которого пригласили организаторы. Военно-морские силы передали музею часть материалов. Вопросы для интервью мы согласуем с ним завтра."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_maritime_1",
+          "word_id": "ales_07cbe2f9ff4b144a1add94fb",
+          "term": "оборона",
+          "sense_hints": [
+            "defense"
+          ],
+          "target": "Оборона",
+          "meaning": "defense",
+          "distractors": [
+            "exploration",
+            "settlement",
+            "trade"
+          ],
+          "prompt": "What is the new section’s theme concerning the coast?",
+          "evidence": "Новый раздел музея называется «Оборона побережья».",
+          "explanation": "“Оборона” means defense in this passage.",
+          "review_target": "Оборона",
+          "review_text": "Оборона города описана в этой книге."
+        },
+        {
+          "id": "ales_e4_maritime_2",
+          "word_id": "ales_3fca8dc1102df6b73b8636e7",
+          "term": "подводная лодка (подлодка)",
+          "sense_hints": [
+            "submarine"
+          ],
+          "target": "подводная лодка",
+          "meaning": "a submarine",
+          "distractors": [
+            "a destroyer",
+            "an aircraft carrier",
+            "a patrol boat"
+          ],
+          "prompt": "What appears in the first photograph?",
+          "evidence": "На первой фотографии — подводная лодка.",
+          "explanation": "“подводная лодка” means a submarine in this passage.",
+          "review_target": "подводная лодка",
+          "review_text": "Подводная лодка вернулась в порт."
+        },
+        {
+          "id": "ales_e4_maritime_3",
+          "word_id": "ales_a807a0655d2da6466faef7c2",
+          "term": "военнослужащий",
+          "sense_hints": [
+            "serviceman"
+          ],
+          "target": "Военнослужащий",
+          "meaning": "a service member",
+          "distractors": [
+            "a historian",
+            "a journalist",
+            "a civilian engineer"
+          ],
+          "prompt": "Who has been invited to discuss the collection?",
+          "evidence": "Военнослужащий, которого пригласили организаторы.",
+          "explanation": "“Военнослужащий” means a service member in this passage.",
+          "review_target": "Военнослужащий",
+          "review_text": "Военнослужащий ответил на вопросы школьников."
+        },
+        {
+          "id": "ales_e4_maritime_4",
+          "word_id": "ales_bf5e2868477e28c15d4fb2ff",
+          "term": "военно-морские силы",
+          "sense_hints": [
+            "navy"
+          ],
+          "target": "Военно-морские силы",
+          "meaning": "the navy",
+          "distractors": [
+            "the army",
+            "the air force",
+            "the border service"
+          ],
+          "prompt": "Which organization supplied some of the materials?",
+          "evidence": "Военно-морские силы передали музею часть материалов.",
+          "explanation": "“Военно-морские силы” means the navy in this passage.",
+          "review_target": "Военно-морские силы",
+          "review_text": "Военно-морские силы участвовали в выставке."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_leadership",
+      "title": "Comparing political reports",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Власти опубликовали ответ на обращение жителей. В нём говорится, кому принадлежит власть в этом вопросе."
+        },
+        {
+          "speaker": "B",
+          "text": "А что известно о руководителе совета?"
+        },
+        {
+          "speaker": "A",
+          "text": "Его отставка пока обсуждается. Он сам заявил, что готов уйти в отставку, но дату не назвал. Я проверю официальное сообщение перед выпуском."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_leadership_1",
+          "word_id": "ales_8ba9258eeebfdd5c01424431",
+          "term": "власти (pl.)",
+          "sense_hints": [
+            "authorities"
+          ],
+          "target": "Власти",
+          "meaning": "the authorities",
+          "distractors": [
+            "the residents",
+            "the journalists",
+            "the petitioners"
+          ],
+          "prompt": "Who published the response?",
+          "evidence": "Власти опубликовали ответ на обращение жителей.",
+          "explanation": "“Власти” means the authorities in this passage.",
+          "review_target": "Власти",
+          "review_text": "Власти сообщили об изменении правил."
+        },
+        {
+          "id": "ales_e4_leadership_2",
+          "word_id": "ales_06b7a856341ade1cb170048e",
+          "term": "власть (f.)",
+          "sense_hints": [
+            "power"
+          ],
+          "target": "власть",
+          "meaning": "authority",
+          "distractors": [
+            "responsibility for costs",
+            "ownership of property",
+            "public support"
+          ],
+          "prompt": "What does the response clarify someone’s possession of in this matter?",
+          "evidence": "В нём говорится, кому принадлежит власть в этом вопросе.",
+          "explanation": "“власть” means authority in this passage.",
+          "review_target": "власть",
+          "review_text": "Власть перешла к новому совету."
+        },
+        {
+          "id": "ales_e4_leadership_3",
+          "word_id": "ales_b0f078f981ea98bcb5fb52dc",
+          "term": "отставка",
+          "sense_hints": [
+            "resignation"
+          ],
+          "target": "отставка",
+          "meaning": "resignation",
+          "distractors": [
+            "promotion",
+            "appointment",
+            "temporary leave"
+          ],
+          "prompt": "What change concerning the council leader is under discussion?",
+          "evidence": "Его отставка пока обсуждается.",
+          "explanation": "“отставка” means resignation in this passage.",
+          "review_target": "отставка",
+          "review_text": "Его отставка стала темой заседания."
+        },
+        {
+          "id": "ales_e4_leadership_4",
+          "word_id": "ales_ec6a3ba3c005eff51685eca7",
+          "term": "уходить/уйти в отставку",
+          "sense_hints": [
+            "to resign"
+          ],
+          "target": "уйти в отставку",
+          "meaning": "resign",
+          "distractors": [
+            "stand for election",
+            "take a vacation",
+            "seek promotion"
+          ],
+          "prompt": "What did the leader say he was prepared to do?",
+          "evidence": "Он сам заявил, что готов уйти в отставку, но дату не назвал.",
+          "explanation": "“уйти в отставку” means resign in this passage.",
+          "review_target": "уйти в отставку",
+          "review_text": "Министр решил уйти в отставку."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_court",
+      "title": "Reading a court report",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Судья закончил заседание. В статье сказано, что человека решили приговорить к двум годам заключения."
+        },
+        {
+          "speaker": "B",
+          "text": "Уточняется, куда его отправят?"
+        },
+        {
+          "speaker": "A",
+          "text": "Указана тюрьма в соседнем районе. Других подробностей пока нет. Я попрошу редактора проверить формулировки, прежде чем мы перескажем эту новость."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_court_1",
+          "word_id": "ales_d6c11976077431cf7ba82d4f",
+          "term": "судья",
+          "sense_hints": [
+            "judge"
+          ],
+          "target": "Судья",
+          "meaning": "the judge",
+          "distractors": [
+            "the prosecutor",
+            "the defense lawyer",
+            "the witness"
+          ],
+          "prompt": "Who ended the hearing?",
+          "evidence": "Судья закончил заседание.",
+          "explanation": "“Судья” means the judge in this passage.",
+          "review_target": "Судья",
+          "review_text": "Судья попросил всех сесть."
+        },
+        {
+          "id": "ales_e4_court_2",
+          "word_id": "ales_b5753f11b1ca01ba480df28e",
+          "term": "приговорить",
+          "sense_hints": [
+            "to sentence, to condemn"
+          ],
+          "target": "приговорить",
+          "meaning": "sentence",
+          "distractors": [
+            "question",
+            "acquit",
+            "release"
+          ],
+          "prompt": "What legal action was decided concerning the person?",
+          "evidence": "В статье сказано, что человека решили приговорить к двум годам заключения.",
+          "explanation": "“приговорить” means sentence in this passage.",
+          "review_target": "приговорить",
+          "review_text": "Суд может приговорить его к штрафу."
+        },
+        {
+          "id": "ales_e4_court_3",
+          "word_id": "ales_dcb8d898a6eb9b6f1f43e16c",
+          "term": "заключение",
+          "sense_hints": [
+            "imprisonment; conclusion"
+          ],
+          "target": "заключения",
+          "meaning": "imprisonment",
+          "distractors": [
+            "probation",
+            "community service",
+            "house arrest"
+          ],
+          "prompt": "What does the two-year term refer to in this report?",
+          "evidence": "В статье сказано, что человека решили приговорить к двум годам заключения.",
+          "explanation": "“заключения” means imprisonment in this passage.",
+          "review_target": "заключения",
+          "review_text": "Три года заключения изменили его жизнь."
+        },
+        {
+          "id": "ales_e4_court_4",
+          "word_id": "ales_e85cf71c2760f03a6ee6f076",
+          "term": "тюрьма",
+          "sense_hints": [
+            "jail, prison"
+          ],
+          "target": "тюрьма",
+          "meaning": "a prison",
+          "distractors": [
+            "a courthouse",
+            "a police station",
+            "a hospital"
+          ],
+          "prompt": "What facility is named in the neighboring district?",
+          "evidence": "Указана тюрьма в соседнем районе.",
+          "explanation": "“тюрьма” means a prison in this passage.",
+          "review_target": "тюрьма",
+          "review_text": "Эта тюрьма находится за городом."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_newsroom",
+      "title": "Checking attribution in a news brief",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "По сообщениям прессы, встреча состоится завтра. Но у нас пока нет подтверждения из официального источника."
+        },
+        {
+          "speaker": "B",
+          "text": "А что говорится в документе на столе?"
+        },
+        {
+          "speaker": "A",
+          "text": "Это заявление организаторов. Они хотят заявить о новом проекте, а подробности будут сообщать позже. Я отмечу эту разницу в тексте."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_newsroom_1",
+          "word_id": "ales_4481ece76bea08fdd0d58dcf",
+          "term": "по сообщениям прессы (по 22)",
+          "sense_hints": [
+            "according to the press reports"
+          ],
+          "target": "По сообщениям прессы",
+          "meaning": "according to press reports",
+          "distractors": [
+            "according to eyewitnesses",
+            "according to the organizer",
+            "according to an official schedule"
+          ],
+          "prompt": "What source is given for the meeting date?",
+          "evidence": "По сообщениям прессы, встреча состоится завтра.",
+          "explanation": "“По сообщениям прессы” means according to press reports in this passage.",
+          "review_target": "По сообщениям прессы",
+          "review_text": "По сообщениям прессы, дорогу откроют летом."
+        },
+        {
+          "id": "ales_e4_newsroom_2",
+          "word_id": "ales_b1c20985f8a9eb4b2a0e81d1",
+          "term": "заявление",
+          "sense_hints": [
+            "declaration"
+          ],
+          "target": "заявление",
+          "meaning": "a statement",
+          "distractors": [
+            "an invitation",
+            "a transcript",
+            "a contract"
+          ],
+          "prompt": "What kind of document is on the desk?",
+          "evidence": "Это заявление организаторов.",
+          "explanation": "“заявление” means a statement in this passage.",
+          "review_target": "заявление",
+          "review_text": "Заявление напечатали на первой странице."
+        },
+        {
+          "id": "ales_e4_newsroom_3",
+          "word_id": "ales_45853adf5a61b7eb87ce2bcb",
+          "term": "заявлять/заявить",
+          "sense_hints": [
+            "to declare, to announce"
+          ],
+          "target": "заявить",
+          "meaning": "announce",
+          "distractors": [
+            "ask questions",
+            "raise doubts",
+            "remain silent"
+          ],
+          "prompt": "What do the organizers intend to do regarding the new project?",
+          "evidence": "Они хотят заявить о новом проекте, а подробности будут сообщать позже.",
+          "explanation": "“заявить” means announce in this passage.",
+          "review_target": "заявить",
+          "review_text": "Он хочет заявить о своём решении."
+        },
+        {
+          "id": "ales_e4_newsroom_4",
+          "word_id": "ales_bffea1849069b1220a5a97ab",
+          "term": "сообщать/сообщить",
+          "sense_hints": [
+            "to report"
+          ],
+          "target": "сообщать",
+          "meaning": "report",
+          "distractors": [
+            "verify",
+            "withhold",
+            "discuss internally"
+          ],
+          "prompt": "What will they do with the details later?",
+          "evidence": "Они хотят заявить о новом проекте, а подробности будут сообщать позже.",
+          "explanation": "“сообщать” means report in this passage.",
+          "review_target": "сообщать",
+          "review_text": "Об изменениях будут сообщать по радио."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_aircraft",
+      "title": "Preparing an aviation history segment",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В фильме показан сверхзвуковой самолёт. Во время испытаний он потерпел аварию, но пилот успел катапультироваться."
+        },
+        {
+          "speaker": "B",
+          "text": "А что в следующем эпизоде?"
+        },
+        {
+          "speaker": "A",
+          "text": "Посадка другой машины. Эти кадры сняли позже, поэтому их нельзя ставить рядом без пояснения. Я добавлю даты под каждым эпизодом."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_aircraft_1",
+          "word_id": "ales_df6133894695b6f580e3355b",
+          "term": "сверхзвуковой",
+          "sense_hints": [
+            "supersonic"
+          ],
+          "target": "сверхзвуковой",
+          "meaning": "supersonic",
+          "distractors": [
+            "subsonic",
+            "unmanned",
+            "amphibious"
+          ],
+          "prompt": "What type of aircraft is shown in the first episode?",
+          "evidence": "В фильме показан сверхзвуковой самолёт.",
+          "explanation": "“сверхзвуковой” means supersonic in this passage.",
+          "review_target": "сверхзвуковой",
+          "review_text": "Этот сверхзвуковой самолёт находится в музее."
+        },
+        {
+          "id": "ales_e4_aircraft_2",
+          "word_id": "ales_1082e529fa04b6af4dfdb122",
+          "term": "потерпеть аварию",
+          "sense_hints": [
+            "to have an accident"
+          ],
+          "target": "потерпел аварию",
+          "meaning": "had an accident",
+          "distractors": [
+            "lost radio contact",
+            "changed course",
+            "made a test flight"
+          ],
+          "prompt": "What happened to the aircraft during testing?",
+          "evidence": "Во время испытаний он потерпел аварию, но пилот успел катапультироваться.",
+          "explanation": "“потерпел аварию” means had an accident in this passage.",
+          "review_target": "потерпел аварию",
+          "review_text": "Этот самолёт потерпел аварию много лет назад."
+        },
+        {
+          "id": "ales_e4_aircraft_3",
+          "word_id": "ales_bb2d3e6f379c9ba031c50875",
+          "term": "катапультироваться",
+          "sense_hints": [
+            "to eject"
+          ],
+          "target": "катапультироваться",
+          "meaning": "eject",
+          "distractors": [
+            "land the aircraft",
+            "restore control",
+            "send a message"
+          ],
+          "prompt": "What did the pilot manage to do?",
+          "evidence": "Во время испытаний он потерпел аварию, но пилот успел катапультироваться.",
+          "explanation": "“катапультироваться” means eject in this passage.",
+          "review_target": "катапультироваться",
+          "review_text": "Пилот смог катапультироваться вовремя."
+        },
+        {
+          "id": "ales_e4_aircraft_4",
+          "word_id": "ales_830379ee6bf344c2ea55f1bd",
+          "term": "посадка",
+          "sense_hints": [
+            "landing"
+          ],
+          "target": "Посадка",
+          "meaning": "a landing",
+          "distractors": [
+            "a takeoff",
+            "a refueling",
+            "a flyover"
+          ],
+          "prompt": "What appears in the later episode?",
+          "evidence": "Посадка другой машины.",
+          "explanation": "“Посадка” means a landing in this passage.",
+          "review_target": "Посадка",
+          "review_text": "Посадка прошла без задержки."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_fire_report",
+      "title": "Checking an incident summary",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сводке написано, что пожар возник вечером. Огонь начал охватывать верхний этаж ещё до приезда помощи."
+        },
+        {
+          "speaker": "B",
+          "text": "Что известно о людях внутри?"
+        },
+        {
+          "speaker": "A",
+          "text": "У одного человека ожог руки. Спасательный отряд передал эти сведения редакции. Имена пока не публикуют, а остальные данные ещё проверяют."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_fire_report_1",
+          "word_id": "ales_f06db785cb21f580a78f7870",
+          "term": "пожар возник",
+          "sense_hints": [
+            "fire started"
+          ],
+          "target": "пожар возник",
+          "meaning": "a fire started",
+          "distractors": [
+            "a fire was detected",
+            "a fire was contained",
+            "a fire was extinguished"
+          ],
+          "prompt": "What event is placed in the evening?",
+          "evidence": "В сводке написано, что пожар возник вечером.",
+          "explanation": "“пожар возник” means a fire started in this passage.",
+          "review_target": "пожар возник",
+          "review_text": "В соседнем здании пожар возник ночью."
+        },
+        {
+          "id": "ales_e4_fire_report_2",
+          "word_id": "ales_9b493841c5610491e668d6b3",
+          "term": "охватывать/охватить",
+          "sense_hints": [
+            "to engulf, to envelop"
+          ],
+          "target": "охватывать",
+          "meaning": "engulf",
+          "distractors": [
+            "bypass",
+            "recede from",
+            "remain below"
+          ],
+          "prompt": "What did the fire begin doing to the upper floor?",
+          "evidence": "Огонь начал охватывать верхний этаж ещё до приезда помощи.",
+          "explanation": "“охватывать” means engulf in this passage.",
+          "review_target": "охватывать",
+          "review_text": "Туман начал охватывать долину."
+        },
+        {
+          "id": "ales_e4_fire_report_3",
+          "word_id": "ales_5c0e999df03174f982fa7860",
+          "term": "ожог",
+          "sense_hints": [
+            "burn"
+          ],
+          "target": "ожог",
+          "meaning": "a burn",
+          "distractors": [
+            "a fracture",
+            "a bruise",
+            "a cut"
+          ],
+          "prompt": "What injury to a hand is reported?",
+          "evidence": "У одного человека ожог руки.",
+          "explanation": "“ожог” means a burn in this passage.",
+          "review_target": "ожог",
+          "review_text": "У него остался небольшой ожог."
+        },
+        {
+          "id": "ales_e4_fire_report_4",
+          "word_id": "ales_041e37e3686d0899fa2a3598",
+          "term": "спасательный",
+          "sense_hints": [
+            "rescue (attr.)"
+          ],
+          "target": "Спасательный",
+          "meaning": "rescue",
+          "distractors": [
+            "police",
+            "construction",
+            "medical research"
+          ],
+          "prompt": "What kind of team supplied the information?",
+          "evidence": "Спасательный отряд передал эти сведения редакции.",
+          "explanation": "“Спасательный” means rescue in this passage.",
+          "review_target": "Спасательный",
+          "review_text": "Спасательный катер вернулся к берегу."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_access",
+      "title": "Discussing access to an archive",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Защита документов — главная тема новой инструкции. Охрана уже получила свой экземпляр."
+        },
+        {
+          "speaker": "B",
+          "text": "Почему нам не разрешили войти вчера?"
+        },
+        {
+          "speaker": "A",
+          "text": "В письме указано отсутствие разрешения. Отказ можно обжаловать, но сначала нужно выяснить, какого документа не хватает. Я позвоню в архив после обеда."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_access_1",
+          "word_id": "ales_5c1aea16f55ad9247a3b614b",
+          "term": "защита",
+          "sense_hints": [
+            "protection"
+          ],
+          "target": "Защита",
+          "meaning": "protection",
+          "distractors": [
+            "translation",
+            "publication",
+            "replacement"
+          ],
+          "prompt": "What aspect of the documents is the instruction about?",
+          "evidence": "Защита документов — главная тема новой инструкции.",
+          "explanation": "“Защита” means protection in this passage.",
+          "review_target": "Защита",
+          "review_text": "Защита старых книг требует внимания."
+        },
+        {
+          "id": "ales_e4_access_2",
+          "word_id": "ales_4944926050743beae0b40f51",
+          "term": "охрана",
+          "sense_hints": [
+            "guard, protection"
+          ],
+          "target": "Охрана",
+          "meaning": "security staff",
+          "distractors": [
+            "cleaning staff",
+            "research staff",
+            "visitors"
+          ],
+          "prompt": "Who already received a copy?",
+          "evidence": "Охрана уже получила свой экземпляр.",
+          "explanation": "“Охрана” means security staff in this passage.",
+          "review_target": "Охрана",
+          "review_text": "Охрана проверила вход."
+        },
+        {
+          "id": "ales_e4_access_3",
+          "word_id": "ales_b1cded96492aabc4d3e7e506",
+          "term": "отсутствие",
+          "sense_hints": [
+            "absence, lack"
+          ],
+          "target": "отсутствие",
+          "meaning": "absence",
+          "distractors": [
+            "expiration",
+            "withdrawal",
+            "incorrect wording"
+          ],
+          "prompt": "What problem with permission is stated in the letter?",
+          "evidence": "В письме указано отсутствие разрешения.",
+          "explanation": "“отсутствие” means absence in this passage.",
+          "review_target": "отсутствие",
+          "review_text": "Отсутствие ответа нас удивило."
+        },
+        {
+          "id": "ales_e4_access_4",
+          "word_id": "ales_effc5194d85f30b244c64bc7",
+          "term": "отказ",
+          "sense_hints": [
+            "refusal"
+          ],
+          "target": "Отказ",
+          "meaning": "a refusal",
+          "distractors": [
+            "a fee",
+            "a delay",
+            "an appointment"
+          ],
+          "prompt": "What can be appealed?",
+          "evidence": "Отказ можно обжаловать, но сначала нужно выяснить, какого документа не хватает.",
+          "explanation": "“Отказ” means a refusal in this passage.",
+          "review_target": "Отказ",
+          "review_text": "Отказ пришёл по электронной почте."
+        }
+      ]
+    },
+    {
+      "id": "ales_e4_town_project",
+      "title": "Discussing a community initiative",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В отчёте описана деятельность нашего центра. Развитие района выделили в отдельную главу."
+        },
+        {
+          "speaker": "B",
+          "text": "Чего организаторы ждут от нового проекта?"
+        },
+        {
+          "speaker": "A",
+          "text": "Они надеются, что он будет способствовать сотрудничеству. Но без общего усилия результата не будет. Поэтому на следующую встречу пригласили всех участников."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e4_town_project_1",
+          "word_id": "ales_e84c8ae87ea3e7bab9d700fb",
+          "term": "деятельность",
+          "sense_hints": [
+            "activity"
+          ],
+          "target": "деятельность",
+          "meaning": "activities",
+          "distractors": [
+            "location",
+            "ownership",
+            "expenses"
+          ],
+          "prompt": "What does the report describe about the center?",
+          "evidence": "В отчёте описана деятельность нашего центра.",
+          "explanation": "“деятельность” means activities in this passage.",
+          "review_target": "деятельность",
+          "review_text": "Его деятельность связана с образованием."
+        },
+        {
+          "id": "ales_e4_town_project_2",
+          "word_id": "ales_102880b555aac0d1e54414d8",
+          "term": "развитие",
+          "sense_hints": [
+            "development"
+          ],
+          "target": "Развитие",
+          "meaning": "development",
+          "distractors": [
+            "boundaries",
+            "population",
+            "history"
+          ],
+          "prompt": "What aspect of the district has its own chapter?",
+          "evidence": "Развитие района выделили в отдельную главу.",
+          "explanation": "“Развитие” means development in this passage.",
+          "review_target": "Развитие",
+          "review_text": "Развитие транспорта обсуждали на встрече."
+        },
+        {
+          "id": "ales_e4_town_project_3",
+          "word_id": "ales_295e40b3c5a578006bb780b8",
+          "term": "способствовать",
+          "sense_hints": [
+            "to contribute"
+          ],
+          "target": "способствовать",
+          "meaning": "contribute to",
+          "distractors": [
+            "replace",
+            "prevent",
+            "require"
+          ],
+          "prompt": "What relationship do organizers hope the project will have to cooperation?",
+          "evidence": "Они надеются, что он будет способствовать сотрудничеству.",
+          "explanation": "“способствовать” means contribute to in this passage.",
+          "review_target": "способствовать",
+          "review_text": "Новый маршрут будет способствовать обмену товарами."
+        },
+        {
+          "id": "ales_e4_town_project_4",
+          "word_id": "ales_38cfbc399c0212c4f9a5292e",
+          "term": "усилие",
+          "sense_hints": [
+            "effort"
+          ],
+          "target": "усилия",
+          "meaning": "effort",
+          "distractors": [
+            "funding",
+            "permission",
+            "leadership"
+          ],
+          "prompt": "What shared input does the speaker say is necessary for results?",
+          "evidence": "Но без общего усилия результата не будет.",
+          "explanation": "“усилия” means effort in this passage.",
+          "review_target": "усилия",
+          "review_text": "Без дополнительного усилия задачу не решить."
+        }
+      ]
     }
   ]
 }

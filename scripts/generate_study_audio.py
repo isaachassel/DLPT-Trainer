@@ -25,7 +25,8 @@ BATCHES = {'original': ('vocabulary-expansion-20261104', '2026-11-04'),
            'lesson32': ('lesson32-20261108', '2026-11-08'),
            'ales': ('ales-20261113', '2026-11-13'),
            'ales2': ('ales-20261122', '2026-11-22'),
-           'ales3': ('ales-20261123', '2026-11-23')}
+           'ales3': ('ales-20261123', '2026-11-23'),
+           'ales4': ('ales-20261124', '2026-11-24')}
 
 
 def select_batch(passages, batch):
@@ -34,7 +35,7 @@ def select_batch(passages, batch):
     if batch.startswith('ales'):
         if batch == 'ales':
             selected = [p for p in passages if p['id'].startswith('ales_')
-                        and not p['id'].startswith(('ales_e2_', 'ales_e3_'))]
+                        and not p['id'].startswith(('ales_e2_', 'ales_e3_', 'ales_e4_'))]
         else:
             selected = [p for p in passages if p['id'].startswith(f'ales_e{batch[-1]}_')]
     else:

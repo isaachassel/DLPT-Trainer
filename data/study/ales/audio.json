@@ -1540,6 +1540,566 @@
         "https://elevenlabs.io/speech-engine-terms"
       ],
       "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_visit": {
+      "path": "data/study/audio/ales_e4_visit.mp3",
+      "sha256": "b7ced97f10480afb94547f52896f2dd305e5dc4ea07546690eae300a3b4f5e2b",
+      "duration_seconds": 16.56,
+      "script_fingerprint": "738e96dc10f52803e45a5cd6e58ef3714f64312f5ad27c7f2e9e7a2a058674e9",
+      "generated_at": "2026-11-24T14:09:09.757011+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 243,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_walk": {
+      "path": "data/study/audio/ales_e4_walk.mp3",
+      "sha256": "a134f52266b9c6cf210f3e1780f80ba5610e5d7edce8460f7d65979d472eca5f",
+      "duration_seconds": 17.04,
+      "script_fingerprint": "07a0bc8739dfa6d598b53dd9b646736bd3094c62839347941decf5adcdd9df53",
+      "generated_at": "2026-11-24T14:09:18.520627+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 241,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_chess": {
+      "path": "data/study/audio/ales_e4_chess.mp3",
+      "sha256": "f86a94e7a7386bbc0abc97cb9a6f21f020b1f3b77abf4e58739eb23c7a76928e",
+      "duration_seconds": 16.16,
+      "script_fingerprint": "2e1f84f8452ed97af145ace597008131c04ef7a98a865da7faac66cfd6e5dbfe",
+      "generated_at": "2026-11-24T14:09:25.753082+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 247,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_racing": {
+      "path": "data/study/audio/ales_e4_racing.mp3",
+      "sha256": "c55f82f3139d2474095dd9ef7d2496c9418515735726a81ebd8fe4eccfd95b9b",
+      "duration_seconds": 17.12,
+      "script_fingerprint": "e15fca582f176950c1b414f6ed2b25483c2407789b00a670287f1d6858e6db23",
+      "generated_at": "2026-11-24T14:09:31.933436+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 255,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_panel": {
+      "path": "data/study/audio/ales_e4_panel.mp3",
+      "sha256": "f571c576c5776be1bc24e6bfcb2cdf95ecfd28d1fffcdb2744fa834bf90b7b45",
+      "duration_seconds": 17.2,
+      "script_fingerprint": "f30f53053f1bf8aa344df6592205a7e4d4bfb89a66e53890bd02e697fffd0611",
+      "generated_at": "2026-11-24T14:09:38.752771+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 268,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_options": {
+      "path": "data/study/audio/ales_e4_options.mp3",
+      "sha256": "816a0fd2eac44bc00334fded14496dce76d0d6968b7571c1a5b11bfe705d2674",
+      "duration_seconds": 18.16,
+      "script_fingerprint": "cace021c9c48f3e3ded8ae2ccef27831faf52f9fb1bb891b870fe38fcdd568e1",
+      "generated_at": "2026-11-24T14:09:45.336088+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 252,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_design": {
+      "path": "data/study/audio/ales_e4_design.mp3",
+      "sha256": "ade8937ad6d1ff9ae8416ad0b8f4d8c1c3ebb802a1c7727f065c230218d0e1bb",
+      "duration_seconds": 17.28,
+      "script_fingerprint": "14fcf6b48ec9847f5b92f36870fdbc52c05c7c6de9ebd359e3242dc02b3f0173",
+      "generated_at": "2026-11-24T14:09:53.451015+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 258,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_machine": {
+      "path": "data/study/audio/ales_e4_machine.mp3",
+      "sha256": "0c2371a50fe08980ff097839ec049781d6810bf05c1825f183f930bca111e369",
+      "duration_seconds": 18.64,
+      "script_fingerprint": "8aca902c00140abe6236171cbd2ff4c64c3c89422b66dc25a6bc822d3c3c8029",
+      "generated_at": "2026-11-24T14:10:00.668581+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 269,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_supplies": {
+      "path": "data/study/audio/ales_e4_supplies.mp3",
+      "sha256": "38e96553635b4b467fab7ceb5f89c5b2d513bf6da32e4801ae743fc3f656d147",
+      "duration_seconds": 17.84,
+      "script_fingerprint": "363893d4ed25dbea5c37bfc5ea198402c7d71d2c61ef9b81d50819d748779bef",
+      "generated_at": "2026-11-24T14:10:07.970131+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 245,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_exhibit": {
+      "path": "data/study/audio/ales_e4_exhibit.mp3",
+      "sha256": "807ab4ee50338be009aa91746a457f1d2858356a708d9d7a0d9d0b4b39cbf345",
+      "duration_seconds": 17.52,
+      "script_fingerprint": "93c25b183f2fb5e976a2cc485c90a427b6fa35c8a956e375ee1976de38270b92",
+      "generated_at": "2026-11-24T14:10:15.528849+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 256,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_restoration": {
+      "path": "data/study/audio/ales_e4_restoration.mp3",
+      "sha256": "d4a375a852fc6c0ab9b915162bb7df3350da540a69e6fda2768cb8b208457a72",
+      "duration_seconds": 18.72,
+      "script_fingerprint": "3176711ba0c83aab2a139823b9670e8ddc710a4196891297ccc69463b551df74",
+      "generated_at": "2026-11-24T14:10:23.113348+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 277,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_waterway": {
+      "path": "data/study/audio/ales_e4_waterway.mp3",
+      "sha256": "5adf8a1f1f313563b987132c3375279e982d61148a5a84a1a72cb14e4a4c02be",
+      "duration_seconds": 18.64,
+      "script_fingerprint": "8abfca643c722a9569f75f1cc6299177567264406d60d8fec59df63087610875",
+      "generated_at": "2026-11-24T14:10:31.338750+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 269,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_maritime": {
+      "path": "data/study/audio/ales_e4_maritime.mp3",
+      "sha256": "ef03c9de7381cdf384820938407d01aff323201e86c7d0d07962b5dd47a02f30",
+      "duration_seconds": 18.72,
+      "script_fingerprint": "0e3f2ac3bc7f994633312f3a110e7dd3ce7522b40a9464671599c36c52069e54",
+      "generated_at": "2026-11-24T14:10:39.242821+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 266,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_leadership": {
+      "path": "data/study/audio/ales_e4_leadership.mp3",
+      "sha256": "b0e7e00bf270bfba4012b7882c243b0f5582a6d59682ea1e3d65ab49f4af25d0",
+      "duration_seconds": 17.84,
+      "script_fingerprint": "64a569a57647360f58e00518b6acf8bdf5f14d38eaa6a7a1170ce2094335f6b5",
+      "generated_at": "2026-11-24T14:10:46.303720+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 280,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_court": {
+      "path": "data/study/audio/ales_e4_court.mp3",
+      "sha256": "951e1b3fe40808fa4d96b6de92cc2803c3eb739f3af0a72511a4c924e371d0a5",
+      "duration_seconds": 18.32,
+      "script_fingerprint": "568b166d1588be535b04dd6c9f0c7025d70de9fd5ca4906417b77ab7dbcfc1ac",
+      "generated_at": "2026-11-24T14:10:53.875055+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 275,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_newsroom": {
+      "path": "data/study/audio/ales_e4_newsroom.mp3",
+      "sha256": "40235a5e9ee13971dcd931c9d25b488af102b859d67c141eb60a34ead09e20b6",
+      "duration_seconds": 18.08,
+      "script_fingerprint": "8eee9b0e439d18318f16b610cc146b82639380746f7cb937502a8c9c6368e820",
+      "generated_at": "2026-11-24T14:11:01.608762+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 273,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_aircraft": {
+      "path": "data/study/audio/ales_e4_aircraft.mp3",
+      "sha256": "75a0ef18b7f57ca7f383115b00899db8b2e309033e4cb193677fe5ada3f06e73",
+      "duration_seconds": 18.72,
+      "script_fingerprint": "f638a3566c30c969fb098a3d69b25d755ae43928f0c881ae03e8bc02c9130cd1",
+      "generated_at": "2026-11-24T14:11:09.713172+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 267,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_fire_report": {
+      "path": "data/study/audio/ales_e4_fire_report.mp3",
+      "sha256": "e90f78e42cfdc56bc7fa4aa99e78c99a66ba50726eacb94749af972abc03043b",
+      "duration_seconds": 18.08,
+      "script_fingerprint": "f1bd763d825b00ae6bed38748db9696eedea6880617dc728b2e7ed16015619f1",
+      "generated_at": "2026-11-24T14:11:17.428702+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 268,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_access": {
+      "path": "data/study/audio/ales_e4_access.mp3",
+      "sha256": "17103d403f259f53d15d3814a7d94c0a1c8681769bb7eb16ec853e18b2180073",
+      "duration_seconds": 18.8,
+      "script_fingerprint": "508c0e12cf19594d42494d85c5d8c7b916f52b5a7834323c1b3adb38ec1f5c3f",
+      "generated_at": "2026-11-24T14:11:24.431569+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 272,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
+    },
+    "ales_e4_town_project": {
+      "path": "data/study/audio/ales_e4_town_project.mp3",
+      "sha256": "c637c3bee1aaf9736c18f3592f86dacc8e304e68d102f0636242d5e75cef2c41",
+      "duration_seconds": 18.0,
+      "script_fingerprint": "a73a987ccaf3e2c385f251697141c09d03f58b30d0f05d671b3d4d96755ca17d",
+      "generated_at": "2026-11-24T14:11:33.500885+00:00",
+      "provider": "ElevenLabs",
+      "model": "eleven_v3",
+      "voice_ids": {
+        "A": "cgSgspJ2msm6clMCkdW9",
+        "B": "cjVigY5qzO86Huf0OWal"
+      },
+      "account_tier": "starter",
+      "input_characters": 285,
+      "commercial_use": true,
+      "attribution_required": false,
+      "model_status": "generally_available",
+      "terms_checked": "2026-11-24",
+      "sources": [
+        "https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform",
+        "https://elevenlabs.io/blog/eleven-v3-is-now-generally-available",
+        "https://elevenlabs.io/terms-of-use",
+        "https://elevenlabs.io/service-specific-terms",
+        "https://elevenlabs.io/elevenapi-terms",
+        "https://elevenlabs.io/speech-engine-terms"
+      ],
+      "approval": "Standing owner approval of the Jessica/Eric Eleven v3 method; no individual human listening review claimed"
     }
   }
 }

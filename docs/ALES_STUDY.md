@@ -27,9 +27,9 @@ computer; this does not introduce cloud account synchronization.
 
 The supplied CSV imported **474 rows / 474 distinct headword-sense entries**.
 All entries are available for reading word review: uncheck context-only and use
-**Start review**. The expanded authored passage bank contains **55 dialogues,
-220 comprehension questions and 220 fresh short review contexts**, covering
-**220 of 474 entries** in both reading and listening. The remaining **254 entries
+**Start review**. The expanded authored passage bank contains **75 dialogues,
+300 comprehension questions and 300 fresh short review contexts**, covering
+**300 of 474 entries** in both reading and listening. The remaining **174 entries
 do not yet have authored passage/audio coverage**. Coverage counts are shown
 in the interface and report. Completing every current passage does not test the
 entire glossary. No unit assignments are guessed or used to organize ALES study.
@@ -40,6 +40,8 @@ The second batch adds museum visits, youth programs, rail services, housing,
 manufacturing, financial reporting, education, environmental surveys and more.
 The third batch adds family descriptions, community events, publications,
 workplace decisions, travel, science, diplomacy and local administration.
+The fourth batch adds visits, walking routes, chess, event planning, restoration,
+river travel, museum interviews, public announcements and incident reporting.
 These are original synthetic learning materials, not authentic SLS/DLI items.
 Language, distractors and pronunciation remain provisional pending instructor
 review. Each target is linked by exact source headword AND English sense.
@@ -74,7 +76,7 @@ Self-rated later reviews preserve their history and scheduling.
 
 The `ales` audio batch selects only the original 15 dialogues. Use `--batch ales2`
 to preflight the 20-dialogue expansion; append `--generate` only when authorized
-to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch. Separate ledgers keep earlier batches unchanged.
+to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch and `--batch ales4` for the fourth. Separate ledgers keep earlier batches unchanged.
 
 The importer reads UTF-8 CSV (with or without BOM) using the five original
 column names. It preserves supplied source metadata but never fills blank item,
@@ -89,7 +91,7 @@ also remain ignored. Only authored passages/questions, generated recordings and
 their internal provenance are versioned.
 
 Add original passage specs to `scripts/prepare_ales_passages.py` or its imported
-`scripts/ales_expansion.py` / `scripts/ales_expansion3.py` batches. Each target
+`scripts/ales_expansion.py`, `scripts/ales_expansion3.py` or `scripts/ales_expansion4.py` batches. Each target
 needs the exact CSV entry/sense, a spoken form occurring in the dialogue, one
 correct contextual answer, three distinct plausible alternatives, a comprehension
 question and a separate short review sentence. Avoid questions solvable from
@@ -162,9 +164,29 @@ This later snapshot includes the interrupted request and retry; exact individual
 request billing could not be verified through history. The immediate completion
 counter was lower, so later-settling provider counters remain the authority.
 
+## Audio expansion, 2026-11-24
+
+The fourth batch adds 20 original dialogues and 80 previously uncovered senses,
+with four questions per dialogue and 80 separate short reading-review contexts.
+All earlier 55 passages remain unchanged. A snapshot regression checks their
+content; batch-selection checks keep generation separate from earlier recordings.
+
+Scripts total **5,266 input characters**, within the separate 8,000-character
+batch cap. The same Jessica/Eric voices and generally available `eleven_v3`
+model are used under Starter. Reservations and provider account snapshots are
+kept in ignored `storage/workshop/ales-20261124/ledger.json`. Language and
+pronunciation are provisional; technical validation is not instructor review.
+The live demo is unchanged; this batch is local to the ALES study branch.
+
+All 20 recordings completed without retries and passed decoding, checksum and
+script-fingerprint checks before activation. They total approximately 357 seconds.
+The later provider snapshot rose from **9,747 to 11,853** used credits: an
+observed **2,106 credits**, leaving **44,344 of 56,197**. Counters can settle after
+requests finish; this is an observed batch total rather than per-request billing.
+
 ## Verification
 
-76 focused tests passed (22 ALES tests plus 54 existing study regressions).
+79 focused tests passed (25 ALES tests plus 54 existing study regressions).
 They cover import validation and sense identity, all authored links,
 strong/weak/mixed/guessed performance, maximum-length 15-passage tests without repeats, sparse
 banks, early stopping, hidden pending results, retries, profile/skill isolation,
@@ -190,3 +212,11 @@ advanced to the new community-event dialogue, and saved six recognized words
 and two missed/guessed words in the QA profile. Transcripts appeared only after
 completion. The weaker-word review opened successfully, retaining the existing
 due-card priority. Proof: `storage/exports/ales-third-batch-report.jpg` (ignored).
+
+The November 24 browser check verified existing passages still update the same
+profile evidence, then played the new route-planning dialogue to completion.
+It advanced to a second passage and saved six recognized words plus two
+missed/guessed words. The new target `стараться` then opened in weaker-word
+review and saved a ten-minute retry schedule. Transcripts stayed hidden until
+the assessment finished. Proof: `storage/exports/ales-fourth-batch-report.jpg`
+(ignored). No real learner profile was used for these checks.
