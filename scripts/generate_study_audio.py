@@ -24,15 +24,19 @@ PAID = {'starter', 'creator', 'pro', 'scale', 'business', 'enterprise'}
 BATCHES = {'original': ('vocabulary-expansion-20261104', '2026-11-04'),
            'lesson32': ('lesson32-20261108', '2026-11-08'),
            'ales': ('ales-20261113', '2026-11-13'),
-           'ales2': ('ales-20261122', '2026-11-22')}
+           'ales2': ('ales-20261122', '2026-11-22'),
+           'ales3': ('ales-20261123', '2026-11-23')}
 
 
 def select_batch(passages, batch):
     if batch not in BATCHES:
         raise ValueError('Unknown study audio batch')
-    if batch in {'ales', 'ales2'}:
-        selected = [p for p in passages if p['id'].startswith('ales_')
-                    and p['id'].startswith('ales_e2_') == (batch == 'ales2')]
+    if batch.startswith('ales'):
+        if batch == 'ales':
+            selected = [p for p in passages if p['id'].startswith('ales_')
+                        and not p['id'].startswith(('ales_e2_', 'ales_e3_'))]
+        else:
+            selected = [p for p in passages if p['id'].startswith(f'ales_e{batch[-1]}_')]
     else:
         selected = [p for p in passages if p['id'].startswith('vocab_')
                     and p['id'].startswith('vocab_l32_') == (batch == 'lesson32')]

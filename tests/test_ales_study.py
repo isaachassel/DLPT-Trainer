@@ -29,7 +29,7 @@ def csv_file(path, rows):
 def catalog(tmp_path):
     rows = [[t['term'], t['sense_hints'][0], '', str(n + 1), '97']
             for p in build()['passages'] for n, t in enumerate(p['targets'])]
-    rows.append(['шахтёр', 'miner', '', '', '110'])  # no contextual coverage yet
+    rows.append(['ядерный', 'nuclear', '', '', '110'])  # no contextual coverage yet
     ales = tmp_path / 'ales.json'
     save_vocabulary(import_ales(csv_file(tmp_path / 'source.csv', rows)), ales)
     course = tmp_path / 'course.json'
@@ -75,13 +75,13 @@ def test_invalid_import_fails_without_partial_output(tmp_path, rows):
 
 def test_all_authored_targets_link_exactly_and_uncovered_words_remain_available(catalog):
     assert build() == json.loads((ROOT / 'data/study/ales/passages.json').read_text(encoding='utf-8'))
-    assert len(catalog.eligible('reading', 'ALES glossary', context_only=False)) == 141
-    assert len(catalog.eligible('reading', 'ALES glossary')) == 140
+    assert len(catalog.eligible('reading', 'ALES glossary', context_only=False)) == 221
+    assert len(catalog.eligible('reading', 'ALES glossary')) == 220
     assert not catalog.checks('reading', 'Course modules')
     pairs = catalog.checks(*FILTERS)
-    assert len(pairs) == 35 and all(len(p['targets']) == 4 for p in pairs)
+    assert len(pairs) == 55 and all(len(p['targets']) == 4 for p in pairs)
     ids = [t['word_id'] for p in pairs for t in p['targets']]
-    assert len(set(ids)) == 140
+    assert len(set(ids)) == 220
     for p in pairs:
         for t in p['targets']:
             assert t['word_ids'] == [t['word_id']]
@@ -107,8 +107,8 @@ def test_outcomes_remain_private_until_completion_and_feed_review(env, catalog, 
     assert store.states(token) == {}  # no automatic mastery certification
     report = report_html(finished)
     assert 'Correctly recognized without guessing' in report and 'Words to work on again' in report
-    assert '133 glossary entries were not tested' in report
-    assert '140 of 141 entries' in report
+    assert '213 glossary entries were not tested' in report
+    assert '220 of 221 entries' in report
     if correct < 4 or guess:
         nonce = store.next_card(token, catalog, group='ALES glossary', focus_only=True)
         attempt = store.attempt(token, nonce)
@@ -175,12 +175,12 @@ def test_replaced_ales_check_does_not_publish_partial_evidence(env, catalog):
 
 def test_uncovered_word_can_be_studied_without_inventing_passage_evidence(env, catalog):
     store, token, clock = env
-    wid = ales_id('шахтёр', 'miner')
+    wid = ales_id('ядерный', 'nuclear')
     nonce = store.next_card(token, catalog, group='ALES glossary', context_only=False,
                             exclude=[key for key in catalog.words if key != wid])
     assert store.attempt(token, nonce)['word_id'] == wid
     assert store.attempt(token, nonce)['context_id'] is None
-    store.reveal(token, nonce, 'miner')
+    store.reveal(token, nonce, 'nuclear')
     store.rate(token, nonce, 'Good')
     assert (wid, 'reading') in store.states(token)
     assert wid not in store.word_evidence(token, 'reading')
@@ -212,7 +212,7 @@ def test_audio_provenance_and_listening_flow(env, catalog):
     from ui.vocabulary_check import CheckUI
     records = json.loads((ROOT / 'data/study/ales/audio.json').read_text())['recordings']
     passages = build()['passages']
-    assert len(records) == len(passages) == 35
+    assert len(records) == len(passages) == 55
     assert all(p['id'].startswith('vocab_') for p in select_batch(build()['passages'] + build_course()['passages'], 'original'))
     for p in passages:
         r = records[p['id']]
@@ -220,7 +220,7 @@ def test_audio_provenance_and_listening_flow(env, catalog):
         assert r['commercial_use'] and r['attribution_required'] is False
         assert r['model_status'] == 'generally_available'
         assert abs(decode(ROOT / r['path']) - r['duration_seconds']) < .1
-    assert len(catalog.checks('listening', 'ALES glossary')) == 35
+    assert len(catalog.checks('listening', 'ALES glossary')) == 55
     store, token, clock = env
     with gr.Blocks():
         ui = CheckUI()
@@ -251,13 +251,27 @@ def test_expansion_is_disjoint_and_original_items_are_unchanged():
     assert not {t['word_id'] for p in original for t in p['targets']} & {
         t['word_id'] for p in expansion for t in p['targets']}
     assert sum(len(t['text']) for p in expansion for t in p['turns']) == 5033 <= BUDGET
-    assert len({t['id'] for p in build()['passages'] for t in p['targets']}) == 140
+    assert len({t['id'] for p in build()['passages'] for t in p['targets']}) == 220
+
+
+def test_third_batch_preserves_prior_bank_and_uses_only_new_senses():
+    from scripts.generate_study_audio import select_batch, BUDGET
+    all_passages = build()['passages']
+    prior = dict(version=1, passages=[p for p in all_passages if not p['id'].startswith('ales_e3_')])
+    assert hashlib.sha256(json.dumps(prior, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == (
+        'e6669d2977e80f7b1dcd1522c6a19b7be3e655b6f7269c32a405d4409877ecff')
+    batches = [select_batch(all_passages, b) for b in ('ales', 'ales2', 'ales3')]
+    assert [len(b) for b in batches] == [15, 20, 20]
+    assert sum(len(t['text']) for p in batches[2] for t in p['turns']) == 5327 <= BUDGET
+    ids = [t['word_id'] for p in all_passages for t in p['targets']]
+    assert len(ids) == len(set(ids)) == 220
 
 
 @pytest.mark.parametrize('skill', ['reading', 'listening'])
-def test_every_new_passage_scores_and_saves_distinct_word_evidence(env, catalog, skill, monkeypatch):
+@pytest.mark.parametrize('prefix', ['ales_e2_', 'ales_e3_'])
+def test_every_new_passage_scores_and_saves_distinct_word_evidence(env, catalog, skill, prefix, monkeypatch):
     store, token, clock = env
-    passages = [p for p in catalog.checks(skill, 'ALES glossary') if p['id'].startswith('ales_e2_')]
+    passages = [p for p in catalog.checks(skill, 'ALES glossary') if p['id'].startswith(prefix)]
     assert len(passages) == 20
     for p in passages:
         monkeypatch.setattr(catalog, 'checks', lambda *args, p=p: [copy.deepcopy(p)])

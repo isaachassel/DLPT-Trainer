@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from core.ales import ales_id
 from scripts.ales_expansion import SPECS as EXPANSION_SPECS
+from scripts.ales_expansion3 import SPECS as EXPANSION3_SPECS
 
 SPECS = [
 ('weather', 1, 'Planning an outdoor event', [
@@ -155,7 +156,7 @@ SPECS = [
 
 def build(include_expansion=True):
     passages = []
-    for key, stage, title, turns, lines in SPECS + (EXPANSION_SPECS if include_expansion else []):
+    for key, stage, title, turns, lines in SPECS + (EXPANSION_SPECS + EXPANSION3_SPECS if include_expansion else []):
         targets = []
         text = '\n'.join(text for _, text in turns)
         for n, line in enumerate(lines.strip().splitlines(), 1):
