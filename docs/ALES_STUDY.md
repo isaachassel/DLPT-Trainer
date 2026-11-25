@@ -27,9 +27,9 @@ computer; this does not introduce cloud account synchronization.
 
 The supplied CSV imported **474 rows / 474 distinct headword-sense entries**.
 All entries are available for reading word review: uncheck context-only and use
-**Start review**. The expanded authored passage bank contains **75 dialogues,
-300 comprehension questions and 300 fresh short review contexts**, covering
-**300 of 474 entries** in both reading and listening. The remaining **174 entries
+**Start review**. The expanded authored passage bank contains **95 dialogues,
+380 comprehension questions and 380 fresh short review contexts**, covering
+**380 of 474 entries** in both reading and listening. The remaining **94 entries
 do not yet have authored passage/audio coverage**. Coverage counts are shown
 in the interface and report. Completing every current passage does not test the
 entire glossary. No unit assignments are guessed or used to organize ALES study.
@@ -42,6 +42,8 @@ The third batch adds family descriptions, community events, publications,
 workplace decisions, travel, science, diplomacy and local administration.
 The fourth batch adds visits, walking routes, chess, event planning, restoration,
 river travel, museum interviews, public announcements and incident reporting.
+The fifth batch adds neighborhood events, guest visits, instrument settings,
+maintenance, training, surveys, historical displays and collection catalogs.
 These are original synthetic learning materials, not authentic SLS/DLI items.
 Language, distractors and pronunciation remain provisional pending instructor
 review. Each target is linked by exact source headword AND English sense.
@@ -76,7 +78,7 @@ Self-rated later reviews preserve their history and scheduling.
 
 The `ales` audio batch selects only the original 15 dialogues. Use `--batch ales2`
 to preflight the 20-dialogue expansion; append `--generate` only when authorized
-to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch and `--batch ales4` for the fourth. Separate ledgers keep earlier batches unchanged.
+to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch and `--batch ales4` for the fourth, and `--batch ales5` for the fifth. Separate ledgers keep earlier batches unchanged.
 
 The importer reads UTF-8 CSV (with or without BOM) using the five original
 column names. It preserves supplied source metadata but never fills blank item,
@@ -91,7 +93,7 @@ also remain ignored. Only authored passages/questions, generated recordings and
 their internal provenance are versioned.
 
 Add original passage specs to `scripts/prepare_ales_passages.py` or its imported
-`scripts/ales_expansion.py`, `scripts/ales_expansion3.py` or `scripts/ales_expansion4.py` batches. Each target
+`scripts/ales_expansion.py`, `scripts/ales_expansion3.py`, `scripts/ales_expansion4.py` or `scripts/ales_expansion5.py` batches. Each target
 needs the exact CSV entry/sense, a spoken form occurring in the dialogue, one
 correct contextual answer, three distinct plausible alternatives, a comprehension
 question and a separate short review sentence. Avoid questions solvable from
@@ -184,9 +186,34 @@ The later provider snapshot rose from **9,747 to 11,853** used credits: an
 observed **2,106 credits**, leaving **44,344 of 56,197**. Counters can settle after
 requests finish; this is an observed batch total rather than per-request billing.
 
+## Fifth audio batch, 2026-11-24
+
+Added 20 original dialogues, 80 vocabulary-dependent questions, and 80 separate
+short reading-review contexts for previously uncovered senses. All 75 earlier
+passages and audio records are preserved. The bank now contains 95 dialogues
+covering 380 of 474 entries in both reading and listening; 94 entries remain.
+
+The approved Jessica/Eric voices and generally available `eleven_v3` model were
+used under Starter. Scripts total **5,166 unique input characters**. The first
+235-character request was interrupted before its audio could be saved; the
+provider counter increased by 94 credits. History retrieval was rejected by the
+configured key, so recovery was unavailable. One bounded retry was made after
+reviewing the balance and recording the possible duplicate charge. The original
+reservation remains in the ledger: **5,401 reserved input characters**, below
+the separate 8,000-character cap. No completed recording was regenerated.
+
+All 20 final MP3s decoded and passed checksum and script-fingerprint validation
+before publication into the local bank. Total new audio duration is **351.6
+seconds**. The later provider snapshot increased from **11,853 to 14,014 used
+credits**, an observed **2,161 credits**, leaving **42,183 of 56,197**. This
+includes the interrupted request; provider snapshots can settle asynchronously.
+The ledger remains ignored at `storage/workshop/ales5-20261124/ledger.json`.
+No credit purchase, subscription change, push or live deployment is included.
+Technical checks do not constitute instructor pronunciation or item review.
+
 ## Verification
 
-79 focused tests passed (25 ALES tests plus 54 existing study regressions).
+82 focused tests passed (28 ALES tests plus 54 existing study regressions).
 They cover import validation and sense identity, all authored links,
 strong/weak/mixed/guessed performance, maximum-length 15-passage tests without repeats, sparse
 banks, early stopping, hidden pending results, retries, profile/skill isolation,
@@ -220,3 +247,16 @@ missed/guessed words. The new target `стараться` then opened in weaker-
 review and saved a ten-minute retry schedule. Transcripts stayed hidden until
 the assessment finished. Proof: `storage/exports/ales-fourth-batch-report.jpg`
 (ignored). No real learner profile was used for these checks.
+
+The fifth-batch browser check used a disposable QA profile with seeded prior-bank
+history, leaving real learners untouched. It played the new neighborhood-event
+recording to completion, advanced to the anniversary dialogue, and saved six
+confidently recognized senses and two missed/guessed senses. Transcripts stayed
+hidden until completion. The weaker phrase `по крайней мере` opened in listening
+review and saved a ten-minute retry. Proof is in ignored
+`storage/exports/ales-fifth-batch-report.jpg`. The local preview is signed out and
+available at port 7864; the live demo remains unchanged.
+
+The focused regression suite must run with local socket access on Windows:
+Gradio's event-loop initialization can stall in a network-restricted sandbox.
+The 82-test successful run used local socket access and disabled Gradio analytics.
