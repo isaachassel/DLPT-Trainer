@@ -8,7 +8,7 @@ This is a local study feature. The live Hugging Face/WordPress demo is unchanged
 Run `.venv/Scripts/python.exe study_app.py` and open <http://127.0.0.1:7864/>.
 Sign into an existing profile (or create one), click **Study ALES words**, and
 choose Reading or Listening. Choose 2–15 passages, then **Start ALES assessment**.
-Each passage has four questions whose answer depends on a target glossary word.
+Each passage has three or four questions whose answers depend on target glossary words.
 Select an answer or **I don’t know**; mark uncertain correct answers as guesses.
 Listening permits replays for study. Keys and transcripts appear after the check.
 
@@ -27,12 +27,12 @@ computer; this does not introduce cloud account synchronization.
 
 The supplied CSV imported **474 rows / 474 distinct headword-sense entries**.
 All entries are available for reading word review: uncheck context-only and use
-**Start review**. The expanded authored passage bank contains **95 dialogues,
-380 comprehension questions and 380 fresh short review contexts**, covering
-**380 of 474 entries** in both reading and listening. The remaining **94 entries
-do not yet have authored passage/audio coverage**. Coverage counts are shown
-in the interface and report. Completing every current passage does not test the
-entire glossary. No unit assignments are guessed or used to organize ALES study.
+**Start review**. The completed first-pass bank contains **119 dialogues,
+474 comprehension questions and 474 fresh short review contexts**, covering
+**all 474 entries** in both reading and listening. Each sense has one authored
+dialogue and a separate short reading-review sentence. Coverage counts are shown
+in the interface and report. A single assessment still checks only its selected
+passages; full bank coverage does not mean a learner has mastered every word. No unit assignments are guessed or used to organize ALES study.
 
 Topics include weather, travel, employment, budgets, diplomacy, research,
 elections, rules, relief, aviation, shipping, courts, science, sport and news.
@@ -44,6 +44,8 @@ The fourth batch adds visits, walking routes, chess, event planning, restoration
 river travel, museum interviews, public announcements and incident reporting.
 The fifth batch adds neighborhood events, guest visits, instrument settings,
 maintenance, training, surveys, historical displays and collection catalogs.
+The final batch adds fictional news editing, public safety, legal reporting,
+historical accounts, military museums, energy, maritime topics and community events.
 These are original synthetic learning materials, not authentic SLS/DLI items.
 Language, distractors and pronunciation remain provisional pending instructor
 review. Each target is linked by exact source headword AND English sense.
@@ -78,7 +80,7 @@ Self-rated later reviews preserve their history and scheduling.
 
 The `ales` audio batch selects only the original 15 dialogues. Use `--batch ales2`
 to preflight the 20-dialogue expansion; append `--generate` only when authorized
-to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch and `--batch ales4` for the fourth, and `--batch ales5` for the fifth. Separate ledgers keep earlier batches unchanged.
+to spend provider credits. Use `--batch ales3` for the third 20-dialogue batch and `--batch ales4` for the fourth, and `--batch ales5` for the fifth. Use `--batch ales6` for the final 24-dialogue batch. Separate ledgers keep earlier batches unchanged.
 
 The importer reads UTF-8 CSV (with or without BOM) using the five original
 column names. It preserves supplied source metadata but never fills blank item,
@@ -93,7 +95,7 @@ also remain ignored. Only authored passages/questions, generated recordings and
 their internal provenance are versioned.
 
 Add original passage specs to `scripts/prepare_ales_passages.py` or its imported
-`scripts/ales_expansion.py`, `scripts/ales_expansion3.py`, `scripts/ales_expansion4.py` or `scripts/ales_expansion5.py` batches. Each target
+`scripts/ales_expansion.py`, `scripts/ales_expansion3.py`, `scripts/ales_expansion4.py` or `scripts/ales_expansion5.py` or `scripts/ales_expansion6.py` batches. Each target
 needs the exact CSV entry/sense, a spoken form occurring in the dialogue, one
 correct contextual answer, three distinct plausible alternatives, a comprehension
 question and a separate short review sentence. Avoid questions solvable from
@@ -211,9 +213,51 @@ The ledger remains ignored at `storage/workshop/ales5-20261124/ledger.json`.
 No credit purchase, subscription change, push or live deployment is included.
 Technical checks do not constitute instructor pronunciation or item review.
 
+## Final coverage batch, 2026-11-25
+
+Added 24 original dialogues and 94 fresh reading-review sentences for every
+remaining imported word/sense ID. Twenty-two dialogues have four questions; two
+have three. All 95 earlier dialogues, recording records and IDs are preserved.
+The first-pass bank now has 119 dialogues and 474 questions, covering all 474
+imported entries. This is complete coverage of this CSV, not a claim of learner
+mastery, validated assessment accuracy, or comprehensive coverage of every sense
+of each Russian word. Broader contexts and instructor review remain useful.
+
+Scripts total **6,523 unique input characters** with the existing Jessica/Eric
+voices and generally available `eleven_v3` model under Starter. The first
+265-character request ended with a connection error before an asset was saved;
+the provider counter rose by 106 credits. A reviewed bounded retry retained the
+first reservation in the ignored ledger, giving **6,788 reserved characters**
+within the separate 8,000-character cap. Successfully saved recordings are reused.
+The audit ledger is `storage/workshop/ales6-20261125/ledger.json` (ignored).
+
+All 24 MP3s decoded and passed checksum and script-fingerprint validation before
+activation, adding **450.6 seconds** of audio. The later account snapshot rose
+from **14,014 to 16,729 used credits**, an observed **2,715 credits** including
+the failed request, leaving **39,468 of 56,197**. Provider counters can settle
+after generation; these are observed snapshots rather than guaranteed prices.
+No credit purchase, subscription change or live deployment was performed.
+
+
+Three source glosses warrant clarification without changing imported IDs:
+
+- `ракетная установка`: imported as “missile unit”; the photograph context uses
+  “missile launcher.”
+- `ракетоносец`: imported as “rocket launcher”; the flight context uses
+  “missile-carrying aircraft.” This follows the aircraft/vessel meaning in the
+  [Small Academic Dictionary entry reproduced by Kartaslov](https://kartaslov.ru/значение-слова/ракетоносец).
+- `превышение`: imported as “to exceed”; the contextual answer uses the noun
+  “exceeding the limit.”
+
+These clarifications appear in post-check explanations. The original glossary
+and its raw entry display are preserved; an instructor can review the glosses
+before any separate glossary correction. All new scenarios are fictional study
+material, including news and historical-report scenarios; they are not authentic
+SLS items or current-event claims.
+
 ## Verification
 
-82 focused tests passed (28 ALES tests plus 54 existing study regressions).
+87 focused tests passed (33 ALES tests plus 54 existing study regressions).
 They cover import validation and sense identity, all authored links,
 strong/weak/mixed/guessed performance, maximum-length 15-passage tests without repeats, sparse
 banks, early stopping, hidden pending results, retries, profile/skill isolation,
@@ -259,4 +303,15 @@ available at port 7864; the live demo remains unchanged.
 
 The focused regression suite must run with local socket access on Windows:
 Gradio's event-loop initialization can stall in a network-restricted sandbox.
-The 82-test successful run used local socket access and disabled Gradio analytics.
+Successful regression runs use local socket access and disabled Gradio analytics.
+
+The final-coverage browser check on November 25 used a disposable QA profile.
+It played the new community-showcase and rehearsal-route recordings, observed
+the route recording finish, and verified the transition from four questions to
+three without an empty fourth question or stale guess control. The report saved
+five recognized senses and two missed/guessed senses out of seven checked;
+transcripts appeared only after completion. The missed `попасть` then opened in
+listening review and saved as shaky with a ten-minute retry. The bank showed
+474/474 entries covered while correctly distinguishing the 467 entries not
+checked in that session. Proof: `storage/exports/ales-complete-bank-report.jpg`
+(ignored). The preview remains at port 7864 and the live demo is unchanged.

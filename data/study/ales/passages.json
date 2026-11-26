@@ -9880,6 +9880,2462 @@
           "review_text": "Для героя книги важна свобода."
         }
       ]
+    },
+    {
+      "id": "ales_e6_diplomacy",
+      "title": "Editing a diplomatic news brief",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Новый выпуск посвящён Ближнему Востоку. В первом сообщении обсуждают мирный договор, но полный текст ещё не получен."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто подтвердил эту информацию?"
+        },
+        {
+          "speaker": "A",
+          "text": "Правительственный источник. Договор собираются вводить в силу осенью. Редактор просит проверить дату перед публикацией."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_diplomacy_1",
+          "word_id": "ales_754f67af1e57c29ba889c192",
+          "term": "Ближний Восток",
+          "sense_hints": [
+            "Middle East"
+          ],
+          "target": "Ближнему Востоку",
+          "meaning": "the Middle East",
+          "distractors": [
+            "the Far East",
+            "Central Asia",
+            "Eastern Europe"
+          ],
+          "prompt": "Which region is the new edition about?",
+          "evidence": "Новый выпуск посвящён Ближнему Востоку.",
+          "explanation": "“Ближнему Востоку” means the Middle East in this passage.",
+          "review_target": "Ближнему Востоку",
+          "review_text": "Доклад посвящён Ближнему Востоку."
+        },
+        {
+          "id": "ales_e6_diplomacy_2",
+          "word_id": "ales_9b2ad7957ab9ecb44ea4ab3e",
+          "term": "мирный договор",
+          "sense_hints": [
+            "peace treaty"
+          ],
+          "target": "мирный договор",
+          "meaning": "peace treaty",
+          "distractors": [
+            "trade agreement",
+            "defense pact",
+            "border permit"
+          ],
+          "prompt": "What document is discussed in the first report?",
+          "evidence": "В первом сообщении обсуждают мирный договор, но полный текст ещё не получен.",
+          "explanation": "“мирный договор” means peace treaty in this passage.",
+          "review_target": "мирный договор",
+          "review_text": "Стороны обсуждают мирный договор."
+        },
+        {
+          "id": "ales_e6_diplomacy_3",
+          "word_id": "ales_affb92652fa1944b7b7a693d",
+          "term": "правительственный",
+          "sense_hints": [
+            "governmental"
+          ],
+          "target": "Правительственный",
+          "meaning": "government",
+          "distractors": [
+            "opposition",
+            "academic",
+            "commercial"
+          ],
+          "prompt": "What kind of source confirmed the information?",
+          "evidence": "Правительственный источник.",
+          "explanation": "“Правительственный” means government in this passage.",
+          "review_target": "Правительственный",
+          "review_text": "Правительственный доклад появится завтра."
+        },
+        {
+          "id": "ales_e6_diplomacy_4",
+          "word_id": "ales_5f4562899ddbc7be2fdfbb75",
+          "term": "вводить в силу",
+          "sense_hints": [
+            "to bring into effect, to enforce"
+          ],
+          "target": "вводить в силу",
+          "meaning": "bring into effect",
+          "distractors": [
+            "submit for debate",
+            "translate",
+            "cancel"
+          ],
+          "prompt": "What do they intend to do with the treaty in autumn?",
+          "evidence": "Договор собираются вводить в силу осенью.",
+          "explanation": "“вводить в силу” means bring into effect in this passage.",
+          "review_target": "вводить в силу",
+          "review_text": "Новые правила будут вводить в силу постепенно."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_bulletin",
+      "title": "Checking a historical bulletin",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сводке говорится, что бой закончился ночью. Войска оставались за рекой, но точное место на карте не отмечено."
+        },
+        {
+          "speaker": "B",
+          "text": "Откуда автор получил сведения?"
+        },
+        {
+          "speaker": "A",
+          "text": "Он ссылается на разведку. В приложении есть боевой приказ, однако его дату ещё проверяют по архивным документам."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_bulletin_1",
+          "word_id": "ales_f0b61d6e366220b6e918a666",
+          "term": "бой",
+          "sense_hints": [
+            "battle, combat, fight"
+          ],
+          "target": "бой",
+          "meaning": "battle",
+          "distractors": [
+            "march",
+            "meeting",
+            "exercise"
+          ],
+          "prompt": "What ended during the night?",
+          "evidence": "В сводке говорится, что бой закончился ночью.",
+          "explanation": "“бой” means battle in this passage.",
+          "review_target": "бой",
+          "review_text": "Этот бой описан в воспоминаниях."
+        },
+        {
+          "id": "ales_e6_bulletin_2",
+          "word_id": "ales_bb1143f845f058c68a4c9422",
+          "term": "войска (pl.)",
+          "sense_hints": [
+            "forces"
+          ],
+          "target": "Войска",
+          "meaning": "troops",
+          "distractors": [
+            "refugees",
+            "reporters",
+            "negotiators"
+          ],
+          "prompt": "Who remained beyond the river?",
+          "evidence": "Войска оставались за рекой, но точное место на карте не отмечено.",
+          "explanation": "“Войска” means troops in this passage.",
+          "review_target": "Войска",
+          "review_text": "Войска вернулись после учений."
+        },
+        {
+          "id": "ales_e6_bulletin_3",
+          "word_id": "ales_d7ca2db46ab05cb681da96a6",
+          "term": "разведка",
+          "sense_hints": [
+            "intelligence, reconnaissance"
+          ],
+          "target": "разведку",
+          "meaning": "intelligence service",
+          "distractors": [
+            "local press",
+            "medical service",
+            "city council"
+          ],
+          "prompt": "What source of information does the author cite?",
+          "evidence": "Он ссылается на разведку.",
+          "explanation": "“разведку” means intelligence service in this passage.",
+          "review_target": "разведку",
+          "review_text": "В докладе упоминают разведку."
+        },
+        {
+          "id": "ales_e6_bulletin_4",
+          "word_id": "ales_a623c18386888fd145df29db",
+          "term": "боевой",
+          "sense_hints": [
+            "combat (attr.), fighting"
+          ],
+          "target": "боевой",
+          "meaning": "combat",
+          "distractors": [
+            "administrative",
+            "ceremonial",
+            "medical"
+          ],
+          "prompt": "What type of order appears in the appendix?",
+          "evidence": "В приложении есть боевой приказ, однако его дату ещё проверяют по архивным документам.",
+          "explanation": "“боевой” means combat in this passage.",
+          "review_target": "боевой",
+          "review_text": "В музее хранится боевой журнал."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_museum",
+      "title": "Reviewing military museum labels",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На первой фотографии ракетная установка. Рядом показан ракетоносец в полёте, но подпись к нему пока не готова."
+        },
+        {
+          "speaker": "B",
+          "text": "А что изображено на схеме под фотографиями?"
+        },
+        {
+          "speaker": "A",
+          "text": "Боеголовка. Для следующего стенда выбрали зенитный комплекс. Экскурсовод просит проверить все названия до открытия выставки."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_museum_1",
+          "word_id": "ales_d5f5901b6edb7dd85263dde8",
+          "term": "ракетная установка",
+          "sense_hints": [
+            "missile unit"
+          ],
+          "target": "ракетная установка",
+          "meaning": "missile launcher",
+          "distractors": [
+            "radar station",
+            "fuel tanker",
+            "field hospital"
+          ],
+          "prompt": "What is shown in the first photograph?",
+          "evidence": "На первой фотографии ракетная установка.",
+          "explanation": "“ракетная установка” means missile launcher in this passage. The imported gloss is \"missile unit\"; here the term names the launcher shown in a photograph.",
+          "review_target": "ракетная установка",
+          "review_text": "На снимке видна ракетная установка."
+        },
+        {
+          "id": "ales_e6_museum_2",
+          "word_id": "ales_8045fc4b82ca713d4b01acd5",
+          "term": "ракетоносец",
+          "sense_hints": [
+            "rocket launcher"
+          ],
+          "target": "ракетоносец",
+          "meaning": "missile-carrying aircraft",
+          "distractors": [
+            "transport aircraft",
+            "refueling aircraft",
+            "reconnaissance aircraft"
+          ],
+          "prompt": "What type of aircraft is shown in flight nearby?",
+          "evidence": "Рядом показан ракетоносец в полёте, но подпись к нему пока не готова.",
+          "explanation": "“ракетоносец” means missile-carrying aircraft in this passage. The imported gloss is \"rocket launcher\"; here ракетоносец denotes the missile-carrying aircraft, not a ground launcher.",
+          "review_target": "ракетоносец",
+          "review_text": "На выставке показан старый ракетоносец."
+        },
+        {
+          "id": "ales_e6_museum_3",
+          "word_id": "ales_2b050ecabe1621854f8f6574",
+          "term": "боеголовка",
+          "sense_hints": [
+            "warhead"
+          ],
+          "target": "Боеголовка",
+          "meaning": "warhead",
+          "distractors": [
+            "engine",
+            "guidance antenna",
+            "fuel tank"
+          ],
+          "prompt": "What component is depicted in the diagram?",
+          "evidence": "Боеголовка.",
+          "explanation": "“Боеголовка” means warhead in this passage.",
+          "review_target": "Боеголовка",
+          "review_text": "Боеголовка обозначена на музейной схеме."
+        },
+        {
+          "id": "ales_e6_museum_4",
+          "word_id": "ales_29caa6f8e7740af266981cd1",
+          "term": "зенитный",
+          "sense_hints": [
+            "antiaircraft"
+          ],
+          "target": "зенитный",
+          "meaning": "antiaircraft",
+          "distractors": [
+            "antitank",
+            "coastal-defense",
+            "communications"
+          ],
+          "prompt": "What role does the system chosen for the next display have?",
+          "evidence": "Для следующего стенда выбрали зенитный комплекс.",
+          "explanation": "“зенитный” means antiaircraft in this passage.",
+          "review_target": "зенитный",
+          "review_text": "В книге описан зенитный комплекс."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_energy",
+      "title": "Planning an energy documentary",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В первой части фильма показана атомная электростанция. Вторая часть рассказывает про нефтяной терминал у моря."
+        },
+        {
+          "speaker": "B",
+          "text": "Какие слова нужно объяснить в словаре к фильму?"
+        },
+        {
+          "speaker": "A",
+          "text": "Редактор выделил слово «ядерный». Ещё будет схема, на которой изображена сеть городских станций. Подписи к ней готовят отдельно."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_energy_1",
+          "word_id": "ales_dd6bca3a368534e9b8fe722a",
+          "term": "атомная электростанция",
+          "sense_hints": [
+            "nuclear power station"
+          ],
+          "target": "атомная электростанция",
+          "meaning": "nuclear power station",
+          "distractors": [
+            "hydroelectric dam",
+            "coal-fired station",
+            "wind farm"
+          ],
+          "prompt": "What facility appears in the first part?",
+          "evidence": "В первой части фильма показана атомная электростанция.",
+          "explanation": "“атомная электростанция” means nuclear power station in this passage.",
+          "review_target": "атомная электростанция",
+          "review_text": "За городом расположена атомная электростанция."
+        },
+        {
+          "id": "ales_e6_energy_2",
+          "word_id": "ales_010f314613df1764ec92cd47",
+          "term": "нефтяной",
+          "sense_hints": [
+            "oil (attr.)"
+          ],
+          "target": "нефтяной",
+          "meaning": "oil",
+          "distractors": [
+            "grain",
+            "passenger",
+            "container"
+          ],
+          "prompt": "What type of terminal is the second part about?",
+          "evidence": "Вторая часть рассказывает про нефтяной терминал у моря.",
+          "explanation": "“нефтяной” means oil in this passage.",
+          "review_target": "нефтяной",
+          "review_text": "В порту строят нефтяной терминал."
+        },
+        {
+          "id": "ales_e6_energy_3",
+          "word_id": "ales_c86a987f826ad8c1e2d97ca1",
+          "term": "ядерный",
+          "sense_hints": [
+            "nuclear"
+          ],
+          "target": "ядерный",
+          "meaning": "nuclear",
+          "distractors": [
+            "thermal",
+            "hydraulic",
+            "electrical"
+          ],
+          "prompt": "What does the word singled out for the glossary mean?",
+          "evidence": "Редактор выделил слово «ядерный».",
+          "explanation": "“ядерный” means nuclear in this passage.",
+          "review_target": "ядерный",
+          "review_text": "В статье встречается термин «ядерный»."
+        },
+        {
+          "id": "ales_e6_energy_4",
+          "word_id": "ales_cf03ec42b40b8a8b9032c52c",
+          "term": "сеть",
+          "sense_hints": [
+            "network"
+          ],
+          "target": "сеть",
+          "meaning": "network",
+          "distractors": [
+            "output",
+            "budget",
+            "construction timetable"
+          ],
+          "prompt": "What aspect of the city’s stations does the diagram show?",
+          "evidence": "Ещё будет схема, на которой изображена сеть городских станций.",
+          "explanation": "“сеть” means network in this passage.",
+          "review_target": "сеть",
+          "review_text": "В регионе появилась новая сеть магазинов."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_explosion",
+      "title": "Clarifying a fictional incident report",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сообщении упомянут взрыв у пустого склада. Причину пока не назвали, и редактор не хочет делать выводы."
+        },
+        {
+          "speaker": "B",
+          "text": "В тексте есть слова «взрывное устройство»?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Эксперт проверяет, мог ли обнаруженный заряд взорваться. До его заключения заметку решили не публиковать."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_explosion_1",
+          "word_id": "ales_9e0b92ca7adec8f3fe644455",
+          "term": "взрыв",
+          "sense_hints": [
+            "explosion"
+          ],
+          "target": "взрыв",
+          "meaning": "explosion",
+          "distractors": [
+            "fire",
+            "collapse",
+            "power failure"
+          ],
+          "prompt": "What event is mentioned near the empty warehouse?",
+          "evidence": "В сообщении упомянут взрыв у пустого склада.",
+          "explanation": "“взрыв” means explosion in this passage.",
+          "review_target": "взрыв",
+          "review_text": "В пьесе за сценой слышен взрыв."
+        },
+        {
+          "id": "ales_e6_explosion_2",
+          "word_id": "ales_57c2237664e28cd58b0ddc5e",
+          "term": "взрывное устройство",
+          "sense_hints": [
+            "blasting device"
+          ],
+          "target": "взрывное устройство",
+          "meaning": "explosive device",
+          "distractors": [
+            "tracking device",
+            "fire extinguisher",
+            "warning siren"
+          ],
+          "prompt": "What kind of object does the second speaker ask whether the report mentions?",
+          "evidence": "В тексте есть слова «взрывное устройство»?",
+          "explanation": "“взрывное устройство” means explosive device in this passage.",
+          "review_target": "взрывное устройство",
+          "review_text": "В романе полиция обнаружила взрывное устройство."
+        },
+        {
+          "id": "ales_e6_explosion_3",
+          "word_id": "ales_47423417172865383767a398",
+          "term": "заряд",
+          "sense_hints": [
+            "charge"
+          ],
+          "target": "заряд",
+          "meaning": "explosive charge",
+          "distractors": [
+            "electrical bill",
+            "criminal accusation",
+            "radio message"
+          ],
+          "prompt": "What object’s possible behavior is being examined?",
+          "evidence": "Эксперт проверяет, мог ли обнаруженный заряд взорваться.",
+          "explanation": "“заряд” means explosive charge in this passage.",
+          "review_target": "заряд",
+          "review_text": "На музейной схеме отмечен заряд."
+        },
+        {
+          "id": "ales_e6_explosion_4",
+          "word_id": "ales_eefb7c2047a62fcf6fce79f2",
+          "term": "взрываться/взорваться",
+          "sense_hints": [
+            "to explode"
+          ],
+          "target": "взорваться",
+          "meaning": "explode",
+          "distractors": [
+            "sink",
+            "leak",
+            "overheat"
+          ],
+          "prompt": "What does the expert want to determine whether the object could do?",
+          "evidence": "Эксперт проверяет, мог ли обнаруженный заряд взорваться.",
+          "explanation": "“взорваться” means explode in this passage.",
+          "review_target": "взорваться",
+          "review_text": "В фильме старый снаряд мог взорваться."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_safety",
+      "title": "Reviewing a safety announcement",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В объявлении сказано, что специалисты смогли обезвредить опасный предмет. Остальные детали пока уточняются."
+        },
+        {
+          "speaker": "B",
+          "text": "Что решили сделать с испорченными материалами?"
+        },
+        {
+          "speaker": "A",
+          "text": "Их решили уничтожить. Кроме того, предложили усилить охрану склада и прекратить ночные работы. Решение обсудят утром."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_safety_1",
+          "word_id": "ales_53f38f0cf2e94e6736baa154",
+          "term": "обезвредить (вред 51)",
+          "sense_hints": [
+            "to render harmless"
+          ],
+          "target": "обезвредить",
+          "meaning": "render harmless",
+          "distractors": [
+            "identify",
+            "locate",
+            "transport"
+          ],
+          "prompt": "What did specialists manage to do to the dangerous object?",
+          "evidence": "В объявлении сказано, что специалисты смогли обезвредить опасный предмет.",
+          "explanation": "“обезвредить” means render harmless in this passage.",
+          "review_target": "обезвредить",
+          "review_text": "Специалисты должны обезвредить находку."
+        },
+        {
+          "id": "ales_e6_safety_2",
+          "word_id": "ales_640387ebc536f1f5d4da8369",
+          "term": "уничтожать/уничтожить",
+          "sense_hints": [
+            "to destroy"
+          ],
+          "target": "уничтожить",
+          "meaning": "destroy",
+          "distractors": [
+            "inspect",
+            "return",
+            "store"
+          ],
+          "prompt": "What was decided for the damaged materials?",
+          "evidence": "Их решили уничтожить.",
+          "explanation": "“уничтожить” means destroy in this passage.",
+          "review_target": "уничтожить",
+          "review_text": "Старые копии решили уничтожить."
+        },
+        {
+          "id": "ales_e6_safety_3",
+          "word_id": "ales_d5e9f695540f1873e81fbb8b",
+          "term": "усиливать/усилить",
+          "sense_hints": [
+            "to increase, to intensify"
+          ],
+          "target": "усилить",
+          "meaning": "strengthen",
+          "distractors": [
+            "reduce",
+            "replace",
+            "inspect"
+          ],
+          "prompt": "What change to warehouse security was proposed?",
+          "evidence": "Кроме того, предложили усилить охрану склада и прекратить ночные работы.",
+          "explanation": "“усилить” means strengthen in this passage.",
+          "review_target": "усилить",
+          "review_text": "Организаторы решили усилить контроль."
+        },
+        {
+          "id": "ales_e6_safety_4",
+          "word_id": "ales_9eacd9286e791a78b701e468",
+          "term": "прекращать/прекратить",
+          "sense_hints": [
+            "to stop, to terminate"
+          ],
+          "target": "прекратить",
+          "meaning": "stop",
+          "distractors": [
+            "extend",
+            "reschedule",
+            "supervise"
+          ],
+          "prompt": "What did they propose doing with night work?",
+          "evidence": "Кроме того, предложили усилить охрану склада и прекратить ночные работы.",
+          "explanation": "“прекратить” means stop in this passage.",
+          "review_target": "прекратить",
+          "review_text": "Шум попросили прекратить до начала встречи."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_attack",
+      "title": "Discussing a fictional news script",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сценарии вооружённый человек появляется у моста. Редактор просит уточнить, кто он и откуда пришёл."
+        },
+        {
+          "speaker": "B",
+          "text": "В следующей сцене его называют боевиком?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Дальше описано нападение на пост. Кто решил напасть первым, автор пока не объяснил. Этот эпизод ещё будут обсуждать."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_attack_1",
+          "word_id": "ales_0271f6a1be5a6712817cc2c3",
+          "term": "вооружённый",
+          "sense_hints": [
+            "armed"
+          ],
+          "target": "вооружённый",
+          "meaning": "armed",
+          "distractors": [
+            "wounded",
+            "uniformed",
+            "masked"
+          ],
+          "prompt": "How is the person at the bridge described?",
+          "evidence": "В сценарии вооружённый человек появляется у моста.",
+          "explanation": "“вооружённый” means armed in this passage.",
+          "review_target": "вооружённый",
+          "review_text": "В рассказе появляется вооружённый охранник."
+        },
+        {
+          "id": "ales_e6_attack_2",
+          "word_id": "ales_0a6e5e128917ad8418f194fd",
+          "term": "боевик",
+          "sense_hints": [
+            "fighter"
+          ],
+          "target": "боевиком",
+          "meaning": "militant fighter",
+          "distractors": [
+            "civilian witness",
+            "police officer",
+            "aid worker"
+          ],
+          "prompt": "What is the character called in the next scene?",
+          "evidence": "В следующей сцене его называют боевиком?",
+          "explanation": "“боевиком” means militant fighter in this passage.",
+          "review_target": "боевиком",
+          "review_text": "В романе этот человек оказался боевиком."
+        },
+        {
+          "id": "ales_e6_attack_3",
+          "word_id": "ales_bab3b7ff13a7132233a9e756",
+          "term": "нападение",
+          "sense_hints": [
+            "attack"
+          ],
+          "target": "нападение",
+          "meaning": "attack",
+          "distractors": [
+            "inspection",
+            "withdrawal",
+            "negotiation"
+          ],
+          "prompt": "What event at the post is described?",
+          "evidence": "Дальше описано нападение на пост.",
+          "explanation": "“нападение” means attack in this passage.",
+          "review_target": "нападение",
+          "review_text": "Нападение стало темой вечернего выпуска."
+        },
+        {
+          "id": "ales_e6_attack_4",
+          "word_id": "ales_a5524485da5e132bc45be09f",
+          "term": "нападать/напасть",
+          "sense_hints": [
+            "to attack"
+          ],
+          "target": "напасть",
+          "meaning": "attack",
+          "distractors": [
+            "retreat",
+            "surrender",
+            "negotiate"
+          ],
+          "prompt": "What action does the author leave unexplained as to who decided to take it first?",
+          "evidence": "Кто решил напасть первым, автор пока не объяснил.",
+          "explanation": "“напасть” means attack in this passage.",
+          "review_target": "напасть",
+          "review_text": "Герой опасался, что на него могут напасть."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_testimony",
+      "title": "Reviewing a courtroom scene",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Обвинитель попросил вызвать директора. Его хотят обвинить в передаче документов, но дело ещё рассматривают."
+        },
+        {
+          "speaker": "B",
+          "text": "Он согласился свидетельствовать?"
+        },
+        {
+          "speaker": "A",
+          "text": "В тексте ответа нет. Следователь продолжает подозревать другого сотрудника. Автор обещал уточнить роли персонажей в следующей версии."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_testimony_1",
+          "word_id": "ales_539962e308a66dc9dbc35a32",
+          "term": "обвинитель",
+          "sense_hints": [
+            "prosecutor, accuser"
+          ],
+          "target": "Обвинитель",
+          "meaning": "prosecutor",
+          "distractors": [
+            "defense lawyer",
+            "judge",
+            "court clerk"
+          ],
+          "prompt": "Who asked for the director to be called?",
+          "evidence": "Обвинитель попросил вызвать директора.",
+          "explanation": "“Обвинитель” means prosecutor in this passage.",
+          "review_target": "Обвинитель",
+          "review_text": "Обвинитель выступит после перерыва."
+        },
+        {
+          "id": "ales_e6_testimony_2",
+          "word_id": "ales_a9376c3ffcd95283073d5afb",
+          "term": "обвинять/обвинить (вина 43)",
+          "sense_hints": [
+            "to accuse"
+          ],
+          "target": "обвинить",
+          "meaning": "accuse",
+          "distractors": [
+            "acquit",
+            "reward",
+            "question informally"
+          ],
+          "prompt": "What do they intend to do concerning the transfer of documents?",
+          "evidence": "Его хотят обвинить в передаче документов, но дело ещё рассматривают.",
+          "explanation": "“обвинить” means accuse in this passage.",
+          "review_target": "обвинить",
+          "review_text": "Его пытались обвинить в нарушении правил."
+        },
+        {
+          "id": "ales_e6_testimony_3",
+          "word_id": "ales_745c36046da17c2d0f7bbc71",
+          "term": "свидетельствовать",
+          "sense_hints": [
+            "to testify, to bear witness to"
+          ],
+          "target": "свидетельствовать",
+          "meaning": "testify",
+          "distractors": [
+            "appeal",
+            "confess",
+            "serve on a jury"
+          ],
+          "prompt": "What does the second speaker ask whether the person agreed to do?",
+          "evidence": "Он согласился свидетельствовать?",
+          "explanation": "“свидетельствовать” means testify in this passage.",
+          "review_target": "свидетельствовать",
+          "review_text": "Она согласилась свидетельствовать в суде."
+        },
+        {
+          "id": "ales_e6_testimony_4",
+          "word_id": "ales_aa83944aba08f773508d29cb",
+          "term": "подозревать",
+          "sense_hints": [
+            "to suspect"
+          ],
+          "target": "подозревать",
+          "meaning": "suspect",
+          "distractors": [
+            "defend",
+            "convict",
+            "release"
+          ],
+          "prompt": "What attitude does the investigator still have toward another employee?",
+          "evidence": "Следователь продолжает подозревать другого сотрудника.",
+          "explanation": "“подозревать” means suspect in this passage.",
+          "review_target": "подозревать",
+          "review_text": "Без доказательств нельзя подозревать каждого."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_customs",
+      "title": "Editing a customs report",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В черновике упомянута контрабанда. На складе нашли партию наркотиков, но её происхождение ещё проверяют."
+        },
+        {
+          "speaker": "B",
+          "text": "Кого решили задержать?"
+        },
+        {
+          "speaker": "A",
+          "text": "Водителя. В машине также был несовершеннолетний пассажир. Редактор просит не включать его имя в заметку и дождаться уточнений."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_customs_1",
+          "word_id": "ales_d31411780bf41ffbeaf6029b",
+          "term": "контрабанда",
+          "sense_hints": [
+            "smuggling, contraband"
+          ],
+          "target": "контрабанда",
+          "meaning": "smuggling",
+          "distractors": [
+            "tax evasion",
+            "forgery",
+            "fraud"
+          ],
+          "prompt": "What activity is mentioned in the draft?",
+          "evidence": "В черновике упомянута контрабанда.",
+          "explanation": "“контрабанда” means smuggling in this passage.",
+          "review_target": "контрабанда",
+          "review_text": "Контрабанда обсуждалась в документальном фильме."
+        },
+        {
+          "id": "ales_e6_customs_2",
+          "word_id": "ales_d7009cffe68b265b56e219b5",
+          "term": "партия (наркотиков)",
+          "sense_hints": [
+            "batch (of drugs)"
+          ],
+          "target": "партию наркотиков",
+          "meaning": "batch of drugs",
+          "distractors": [
+            "list of medicines",
+            "medical prescription",
+            "package of test equipment"
+          ],
+          "prompt": "What was found at the warehouse?",
+          "evidence": "На складе нашли партию наркотиков, но её происхождение ещё проверяют.",
+          "explanation": "“партию наркотиков” means batch of drugs in this passage.",
+          "review_target": "партию наркотиков",
+          "review_text": "В сводке упомянули партию наркотиков."
+        },
+        {
+          "id": "ales_e6_customs_3",
+          "word_id": "ales_8286a9d8d498fe8a6abc024f",
+          "term": "задерживать/задержать",
+          "sense_hints": [
+            "to detain"
+          ],
+          "target": "задержать",
+          "meaning": "detain",
+          "distractors": [
+            "fine",
+            "escort",
+            "question by phone"
+          ],
+          "prompt": "What did they decide to do with the driver?",
+          "evidence": "Кого решили задержать?",
+          "explanation": "“задержать” means detain in this passage.",
+          "review_target": "задержать",
+          "review_text": "В рассказе приказали задержать курьера."
+        },
+        {
+          "id": "ales_e6_customs_4",
+          "word_id": "ales_2884047d1f67b661a33a4f90",
+          "term": "несовершеннолетний",
+          "sense_hints": [
+            "under legal age, minor"
+          ],
+          "target": "несовершеннолетний",
+          "meaning": "under legal age",
+          "distractors": [
+            "foreign",
+            "unaccompanied",
+            "injured"
+          ],
+          "prompt": "How is the passenger described?",
+          "evidence": "В машине также был несовершеннолетний пассажир.",
+          "explanation": "“несовершеннолетний” means under legal age in this passage.",
+          "review_target": "несовершеннолетний",
+          "review_text": "На встречу пришёл несовершеннолетний участник."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_inquiry",
+      "title": "Checking a crime-documentary outline",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В начале фильма упоминается Федеральное бюро расследования. Затем автор рассказывает, когда начался розыск."
+        },
+        {
+          "speaker": "B",
+          "text": "Кого ищут в этой истории?"
+        },
+        {
+          "speaker": "A",
+          "text": "В письме сказано: преступника. Позднее его называют убийцей, но редактор просит уточнить, на каком документе основано это утверждение."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_inquiry_1",
+          "word_id": "ales_5560219f1502400e57fbfc14",
+          "term": "Федеральное бюро расследования (ФБР)",
+          "sense_hints": [
+            "Federal Bureau of Investigation (FBI)"
+          ],
+          "target": "Федеральное бюро расследования",
+          "meaning": "Federal Bureau of Investigation",
+          "distractors": [
+            "Central Intelligence Agency",
+            "Department of Justice",
+            "Secret Service"
+          ],
+          "prompt": "Which agency is mentioned at the beginning?",
+          "evidence": "В начале фильма упоминается Федеральное бюро расследования.",
+          "explanation": "“Федеральное бюро расследования” means Federal Bureau of Investigation in this passage.",
+          "review_target": "Федеральное бюро расследования",
+          "review_text": "В статье упоминается Федеральное бюро расследования."
+        },
+        {
+          "id": "ales_e6_inquiry_2",
+          "word_id": "ales_cda768dd390559e9a1f531b6",
+          "term": "розыск",
+          "sense_hints": [
+            "search"
+          ],
+          "target": "розыск",
+          "meaning": "search for a wanted person",
+          "distractors": [
+            "trial",
+            "interrogation",
+            "extradition"
+          ],
+          "prompt": "What process’s beginning does the author describe?",
+          "evidence": "Затем автор рассказывает, когда начался розыск.",
+          "explanation": "“розыск” means search for a wanted person in this passage.",
+          "review_target": "розыск",
+          "review_text": "Розыск продолжался несколько месяцев."
+        },
+        {
+          "id": "ales_e6_inquiry_3",
+          "word_id": "ales_03b21c6bd25a5e4a7efb5fbb",
+          "term": "преступник",
+          "sense_hints": [
+            "criminal"
+          ],
+          "target": "преступника",
+          "meaning": "criminal",
+          "distractors": [
+            "witness",
+            "informant",
+            "investigator"
+          ],
+          "prompt": "How does the letter identify the person sought?",
+          "evidence": "В письме сказано: преступника.",
+          "explanation": "“преступника” means criminal in this passage.",
+          "review_target": "преступника",
+          "review_text": "В романе искали преступника."
+        },
+        {
+          "id": "ales_e6_inquiry_4",
+          "word_id": "ales_72afc6fa0f883f4e90dd5e7a",
+          "term": "убийца",
+          "sense_hints": [
+            "murderer"
+          ],
+          "target": "убийцей",
+          "meaning": "murderer",
+          "distractors": [
+            "robber",
+            "smuggler",
+            "forger"
+          ],
+          "prompt": "What is that person called later?",
+          "evidence": "Позднее его называют убийцей, но редактор просит уточнить, на каком документе основано это утверждение.",
+          "explanation": "“убийцей” means murderer in this passage.",
+          "review_target": "убийцей",
+          "review_text": "Герой рассказа оказался убийцей."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_recruitment",
+      "title": "Preparing an archive interview",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В архиве есть папка под названием «Вербовка». В ней описано, как организатор пытался завербовать новых участников."
+        },
+        {
+          "speaker": "B",
+          "text": "Для какой группы он работал?"
+        },
+        {
+          "speaker": "A",
+          "text": "В письме упомянут подпольный кружок. Один сосед сумел подслушать разговор, но его воспоминания записали только спустя много лет."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_recruitment_1",
+          "word_id": "ales_8325e9811879be312590f7ec",
+          "term": "вербовка",
+          "sense_hints": [
+            "recruitment"
+          ],
+          "target": "Вербовка",
+          "meaning": "recruitment",
+          "distractors": [
+            "surveillance",
+            "fundraising",
+            "training"
+          ],
+          "prompt": "What subject is named on the folder?",
+          "evidence": "В архиве есть папка под названием «Вербовка».",
+          "explanation": "“Вербовка” means recruitment in this passage.",
+          "review_target": "Вербовка",
+          "review_text": "Вербовка стала темой исследования."
+        },
+        {
+          "id": "ales_e6_recruitment_2",
+          "word_id": "ales_6233961ad2d3c7893d5e6812",
+          "term": "вербовать/завербовать",
+          "sense_hints": [
+            "to recruit"
+          ],
+          "target": "завербовать",
+          "meaning": "recruit",
+          "distractors": [
+            "dismiss",
+            "interrogate",
+            "transport"
+          ],
+          "prompt": "What did the organizer try to do with new participants?",
+          "evidence": "В ней описано, как организатор пытался завербовать новых участников.",
+          "explanation": "“завербовать” means recruit in this passage.",
+          "review_target": "завербовать",
+          "review_text": "Организатор хотел завербовать сторонников."
+        },
+        {
+          "id": "ales_e6_recruitment_3",
+          "word_id": "ales_23440f3120d30e3981b95a96",
+          "term": "подпольный",
+          "sense_hints": [
+            "underground"
+          ],
+          "target": "подпольный",
+          "meaning": "clandestine",
+          "distractors": [
+            "official",
+            "international",
+            "temporary"
+          ],
+          "prompt": "How is the circle described?",
+          "evidence": "В письме упомянут подпольный кружок.",
+          "explanation": "“подпольный” means clandestine in this passage.",
+          "review_target": "подпольный",
+          "review_text": "В книге описан подпольный журнал."
+        },
+        {
+          "id": "ales_e6_recruitment_4",
+          "word_id": "ales_10896c5a5e5eb73ef5889b15",
+          "term": "подслушивать/подслушать",
+          "sense_hints": [
+            "to eavesdrop, to overhear"
+          ],
+          "target": "подслушать",
+          "meaning": "overhear",
+          "distractors": [
+            "record with permission",
+            "interrupt",
+            "translate"
+          ],
+          "prompt": "What did the neighbor manage to do with the conversation?",
+          "evidence": "Один сосед сумел подслушать разговор, но его воспоминания записали только спустя много лет.",
+          "explanation": "“подслушать” means overhear in this passage.",
+          "review_target": "подслушать",
+          "review_text": "Он не хотел подслушать чужой разговор."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_report",
+      "title": "Checking wording in a fictional report",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Репортаж пока не готов. В нём говорится, что охранника пытались застрелить, но исход этого эпизода ещё уточняют."
+        },
+        {
+          "speaker": "B",
+          "text": "А кто упомянут в следующем абзаце?"
+        },
+        {
+          "speaker": "A",
+          "text": "Убитый свидетель. Остальной текст редактор обещал прислать вечером. До этого не будем соединять два эпизода в одну историю."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_report_1",
+          "word_id": "ales_c89866ba17ed561436e025b2",
+          "term": "репортаж",
+          "sense_hints": [
+            "reporting"
+          ],
+          "target": "Репортаж",
+          "meaning": "news report",
+          "distractors": [
+            "advertisement",
+            "editorial",
+            "official decree"
+          ],
+          "prompt": "What is not ready yet?",
+          "evidence": "Репортаж пока не готов.",
+          "explanation": "“Репортаж” means news report in this passage.",
+          "review_target": "Репортаж",
+          "review_text": "Репортаж выйдет в воскресенье."
+        },
+        {
+          "id": "ales_e6_report_2",
+          "word_id": "ales_1689ca8c0273731b8e56ef79",
+          "term": "застрелить (стрелять 16)",
+          "sense_hints": [
+            "to shoot, to kill"
+          ],
+          "target": "застрелить",
+          "meaning": "shoot dead",
+          "distractors": [
+            "abduct",
+            "arrest",
+            "intimidate"
+          ],
+          "prompt": "What does the report say someone attempted to do to the guard?",
+          "evidence": "В нём говорится, что охранника пытались застрелить, но исход этого эпизода ещё уточняют.",
+          "explanation": "“застрелить” means shoot dead in this passage.",
+          "review_target": "застрелить",
+          "review_text": "В сценарии злодей хотел застрелить героя."
+        },
+        {
+          "id": "ales_e6_report_3",
+          "word_id": "ales_db67a5c814ded2406e99c7d3",
+          "term": "убитый",
+          "sense_hints": [
+            "killed"
+          ],
+          "target": "Убитый",
+          "meaning": "killed",
+          "distractors": [
+            "missing",
+            "injured",
+            "detained"
+          ],
+          "prompt": "What is the stated condition of the witness in the next paragraph?",
+          "evidence": "Убитый свидетель.",
+          "explanation": "“Убитый” means killed in this passage.",
+          "review_target": "Убитый",
+          "review_text": "Убитый персонаж появляется только в воспоминаниях."
+        },
+        {
+          "id": "ales_e6_report_4",
+          "word_id": "ales_4b1f313f3be340e09a6fd0c1",
+          "term": "остальной",
+          "sense_hints": [
+            "remaining, the rest"
+          ],
+          "target": "Остальной",
+          "meaning": "remaining",
+          "distractors": [
+            "original",
+            "translated",
+            "rejected"
+          ],
+          "prompt": "Which portion of the text will the editor send later?",
+          "evidence": "Остальной текст редактор обещал прислать вечером.",
+          "explanation": "“Остальной” means remaining in this passage.",
+          "review_target": "Остальной",
+          "review_text": "Остальной материал находится в архиве."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_memorial",
+      "title": "Preparing a memorial exhibit",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Первый стенд рассказывает про гибель экспедиции. В дневнике есть запись о том, что один участник мог погибнуть ещё до прибытия помощи."
+        },
+        {
+          "speaker": "B",
+          "text": "Что изображено на рисунке рядом?"
+        },
+        {
+          "speaker": "A",
+          "text": "Мёртвый олень у дороги. В последнем разделе обсуждается смерть руководителя. Даты ещё проверяют по письмам."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_memorial_1",
+          "word_id": "ales_632fc1696a94414ebc6e1066",
+          "term": "гибель",
+          "sense_hints": [
+            "death"
+          ],
+          "target": "гибель",
+          "meaning": "loss of life",
+          "distractors": [
+            "return",
+            "departure",
+            "discovery"
+          ],
+          "prompt": "What aspect of the expedition is the first display about?",
+          "evidence": "Первый стенд рассказывает про гибель экспедиции.",
+          "explanation": "“гибель” means loss of life in this passage.",
+          "review_target": "гибель",
+          "review_text": "В книге описана гибель путешественников."
+        },
+        {
+          "id": "ales_e6_memorial_2",
+          "word_id": "ales_9259adeb0a2babbc382d16c7",
+          "term": "погибать/погибнуть",
+          "sense_hints": [
+            "to die, to perish"
+          ],
+          "target": "погибнуть",
+          "meaning": "perish",
+          "distractors": [
+            "get lost",
+            "fall ill",
+            "leave"
+          ],
+          "prompt": "What might have happened to one member before help arrived?",
+          "evidence": "В дневнике есть запись о том, что один участник мог погибнуть ещё до прибытия помощи.",
+          "explanation": "“погибнуть” means perish in this passage.",
+          "review_target": "погибнуть",
+          "review_text": "Герой мог погибнуть во время бури."
+        },
+        {
+          "id": "ales_e6_memorial_3",
+          "word_id": "ales_bf28f01ca8e53ca5b90dabb8",
+          "term": "мёртвый",
+          "sense_hints": [
+            "dead"
+          ],
+          "target": "Мёртвый",
+          "meaning": "dead",
+          "distractors": [
+            "wounded",
+            "frightened",
+            "trapped"
+          ],
+          "prompt": "How is the deer in the drawing described?",
+          "evidence": "Мёртвый олень у дороги.",
+          "explanation": "“Мёртвый” means dead in this passage.",
+          "review_target": "Мёртвый",
+          "review_text": "На берегу лежал мёртвый краб."
+        },
+        {
+          "id": "ales_e6_memorial_4",
+          "word_id": "ales_1ecb7fb3cc770f0c4b3f2e2c",
+          "term": "смерть",
+          "sense_hints": [
+            "death"
+          ],
+          "target": "смерть",
+          "meaning": "death",
+          "distractors": [
+            "appointment",
+            "illness",
+            "retirement"
+          ],
+          "prompt": "What event concerning the leader does the final section discuss?",
+          "evidence": "В последнем разделе обсуждается смерть руководителя.",
+          "explanation": "“смерть” means death in this passage.",
+          "review_target": "смерть",
+          "review_text": "Его смерть упомянута в последней главе."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_rescue",
+      "title": "Reviewing a fictional rescue bulletin",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В сообщении названа только одна жертва аварии. Раненый пассажир пока не смог ответить на вопросы журналиста."
+        },
+        {
+          "speaker": "B",
+          "text": "А что известно о водителе?"
+        },
+        {
+          "speaker": "A",
+          "text": "Он мог получить ранение ещё утром, но сумел остаться в живых. Других сведений редакция пока не получила, поэтому заметка будет короткой."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_rescue_1",
+          "word_id": "ales_d9bef151a62cac5028e89c0c",
+          "term": "жертва",
+          "sense_hints": [
+            "victim, casualty"
+          ],
+          "target": "жертва",
+          "meaning": "victim",
+          "distractors": [
+            "witness",
+            "rescuer",
+            "suspect"
+          ],
+          "prompt": "What role does the one person named in the report have?",
+          "evidence": "В сообщении названа только одна жертва аварии.",
+          "explanation": "“жертва” means victim in this passage.",
+          "review_target": "жертва",
+          "review_text": "Жертва происшествия дала интервью."
+        },
+        {
+          "id": "ales_e6_rescue_2",
+          "word_id": "ales_fb87a8cb17f79512269239d6",
+          "term": "раненый",
+          "sense_hints": [
+            "wounded, injured"
+          ],
+          "target": "Раненый",
+          "meaning": "injured",
+          "distractors": [
+            "exhausted",
+            "frightened",
+            "unconscious"
+          ],
+          "prompt": "How is the passenger described?",
+          "evidence": "Раненый пассажир пока не смог ответить на вопросы журналиста.",
+          "explanation": "“Раненый” means injured in this passage.",
+          "review_target": "Раненый",
+          "review_text": "Раненый герой оставался в палатке."
+        },
+        {
+          "id": "ales_e6_rescue_3",
+          "word_id": "ales_66cd863aeaa232c41941d8cf",
+          "term": "получать/получить ранение",
+          "sense_hints": [
+            "to be wounded, to be injured"
+          ],
+          "target": "получить ранение",
+          "meaning": "be injured",
+          "distractors": [
+            "receive treatment",
+            "lose consciousness",
+            "be evacuated"
+          ],
+          "prompt": "What may have happened to the driver earlier that morning?",
+          "evidence": "Он мог получить ранение ещё утром, но сумел остаться в живых.",
+          "explanation": "“получить ранение” means be injured in this passage.",
+          "review_target": "получить ранение",
+          "review_text": "Персонаж мог получить ранение в дороге."
+        },
+        {
+          "id": "ales_e6_rescue_4",
+          "word_id": "ales_962334c63ae4500b9e1a5025",
+          "term": "оставаться/остаться в живых",
+          "sense_hints": [
+            "to survive"
+          ],
+          "target": "остаться в живых",
+          "meaning": "survive",
+          "distractors": [
+            "remain at the scene",
+            "stay awake",
+            "recover fully"
+          ],
+          "prompt": "What did the driver manage to do despite what happened?",
+          "evidence": "Он мог получить ранение ещё утром, но сумел остаться в живых.",
+          "explanation": "“остаться в живых” means survive in this passage.",
+          "review_target": "остаться в живых",
+          "review_text": "Путешественник сумел остаться в живых."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_memoir",
+      "title": "Editing a doctor’s fictional memoir",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В первой главе врач боялся, что пациент может скончаться до приезда родственников. Автор описывает этот случай без имён и точных дат."
+        },
+        {
+          "speaker": "B",
+          "text": "Кто появляется в следующей главе?"
+        },
+        {
+          "speaker": "A",
+          "text": "Человек, у которого на руке был шрам. В его рассказе упомянуто снотворное, но название препарата автор решил не включать."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_memoir_1",
+          "word_id": "ales_06b649436fe901e0cf8d1330",
+          "term": "скончаться",
+          "sense_hints": [
+            "to die"
+          ],
+          "target": "скончаться",
+          "meaning": "die",
+          "distractors": [
+            "recover",
+            "leave the hospital",
+            "fall asleep"
+          ],
+          "prompt": "What did the doctor fear might happen before the relatives arrived?",
+          "evidence": "В первой главе врач боялся, что пациент может скончаться до приезда родственников.",
+          "explanation": "“скончаться” means die in this passage.",
+          "review_target": "скончаться",
+          "review_text": "По сюжету писатель должен скончаться в последней главе."
+        },
+        {
+          "id": "ales_e6_memoir_2",
+          "word_id": "ales_9bcc3c7a4772424ce08703df",
+          "term": "случай",
+          "sense_hints": [
+            "occasion"
+          ],
+          "target": "случай",
+          "meaning": "case or occurrence",
+          "distractors": [
+            "diagnosis",
+            "prescription",
+            "appointment"
+          ],
+          "prompt": "What does the author describe without names or exact dates?",
+          "evidence": "Автор описывает этот случай без имён и точных дат.",
+          "explanation": "“случай” means case or occurrence in this passage.",
+          "review_target": "случай",
+          "review_text": "Этот случай запомнился всем участникам."
+        },
+        {
+          "id": "ales_e6_memoir_3",
+          "word_id": "ales_cad0778ffe055e6677e3c6d1",
+          "term": "шрам",
+          "sense_hints": [
+            "scar"
+          ],
+          "target": "шрам",
+          "meaning": "scar",
+          "distractors": [
+            "bruise",
+            "bandage",
+            "tattoo"
+          ],
+          "prompt": "What did the person in the next chapter have on an arm?",
+          "evidence": "Человек, у которого на руке был шрам.",
+          "explanation": "“шрам” means scar in this passage.",
+          "review_target": "шрам",
+          "review_text": "На ладони остался небольшой шрам."
+        },
+        {
+          "id": "ales_e6_memoir_4",
+          "word_id": "ales_bdc2a17050aa43b4d4788a8f",
+          "term": "снотворное",
+          "sense_hints": [
+            "medicine taken to induce sleep"
+          ],
+          "target": "снотворное",
+          "meaning": "sleeping medicine",
+          "distractors": [
+            "painkiller",
+            "antibiotic",
+            "antiseptic"
+          ],
+          "prompt": "What type of medicine is mentioned in the person’s story?",
+          "evidence": "В его рассказе упомянуто снотворное, но название препарата автор решил не включать.",
+          "explanation": "“снотворное” means sleeping medicine in this passage.",
+          "review_target": "снотворное",
+          "review_text": "В рассказе упоминается снотворное."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_collision",
+      "title": "Comparing two incident accounts",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В первом рассказе машина могла врезаться в ограждение. Автор ещё не решил, чем закончится эта сцена."
+        },
+        {
+          "speaker": "B",
+          "text": "А падение моста относится к тому же эпизоду?"
+        },
+        {
+          "speaker": "A",
+          "text": "Нет. Во втором рассказе описаны столкновения на дороге. Там автобус рисковал разбиться, но последние страницы пока отсутствуют."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_collision_1",
+          "word_id": "ales_c05e59b9970de5b291460be6",
+          "term": "врезаться/врезаться",
+          "sense_hints": [
+            "to crash into"
+          ],
+          "target": "врезаться",
+          "meaning": "crash into",
+          "distractors": [
+            "stop beside",
+            "drive around",
+            "pull away from"
+          ],
+          "prompt": "What might the car do in relation to the barrier?",
+          "evidence": "В первом рассказе машина могла врезаться в ограждение.",
+          "explanation": "“врезаться” means crash into in this passage.",
+          "review_target": "врезаться",
+          "review_text": "Машина могла врезаться в дерево."
+        },
+        {
+          "id": "ales_e6_collision_2",
+          "word_id": "ales_a661854bbcab959d65f2dca3",
+          "term": "падение",
+          "sense_hints": [
+            "fall"
+          ],
+          "target": "падение",
+          "meaning": "collapse",
+          "distractors": [
+            "construction",
+            "inspection",
+            "closure"
+          ],
+          "prompt": "What event involving a bridge does the second speaker ask about?",
+          "evidence": "А падение моста относится к тому же эпизоду?",
+          "explanation": "“падение” means collapse in this passage.",
+          "review_target": "падение",
+          "review_text": "Падение дерева перекрыло дорогу."
+        },
+        {
+          "id": "ales_e6_collision_3",
+          "word_id": "ales_4546a401802b8fbfd49c4878",
+          "term": "столкновения (столкнуться 43E)",
+          "sense_hints": [
+            "collision, clash, conflict"
+          ],
+          "target": "столкновения",
+          "meaning": "collisions",
+          "distractors": [
+            "traffic jams",
+            "roadworks",
+            "detours"
+          ],
+          "prompt": "What road events are described in the second story?",
+          "evidence": "Во втором рассказе описаны столкновения на дороге.",
+          "explanation": "“столкновения” means collisions in this passage.",
+          "review_target": "столкновения",
+          "review_text": "Столкновения произошли на разных участках."
+        },
+        {
+          "id": "ales_e6_collision_4",
+          "word_id": "ales_a180a3d7c99a94a2f682a32b",
+          "term": "разбиваться/разбиться",
+          "sense_hints": [
+            "to crash, to be smashed"
+          ],
+          "target": "разбиться",
+          "meaning": "crash",
+          "distractors": [
+            "get delayed",
+            "run out of fuel",
+            "lose its way"
+          ],
+          "prompt": "What risk did the bus face?",
+          "evidence": "Там автобус рисковал разбиться, но последние страницы пока отсутствуют.",
+          "explanation": "“разбиться” means crash in this passage.",
+          "review_target": "разбиться",
+          "review_text": "Лодка могла разбиться о камни."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_route",
+      "title": "Following directions to a rehearsal",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "После обеда группа должна двинуться к театру. Потом нужно пройти через двор, потому что главный вход закрыт."
+        },
+        {
+          "speaker": "B",
+          "text": "Мы сможем попасть в зал до начала репетиции?"
+        },
+        {
+          "speaker": "A",
+          "text": "Думаю, да. Администратор обещал встретить нас у двери. Я ещё уточню время и пришлю сообщение всем участникам."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_route_1",
+          "word_id": "ales_9fb84da51381f77e578f7f37",
+          "term": "двигаться/двинуться",
+          "sense_hints": [
+            "to move"
+          ],
+          "target": "двинуться",
+          "meaning": "set off",
+          "distractors": [
+            "send a message",
+            "look over",
+            "make a call"
+          ],
+          "prompt": "What should the group do toward the theater after lunch?",
+          "evidence": "После обеда группа должна двинуться к театру.",
+          "explanation": "“двинуться” means set off in this passage.",
+          "review_target": "двинуться",
+          "review_text": "Колонна должна двинуться утром."
+        },
+        {
+          "id": "ales_e6_route_2",
+          "word_id": "ales_4b2788bce6ea00ee495eb18f",
+          "term": "проходить/пройти (ходить 11)",
+          "sense_hints": [
+            "to go, to pass"
+          ],
+          "target": "пройти",
+          "meaning": "walk through",
+          "distractors": [
+            "wait in",
+            "inspect",
+            "go around"
+          ],
+          "prompt": "What should the group do in the courtyard?",
+          "evidence": "Потом нужно пройти через двор, потому что главный вход закрыт.",
+          "explanation": "“пройти” means walk through in this passage.",
+          "review_target": "пройти",
+          "review_text": "До площади можно пройти через парк."
+        },
+        {
+          "id": "ales_e6_route_3",
+          "word_id": "ales_6f8a485e0477586e7d1e5c3f",
+          "term": "попадать/попасть",
+          "sense_hints": [
+            "to get"
+          ],
+          "target": "попасть",
+          "meaning": "get into",
+          "distractors": [
+            "find out about",
+            "rent",
+            "telephone"
+          ],
+          "prompt": "What do the visitors hope to do concerning the hall before rehearsal?",
+          "evidence": "Мы сможем попасть в зал до начала репетиции?",
+          "explanation": "“попасть” means get into in this passage.",
+          "review_target": "попасть",
+          "review_text": "Без пропуска трудно попасть в здание."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_fair",
+      "title": "Planning a community showcase",
+      "language": "ru",
+      "stage": 1,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На сцену первой выйдет манекенщица. За ней выступит участник, награждённый на прошлогоднем конкурсе."
+        },
+        {
+          "speaker": "B",
+          "text": "У входа уже собралась толпа?"
+        },
+        {
+          "speaker": "A",
+          "text": "Да. Наш маленький праздник начинает становиться популярным. Организаторы ещё проверяют список выступающих и готовят места для гостей."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_fair_1",
+          "word_id": "ales_5965bda857f025dc59b1abf4",
+          "term": "манекенщица",
+          "sense_hints": [
+            "model"
+          ],
+          "target": "манекенщица",
+          "meaning": "fashion model",
+          "distractors": [
+            "singer",
+            "presenter",
+            "designer"
+          ],
+          "prompt": "Who will be first on stage?",
+          "evidence": "На сцену первой выйдет манекенщица.",
+          "explanation": "“манекенщица” means fashion model in this passage.",
+          "review_target": "манекенщица",
+          "review_text": "На встречу пришла известная манекенщица."
+        },
+        {
+          "id": "ales_e6_fair_2",
+          "word_id": "ales_d56e930d774e21eeb0909801",
+          "term": "награждённый",
+          "sense_hints": [
+            "one who was awarded"
+          ],
+          "target": "награждённый",
+          "meaning": "given an award",
+          "distractors": [
+            "disqualified",
+            "selected as a judge",
+            "invited as an observer"
+          ],
+          "prompt": "What happened to the next participant at last year’s contest?",
+          "evidence": "За ней выступит участник, награждённый на прошлогоднем конкурсе.",
+          "explanation": "“награждённый” means given an award in this passage.",
+          "review_target": "награждённый",
+          "review_text": "Студент, награждённый за работу, выступил первым."
+        },
+        {
+          "id": "ales_e6_fair_3",
+          "word_id": "ales_ce5e34cedcc665b04db45765",
+          "term": "толпа",
+          "sense_hints": [
+            "crowd"
+          ],
+          "target": "толпа",
+          "meaning": "crowd",
+          "distractors": [
+            "queue of vehicles",
+            "security team",
+            "press delegation"
+          ],
+          "prompt": "What group does the second speaker ask about at the entrance?",
+          "evidence": "У входа уже собралась толпа?",
+          "explanation": "“толпа” means crowd in this passage.",
+          "review_target": "толпа",
+          "review_text": "Возле вокзала собралась толпа."
+        },
+        {
+          "id": "ales_e6_fair_4",
+          "word_id": "ales_5799a3a4c0b93ceae84c872e",
+          "term": "становиться/стать",
+          "sense_hints": [
+            "to become"
+          ],
+          "target": "становиться",
+          "meaning": "become",
+          "distractors": [
+            "remain",
+            "seem",
+            "stop being"
+          ],
+          "prompt": "What change in popularity does the speaker describe?",
+          "evidence": "Наш маленький праздник начинает становиться популярным.",
+          "explanation": "“становиться” means become in this passage.",
+          "review_target": "становиться",
+          "review_text": "К вечеру начало становиться холодно."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_border",
+      "title": "Reviewing a historical evacuation account",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В тексте упомянут рубеж у реки. Туда направили силы быстрого реагирования, но время прибытия пока не указано."
+        },
+        {
+          "speaker": "B",
+          "text": "Какую задачу описывает автор?"
+        },
+        {
+          "speaker": "A",
+          "text": "Освободить жителей, которых удерживали в здании. Позже в рассказе начали обстреливать мост. Этот эпизод редактор просит проверить отдельно."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_border_1",
+          "word_id": "ales_7a4a957ffb209081ebba4ca9",
+          "term": "рубеж",
+          "sense_hints": [
+            "border, boundary"
+          ],
+          "target": "рубеж",
+          "meaning": "boundary",
+          "distractors": [
+            "headquarters",
+            "crossing point",
+            "settlement"
+          ],
+          "prompt": "What feature near the river is mentioned?",
+          "evidence": "В тексте упомянут рубеж у реки.",
+          "explanation": "“рубеж” means boundary in this passage.",
+          "review_target": "рубеж",
+          "review_text": "На карте отмечен прежний рубеж."
+        },
+        {
+          "id": "ales_e6_border_2",
+          "word_id": "ales_015c03b62756acd917edf5b7",
+          "term": "силы быстрого реагирования",
+          "sense_hints": [
+            "rapid deployment force"
+          ],
+          "target": "силы быстрого реагирования",
+          "meaning": "rapid-response forces",
+          "distractors": [
+            "border inspectors",
+            "engineering crews",
+            "peace negotiators"
+          ],
+          "prompt": "Who was sent there?",
+          "evidence": "Туда направили силы быстрого реагирования, но время прибытия пока не указано.",
+          "explanation": "“силы быстрого реагирования” means rapid-response forces in this passage.",
+          "review_target": "силы быстрого реагирования",
+          "review_text": "В сообщении упомянуты силы быстрого реагирования."
+        },
+        {
+          "id": "ales_e6_border_3",
+          "word_id": "ales_6440b3c953a09a4b861aa2b6",
+          "term": "освобождать/освободить (свободный 26)",
+          "sense_hints": [
+            "to free, to liberate"
+          ],
+          "target": "Освободить",
+          "meaning": "free",
+          "distractors": [
+            "question",
+            "register",
+            "relocate voluntarily"
+          ],
+          "prompt": "What was the task concerning the residents held in the building?",
+          "evidence": "Освободить жителей, которых удерживали в здании.",
+          "explanation": "“Освободить” means free in this passage.",
+          "review_target": "Освободить",
+          "review_text": "Герои решили освободить пленника."
+        },
+        {
+          "id": "ales_e6_border_4",
+          "word_id": "ales_92f85afa69a933722d31606e",
+          "term": "обстреливать/обстрелять",
+          "sense_hints": [
+            "to fire upon, to shell"
+          ],
+          "target": "обстреливать",
+          "meaning": "fire upon",
+          "distractors": [
+            "inspect",
+            "guard",
+            "rebuild"
+          ],
+          "prompt": "What began happening to the bridge later?",
+          "evidence": "Позже в рассказе начали обстреливать мост.",
+          "explanation": "“обстреливать” means fire upon in this passage.",
+          "review_target": "обстреливать",
+          "review_text": "В романе начали обстреливать крепость."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_resistance",
+      "title": "Discussing a fictional historical chapter",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Глава называется «Борьба за город». В начале описано сопротивление жителей, но имена участников ещё не названы."
+        },
+        {
+          "speaker": "B",
+          "text": "Как реагирует командир в следующем эпизоде?"
+        },
+        {
+          "speaker": "A",
+          "text": "Он приказал применять силу. Однако жители продолжали оказывать сопротивление. Автор хочет сравнить два рассказа об этом событии."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_resistance_1",
+          "word_id": "ales_cb4d933e01cd3fd43fefd5e6",
+          "term": "борьба",
+          "sense_hints": [
+            "struggle, fight"
+          ],
+          "target": "Борьба",
+          "meaning": "struggle",
+          "distractors": [
+            "negotiations",
+            "celebration",
+            "search"
+          ],
+          "prompt": "What activity is named in the chapter title?",
+          "evidence": "Глава называется «Борьба за город».",
+          "explanation": "“Борьба” means struggle in this passage.",
+          "review_target": "Борьба",
+          "review_text": "Борьба за первое место продолжалась весь день."
+        },
+        {
+          "id": "ales_e6_resistance_2",
+          "word_id": "ales_5ddc8555f6ac391d6f8c0432",
+          "term": "сопротивление",
+          "sense_hints": [
+            "resistance"
+          ],
+          "target": "сопротивление",
+          "meaning": "resistance",
+          "distractors": [
+            "cooperation",
+            "panic",
+            "indifference"
+          ],
+          "prompt": "What response by residents is described at the beginning?",
+          "evidence": "В начале описано сопротивление жителей, но имена участников ещё не названы.",
+          "explanation": "“сопротивление” means resistance in this passage.",
+          "review_target": "сопротивление",
+          "review_text": "Предложение встретило сопротивление."
+        },
+        {
+          "id": "ales_e6_resistance_3",
+          "word_id": "ales_5b99f121c304e293c8632b19",
+          "term": "сила",
+          "sense_hints": [
+            "force"
+          ],
+          "target": "силу",
+          "meaning": "force",
+          "distractors": [
+            "persuasion",
+            "deception",
+            "patience"
+          ],
+          "prompt": "What did the commander order to be used?",
+          "evidence": "Он приказал применять силу.",
+          "explanation": "“силу” means force in this passage.",
+          "review_target": "силу",
+          "review_text": "В этой сцене решили применить силу."
+        },
+        {
+          "id": "ales_e6_resistance_4",
+          "word_id": "ales_086eba53361fdb4bdd598a17",
+          "term": "оказывать сопротивление",
+          "sense_hints": [
+            "to offer resistance"
+          ],
+          "target": "оказывать сопротивление",
+          "meaning": "offer resistance",
+          "distractors": [
+            "request assistance",
+            "negotiate terms",
+            "obey instructions"
+          ],
+          "prompt": "What did the residents continue to do?",
+          "evidence": "Однако жители продолжали оказывать сопротивление.",
+          "explanation": "“оказывать сопротивление” means offer resistance in this passage.",
+          "review_target": "оказывать сопротивление",
+          "review_text": "Персонаж продолжал оказывать сопротивление."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_health",
+      "title": "Editing a health-conference program",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В программе есть доклад про СПИД. Рядом указан другой доклад, в котором исследуют распространение вируса среди животных."
+        },
+        {
+          "speaker": "B",
+          "text": "Что именно хотят выяснить исследователи?"
+        },
+        {
+          "speaker": "A",
+          "text": "Может ли этот вирус заразить новый вид животных. Пока они опасаются делать выводы. Редактор просит не смешивать темы двух докладов."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_health_1",
+          "word_id": "ales_20729b7ac8f3c106502007a3",
+          "term": "СПИД",
+          "sense_hints": [
+            "AIDS"
+          ],
+          "target": "СПИД",
+          "meaning": "AIDS",
+          "distractors": [
+            "influenza",
+            "hepatitis",
+            "malaria"
+          ],
+          "prompt": "What disease is the first named talk about?",
+          "evidence": "В программе есть доклад про СПИД.",
+          "explanation": "“СПИД” means AIDS in this passage.",
+          "review_target": "СПИД",
+          "review_text": "В заголовке статьи упоминается СПИД."
+        },
+        {
+          "id": "ales_e6_health_2",
+          "word_id": "ales_cac7ac39d3144bb3d0b9f4cd",
+          "term": "распространение",
+          "sense_hints": [
+            "spreading, expansion"
+          ],
+          "target": "распространение",
+          "meaning": "spread",
+          "distractors": [
+            "origin",
+            "structure",
+            "detection"
+          ],
+          "prompt": "Which aspect of the animal virus is being studied?",
+          "evidence": "Рядом указан другой доклад, в котором исследуют распространение вируса среди животных.",
+          "explanation": "“распространение” means spread in this passage.",
+          "review_target": "распространение",
+          "review_text": "Распространение новостей обсуждали на семинаре."
+        },
+        {
+          "id": "ales_e6_health_3",
+          "word_id": "ales_5a7718d248bb5284d88984ee",
+          "term": "заражать/заразить",
+          "sense_hints": [
+            "to infect, to contaminate"
+          ],
+          "target": "заразить",
+          "meaning": "infect",
+          "distractors": [
+            "protect",
+            "attract",
+            "frighten"
+          ],
+          "prompt": "What do researchers want to know whether the virus can do to another species?",
+          "evidence": "Может ли этот вирус заразить новый вид животных.",
+          "explanation": "“заразить” means infect in this passage.",
+          "review_target": "заразить",
+          "review_text": "В рассказе врач боялся заразить коллегу."
+        },
+        {
+          "id": "ales_e6_health_4",
+          "word_id": "ales_b04d116e2be2e315f56af202",
+          "term": "опасаться",
+          "sense_hints": [
+            "to fear"
+          ],
+          "target": "опасаются",
+          "meaning": "are wary of",
+          "distractors": [
+            "are eager to",
+            "are required to",
+            "have agreed to"
+          ],
+          "prompt": "How do researchers currently feel about drawing conclusions?",
+          "evidence": "Пока они опасаются делать выводы.",
+          "explanation": "“опасаются” means are wary of in this passage.",
+          "review_target": "опасаются",
+          "review_text": "Участники опасаются задержки рейса."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_maritime",
+      "title": "Preparing a maritime film discussion",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "На первой схеме изображён трал. Во второй части фильма судно должно состыковаться с плавучей платформой."
+        },
+        {
+          "speaker": "B",
+          "text": "Какие вопросы задали зрители после просмотра?"
+        },
+        {
+          "speaker": "A",
+          "text": "Они спросили, зачем пришлось слить воду из бака. Ещё предложили предусмотреть больше времени для обсуждения. Ответы автора запишут завтра."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_maritime_1",
+          "word_id": "ales_2a2e06521f29f0866e69e953",
+          "term": "трал",
+          "sense_hints": [
+            "trawl"
+          ],
+          "target": "трал",
+          "meaning": "trawl net",
+          "distractors": [
+            "anchor",
+            "propeller",
+            "mooring line"
+          ],
+          "prompt": "What piece of equipment is in the first diagram?",
+          "evidence": "На первой схеме изображён трал.",
+          "explanation": "“трал” means trawl net in this passage.",
+          "review_target": "трал",
+          "review_text": "В музее показан старый трал."
+        },
+        {
+          "id": "ales_e6_maritime_2",
+          "word_id": "ales_6a793e30b272ec01988c5d25",
+          "term": "стыковаться/состыковаться",
+          "sense_hints": [
+            "to dock"
+          ],
+          "target": "состыковаться",
+          "meaning": "dock",
+          "distractors": [
+            "communicate by radio",
+            "change places",
+            "break contact"
+          ],
+          "prompt": "What should the vessel do with the floating platform?",
+          "evidence": "Во второй части фильма судно должно состыковаться с плавучей платформой.",
+          "explanation": "“состыковаться” means dock in this passage.",
+          "review_target": "состыковаться",
+          "review_text": "Корабль должен состыковаться со станцией."
+        },
+        {
+          "id": "ales_e6_maritime_3",
+          "word_id": "ales_7e8ac4ac311c459c6fa51f8a",
+          "term": "сливать/слить",
+          "sense_hints": [
+            "to pour out"
+          ],
+          "target": "слить",
+          "meaning": "drain",
+          "distractors": [
+            "heat",
+            "filter",
+            "measure"
+          ],
+          "prompt": "What action involving the water in the tank did viewers ask about?",
+          "evidence": "Они спросили, зачем пришлось слить воду из бака.",
+          "explanation": "“слить” means drain in this passage.",
+          "review_target": "слить",
+          "review_text": "После опыта нужно слить воду."
+        },
+        {
+          "id": "ales_e6_maritime_4",
+          "word_id": "ales_454ffa9a914027576a482a9a",
+          "term": "предусматривать/предусмотреть",
+          "sense_hints": [
+            "to anticipate, to foresee"
+          ],
+          "target": "предусмотреть",
+          "meaning": "allow for",
+          "distractors": [
+            "cut back",
+            "record retrospectively",
+            "charge extra for"
+          ],
+          "prompt": "What did viewers propose concerning more discussion time?",
+          "evidence": "Ещё предложили предусмотреть больше времени для обсуждения.",
+          "explanation": "“предусмотреть” means allow for in this passage.",
+          "review_target": "предусмотреть",
+          "review_text": "В плане нужно предусмотреть перерыв."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_crime",
+      "title": "Comparing scenes in a detective story",
+      "language": "ru",
+      "stage": 3,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "В первой сцене преступники собирались совершить налёт на магазин. Дальше они пытались угнать автобус, но автор ещё меняет сюжет."
+        },
+        {
+          "speaker": "B",
+          "text": "Что происходит в разговоре с охранником?"
+        },
+        {
+          "speaker": "A",
+          "text": "Один персонаж начинает угрожать ему и требовать ключи. Редактор просит сократить эту сцену и уточнить её место в рассказе."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_crime_1",
+          "word_id": "ales_2d69e72d9f3b4052a5d5630a",
+          "term": "совершать/совершить налёт",
+          "sense_hints": [
+            "to raid"
+          ],
+          "target": "совершить налёт",
+          "meaning": "carry out a raid",
+          "distractors": [
+            "conduct an inspection",
+            "organize a boycott",
+            "make a delivery"
+          ],
+          "prompt": "What were the criminals planning to do at the store?",
+          "evidence": "В первой сцене преступники собирались совершить налёт на магазин.",
+          "explanation": "“совершить налёт” means carry out a raid in this passage.",
+          "review_target": "совершить налёт",
+          "review_text": "В романе банда решила совершить налёт на склад."
+        },
+        {
+          "id": "ales_e6_crime_2",
+          "word_id": "ales_3e50c35bbb79236b54da86f3",
+          "term": "угонять/угнать",
+          "sense_hints": [
+            "to hijack"
+          ],
+          "target": "угнать",
+          "meaning": "hijack",
+          "distractors": [
+            "stop for inspection",
+            "charter",
+            "repair"
+          ],
+          "prompt": "What did they later try to do with the bus?",
+          "evidence": "Дальше они пытались угнать автобус, но автор ещё меняет сюжет.",
+          "explanation": "“угнать” means hijack in this passage.",
+          "review_target": "угнать",
+          "review_text": "По сюжету преступник пытался угнать самолёт."
+        },
+        {
+          "id": "ales_e6_crime_3",
+          "word_id": "ales_bd6e8b0f81d639277cc4f565",
+          "term": "угрожать (угроза 40)",
+          "sense_hints": [
+            "to threaten"
+          ],
+          "target": "угрожать",
+          "meaning": "threaten",
+          "distractors": [
+            "reassure",
+            "deceive",
+            "thank"
+          ],
+          "prompt": "How does one character begin treating the guard?",
+          "evidence": "Один персонаж начинает угрожать ему и требовать ключи.",
+          "explanation": "“угрожать” means threaten in this passage.",
+          "review_target": "угрожать",
+          "review_text": "Герой не позволил угрожать своему другу."
+        },
+        {
+          "id": "ales_e6_crime_4",
+          "word_id": "ales_b163d72bf8796bd76eff9972",
+          "term": "требовать/потребовать",
+          "sense_hints": [
+            "to demand"
+          ],
+          "target": "требовать",
+          "meaning": "demand",
+          "distractors": [
+            "offer",
+            "hide",
+            "return"
+          ],
+          "prompt": "What does that character do concerning the keys?",
+          "evidence": "Один персонаж начинает угрожать ему и требовать ключи.",
+          "explanation": "“требовать” means demand in this passage.",
+          "review_target": "требовать",
+          "review_text": "Участники стали требовать объяснений."
+        }
+      ]
+    },
+    {
+      "id": "ales_e6_tremor",
+      "title": "Discussing a monitoring-station log",
+      "language": "ru",
+      "stage": 2,
+      "collection": "ales",
+      "source": "Original ALES study dialogue; provisional language review",
+      "turns": [
+        {
+          "speaker": "A",
+          "text": "Дежурный записал слабый толчок ночью. В журнале также отмечено превышение установленной нормы, но измерение ещё проверяют."
+        },
+        {
+          "speaker": "B",
+          "text": "Прибор уже удалось настроить?"
+        },
+        {
+          "speaker": "A",
+          "text": "Первая попытка была неудачной. Завтра приедет специалист и посмотрит все записи. До его приезда отчёт останется предварительным."
+        }
+      ],
+      "targets": [
+        {
+          "id": "ales_e6_tremor_1",
+          "word_id": "ales_40bceb828e53e12c7d8b5582",
+          "term": "толчок",
+          "sense_hints": [
+            "tremor"
+          ],
+          "target": "толчок",
+          "meaning": "tremor",
+          "distractors": [
+            "noise",
+            "flash",
+            "gust"
+          ],
+          "prompt": "What did the observer record during the night?",
+          "evidence": "Дежурный записал слабый толчок ночью.",
+          "explanation": "“толчок” means tremor in this passage.",
+          "review_target": "толчок",
+          "review_text": "Жители почувствовали слабый толчок."
+        },
+        {
+          "id": "ales_e6_tremor_2",
+          "word_id": "ales_f208eb7868cdcaeff3591d9c",
+          "term": "превышение",
+          "sense_hints": [
+            "to exceed"
+          ],
+          "target": "превышение",
+          "meaning": "exceeding the limit",
+          "distractors": [
+            "reaching the minimum",
+            "meeting the average",
+            "falling below the limit"
+          ],
+          "prompt": "What relationship to the established norm is noted in the log?",
+          "evidence": "В журнале также отмечено превышение установленной нормы, но измерение ещё проверяют.",
+          "explanation": "“превышение” means exceeding the limit in this passage. The imported gloss is \"to exceed\"; превышение is a noun, meaning an excess or exceeding a limit.",
+          "review_target": "превышение",
+          "review_text": "В отчёте отмечено превышение расходов."
+        },
+        {
+          "id": "ales_e6_tremor_3",
+          "word_id": "ales_a0c9903fc38d866ecdecfb44",
+          "term": "попытка",
+          "sense_hints": [
+            "attempt"
+          ],
+          "target": "попытка",
+          "meaning": "attempt",
+          "distractors": [
+            "measurement",
+            "delivery",
+            "forecast"
+          ],
+          "prompt": "What was unsuccessful the first time?",
+          "evidence": "Первая попытка была неудачной.",
+          "explanation": "“попытка” means attempt in this passage.",
+          "review_target": "попытка",
+          "review_text": "Вторая попытка оказалась удачной."
+        }
+      ]
     }
   ]
 }

@@ -29,7 +29,7 @@ def csv_file(path, rows):
 def catalog(tmp_path):
     rows = [[t['term'], t['sense_hints'][0], '', str(n + 1), '97']
             for p in build()['passages'] for n, t in enumerate(p['targets'])]
-    rows.append(['ядерный', 'nuclear', '', '', '110'])  # no contextual coverage yet
+    rows.append(['контрольный термин', 'fixture-only uncovered entry', '', '', '110'])
     ales = tmp_path / 'ales.json'
     save_vocabulary(import_ales(csv_file(tmp_path / 'source.csv', rows)), ales)
     course = tmp_path / 'course.json'
@@ -75,13 +75,13 @@ def test_invalid_import_fails_without_partial_output(tmp_path, rows):
 
 def test_all_authored_targets_link_exactly_and_uncovered_words_remain_available(catalog):
     assert build() == json.loads((ROOT / 'data/study/ales/passages.json').read_text(encoding='utf-8'))
-    assert len(catalog.eligible('reading', 'ALES glossary', context_only=False)) == 381
-    assert len(catalog.eligible('reading', 'ALES glossary')) == 380
+    assert len(catalog.eligible('reading', 'ALES glossary', context_only=False)) == 475
+    assert len(catalog.eligible('reading', 'ALES glossary')) == 474
     assert not catalog.checks('reading', 'Course modules')
     pairs = catalog.checks(*FILTERS)
-    assert len(pairs) == 95 and all(len(p['targets']) == 4 for p in pairs)
+    assert len(pairs) == 119 and all(3 <= len(p['targets']) <= 4 for p in pairs)
     ids = [t['word_id'] for p in pairs for t in p['targets']]
-    assert len(set(ids)) == 380
+    assert len(set(ids)) == 474
     for p in pairs:
         for t in p['targets']:
             assert t['word_ids'] == [t['word_id']]
@@ -95,21 +95,25 @@ def test_outcomes_remain_private_until_completion_and_feed_review(env, catalog, 
     from ui.vocabulary_check import report_html
     store, token, clock = env
     key = store.start_check(token, catalog, FILTERS, maximum=2)
+    first_count = len(store.check_state(token, key)['current']['targets'])
     first = answer(store, token, key, correct, guess)
-    assert first['current']['stage'] == stage
+    expected_stage = 2 if first_count == 3 and correct == 3 and not guess else stage
+    assert first['current']['stage'] == expected_stage
     assert store.word_evidence(token, 'reading') == {} and report_html(first) == ''
     finished = answer(store, token, key, correct, guess)
     assert finished['status'] == 'complete' and finished['evidence_published']
     evidence = store.word_evidence(token, 'reading')
-    assert len(evidence) == 8
-    assert sum(e['focus'] for e in evidence.values()) == (8 if guess else 2 * (4 - correct))
+    counts = [len(p['targets']) for p in finished['completed']]
+    total = sum(counts)
+    assert len(evidence) == total
+    assert sum(e['focus'] for e in evidence.values()) == (total if guess else sum(max(0, n - correct) for n in counts))
     assert store.word_evidence(token, 'listening') == {}
     assert store.states(token) == {}  # no automatic mastery certification
     report = report_html(finished)
     assert 'Correctly recognized without guessing' in report and 'Words to work on again' in report
-    assert '373 glossary entries were not tested' in report
-    assert '380 of 381 entries' in report
-    if correct < 4 or guess:
+    assert f'{475 - total} glossary entries were not tested' in report
+    assert '474 of 475 entries' in report
+    if any(e['focus'] for e in evidence.values()):
         nonce = store.next_card(token, catalog, group='ALES glossary', focus_only=True)
         attempt = store.attempt(token, nonce)
         assert evidence[attempt['word_id']]['focus']
@@ -122,18 +126,20 @@ def test_maximum_length_no_repeat_and_restart_export(env, catalog):
     store, token, clock = env
     key = store.start_check(token, catalog, FILTERS, maximum=15)
     seen = set()
+    expected_words = 0
     for _ in range(15):
         state = store.check_state(token, key)
         assert state['current']['id'] not in seen
         seen.add(state['current']['id'])
+        expected_words += len(state['current']['targets'])
         clock[0] += 1
         state = answer(store, token, key)
     assert state['end_reason'] == 'planned_length'
     reopened = StudyStore(store.path, clock=lambda: clock[0])
     login = reopened.login('ALES test', 'test-password')
-    assert len(reopened.word_evidence(login, 'reading')) == 60
+    assert len(reopened.word_evidence(login, 'reading')) == expected_words
     exported = reopened.export(login)
-    assert len(exported['vocabulary_checks']) == 60
+    assert len(exported['vocabulary_checks']) == expected_words
     assert 'password' not in json.dumps(exported) and 'token_hash' not in json.dumps(exported)
 
 
@@ -142,13 +148,13 @@ def test_retries_early_stop_sparse_bank_and_profile_isolation(env, catalog, monk
     key = store.start_check(token, catalog, FILTERS, 2)
     p = store.check_state(token, key)['current']
     with pytest.raises(ValueError):
-        store.submit_check(token, key, p['nonce'], [None] * 4, [False] * 4)
+        store.submit_check(token, key, p['nonce'], [None] * len(p['targets']), [False] * len(p['targets']))
     with pytest.raises(ValueError):
-        store.submit_check(token, key, p['nonce'], [UNKNOWN] * 4, ['false'] * 4)
+        store.submit_check(token, key, p['nonce'], [UNKNOWN] * len(p['targets']), ['false'] * len(p['targets']))
     state = answer(store, token, key, 0)
     assert store.submit_check(token, key, p['nonce'], [], []) == state
     finished = store.cancel_check(token, key)
-    assert len(store.word_evidence(token, 'reading')) == 4
+    assert len(store.word_evidence(token, 'reading')) == len(p['targets'])
     assert store.cancel_check(token, key) == finished
     stranger = store.create_profile('Other ALES', 'test-password')
     with pytest.raises(ValueError):
@@ -175,12 +181,12 @@ def test_replaced_ales_check_does_not_publish_partial_evidence(env, catalog):
 
 def test_uncovered_word_can_be_studied_without_inventing_passage_evidence(env, catalog):
     store, token, clock = env
-    wid = ales_id('ядерный', 'nuclear')
+    wid = ales_id('контрольный термин', 'fixture-only uncovered entry')
     nonce = store.next_card(token, catalog, group='ALES glossary', context_only=False,
                             exclude=[key for key in catalog.words if key != wid])
     assert store.attempt(token, nonce)['word_id'] == wid
     assert store.attempt(token, nonce)['context_id'] is None
-    store.reveal(token, nonce, 'nuclear')
+    store.reveal(token, nonce, 'fixture-only uncovered entry')
     store.rate(token, nonce, 'Good')
     assert (wid, 'reading') in store.states(token)
     assert wid not in store.word_evidence(token, 'reading')
@@ -212,7 +218,7 @@ def test_audio_provenance_and_listening_flow(env, catalog):
     from ui.vocabulary_check import CheckUI
     records = json.loads((ROOT / 'data/study/ales/audio.json').read_text())['recordings']
     passages = build()['passages']
-    assert len(records) == len(passages) == 95
+    assert len(records) == len(passages) == 119
     assert all(p['id'].startswith('vocab_') for p in select_batch(build()['passages'] + build_course()['passages'], 'original'))
     for p in passages:
         r = records[p['id']]
@@ -220,7 +226,7 @@ def test_audio_provenance_and_listening_flow(env, catalog):
         assert r['commercial_use'] and r['attribution_required'] is False
         assert r['model_status'] == 'generally_available'
         assert abs(decode(ROOT / r['path']) - r['duration_seconds']) < .1
-    assert len(catalog.checks('listening', 'ALES glossary')) == 95
+    assert len(catalog.checks('listening', 'ALES glossary')) == 119
     store, token, clock = env
     with gr.Blocks():
         ui = CheckUI()
@@ -229,12 +235,13 @@ def test_audio_provenance_and_listening_flow(env, catalog):
     outputs = ui.present(state)
     assert state['current']['text'] not in outputs[4] and outputs[-2]['value'] == ''
     for n in range(6):
-        assert outputs[6 + n * 3]['visible'] is (n < 4)
-        assert outputs[7 + n * 3]['visible'] is (n < 4)
+        assert outputs[6 + n * 3]['visible'] is (n < len(state['current']['targets']))
+        assert outputs[7 + n * 3]['visible'] is (n < len(state['current']['targets']))
     answer(store, token, key)
     finished = answer(store, token, key, 0)
     assert 'Transcript:' in ui.present(finished)[-2]['value']
-    assert len(store.word_evidence(token, 'listening')) == 8 and not store.word_evidence(token, 'reading')
+    assert len(store.word_evidence(token, 'listening')) == sum(len(p['targets']) for p in finished['completed'])
+    assert not store.word_evidence(token, 'reading')
     nonce = store.next_card(token, catalog, skill='listening', group='ALES glossary', focus_only=True)
     attempt = store.attempt(token, nonce)
     assert catalog.contexts[attempt['context_id']]['audio_path']
@@ -251,26 +258,26 @@ def test_expansion_is_disjoint_and_original_items_are_unchanged():
     assert not {t['word_id'] for p in original for t in p['targets']} & {
         t['word_id'] for p in expansion for t in p['targets']}
     assert sum(len(t['text']) for p in expansion for t in p['turns']) == 5033 <= BUDGET
-    assert len({t['id'] for p in build()['passages'] for t in p['targets']}) == 380
+    assert len({t['id'] for p in build()['passages'] for t in p['targets']}) == 474
 
 
 def test_third_batch_preserves_prior_bank_and_uses_only_new_senses():
     from scripts.generate_study_audio import select_batch, BUDGET
     all_passages = build()['passages']
-    prior = dict(version=1, passages=[p for p in all_passages if not p['id'].startswith(('ales_e3_', 'ales_e4_', 'ales_e5_'))])
+    prior = dict(version=1, passages=[p for p in all_passages if not p['id'].startswith(('ales_e3_', 'ales_e4_', 'ales_e5_', 'ales_e6_'))])
     assert hashlib.sha256(json.dumps(prior, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == (
         'e6669d2977e80f7b1dcd1522c6a19b7be3e655b6f7269c32a405d4409877ecff')
     batches = [select_batch(all_passages, b) for b in ('ales', 'ales2', 'ales3')]
     assert [len(b) for b in batches] == [15, 20, 20]
     assert sum(len(t['text']) for p in batches[2] for t in p['turns']) == 5327 <= BUDGET
     ids = [t['word_id'] for p in all_passages for t in p['targets']]
-    assert len(ids) == len(set(ids)) == 380
+    assert len(ids) == len(set(ids)) == 474
 
 
 def test_fourth_batch_preserves_prior_bank_and_generation_boundaries():
     from scripts.generate_study_audio import select_batch, BUDGET
     passages = build()['passages']
-    prior = dict(version=1, passages=[p for p in passages if not p['id'].startswith(('ales_e4_', 'ales_e5_'))])
+    prior = dict(version=1, passages=[p for p in passages if not p['id'].startswith(('ales_e4_', 'ales_e5_', 'ales_e6_'))])
     assert hashlib.sha256(json.dumps(prior, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == (
         'ff59b647c0a221f1f5157cf2eebf00dd1bda0f48815c09a57f4faf5bcb230783')
     batches = [select_batch(passages, b) for b in ('ales', 'ales2', 'ales3', 'ales4')]
@@ -284,30 +291,86 @@ def test_fourth_batch_preserves_prior_bank_and_generation_boundaries():
 def test_fifth_batch_preserves_prior_bank_and_generation_boundaries():
     from scripts.generate_study_audio import select_batch, BUDGET
     passages = build()['passages']
-    prior = dict(version=1, passages=[p for p in passages if not p['id'].startswith('ales_e5_')])
+    prior = dict(version=1, passages=[p for p in passages if not p['id'].startswith(('ales_e5_', 'ales_e6_'))])
     assert hashlib.sha256(json.dumps(prior, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == (
         '4d80e827059be836db3616b52c347393efd19f6473f1c294431e27dfecc03bee')
     batches = [select_batch(passages, b) for b in ('ales', 'ales2', 'ales3', 'ales4', 'ales5')]
     assert [len(b) for b in batches] == [15, 20, 20, 20, 20]
     assert sum(len(t['text']) for p in batches[4] for t in p['turns']) == 5166 <= BUDGET
-    assert len({p['id'] for batch in batches for p in batch}) == len(passages)
+    assert len({p['id'] for batch in batches for p in batch}) == 95
     assert not {t['word_id'] for p in prior['passages'] for t in p['targets']} & {
         t['word_id'] for p in batches[4] for t in p['targets']}
 
 
+def test_final_batch_preserves_prior_bank_and_completes_474_senses():
+    from scripts.generate_study_audio import select_batch, BUDGET
+    passages = build()['passages']
+    prior = dict(version=1, passages=[p for p in passages if not p['id'].startswith('ales_e6_')])
+    assert hashlib.sha256(json.dumps(prior, sort_keys=True, ensure_ascii=False).encode()).hexdigest() == (
+        '06acfc1b3eb24a3aa1f78b3ccd9285f9ef35da4fbdec486386b6bac020ed5141')
+    batches = [select_batch(passages, b) for b in ('ales', 'ales2', 'ales3', 'ales4', 'ales5', 'ales6')]
+    assert [len(b) for b in batches] == [15, 20, 20, 20, 20, 24]
+    assert len({p['id'] for batch in batches for p in batch}) == 119
+    new = batches[-1]
+    assert sum(len(t['text']) for p in new for t in p['turns']) == 6523 <= BUDGET
+    assert sorted(len(p['targets']) for p in new) == [3, 3] + [4] * 22
+    new_ids = {t['word_id'] for p in new for t in p['targets']}
+    old_ids = {t['word_id'] for p in prior['passages'] for t in p['targets']}
+    assert len(new_ids) == 94 and not old_ids & new_ids
+    assert len(old_ids | new_ids) == 474
+
+
 @pytest.mark.parametrize('skill', ['reading', 'listening'])
-@pytest.mark.parametrize('prefix', ['ales_e2_', 'ales_e3_', 'ales_e4_', 'ales_e5_'])
+def test_three_question_passages_clear_unused_controls_and_save_exactly_three(env, catalog, skill, monkeypatch):
+    import gradio as gr
+    from ui.vocabulary_check import CheckUI
+    store, token, clock = env
+    with gr.Blocks():
+        ui = CheckUI()
+    # Present four questions first, then transition to each shorter passage.
+    candidates = catalog.checks(skill, 'ALES glossary')
+    for pid in ('ales_e6_route', 'ales_e6_tremor'):
+        for passage in (next(p for p in candidates if p['id'] == 'ales_e6_fair'),
+                        next(p for p in candidates if p['id'] == pid)):
+            monkeypatch.setattr(catalog, 'checks', lambda *args, p=passage: [copy.deepcopy(p)])
+            key = store.start_check(token, catalog, [skill, *FILTERS[1:]], maximum=2)
+            state = store.check_state(token, key)
+            output = ui.present(state)
+            count = len(passage['targets'])
+            assert output[-2]['value'] == ''
+            if skill == 'listening':
+                assert passage['text'] not in output[4] and output[5]['value']
+            for n in range(6):
+                slot, radio, guess = output[6+n*3:9+n*3]
+                assert slot['visible'] is (n < count)
+                assert radio['visible'] is (n < count)
+                assert radio['value'] is None and guess['value'] is False
+                assert len(radio['choices']) == (5 if n < count else 0)
+                if n >= count:
+                    assert radio['label'] == '' and not guess['interactive']
+            finished = answer(store, token, key, correct=2)
+            assert finished['status'] == 'complete' and finished['end_reason'] == 'content_exhausted'
+            assert len(finished['completed'][0]['results']) == count
+            clock[0] += 1
+    assert len(store.word_evidence(token, skill)) == 10  # four + three + three, no phantom fourth words
+    assert not store.word_evidence(token, 'reading' if skill == 'listening' else 'listening')
+
+
+@pytest.mark.parametrize('skill', ['reading', 'listening'])
+@pytest.mark.parametrize('prefix', ['ales_e2_', 'ales_e3_', 'ales_e4_', 'ales_e5_', 'ales_e6_'])
 def test_every_new_passage_scores_and_saves_distinct_word_evidence(env, catalog, skill, prefix, monkeypatch):
     store, token, clock = env
     passages = [p for p in catalog.checks(skill, 'ALES glossary') if p['id'].startswith(prefix)]
-    assert len(passages) == 20
+    assert len(passages) == (24 if prefix == 'ales_e6_' else 20)
     for p in passages:
         monkeypatch.setattr(catalog, 'checks', lambda *args, p=p: [copy.deepcopy(p)])
         key = store.start_check(token, catalog, [skill, *FILTERS[1:]], maximum=2)
         finished = answer(store, token, key, correct=2)
         assert finished['end_reason'] == 'content_exhausted'
-        assert len(finished['completed'][0]['results']) == 4
+        assert len(finished['completed'][0]['results']) == len(p['targets'])
         clock[0] += 1
     evidence = store.word_evidence(token, skill)
-    assert len(evidence) == 80 and sum(e['focus'] for e in evidence.values()) == 40
+    expected = 94 if prefix == 'ales_e6_' else 80
+    assert len(evidence) == expected
+    assert sum(e['focus'] for e in evidence.values()) == expected - 2 * len(passages)
     assert not store.word_evidence(token, 'reading' if skill == 'listening' else 'listening')

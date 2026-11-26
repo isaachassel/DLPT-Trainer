@@ -16,6 +16,8 @@ from scripts.ales_expansion import SPECS as EXPANSION_SPECS
 from scripts.ales_expansion3 import SPECS as EXPANSION3_SPECS
 from scripts.ales_expansion4 import SPECS as EXPANSION4_SPECS
 from scripts.ales_expansion5 import SPECS as EXPANSION5_SPECS
+from scripts.ales_expansion6 import SPECS as EXPANSION6_SPECS
+from scripts.ales_expansion6 import GLOSSARY_NOTES
 
 SPECS = [
 ('weather', 1, 'Planning an outdoor event', [
@@ -158,7 +160,7 @@ SPECS = [
 
 def build(include_expansion=True):
     passages = []
-    for key, stage, title, turns, lines in SPECS + (EXPANSION_SPECS + EXPANSION3_SPECS + EXPANSION4_SPECS + EXPANSION5_SPECS if include_expansion else []):
+    for key, stage, title, turns, lines in SPECS + (EXPANSION_SPECS + EXPANSION3_SPECS + EXPANSION4_SPECS + EXPANSION5_SPECS + EXPANSION6_SPECS if include_expansion else []):
         targets = []
         text = '\n'.join(text for _, text in turns)
         for n, line in enumerate(lines.strip().splitlines(), 1):
@@ -173,7 +175,8 @@ def build(include_expansion=True):
                             if re.search(pattern, sentence, re.I))
             targets.append(dict(id=f'ales_{key}_{n}', word_id=ales_id(ru, en), term=ru, sense_hints=[en],
                 target=form, meaning=meaning, distractors=alternatives.split(';'), prompt=prompt,
-                evidence=evidence, explanation=f'“{form}” means {meaning} in this passage.',
+                evidence=evidence, explanation=(f'“{form}” means {meaning} in this passage.'
+                    + (' ' + GLOSSARY_NOTES[f'ales_{key}_{n}'] if f'ales_{key}_{n}' in GLOSSARY_NOTES else '')),
                 review_target=form, review_text=review))
         passages.append(dict(id='ales_' + key, title=title, language='ru', stage=stage, collection='ales',
             source='Original ALES study dialogue; provisional language review',
