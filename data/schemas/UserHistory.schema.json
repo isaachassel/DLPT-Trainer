@@ -99,6 +99,13 @@
           "title": "Correct Key",
           "type": "string"
         },
+        "option_id_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Option Id Map",
+          "type": "object"
+        },
         "is_correct": {
           "title": "Is Correct",
           "type": "boolean"
@@ -168,6 +175,13 @@
         "type": "string"
       },
       "title": "Seen Passage Ids",
+      "type": "array"
+    },
+    "seen_family_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Seen Family Ids",
       "type": "array"
     },
     "seen_question_ids": {

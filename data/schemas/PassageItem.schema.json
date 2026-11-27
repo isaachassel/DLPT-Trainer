@@ -152,6 +152,11 @@
       "title": "Id",
       "type": "string"
     },
+    "family_id": {
+      "default": "",
+      "title": "Family Id",
+      "type": "string"
+    },
     "language": {
       "default": "ru",
       "title": "Language",

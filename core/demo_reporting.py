@@ -6,6 +6,7 @@ from .constants import ILR_LEVELS, ILR_THETA
 from .languages import language_profile
 from .models import SessionState
 from .scoring import grouped_accuracy
+from .source_credits import assessment_credits
 
 
 def demo_end_reason(state: SessionState, skill: str) -> str:
@@ -17,7 +18,7 @@ def demo_end_reason(state: SessionState, skill: str) -> str:
     if state.status == "error":
         return "A problem interrupted the test. Your submitted answers were saved."
     if state.completed_count(skill) >= state.max_questions_per_skill:
-        return f"All {state.max_questions_per_skill} questions were completed."
+        return f"All {state.completed_count(skill)} questions were completed."
     return "The test ended before all questions were completed."
 
 
@@ -101,4 +102,4 @@ def build_demo_report(state: SessionState) -> str:
             lines.append('<p>No missed questions to review.</p>')
         lines.append('</section>')
         sections.append(''.join(lines))
-    return ''.join(sections)
+    return ''.join(sections) + assessment_credits(state)

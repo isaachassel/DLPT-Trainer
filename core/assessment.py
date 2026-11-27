@@ -112,10 +112,13 @@ def select(state: SessionState, bank, history=None):
     if history:
         seen.update(history.seen_passage_ids)
     hashes = {content_hash(bank.passages[pid].passage_ru) for pid in seen if pid in bank.passages}
+    families = set(state.seen_family_ids) | (set(history.seen_family_ids) if history else set())
     allowed = set(ilr_range(state.minimum_ilr, state.maximum_ilr))
     candidates = []
     for passage in bank.active_passages(state.active_skill, state.language):
         questions = bank.get_questions(passage.id)
+        if passage.family_id and passage.family_id in families:
+            continue
         if passage.id in seen or content_hash(passage.passage_ru) in hashes or not questions:
             continue
         if not {q.target_ilr for q in questions}.issubset(allowed):

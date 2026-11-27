@@ -141,6 +141,7 @@ class QuestionItem(StrictModel):
 
 class PassageItem(StrictModel):
     id: str
+    family_id: str = ""
     language: str = "ru"
     skill: Literal["reading", "listening"]
     target_ilr: str
@@ -264,6 +265,8 @@ class ResponseRecord(StrictModel):
     evidence_ru: str
     selected_key: str | None
     correct_key: str
+    # Display letters can change; retain the contributor's stable option IDs.
+    option_id_map: dict[str, str] = Field(default_factory=dict)
     is_correct: bool
     response_time_seconds: float
     listening_play_count: int = 0
@@ -284,6 +287,7 @@ class UserHistory(StrictModel):
     profile_id: str
     language: str = "ru"
     seen_passage_ids: list[str] = Field(default_factory=list)
+    seen_family_ids: list[str] = Field(default_factory=list)
     seen_question_ids: list[str] = Field(default_factory=list)
     reading_estimates: list[dict[str, Any]] = Field(default_factory=list)
     listening_estimates: list[dict[str, Any]] = Field(default_factory=list)
@@ -330,6 +334,10 @@ class SessionState(StrictModel):
     demo_mode: bool = False
     current_listening_completed: int = 0
     completed_passage_ids: list[str] = Field(default_factory=list)
+    seen_family_ids: list[str] = Field(default_factory=list)
+    # Attribution snapshots survive a later bank revision, including an unanswered
+    # passage displayed before a timeout. These remain server-side during testing.
+    source_credits: dict[str, dict[str, str]] = Field(default_factory=dict)
     completed_question_ids: list[str] = Field(default_factory=list)
     responses: list[ResponseRecord] = Field(default_factory=list)
     reading_ability: AbilityEstimate

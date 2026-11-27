@@ -1,0 +1,2903 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "ru-read-pilot01-museum",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-museum",
+        "family_id": "ru-read-pilot01-museum",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "1+",
+        "provisional_difficulty": -0.25,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Culture / public event",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "В День России, 12 июня, в честь праздника Музей современной истории страны будет работать бесплатно. Для посетителей организованы игры на знание отечественной географии.\n\nВ этот день у посетителей будет возможность попробовать себя в соревновании на знание географии родной страны. Желающим будет предложено собрать спилс-карту России, представляющую собой набор магнитных элементов в форме российских регионов, которые собираются на специальной магнитной доске в карту Российской Федерации. Соревнование команд на знание федеративного устройства страны начнется в 14.00.\n\nДень России — хороший повод для кого-то вспомнить, а для кого-то лучше узнать события недавнего прошлого. Только в Музее современной истории России находится экспозиция, охватывающая последние 30 лет нашей истории. Она рассказывает о непростом, насыщенном событиями пути, который страна прошла с 1985 года.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "12 июня Музей современной истории России можно посетить бесплатно",
+          "source_publisher": "Ревизор.ру",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://rewizor.ru/museums-exhibitions/news/12-iunya-muzey-sovremennoy-istorii-rossii-mojno-posetit-besplatno/",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17892310",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17892310",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2017-06-09",
+          "learner_label": "Reading passage 1",
+          "attribution": "«12 июня Музей современной истории России можно посетить бесплатно», Ревизор.ру, 2017-06-09; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17892310), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://rewizor.ru/museums-exhibitions/news/12-iunya-muzey-sovremennoy-istorii-rossii-mojno-posetit-besplatno/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "Complete three-paragraph article body; headline excluded from learner text.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Archive body inspected; original publisher URL timed out. Relative dates refer to 2017. The exercise tests the description of an activity, not territorial boundaries.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "1+",
+          "difficulty_rationale": "Concrete event information and explicit purposes; the second paragraph has longer clauses and a specialized object explained in context. Teacher may place it at low 2."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 117,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-museum-q1",
+          "ru-read-pilot01-museum-q2",
+          "ru-read-pilot01-museum-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "fef50fafd362cac02e2a88560dc34e779b76a08bf80a220cab42bb833824871c",
+        "duplicate_detection_hash": "fef50fafd362cac02e2a88560dc34e779b76a08bf80a220cab42bb833824871c"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-museum-q1",
+          "passage_id": "ru-read-pilot01-museum",
+          "stem_en": "Why will admission to the museum be free on June 12?",
+          "choices": {
+            "A": "To mark the opening of a new exhibition.",
+            "B": "To celebrate a national holiday.",
+            "C": "To reward the winners of the geography competition.",
+            "D": "To commemorate the founding of the museum in 1985."
+          },
+          "correct_key": "B",
+          "rationale_en": "The phrase в честь праздника gives the reason: in honor of the holiday.",
+          "evidence_ru": "в честь праздника",
+          "question_type": "cause and effect",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "explicit_cause",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-museum-q2",
+          "passage_id": "ru-read-pilot01-museum",
+          "stem_en": "What will participants in the geography activity be asked to do?",
+          "choices": {
+            "A": "Arrange historical events in chronological order.",
+            "B": "Locate museum buildings on a city map.",
+            "C": "Draw regional boundaries on a blank board.",
+            "D": "Assemble a map using pieces shaped like regions."
+          },
+          "correct_key": "D",
+          "rationale_en": "The unfamiliar спилс-карта is explained by the clause immediately following it.",
+          "evidence_ru": "набор магнитных элементов в форме российских регионов",
+          "question_type": "prominent detail",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "detail_paraphrase",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-museum-q3",
+          "passage_id": "ru-read-pilot01-museum",
+          "stem_en": "What period is the exhibition described in the final paragraph concerned with?",
+          "choices": {
+            "A": "The country’s recent history beginning in 1985.",
+            "B": "The museum’s development over the preceding thirty years.",
+            "C": "The history of the national holiday since its creation.",
+            "D": "Changes in regional boundaries over several centuries."
+          },
+          "correct_key": "A",
+          "rationale_en": "The pronoun Она refers to the exhibition. Do not calculate thirty years backward from today.",
+          "evidence_ru": "Она рассказывает о непростом, насыщенном событиями пути, который страна прошла с 1985 года.",
+          "question_type": "main idea",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "scope",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-museum",
+        "family_id": "ru-read-pilot01-museum",
+        "topic": "Culture / public event",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2017-06-09",
+        "provisional_ilr": "1+",
+        "level_rationale": "Concrete event information and explicit purposes; the second paragraph has longer clauses and a specialized object explained in context. Teacher may place it at low 2.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "12 июня Музей современной истории России можно посетить бесплатно",
+          "publisher": "Ревизор.ру",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://rewizor.ru/museums-exhibitions/news/12-iunya-muzey-sovremennoy-istorii-rossii-mojno-posetit-besplatno/",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17892310",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17892310",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "Complete three-paragraph article body; headline excluded from learner text.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Archive body inspected; original publisher URL timed out. Relative dates refer to 2017. The exercise tests the description of an activity, not territorial boundaries."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "В День России, 12 июня, в честь праздника Музей современной истории страны будет работать бесплатно. Для посетителей организованы игры на знание отечественной географии."
+          },
+          {
+            "id": "p2",
+            "text": "В этот день у посетителей будет возможность попробовать себя в соревновании на знание географии родной страны. Желающим будет предложено собрать спилс-карту России, представляющую собой набор магнитных элементов в форме российских регионов, которые собираются на специальной магнитной доске в карту Российской Федерации. Соревнование команд на знание федеративного устройства страны начнется в 14.00."
+          },
+          {
+            "id": "p3",
+            "text": "День России — хороший повод для кого-то вспомнить, а для кого-то лучше узнать события недавнего прошлого. Только в Музее современной истории России находится экспозиция, охватывающая последние 30 лет нашей истории. Она рассказывает о непростом, насыщенном событиями пути, который страна прошла с 1985 года."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-museum-q1",
+            "skill": "explicit_cause",
+            "stem_en": "Why will admission to the museum be free on June 12?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "To mark the opening of a new exhibition.",
+                "rationale_en": "The passage describes an exhibition but does not announce its opening."
+              },
+              {
+                "id": "B",
+                "text_en": "To celebrate a national holiday.",
+                "rationale_en": "The opening sentence links free admission to Russia Day."
+              },
+              {
+                "id": "C",
+                "text_en": "To reward the winners of the geography competition.",
+                "rationale_en": "Free admission is announced for the holiday, not as a prize."
+              },
+              {
+                "id": "D",
+                "text_en": "To commemorate the founding of the museum in 1985.",
+                "rationale_en": "1985 is the starting point of the history covered by the exhibition, not a founding date."
+              }
+            ],
+            "correct_option_id": "B",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "в честь праздника"
+              }
+            ],
+            "explanation_en": "The phrase в честь праздника gives the reason: in honor of the holiday.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-museum-q2",
+            "skill": "detail_paraphrase",
+            "stem_en": "What will participants in the geography activity be asked to do?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Arrange historical events in chronological order.",
+                "rationale_en": "History is discussed in the exhibition paragraph; this is not the geography task."
+              },
+              {
+                "id": "B",
+                "text_en": "Locate museum buildings on a city map.",
+                "rationale_en": "The text describes regions of the country, not museum locations."
+              },
+              {
+                "id": "C",
+                "text_en": "Draw regional boundaries on a blank board.",
+                "rationale_en": "Participants assemble supplied magnetic pieces; they do not draw boundaries."
+              },
+              {
+                "id": "D",
+                "text_en": "Assemble a map using pieces shaped like regions.",
+                "rationale_en": "The text describes magnetic elements in the shapes of regions assembled on a board."
+              }
+            ],
+            "correct_option_id": "D",
+            "evidence": [
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "набор магнитных элементов в форме российских регионов"
+              }
+            ],
+            "explanation_en": "The unfamiliar спилс-карта is explained by the clause immediately following it.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-museum-q3",
+            "skill": "scope",
+            "stem_en": "What period is the exhibition described in the final paragraph concerned with?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "The country’s recent history beginning in 1985.",
+                "rationale_en": "The paragraph explicitly says that the exhibition covers the path the country has taken since 1985."
+              },
+              {
+                "id": "B",
+                "text_en": "The museum’s development over the preceding thirty years.",
+                "rationale_en": "The thirty years concern national history, not the institution’s development."
+              },
+              {
+                "id": "C",
+                "text_en": "The history of the national holiday since its creation.",
+                "rationale_en": "The holiday motivates the visit; the exhibition is not described as a history of that holiday."
+              },
+              {
+                "id": "D",
+                "text_en": "Changes in regional boundaries over several centuries.",
+                "rationale_en": "This combines the map activity with a historical period not given in the passage."
+              }
+            ],
+            "correct_option_id": "A",
+            "evidence": [
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "Она рассказывает о непростом, насыщенном событиями пути, который страна прошла с 1985 года."
+              }
+            ],
+            "explanation_en": "The pronoun Она refers to the exhibition. Do not calculate thirty years backward from today.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "В День России, 12 июня, в честь праздника Музей современной истории страны будет работать бесплатно. Для посетителей организованы игры на знание отечественной географии.\n\nВ этот день у посетителей будет возможность попробовать себя в соревновании на знание географии родной страны. Желающим будет предложено собрать спилс-карту России, представляющую собой набор магнитных элементов в форме российских регионов, которые собираются на специальной магнитной доске в карту Российской Федерации. Соревнование команд на знание федеративного устройства страны начнется в 14.00.\n\nДень России — хороший повод для кого-то вспомнить, а для кого-то лучше узнать события недавнего прошлого. Только в Музее современной истории России находится экспозиция, охватывающая последние 30 лет нашей истории. Она рассказывает о непростом, насыщенном событиями пути, который страна прошла с 1985 года.",
+        "word_count": 117,
+        "text_sha256": "b5ec65237993be05e5c9e9e5903bb3c539e4378eb662b4c87c8c16ef956d8e8d",
+        "attribution": "«12 июня Музей современной истории России можно посетить бесплатно», Ревизор.ру, 2017-06-09; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17892310), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://rewizor.ru/museums-exhibitions/news/12-iunya-muzey-sovremennoy-istorii-rossii-mojno-posetit-besplatno/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    },
+    {
+      "id": "ru-read-pilot01-sorting",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-sorting",
+        "family_id": "ru-read-pilot01-sorting",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "1+",
+        "provisional_difficulty": -0.25,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Environment / household services",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "Новый стандарт по обращению с твердыми коммунальными отходами действует в Подмосковье с 2019 года. Регион стал первым в стране, где в каждом муниципалитете внедрен раздельный сбор мусора. Жителям Подмосковья рекомендуется оборудовать дома две емкости для сортировки отходов.\n\nРазноцветные баки во дворах и мусоровозы\n\nНапоминаем, что синий бак предназначен для «чистого» мусора (сухого, без следов пищи и другой органики). Серый бак нужен для «грязных» отходов (органических, мокрых).\n\nМусор с контейнерных площадок вывозят машины соответствующих цветов: синие и серые. «Грязный» мусор забирают ежедневно. «Чистый» — вывозят по мере накопления — два раза в неделю или чаще.\n\nПодмосковные села также оборудованы специальными баками для раздельного сбора мусора.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Ружан призывают разделять мусор",
+          "source_publisher": "Inruza.ru",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://inruza.ru/novosti/socialnyy_barometr/ruzhan-prizyvayut-razdelyat-musor",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17836137",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17836137",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2021-07-05",
+          "learner_label": "Reading passage 2",
+          "attribution": "«Ружан призывают разделять мусор», Inruza.ru, 2021-07-05; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17836137), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://inruza.ru/novosti/socialnyy_barometr/ruzhan-prizyvayut-razdelyat-musor. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "Opening paragraph through the sentence about villages, including the original section heading; later sections omitted.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Original URL returned a gateway error; stable archived revision inspected. p2 is a heading, not an added sentence. This is a historical local service description, not current disposal advice.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "1+",
+          "difficulty_rationale": "Everyday instructions with explicitly defined categories and schedules, but administrative vocabulary in the opening sentence raises difficulty."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 102,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-sorting-q1",
+          "ru-read-pilot01-sorting-q2",
+          "ru-read-pilot01-sorting-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "ddeac628d671535583acc08076460a84d95e459cfcd654ac9d843b722689a898",
+        "duplicate_detection_hash": "ddeac628d671535583acc08076460a84d95e459cfcd654ac9d843b722689a898"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-sorting-q1",
+          "passage_id": "ru-read-pilot01-sorting",
+          "stem_en": "Which waste belongs in the gray bin under the system described?",
+          "choices": {
+            "A": "Dry waste without food residue.",
+            "B": "Waste collected only when enough has accumulated.",
+            "C": "Organic or wet waste.",
+            "D": "Waste from villages rather than towns."
+          },
+          "correct_key": "C",
+          "rationale_en": "Match the waste characteristics to the bin, rather than treating color as a geographical label.",
+          "evidence_ru": "Серый бак нужен для «грязных» отходов (органических, мокрых).",
+          "question_type": "prominent detail",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "detail_paraphrase",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-sorting-q2",
+          "passage_id": "ru-read-pilot01-sorting",
+          "stem_en": "How often is “clean” waste collected?",
+          "choices": {
+            "A": "Twice a week or more often, depending on accumulation.",
+            "B": "Every day, on the same schedule as dirty waste.",
+            "C": "Exactly twice a week, regardless of the amount.",
+            "D": "Once a week, after the dirty waste has been removed."
+          },
+          "correct_key": "A",
+          "rationale_en": "Preserve the qualification или чаще; twice weekly is not presented as an exact fixed schedule.",
+          "evidence_ru": "«Чистый» — вывозят по мере накопления — два раза в неделю или чаще.",
+          "question_type": "prominent detail",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "frequency_qualifier",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-sorting-q3",
+          "passage_id": "ru-read-pilot01-sorting",
+          "stem_en": "A resident has a dry container with food still stuck to it. Which conclusion is supported by the passage?",
+          "choices": {
+            "A": "It qualifies as clean waste because it is dry.",
+            "B": "It must be collected by a separate truck reserved for containers.",
+            "C": "It qualifies as clean waste if it comes from a village.",
+            "D": "It does not meet the stated definition of clean waste."
+          },
+          "correct_key": "D",
+          "rationale_en": "This applies the definition to a new example; no outside recycling knowledge is required.",
+          "evidence_ru": "сухого, без следов пищи и другой органики",
+          "question_type": "inference",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "rule_application",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-sorting",
+        "family_id": "ru-read-pilot01-sorting",
+        "topic": "Environment / household services",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2021-07-05",
+        "provisional_ilr": "1+",
+        "level_rationale": "Everyday instructions with explicitly defined categories and schedules, but administrative vocabulary in the opening sentence raises difficulty.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "Ружан призывают разделять мусор",
+          "publisher": "Inruza.ru",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://inruza.ru/novosti/socialnyy_barometr/ruzhan-prizyvayut-razdelyat-musor",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17836137",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17836137",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "Opening paragraph through the sentence about villages, including the original section heading; later sections omitted.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Original URL returned a gateway error; stable archived revision inspected. p2 is a heading, not an added sentence. This is a historical local service description, not current disposal advice."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "Новый стандарт по обращению с твердыми коммунальными отходами действует в Подмосковье с 2019 года. Регион стал первым в стране, где в каждом муниципалитете внедрен раздельный сбор мусора. Жителям Подмосковья рекомендуется оборудовать дома две емкости для сортировки отходов."
+          },
+          {
+            "id": "p2",
+            "text": "Разноцветные баки во дворах и мусоровозы"
+          },
+          {
+            "id": "p3",
+            "text": "Напоминаем, что синий бак предназначен для «чистого» мусора (сухого, без следов пищи и другой органики). Серый бак нужен для «грязных» отходов (органических, мокрых)."
+          },
+          {
+            "id": "p4",
+            "text": "Мусор с контейнерных площадок вывозят машины соответствующих цветов: синие и серые. «Грязный» мусор забирают ежедневно. «Чистый» — вывозят по мере накопления — два раза в неделю или чаще."
+          },
+          {
+            "id": "p5",
+            "text": "Подмосковные села также оборудованы специальными баками для раздельного сбора мусора."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-sorting-q1",
+            "skill": "detail_paraphrase",
+            "stem_en": "Which waste belongs in the gray bin under the system described?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Dry waste without food residue.",
+                "rationale_en": "That is the passage’s definition of clean waste for the blue bin."
+              },
+              {
+                "id": "B",
+                "text_en": "Waste collected only when enough has accumulated.",
+                "rationale_en": "This describes the clean-waste collection schedule, not the gray-bin category."
+              },
+              {
+                "id": "C",
+                "text_en": "Organic or wet waste.",
+                "rationale_en": "The gray bin is explicitly assigned to organic and wet waste."
+              },
+              {
+                "id": "D",
+                "text_en": "Waste from villages rather than towns.",
+                "rationale_en": "Villages also have separate-collection bins; bin color is not assigned by settlement type."
+              }
+            ],
+            "correct_option_id": "C",
+            "evidence": [
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "Серый бак нужен для «грязных» отходов (органических, мокрых)."
+              }
+            ],
+            "explanation_en": "Match the waste characteristics to the bin, rather than treating color as a geographical label.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-sorting-q2",
+            "skill": "frequency_qualifier",
+            "stem_en": "How often is “clean” waste collected?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Twice a week or more often, depending on accumulation.",
+                "rationale_en": "The text combines по мере накопления with два раза в неделю или чаще."
+              },
+              {
+                "id": "B",
+                "text_en": "Every day, on the same schedule as dirty waste.",
+                "rationale_en": "Daily collection applies to dirty waste."
+              },
+              {
+                "id": "C",
+                "text_en": "Exactly twice a week, regardless of the amount.",
+                "rationale_en": "This drops both the accumulation condition and the possibility of more frequent collection."
+              },
+              {
+                "id": "D",
+                "text_en": "Once a week, after the dirty waste has been removed.",
+                "rationale_en": "Neither this frequency nor this sequence appears in the passage."
+              }
+            ],
+            "correct_option_id": "A",
+            "evidence": [
+              {
+                "paragraph_id": "p4",
+                "quote_ru": "«Чистый» — вывозят по мере накопления — два раза в неделю или чаще."
+              }
+            ],
+            "explanation_en": "Preserve the qualification или чаще; twice weekly is not presented as an exact fixed schedule.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-sorting-q3",
+            "skill": "rule_application",
+            "stem_en": "A resident has a dry container with food still stuck to it. Which conclusion is supported by the passage?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "It qualifies as clean waste because it is dry.",
+                "rationale_en": "Dryness is only part of the definition; absence of food residue also matters."
+              },
+              {
+                "id": "B",
+                "text_en": "It must be collected by a separate truck reserved for containers.",
+                "rationale_en": "No container-specific truck is described."
+              },
+              {
+                "id": "C",
+                "text_en": "It qualifies as clean waste if it comes from a village.",
+                "rationale_en": "The definition does not change for villages."
+              },
+              {
+                "id": "D",
+                "text_en": "It does not meet the stated definition of clean waste.",
+                "rationale_en": "Food residue fails the explicit без следов пищи requirement, despite the container being dry."
+              }
+            ],
+            "correct_option_id": "D",
+            "evidence": [
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "сухого, без следов пищи и другой органики"
+              }
+            ],
+            "explanation_en": "This applies the definition to a new example; no outside recycling knowledge is required.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "Новый стандарт по обращению с твердыми коммунальными отходами действует в Подмосковье с 2019 года. Регион стал первым в стране, где в каждом муниципалитете внедрен раздельный сбор мусора. Жителям Подмосковья рекомендуется оборудовать дома две емкости для сортировки отходов.\n\nРазноцветные баки во дворах и мусоровозы\n\nНапоминаем, что синий бак предназначен для «чистого» мусора (сухого, без следов пищи и другой органики). Серый бак нужен для «грязных» отходов (органических, мокрых).\n\nМусор с контейнерных площадок вывозят машины соответствующих цветов: синие и серые. «Грязный» мусор забирают ежедневно. «Чистый» — вывозят по мере накопления — два раза в неделю или чаще.\n\nПодмосковные села также оборудованы специальными баками для раздельного сбора мусора.",
+        "word_count": 104,
+        "text_sha256": "03925a3f436f1c4b3a1fe4d946a76ddeed9220326ecc0022bd928649c23a0bbf",
+        "attribution": "«Ружан призывают разделять мусор», Inruza.ru, 2021-07-05; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17836137), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://inruza.ru/novosti/socialnyy_barometr/ruzhan-prizyvayut-razdelyat-musor. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    },
+    {
+      "id": "ru-read-pilot01-library",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-library",
+        "family_id": "ru-read-pilot01-library",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Culture / reporting limitations",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "На улице Пархоменко, 18, в Санкт-Петербурге сегодня открылась «супербиблиотека». «Ее название — „Книга во времени“ — отражает миссию этого учреждения — показать эволюцию развития книги от ее возникновения до современных электронных вариантов», — говорится в сообщении комитета по культуры. Что скрывается под этой фразой, неясно.\n\nПомимо основных фондов библиотека будет включать в себя зал ретрокниги, медиатеку, литературную и выставочную галерею, а также помещения для проведения различных образовательных мероприятий.\n\nБолее подробную информацию официальный представитель комитета по культуре корреспонденту «Карповки» предоставить сегодня вечером не смог. Не удалось нам выяснить, и какого размера фонды «супербиблиотеки».",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "В Выборгском районе Петербурга открылась «супербиблиотека»",
+          "source_publisher": "Канонер / Карповка",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://kanoner.com/2011/08/26/26459/",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=15517037",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=15517037",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2011-08-26",
+          "learner_label": "Reading passage 3",
+          "attribution": "«В Выборгском районе Петербурга открылась «супербиблиотека»», Канонер / Карповка, 2011-08-26; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=15517037), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://kanoner.com/2011/08/26/26459/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "Complete three-paragraph article body; headline excluded from learner text.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Both the original publisher and archive were inspected. Source wording «комитета по культуры» is retained despite its grammatical error; the error is not assessed.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "2",
+          "difficulty_rationale": "Requires distinguishing an official mission statement from the reporter’s skeptical commentary and interpreting what remains unverified."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 88,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-library-q1",
+          "ru-read-pilot01-library-q2",
+          "ru-read-pilot01-library-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "8ad54372ec0012f5b19d7388afc4155dff88183161152f6143736b6a37e1d2a7",
+        "duplicate_detection_hash": "8ad54372ec0012f5b19d7388afc4155dff88183161152f6143736b6a37e1d2a7"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-library-q1",
+          "passage_id": "ru-read-pilot01-library",
+          "stem_en": "What is the main purpose of this report?",
+          "choices": {
+            "A": "To compare the sizes of collections at several city libraries.",
+            "B": "To report a library opening and outline what is known about it.",
+            "C": "To explain why electronic books have replaced printed books.",
+            "D": "To announce the cancellation of planned educational activities."
+          },
+          "correct_key": "B",
+          "rationale_en": "The passage is an opening report with limited detail, not an argument about publishing trends.",
+          "evidence_ru": "сегодня открылась «супербиблиотека»",
+          "question_type": "main idea",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "main_idea",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-library-q2",
+          "passage_id": "ru-read-pilot01-library",
+          "stem_en": "How does the reporter respond to the official description of the library’s mission?",
+          "choices": {
+            "A": "By praising it as an unusually clear explanation.",
+            "B": "By accusing the committee of deliberately concealing its budget.",
+            "C": "By questioning what the description actually means.",
+            "D": "By dismissing the idea that electronic books belong in libraries."
+          },
+          "correct_key": "C",
+          "rationale_en": "The supported attitude is skepticism about an unclear official formulation; it is not a demonstrated allegation of deception.",
+          "evidence_ru": "Что скрывается под этой фразой, неясно.",
+          "question_type": "tone or attitude",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "author_attitude",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-library-q3",
+          "passage_id": "ru-read-pilot01-library",
+          "stem_en": "What can be concluded about the size of the library’s collection at the time of reporting?",
+          "choices": {
+            "A": "The reporter had not established it.",
+            "B": "It had been confirmed to be the largest in the district.",
+            "C": "It was limited to electronic materials.",
+            "D": "The committee had announced that the collection was empty."
+          },
+          "correct_key": "A",
+          "rationale_en": "An information gap supports a conclusion about the reporting, not about the size or existence of the collection.",
+          "evidence_ru": "Не удалось нам выяснить, и какого размера фонды «супербиблиотеки».",
+          "question_type": "inference",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "supported_inference",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-library",
+        "family_id": "ru-read-pilot01-library",
+        "topic": "Culture / reporting limitations",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2011-08-26",
+        "provisional_ilr": "2",
+        "level_rationale": "Requires distinguishing an official mission statement from the reporter’s skeptical commentary and interpreting what remains unverified.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "В Выборгском районе Петербурга открылась «супербиблиотека»",
+          "publisher": "Канонер / Карповка",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://kanoner.com/2011/08/26/26459/",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=15517037",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=15517037",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "Complete three-paragraph article body; headline excluded from learner text.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Both the original publisher and archive were inspected. Source wording «комитета по культуры» is retained despite its grammatical error; the error is not assessed."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "На улице Пархоменко, 18, в Санкт-Петербурге сегодня открылась «супербиблиотека». «Ее название — „Книга во времени“ — отражает миссию этого учреждения — показать эволюцию развития книги от ее возникновения до современных электронных вариантов», — говорится в сообщении комитета по культуры. Что скрывается под этой фразой, неясно."
+          },
+          {
+            "id": "p2",
+            "text": "Помимо основных фондов библиотека будет включать в себя зал ретрокниги, медиатеку, литературную и выставочную галерею, а также помещения для проведения различных образовательных мероприятий."
+          },
+          {
+            "id": "p3",
+            "text": "Более подробную информацию официальный представитель комитета по культуре корреспонденту «Карповки» предоставить сегодня вечером не смог. Не удалось нам выяснить, и какого размера фонды «супербиблиотеки»."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-library-q1",
+            "skill": "main_idea",
+            "stem_en": "What is the main purpose of this report?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "To compare the sizes of collections at several city libraries.",
+                "rationale_en": "The report concerns one library, and its collection size could not be established."
+              },
+              {
+                "id": "B",
+                "text_en": "To report a library opening and outline what is known about it.",
+                "rationale_en": "The text combines the opening, announced facilities, and gaps in available information."
+              },
+              {
+                "id": "C",
+                "text_en": "To explain why electronic books have replaced printed books.",
+                "rationale_en": "The official mission spans old and electronic forms; replacement is not asserted."
+              },
+              {
+                "id": "D",
+                "text_en": "To announce the cancellation of planned educational activities.",
+                "rationale_en": "Rooms for educational activities are described as planned; no cancellation appears."
+              }
+            ],
+            "correct_option_id": "B",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "сегодня открылась «супербиблиотека»"
+              },
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "Более подробную информацию"
+              }
+            ],
+            "explanation_en": "The passage is an opening report with limited detail, not an argument about publishing trends.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-library-q2",
+            "skill": "author_attitude",
+            "stem_en": "How does the reporter respond to the official description of the library’s mission?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "By praising it as an unusually clear explanation.",
+                "rationale_en": "The reporter explicitly says its meaning is unclear."
+              },
+              {
+                "id": "B",
+                "text_en": "By accusing the committee of deliberately concealing its budget.",
+                "rationale_en": "Neither intention nor a budget is established."
+              },
+              {
+                "id": "C",
+                "text_en": "By questioning what the description actually means.",
+                "rationale_en": "Что скрывается под этой фразой, неясно signals skepticism about the wording’s clarity."
+              },
+              {
+                "id": "D",
+                "text_en": "By dismissing the idea that electronic books belong in libraries.",
+                "rationale_en": "The reporter does not make that claim about electronic books."
+              }
+            ],
+            "correct_option_id": "C",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "Что скрывается под этой фразой, неясно."
+              }
+            ],
+            "explanation_en": "The supported attitude is skepticism about an unclear official formulation; it is not a demonstrated allegation of deception.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-library-q3",
+            "skill": "supported_inference",
+            "stem_en": "What can be concluded about the size of the library’s collection at the time of reporting?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "The reporter had not established it.",
+                "rationale_en": "Не удалось нам выяснить indicates an unsuccessful effort to establish this fact."
+              },
+              {
+                "id": "B",
+                "text_en": "It had been confirmed to be the largest in the district.",
+                "rationale_en": "The label супербиблиотека supplies no verified comparison."
+              },
+              {
+                "id": "C",
+                "text_en": "It was limited to electronic materials.",
+                "rationale_en": "The plans mention older books and other facilities; no such limit is stated."
+              },
+              {
+                "id": "D",
+                "text_en": "The committee had announced that the collection was empty.",
+                "rationale_en": "Failure to obtain information is not evidence of an empty collection."
+              }
+            ],
+            "correct_option_id": "A",
+            "evidence": [
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "Не удалось нам выяснить, и какого размера фонды «супербиблиотеки»."
+              }
+            ],
+            "explanation_en": "An information gap supports a conclusion about the reporting, not about the size or existence of the collection.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "На улице Пархоменко, 18, в Санкт-Петербурге сегодня открылась «супербиблиотека». «Ее название — „Книга во времени“ — отражает миссию этого учреждения — показать эволюцию развития книги от ее возникновения до современных электронных вариантов», — говорится в сообщении комитета по культуры. Что скрывается под этой фразой, неясно.\n\nПомимо основных фондов библиотека будет включать в себя зал ретрокниги, медиатеку, литературную и выставочную галерею, а также помещения для проведения различных образовательных мероприятий.\n\nБолее подробную информацию официальный представитель комитета по культуре корреспонденту «Карповки» предоставить сегодня вечером не смог. Не удалось нам выяснить, и какого размера фонды «супербиблиотеки».",
+        "word_count": 92,
+        "text_sha256": "b6d801e5d2486ff7bd7ab1d0d36f4155ba49a8266b490e34e278ef42b7852f9f",
+        "attribution": "«В Выборгском районе Петербурга открылась «супербиблиотека»», Канонер / Карповка, 2011-08-26; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=15517037), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://kanoner.com/2011/08/26/26459/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    },
+    {
+      "id": "ru-read-pilot01-economics",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-economics",
+        "family_id": "ru-read-pilot01-economics",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Environment / public policy",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "Экспериментальные проекты по раздельному сбору мусора в Московской области пока убыточны. Об этом в интервью РИАМО рассказал глава Министерства экологии и природопользования региона Анзор Шомахов.\n\nВ настоящее время в Подмосковье раздельный сбор мусора производится в Домодедово и Дубне. По мнению Шомахова, причиной того, что эти площадки терпят убытки, является то, что в регионе пока отсутствуют необходимые технические условия, а также мотивация жителей.\n\n«Человек должен понимать, для чего он это делает и что он за это получит. Я живу в квартире, я знаю, где у меня стоит мусорное ведро. У меня есть все основания полагать, что оно у всех так стоит. Я могу туда поставить, наверное, второе ведро. Но точно не больше. Вот мы с двумя ведрами выходим утром и раскладываем по общим ведрам все, что подлежит переработке.\n\nА если кто-то ошибется? В Японии распределением отходов по мусорным бакам занимается дежурный по дому из числа жильцов, который проверяет контейнеры и перебирает их», - отметил министр.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Проекты по раздельному сбору мусора в МО пока убыточны – министр",
+          "source_publisher": "Подмосковье сегодня",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://mosregtoday.ru/chistoe-podmoskov-e/proekty-po-razdelnomu-sboru-musora-v-mo-poka-ubytochny-ministr/",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=16691703",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=16691703",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2015-01-13",
+          "learner_label": "Reading passage 4",
+          "attribution": "«Проекты по раздельному сбору мусора в МО пока убыточны – министр», Подмосковье сегодня, 2015-01-13; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=16691703), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://mosregtoday.ru/chistoe-podmoskov-e/proekty-po-razdelnomu-sboru-musora-v-mo-poka-ubytochny-ministr/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "Complete four-paragraph article body. Archive-added Wayback annotation excluded.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Original URL returned 404; archive inspected. The statement about Japan is the minister’s attributed example, not an independently verified description of all Japanese households. Do not combine this passage with the 2021 sorting article as if they describe the same moment.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "2",
+          "difficulty_rationale": "An attributed explanation of losses is followed by conversational examples and a foreign comparison; questions require tracking cause and argumentative function."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 153,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-economics-q1",
+          "ru-read-pilot01-economics-q2",
+          "ru-read-pilot01-economics-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "63289dfedd85a8aae9734004cf49cc4f43baeb1ffb5d353a7ba3d7468154eac4",
+        "duplicate_detection_hash": "63289dfedd85a8aae9734004cf49cc4f43baeb1ffb5d353a7ba3d7468154eac4"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-economics-q1",
+          "passage_id": "ru-read-pilot01-economics",
+          "stem_en": "According to Shomakhov, why are the pilot projects losing money?",
+          "choices": {
+            "A": "They collect waste in too many municipalities.",
+            "B": "Residents are being charged for keeping a second bin.",
+            "C": "Japanese companies have stopped supplying recycling equipment.",
+            "D": "The necessary technical conditions and residents’ motivation are lacking."
+          },
+          "correct_key": "D",
+          "rationale_en": "The cause is attributed to Shomakhov; the item does not require accepting it as an independently proven economic explanation.",
+          "evidence_ru": "пока отсутствуют необходимые технические условия, а также мотивация жителей",
+          "question_type": "cause and effect",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "attributed_cause",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-economics-q2",
+          "passage_id": "ru-read-pilot01-economics",
+          "stem_en": "In paragraph 2, what does “терпят убытки” mean?",
+          "choices": {
+            "A": "Have temporarily stopped accepting waste.",
+            "B": "Are incurring financial losses.",
+            "C": "Are waiting for permission to expand.",
+            "D": "Are sorting more waste than planned."
+          },
+          "correct_key": "B",
+          "rationale_en": "The opening characterization and the repeated financial term resolve the expression’s meaning.",
+          "evidence_ru": "пока убыточны",
+          "question_type": "meaning from context",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "vocabulary_in_context",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-economics-q3",
+          "passage_id": "ru-read-pilot01-economics",
+          "stem_en": "What point does the example from Japan illustrate in the minister’s remarks?",
+          "choices": {
+            "A": "Residents need enough space to keep many separate bins indoors.",
+            "B": "All sorting work can be performed by collection trucks.",
+            "C": "Someone can check shared bins and correct sorting mistakes.",
+            "D": "Financial rewards have eliminated household sorting errors."
+          },
+          "correct_key": "C",
+          "rationale_en": "Connect the rhetorical question with the example that follows. The inference is about the example’s function.",
+          "evidence_ru": "А если кто-то ошибется?",
+          "question_type": "relationship of ideas",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "function_of_example",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-economics",
+        "family_id": "ru-read-pilot01-economics",
+        "topic": "Environment / public policy",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2015-01-13",
+        "provisional_ilr": "2",
+        "level_rationale": "An attributed explanation of losses is followed by conversational examples and a foreign comparison; questions require tracking cause and argumentative function.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "Проекты по раздельному сбору мусора в МО пока убыточны – министр",
+          "publisher": "Подмосковье сегодня",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://mosregtoday.ru/chistoe-podmoskov-e/proekty-po-razdelnomu-sboru-musora-v-mo-poka-ubytochny-ministr/",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=16691703",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=16691703",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "Complete four-paragraph article body. Archive-added Wayback annotation excluded.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Original URL returned 404; archive inspected. The statement about Japan is the minister’s attributed example, not an independently verified description of all Japanese households. Do not combine this passage with the 2021 sorting article as if they describe the same moment."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "Экспериментальные проекты по раздельному сбору мусора в Московской области пока убыточны. Об этом в интервью РИАМО рассказал глава Министерства экологии и природопользования региона Анзор Шомахов."
+          },
+          {
+            "id": "p2",
+            "text": "В настоящее время в Подмосковье раздельный сбор мусора производится в Домодедово и Дубне. По мнению Шомахова, причиной того, что эти площадки терпят убытки, является то, что в регионе пока отсутствуют необходимые технические условия, а также мотивация жителей."
+          },
+          {
+            "id": "p3",
+            "text": "«Человек должен понимать, для чего он это делает и что он за это получит. Я живу в квартире, я знаю, где у меня стоит мусорное ведро. У меня есть все основания полагать, что оно у всех так стоит. Я могу туда поставить, наверное, второе ведро. Но точно не больше. Вот мы с двумя ведрами выходим утром и раскладываем по общим ведрам все, что подлежит переработке."
+          },
+          {
+            "id": "p4",
+            "text": "А если кто-то ошибется? В Японии распределением отходов по мусорным бакам занимается дежурный по дому из числа жильцов, который проверяет контейнеры и перебирает их», - отметил министр."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-economics-q1",
+            "skill": "attributed_cause",
+            "stem_en": "According to Shomakhov, why are the pilot projects losing money?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "They collect waste in too many municipalities.",
+                "rationale_en": "The text names two locations but does not identify their number as a cause."
+              },
+              {
+                "id": "B",
+                "text_en": "Residents are being charged for keeping a second bin.",
+                "rationale_en": "The second bin illustrates household sorting; no fee is mentioned."
+              },
+              {
+                "id": "C",
+                "text_en": "Japanese companies have stopped supplying recycling equipment.",
+                "rationale_en": "Japan appears as a sorting example, not as an equipment supplier."
+              },
+              {
+                "id": "D",
+                "text_en": "The necessary technical conditions and residents’ motivation are lacking.",
+                "rationale_en": "Both factors are explicitly named in the minister’s explanation."
+              }
+            ],
+            "correct_option_id": "D",
+            "evidence": [
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "пока отсутствуют необходимые технические условия, а также мотивация жителей"
+              }
+            ],
+            "explanation_en": "The cause is attributed to Shomakhov; the item does not require accepting it as an independently proven economic explanation.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-economics-q2",
+            "skill": "vocabulary_in_context",
+            "stem_en": "In paragraph 2, what does “терпят убытки” mean?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Have temporarily stopped accepting waste.",
+                "rationale_en": "The phrase concerns financial performance, not an operational shutdown."
+              },
+              {
+                "id": "B",
+                "text_en": "Are incurring financial losses.",
+                "rationale_en": "This corresponds to убыточны in the opening sentence and убытки in the phrase."
+              },
+              {
+                "id": "C",
+                "text_en": "Are waiting for permission to expand.",
+                "rationale_en": "No approval process is described."
+              },
+              {
+                "id": "D",
+                "text_en": "Are sorting more waste than planned.",
+                "rationale_en": "Neither sorting volume nor a target is expressed by this phrase."
+              }
+            ],
+            "correct_option_id": "B",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "пока убыточны"
+              },
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "эти площадки терпят убытки"
+              }
+            ],
+            "explanation_en": "The opening characterization and the repeated financial term resolve the expression’s meaning.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-economics-q3",
+            "skill": "function_of_example",
+            "stem_en": "What point does the example from Japan illustrate in the minister’s remarks?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Residents need enough space to keep many separate bins indoors.",
+                "rationale_en": "The indoor-space discussion precedes the example, but the example describes a person checking communal bins."
+              },
+              {
+                "id": "B",
+                "text_en": "All sorting work can be performed by collection trucks.",
+                "rationale_en": "The example assigns the checking work to a resident."
+              },
+              {
+                "id": "C",
+                "text_en": "Someone can check shared bins and correct sorting mistakes.",
+                "rationale_en": "The example immediately follows the question about someone making a mistake and describes checking and sorting through containers."
+              },
+              {
+                "id": "D",
+                "text_en": "Financial rewards have eliminated household sorting errors.",
+                "rationale_en": "No reward system or elimination of errors is stated."
+              }
+            ],
+            "correct_option_id": "C",
+            "evidence": [
+              {
+                "paragraph_id": "p4",
+                "quote_ru": "А если кто-то ошибется?"
+              },
+              {
+                "paragraph_id": "p4",
+                "quote_ru": "который проверяет контейнеры и перебирает их"
+              }
+            ],
+            "explanation_en": "Connect the rhetorical question with the example that follows. The inference is about the example’s function.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "Экспериментальные проекты по раздельному сбору мусора в Московской области пока убыточны. Об этом в интервью РИАМО рассказал глава Министерства экологии и природопользования региона Анзор Шомахов.\n\nВ настоящее время в Подмосковье раздельный сбор мусора производится в Домодедово и Дубне. По мнению Шомахова, причиной того, что эти площадки терпят убытки, является то, что в регионе пока отсутствуют необходимые технические условия, а также мотивация жителей.\n\n«Человек должен понимать, для чего он это делает и что он за это получит. Я живу в квартире, я знаю, где у меня стоит мусорное ведро. У меня есть все основания полагать, что оно у всех так стоит. Я могу туда поставить, наверное, второе ведро. Но точно не больше. Вот мы с двумя ведрами выходим утром и раскладываем по общим ведрам все, что подлежит переработке.\n\nА если кто-то ошибется? В Японии распределением отходов по мусорным бакам занимается дежурный по дому из числа жильцов, который проверяет контейнеры и перебирает их», - отметил министр.",
+        "word_count": 154,
+        "text_sha256": "8a2b52594d6d18b5cc6c2b5cab8ee9c8d199ca9c0106d6e59a495a5585754eb6",
+        "attribution": "«Проекты по раздельному сбору мусора в МО пока убыточны – министр», Подмосковье сегодня, 2015-01-13; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=16691703), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://mosregtoday.ru/chistoe-podmoskov-e/proekty-po-razdelnomu-sboru-musora-v-mo-poka-ubytochny-ministr/. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    },
+    {
+      "id": "ru-read-pilot01-buses",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-buses",
+        "family_id": "ru-read-pilot01-buses",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Transport / technology",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "В минувшие выходные в Москве состоялся торжественный запуск первых электробусов, которыми власти города в перспективе намерены заменить московские троллейбусы. Однако первые несколько попыток отправить электробусы в рейс по маршруту троллейбуса N73, следующего от ВДНХ до Алтуфьево, обернулись неудачей.\n\nСогласно информации, которую приводит в своем блоге общественный деятель Максим Кац, неоднократно выступавший с критикой идеи внедрения электробусов, которые необходимо заряжать на конечных остановках и в парке, 1 сентября на маршрут должны были выйти сразу 30 электробусов, однако все сразу пошло не так.\n\n\"У метро ВДНХ Собянин с группой детей погрузился в один работающий электробус, все поехали в сторону Альтуфьево. Однако, проехав три остановки, электробус всех высадил, включая мэра, и уехал в парк\", – написал Кац.\n\nВ течение субботы и воскресенья было предпринято в общей сложности еще шесть попыток выпустить на маршрут два электробуса, но ни одна из них не увенчалась успехом: во всех случаях электробус пришлось снимать с рейса, а пассажиры вынуждены были ждать привычного троллейбуса.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Торжественный запуск первых московских электробусов обернулся провалом. В первом рейсе сломался электробус, в котором ехал Собянин",
+          "source_publisher": "NEWSru.com",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://www.newsru.com/auto/03Sep2018/elbus.html",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17250272",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17250272",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2018-09-03",
+          "learner_label": "Reading passage 5",
+          "attribution": "«Торжественный запуск первых московских электробусов обернулся провалом. В первом рейсе сломался электробус, в котором ехал Собянин», NEWSru.com, 2018-09-03; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17250272), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://www.newsru.com/auto/03Sep2018/elbus.html. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "First four prose paragraphs, ending before embedded tweets and contract details.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Original publisher inspected and explicitly displays CC BY 4.0. Source spelling Альтуфьево in the quotation is retained. This excerpt reports early rollout problems; it supports no conclusion about today’s fleet or the technology’s general viability.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "2",
+          "difficulty_rationale": "Long embedded clauses, an attributed account, a contrast between plans and outcomes, and a context-dependent meaning of парк."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 154,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-buses-q1",
+          "ru-read-pilot01-buses-q2",
+          "ru-read-pilot01-buses-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "910f3a9b64bfee51d1bf6497ba2eb368248e4f07adab48d61e4edcb48ee20988",
+        "duplicate_detection_hash": "910f3a9b64bfee51d1bf6497ba2eb368248e4f07adab48d61e4edcb48ee20988"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-buses-q1",
+          "passage_id": "ru-read-pilot01-buses",
+          "stem_en": "What is the central contrast in this excerpt?",
+          "choices": {
+            "A": "An ambitious launch was followed by repeated unsuccessful attempts to operate the vehicles.",
+            "B": "The city canceled a launch because the mayor could not attend.",
+            "C": "A successful new route replaced an underused railway service.",
+            "D": "Passengers preferred the new vehicles despite longer journeys."
+          },
+          "correct_key": "A",
+          "rationale_en": "The contrast is between the launch’s intended operation and the reported outcome, not between different passenger preferences.",
+          "evidence_ru": "Однако первые несколько попыток",
+          "question_type": "main idea",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "main_idea",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-buses-q2",
+          "passage_id": "ru-read-pilot01-buses",
+          "stem_en": "What does the figure 30 refer to in paragraph 2?",
+          "choices": {
+            "A": "The number of stops successfully completed on September 1.",
+            "B": "The number of vehicles confirmed to have completed their first routes.",
+            "C": "The number of electric buses that were supposed to enter service on September 1.",
+            "D": "The number of passengers who had to leave the mayor’s vehicle."
+          },
+          "correct_key": "C",
+          "rationale_en": "Должны были marks the intended event. Preserve that distinction from what actually happened.",
+          "evidence_ru": "1 сентября на маршрут должны были выйти сразу 30 электробусов",
+          "question_type": "prominent detail",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "planned_vs_actual",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-buses-q3",
+          "passage_id": "ru-read-pilot01-buses",
+          "stem_en": "In the phrase “уехал в парк” in paragraph 3, where did the bus go?",
+          "choices": {
+            "A": "To a public recreation area.",
+            "B": "To the vehicle depot.",
+            "C": "To the next passenger stop.",
+            "D": "To a railway platform."
+          },
+          "correct_key": "B",
+          "rationale_en": "Use the transport context to select the depot meaning of парк.",
+          "evidence_ru": "заряжать на конечных остановках и в парке",
+          "question_type": "meaning from context",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "vocabulary_in_context",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-buses",
+        "family_id": "ru-read-pilot01-buses",
+        "topic": "Transport / technology",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2018-09-03",
+        "provisional_ilr": "2",
+        "level_rationale": "Long embedded clauses, an attributed account, a contrast between plans and outcomes, and a context-dependent meaning of парк.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "Торжественный запуск первых московских электробусов обернулся провалом. В первом рейсе сломался электробус, в котором ехал Собянин",
+          "publisher": "NEWSru.com",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://www.newsru.com/auto/03Sep2018/elbus.html",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17250272",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17250272",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "First four prose paragraphs, ending before embedded tweets and contract details.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Original publisher inspected and explicitly displays CC BY 4.0. Source spelling Альтуфьево in the quotation is retained. This excerpt reports early rollout problems; it supports no conclusion about today’s fleet or the technology’s general viability."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "В минувшие выходные в Москве состоялся торжественный запуск первых электробусов, которыми власти города в перспективе намерены заменить московские троллейбусы. Однако первые несколько попыток отправить электробусы в рейс по маршруту троллейбуса N73, следующего от ВДНХ до Алтуфьево, обернулись неудачей."
+          },
+          {
+            "id": "p2",
+            "text": "Согласно информации, которую приводит в своем блоге общественный деятель Максим Кац, неоднократно выступавший с критикой идеи внедрения электробусов, которые необходимо заряжать на конечных остановках и в парке, 1 сентября на маршрут должны были выйти сразу 30 электробусов, однако все сразу пошло не так."
+          },
+          {
+            "id": "p3",
+            "text": "\"У метро ВДНХ Собянин с группой детей погрузился в один работающий электробус, все поехали в сторону Альтуфьево. Однако, проехав три остановки, электробус всех высадил, включая мэра, и уехал в парк\", – написал Кац."
+          },
+          {
+            "id": "p4",
+            "text": "В течение субботы и воскресенья было предпринято в общей сложности еще шесть попыток выпустить на маршрут два электробуса, но ни одна из них не увенчалась успехом: во всех случаях электробус пришлось снимать с рейса, а пассажиры вынуждены были ждать привычного троллейбуса."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-buses-q1",
+            "skill": "main_idea",
+            "stem_en": "What is the central contrast in this excerpt?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "An ambitious launch was followed by repeated unsuccessful attempts to operate the vehicles.",
+                "rationale_en": "The planned introduction contrasts with failed trips and passengers waiting for trolleybuses."
+              },
+              {
+                "id": "B",
+                "text_en": "The city canceled a launch because the mayor could not attend.",
+                "rationale_en": "The launch occurred and the mayor was on one vehicle."
+              },
+              {
+                "id": "C",
+                "text_en": "A successful new route replaced an underused railway service.",
+                "rationale_en": "The text concerns trolleybuses and describes unsuccessful attempts."
+              },
+              {
+                "id": "D",
+                "text_en": "Passengers preferred the new vehicles despite longer journeys.",
+                "rationale_en": "Passenger preferences and comparative journey lengths are not reported."
+              }
+            ],
+            "correct_option_id": "A",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "Однако первые несколько попыток"
+              },
+              {
+                "paragraph_id": "p4",
+                "quote_ru": "ни одна из них не увенчалась успехом"
+              }
+            ],
+            "explanation_en": "The contrast is between the launch’s intended operation and the reported outcome, not between different passenger preferences.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-buses-q2",
+            "skill": "planned_vs_actual",
+            "stem_en": "What does the figure 30 refer to in paragraph 2?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "The number of stops successfully completed on September 1.",
+                "rationale_en": "Three stops appear in the reported trip; 30 refers to vehicles planned for service."
+              },
+              {
+                "id": "B",
+                "text_en": "The number of vehicles confirmed to have completed their first routes.",
+                "rationale_en": "Должны были выйти describes an intended deployment, not confirmed completion."
+              },
+              {
+                "id": "C",
+                "text_en": "The number of electric buses that were supposed to enter service on September 1.",
+                "rationale_en": "That is the planned figure attributed to Katz’s information."
+              },
+              {
+                "id": "D",
+                "text_en": "The number of passengers who had to leave the mayor’s vehicle.",
+                "rationale_en": "No passenger count is supplied."
+              }
+            ],
+            "correct_option_id": "C",
+            "evidence": [
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "1 сентября на маршрут должны были выйти сразу 30 электробусов"
+              }
+            ],
+            "explanation_en": "Должны были marks the intended event. Preserve that distinction from what actually happened.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-buses-q3",
+            "skill": "vocabulary_in_context",
+            "stem_en": "In the phrase “уехал в парк” in paragraph 3, where did the bus go?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "To a public recreation area.",
+                "rationale_en": "That familiar meaning of парк does not fit the charging and withdrawal-from-service context."
+              },
+              {
+                "id": "B",
+                "text_en": "To the vehicle depot.",
+                "rationale_en": "Paragraph 2 associates парк with charging, and paragraph 3 describes the vehicle leaving service."
+              },
+              {
+                "id": "C",
+                "text_en": "To the next passenger stop.",
+                "rationale_en": "The vehicle had unloaded everyone; the text contrasts this with continuing passenger service."
+              },
+              {
+                "id": "D",
+                "text_en": "To a railway platform.",
+                "rationale_en": "No railway facility is mentioned."
+              }
+            ],
+            "correct_option_id": "B",
+            "evidence": [
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "заряжать на конечных остановках и в парке"
+              },
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "электробус всех высадил, включая мэра, и уехал в парк"
+              }
+            ],
+            "explanation_en": "Use the transport context to select the depot meaning of парк.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "В минувшие выходные в Москве состоялся торжественный запуск первых электробусов, которыми власти города в перспективе намерены заменить московские троллейбусы. Однако первые несколько попыток отправить электробусы в рейс по маршруту троллейбуса N73, следующего от ВДНХ до Алтуфьево, обернулись неудачей.\n\nСогласно информации, которую приводит в своем блоге общественный деятель Максим Кац, неоднократно выступавший с критикой идеи внедрения электробусов, которые необходимо заряжать на конечных остановках и в парке, 1 сентября на маршрут должны были выйти сразу 30 электробусов, однако все сразу пошло не так.\n\n\"У метро ВДНХ Собянин с группой детей погрузился в один работающий электробус, все поехали в сторону Альтуфьево. Однако, проехав три остановки, электробус всех высадил, включая мэра, и уехал в парк\", – написал Кац.\n\nВ течение субботы и воскресенья было предпринято в общей сложности еще шесть попыток выпустить на маршрут два электробуса, но ни одна из них не увенчалась успехом: во всех случаях электробус пришлось снимать с рейса, а пассажиры вынуждены были ждать привычного троллейбуса.",
+        "word_count": 155,
+        "text_sha256": "211926359e2ce9eb079032dec96f46c4e1d0184da46c63ff709c5191e283cba2",
+        "attribution": "«Торжественный запуск первых московских электробусов обернулся провалом. В первом рейсе сломался электробус, в котором ехал Собянин», NEWSru.com, 2018-09-03; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17250272), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://www.newsru.com/auto/03Sep2018/elbus.html. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    },
+    {
+      "id": "ru-read-pilot01-bees",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-read-pilot01-bees",
+        "family_id": "ru-read-pilot01-bees",
+        "language": "ru",
+        "skill": "reading",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "news article",
+        "topic": "Environment / civic action",
+        "subtopic": "Historical published news",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "passage_ru": "На этой неделе британские пчеловоды осадили Парламент и резиденцию премьер-министра страны Гордона Брауна, требуя увеличения ассигнований на борьбу со страшным бедствием — продолжающимся сокращением популяции пчел.\n\nЗа последний год она сократилась примерно на треть. Главе правительства вручили петицию с подписями 140 тыс. человек, озабоченных обрушившейся на страну напастью, сообщает CNN со ссылкой на агентство AP.\n\nВ ближайшие 10 лет Великобритания, подчеркивается в документе, может полностью лишиться популяции медоносных пчел, если правительство и заинтересованные организации ничего не предпримут для защиты этих полезных насекомых от поражающих их болезней. В пчеловодстве в стране занято более 40 тысяч человек.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Пчелы гибнут по всему миру. Ученые бьют тревогу, пчеловоды требуют денег на поиск причин бедствия",
+          "source_publisher": "NEWSru.com",
+          "source_author": "No individual byline identified in the consulted article.",
+          "source_original_url": "https://www.newsru.com/world/07Nov2008/bees.html",
+          "source_archive_publisher": "Русские Викиновости",
+          "source_archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17705701",
+          "source_accessed_date": "2026-11-26",
+          "source_license": "CC BY 4.0",
+          "source_license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "source_license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17705701",
+          "source_license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "source_archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors.",
+          "publication_date": "2008-11-07",
+          "learner_label": "Reading passage 6",
+          "attribution": "«Пчелы гибнут по всему миру. Ученые бьют тревогу, пчеловоды требуют денег на поиск причин бедствия», NEWSru.com, 2008-11-07; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17705701), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://www.newsru.com/world/07Nov2008/bees.html. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI.",
+          "selection": "First three paragraphs only; later scientific claims and speculation excluded.",
+          "modifications": "Web links rendered as plain text; archive-inserted link annotations omitted. Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified.",
+          "authenticity_notes": "Original publisher and archive inspected. A historical petition and its warning are the objects of comprehension; the passage is not presented as current science or as proof that its prediction occurred.",
+          "pack_id": "ru-authentic-reading-pilot-01",
+          "provisional_ilr": "2",
+          "difficulty_rationale": "News-register vocabulary, a pronoun reference across sentences, and a conditional warning; the first sentence may be challenging for learners near 1+."
+        },
+        "license": "CC BY 4.0",
+        "word_count": 94,
+        "audio_duration_seconds": null,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-read-pilot01-bees-q1",
+          "ru-read-pilot01-bees-q2",
+          "ru-read-pilot01-bees-q3"
+        ],
+        "audio_asset_id": null,
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-reading-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-26T00:00:00Z",
+          "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-26T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "a6687147a189b14572e9bd3a4aa52a410ab29c3141d21330ec2bd06bf3844a85",
+        "duplicate_detection_hash": "a6687147a189b14572e9bd3a4aa52a410ab29c3141d21330ec2bd06bf3844a85"
+      },
+      "questions": [
+        {
+          "id": "ru-read-pilot01-bees-q1",
+          "passage_id": "ru-read-pilot01-bees",
+          "stem_en": "What were the beekeepers asking the authorities to do?",
+          "choices": {
+            "A": "Compensate everyone who had signed the petition.",
+            "B": "Set a limit on the number of people employed in beekeeping.",
+            "C": "Move beekeeping operations away from government buildings.",
+            "D": "Increase funding to address the decline in bee populations."
+          },
+          "correct_key": "D",
+          "rationale_en": "The purpose is additional funding. The wording does not say that funding had already been granted.",
+          "evidence_ru": "требуя увеличения ассигнований",
+          "question_type": "speaker/writer intent",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "purpose",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-bees-q2",
+          "passage_id": "ru-read-pilot01-bees",
+          "stem_en": "What had declined by roughly one third over the preceding year?",
+          "choices": {
+            "A": "The bee population.",
+            "B": "The number of petition signatures.",
+            "C": "Government funding for beekeeping.",
+            "D": "The number of people employed in beekeeping."
+          },
+          "correct_key": "A",
+          "rationale_en": "Follow the antecedent across the paragraph boundary instead of attaching the fraction to the nearest later number.",
+          "evidence_ru": "сокращением популяции пчел",
+          "question_type": "reference",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "reference_tracking",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-read-pilot01-bees-q3",
+          "passage_id": "ru-read-pilot01-bees",
+          "stem_en": "Which statement accurately represents the warning in the petition?",
+          "choices": {
+            "A": "Britain was certain to lose all its honeybees within ten years even if action was taken.",
+            "B": "Britain could lose its honeybee population within ten years if protective action was not taken.",
+            "C": "Britain had already lost its entire honeybee population during the preceding year.",
+            "D": "Britain would lose one third of its beekeeping jobs unless the petition received more signatures."
+          },
+          "correct_key": "B",
+          "rationale_en": "A conditional warning is neither a guaranteed prediction nor an event already observed.",
+          "evidence_ru": "может полностью лишиться популяции медоносных пчел",
+          "question_type": "relationship of ideas",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "conditional_claim",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-reading-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-26T00:00:00Z",
+            "authoring_notes": "Published source text preserved. Newly authored questions; teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-26T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": null,
+      "audio_sha256": null,
+      "recording": {
+        "provider": "",
+        "model": "",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Curator must verify plan, model status, voice/input rights and distribution terms.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Teacher-review draft. Verify rights, authenticity, difficulty, unique best answers, distractors and exact evidence. Not calibrated.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-read-pilot01-bees",
+        "family_id": "ru-read-pilot01-bees",
+        "topic": "Environment / civic action",
+        "language": "ru",
+        "modality": "reading",
+        "orientation_en": "Read this historical news report. Answer only from the passage, as of its publication date.",
+        "publication_date": "2008-11-07",
+        "provisional_ilr": "2",
+        "level_rationale": "News-register vocabulary, a pronoun reference across sentences, and a conditional warning; the first sentence may be challenging for learners near 1+.",
+        "review_status": "draft_pending_teacher_review",
+        "diagnostic_eligible": false,
+        "calibration_status": "uncalibrated",
+        "human_reviewer": null,
+        "source": {
+          "title": "Пчелы гибнут по всему миру. Ученые бьют тревогу, пчеловоды требуют денег на поиск причин бедствия",
+          "publisher": "NEWSru.com",
+          "author": "No individual byline identified in the consulted article.",
+          "original_url": "https://www.newsru.com/world/07Nov2008/bees.html",
+          "archive_publisher": "Русские Викиновости",
+          "archive_revision_url": "https://ru.wikinews.org/w/index.php?oldid=17705701",
+          "accessed_date": "2026-11-26",
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0/",
+          "license_evidence_url": "https://ru.wikinews.org/w/index.php?oldid=17705701",
+          "license_basis": "The article-specific source notice explicitly identifies the original publication and CC BY 4.0. This is documented licensing evidence, not independent verification of the entire rights chain.",
+          "archive_notice": "The archive identifies this as a bot import not reviewed by Wikinews editors."
+        },
+        "authenticity": {
+          "kind": "published_russian_verbatim_excerpt",
+          "selection": "First three paragraphs only; later scientific claims and speculation excluded.",
+          "transformations": [
+            "Web links rendered as plain text; archive-inserted link annotations omitted.",
+            "Whitespace normalized; excerpt paragraph IDs added. No sentences rewritten or simplified."
+          ],
+          "notes": "Original publisher and archive inspected. A historical petition and its warning are the objects of comprehension; the passage is not presented as current science or as proof that its prediction occurred."
+        },
+        "paragraphs": [
+          {
+            "id": "p1",
+            "text": "На этой неделе британские пчеловоды осадили Парламент и резиденцию премьер-министра страны Гордона Брауна, требуя увеличения ассигнований на борьбу со страшным бедствием — продолжающимся сокращением популяции пчел."
+          },
+          {
+            "id": "p2",
+            "text": "За последний год она сократилась примерно на треть. Главе правительства вручили петицию с подписями 140 тыс. человек, озабоченных обрушившейся на страну напастью, сообщает CNN со ссылкой на агентство AP."
+          },
+          {
+            "id": "p3",
+            "text": "В ближайшие 10 лет Великобритания, подчеркивается в документе, может полностью лишиться популяции медоносных пчел, если правительство и заинтересованные организации ничего не предпримут для защиты этих полезных насекомых от поражающих их болезней. В пчеловодстве в стране занято более 40 тысяч человек."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-read-pilot01-bees-q1",
+            "skill": "purpose",
+            "stem_en": "What were the beekeepers asking the authorities to do?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Compensate everyone who had signed the petition.",
+                "rationale_en": "The signatures demonstrate support; the passage does not request payments to signatories."
+              },
+              {
+                "id": "B",
+                "text_en": "Set a limit on the number of people employed in beekeeping.",
+                "rationale_en": "Employment is background information, not the requested action."
+              },
+              {
+                "id": "C",
+                "text_en": "Move beekeeping operations away from government buildings.",
+                "rationale_en": "Government buildings are where the appeal took place, not proposed sites for beekeeping."
+              },
+              {
+                "id": "D",
+                "text_en": "Increase funding to address the decline in bee populations.",
+                "rationale_en": "Увеличения ассигнований identifies the funding increase sought to fight the decline."
+              }
+            ],
+            "correct_option_id": "D",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "требуя увеличения ассигнований"
+              },
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "продолжающимся сокращением популяции пчел"
+              }
+            ],
+            "explanation_en": "The purpose is additional funding. The wording does not say that funding had already been granted.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-bees-q2",
+            "skill": "reference_tracking",
+            "stem_en": "What had declined by roughly one third over the preceding year?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "The bee population.",
+                "rationale_en": "Она refers back to популяции пчел in the preceding paragraph."
+              },
+              {
+                "id": "B",
+                "text_en": "The number of petition signatures.",
+                "rationale_en": "The signature total is introduced after the decline and is not its referent."
+              },
+              {
+                "id": "C",
+                "text_en": "Government funding for beekeeping.",
+                "rationale_en": "A funding increase is requested, but the passage does not quantify a previous funding cut."
+              },
+              {
+                "id": "D",
+                "text_en": "The number of people employed in beekeeping.",
+                "rationale_en": "The employment figure is supplied later; no employment decline is stated."
+              }
+            ],
+            "correct_option_id": "A",
+            "evidence": [
+              {
+                "paragraph_id": "p1",
+                "quote_ru": "сокращением популяции пчел"
+              },
+              {
+                "paragraph_id": "p2",
+                "quote_ru": "За последний год она сократилась примерно на треть."
+              }
+            ],
+            "explanation_en": "Follow the antecedent across the paragraph boundary instead of attaching the fraction to the nearest later number.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          },
+          {
+            "id": "ru-read-pilot01-bees-q3",
+            "skill": "conditional_claim",
+            "stem_en": "Which statement accurately represents the warning in the petition?",
+            "options": [
+              {
+                "id": "A",
+                "text_en": "Britain was certain to lose all its honeybees within ten years even if action was taken.",
+                "rationale_en": "This removes both the possibility marker может and the condition introduced by если."
+              },
+              {
+                "id": "B",
+                "text_en": "Britain could lose its honeybee population within ten years if protective action was not taken.",
+                "rationale_en": "This preserves both the possibility and the condition in the document’s warning."
+              },
+              {
+                "id": "C",
+                "text_en": "Britain had already lost its entire honeybee population during the preceding year.",
+                "rationale_en": "The past decline was roughly one third; total loss is a conditional future warning."
+              },
+              {
+                "id": "D",
+                "text_en": "Britain would lose one third of its beekeeping jobs unless the petition received more signatures.",
+                "rationale_en": "This combines unrelated figures and invents a condition about signatures."
+              }
+            ],
+            "correct_option_id": "B",
+            "evidence": [
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "может полностью лишиться популяции медоносных пчел"
+              },
+              {
+                "paragraph_id": "p3",
+                "quote_ru": "если правительство и заинтересованные организации ничего не предпримут"
+              }
+            ],
+            "explanation_en": "A conditional warning is neither a guaranteed prediction nor an event already observed.",
+            "scoring": {
+              "points": 1,
+              "partial_credit": false
+            }
+          }
+        ],
+        "text": "На этой неделе британские пчеловоды осадили Парламент и резиденцию премьер-министра страны Гордона Брауна, требуя увеличения ассигнований на борьбу со страшным бедствием — продолжающимся сокращением популяции пчел.\n\nЗа последний год она сократилась примерно на треть. Главе правительства вручили петицию с подписями 140 тыс. человек, озабоченных обрушившейся на страну напастью, сообщает CNN со ссылкой на агентство AP.\n\nВ ближайшие 10 лет Великобритания, подчеркивается в документе, может полностью лишиться популяции медоносных пчел, если правительство и заинтересованные организации ничего не предпримут для защиты этих полезных насекомых от поражающих их болезней. В пчеловодстве в стране занято более 40 тысяч человек.",
+        "word_count": 95,
+        "text_sha256": "672fd64fa10070c047a958d767e8f5c0a80f7d03381f7af5a03e52b3aede863a",
+        "attribution": "«Пчелы гибнут по всему миру. Ученые бьют тревогу, пчеловоды требуют денег на поиск причин бедствия», NEWSru.com, 2008-11-07; reproduced from Русские Викиновости (https://ru.wikinews.org/w/index.php?oldid=17705701), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Original: https://www.newsru.com/world/07Nov2008/bees.html. Excerpt and formatting changes described in authenticity metadata. Questions and explanations are newly authored and are not endorsed by the publisher, NFLC, or DLI."
+      }
+    }
+  ]
+}

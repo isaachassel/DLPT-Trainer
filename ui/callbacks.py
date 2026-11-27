@@ -436,6 +436,9 @@ def _bank_bundle(state: SessionState) -> PassageBundle:
         # Controlled profile-history reuse only after the currently available bank is exhausted.
         bundle = select_next_bundle(state, bank, None)
     origin = bank.origin_for(bundle.passage.id)
+    if history and bundle.passage.family_id:
+        history.seen_family_ids = sorted(set(history.seen_family_ids) | {bundle.passage.family_id})
+        STORAGE.save_history(history)
     if state.mode != "training":
         state.last_content_note = "Loaded a curator-approved preset passage with fixed local assets. No generation service is used."
     state.last_content_source = "generated_bank" if origin == "generated_bank" else "starter_bank"
@@ -698,6 +701,10 @@ def _status_text(state: SessionState, extra: str = "") -> str:
 def _passage_markdown(bundle: PassageBundle, state: SessionState) -> str:
     passage = bundle.passage
     if passage.skill == "reading":
+        if passage.provenance.get("publication_date"):
+            date = html.escape(passage.provenance["publication_date"])
+            return (f"### Reading passage\n\nPublished: {date}\n\n{passage.passage_ru}\n\n"
+                    "Source credits and license links appear after the assessment ends.")
         return f"### {language_profile(passage.language).short_label} Passage\n\n{passage.passage_ru}"
     source = "Synthetic TTS audio" if passage.source_type == "synthetic" else passage.source_type
     return (
@@ -914,7 +921,7 @@ def start_session_callback(
     language_label="Russian",
     assessment_min_passages=6, assessment_max_passages=18, assessment_target_sd=0.55,
     progress=gr.Progress(),
-    *, simulation_start_level: str | None = None,
+    *, simulation_start_level: str | None = None, seen_family_ids: list[str] | None = None,
 ):
     try:
         _progress(progress, 0.04, "Validating session settings…")
@@ -973,6 +980,7 @@ def start_session_callback(
             assessment_max_passages=assessment_max_passages if mode == "assessment" else 18,
             assessment_target_sd=assessment_target_sd if mode == "assessment" else 0.55,
         )
+        state.seen_family_ids = sorted({x for x in (seen_family_ids or []) if isinstance(x, str) and len(x) <= 100})
         LOGGER.info(
             "Session audio preference session=%s mode=%s language=%s selected_label=%s speed=%s",
             state.session_id, state.mode, state.language, state.voice_label, state.speech_rate_label,

@@ -17,6 +17,8 @@ def package_files(root: Path = ROOT) -> list[Path]:
     if not bank_path.is_file():
         raise ValueError("Missing or unsafe package entry: bank.json")
     for item in json.loads(bank_path.read_text(encoding="utf-8"))["items"]:
+        if item.get("review", {}).get("status") != "approved":
+            continue
         if item.get("audio"):
             review = item.get("recording", {}).get("license_review") or {}
             if (item.get("recording", {}).get("account_tier") not in
@@ -60,7 +62,7 @@ license: mit
 # Language Test
 
 Independent Russian and Mandarin reading/listening practice. One skill per test,
-12 questions, up to 30 minutes. Results are unvalidated practice estimates, not
+About 12 questions, up to 30 minutes; authentic passage question groups stay together. Results are unvalidated practice estimates, not
 official DLPT scores or reliable predictions. No runtime generation or API keys
 are required. Listening recordings use licensed synthetic voices.
 
@@ -91,6 +93,11 @@ def build_package(root: Path = ROOT) -> Path:
         for path in files:
             content = path.read_bytes()
             name = path.relative_to(root).as_posix()
+            if name == "data/assessment/bank.json":
+                bank = json.loads(content)
+                bank["items"] = [{k: v for k, v in item.items() if k != "authoring_record"}
+                                 for item in bank["items"] if item.get("review", {}).get("status") == "approved"]
+                content = json.dumps(bank, ensure_ascii=False, indent=2).encode("utf-8")
             bundle.writestr(name, content)
             manifest.append({"path": name, "bytes": len(content),
                              "sha256": hashlib.sha256(content).hexdigest()})

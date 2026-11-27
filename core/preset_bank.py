@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
@@ -77,6 +77,7 @@ class ContentItem(StrictModel):
     audio_sha256: str | None = None
     recording: Recording = Field(default_factory=Recording)
     review: Review = Field(default_factory=Review)
+    authoring_record: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def relationships(self):

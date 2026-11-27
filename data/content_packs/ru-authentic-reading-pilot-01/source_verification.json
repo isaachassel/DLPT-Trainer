@@ -1,0 +1,49 @@
+{
+  "checked_on": "2026-11-27",
+  "method": "Fetched the six fixed archive revisions over HTTPS; compared whitespace-normalized paragraphs after removing archive-added Wayback link annotations. Original imported text remains unchanged.",
+  "limitation": "Article-specific licensing notices verified on the archive; not independent verification of each original publisher rights chain or factual claims. Teacher review is still required.",
+  "sources": [
+    {
+      "id": "ru-read-pilot01-museum",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=17892310",
+      "archive_html_sha256": "e3403303e049d5dd6984a40007067173b16876b8582eaf7bac30a813702c8648",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    },
+    {
+      "id": "ru-read-pilot01-sorting",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=17836137",
+      "archive_html_sha256": "305c269f3631183cd167ef4cd2bf7ee610c81a7a4db94511a209ee2bc5bdf0de",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    },
+    {
+      "id": "ru-read-pilot01-library",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=15517037",
+      "archive_html_sha256": "58710a44ba842702a0ddfed4a7f49ba2281d0402c0b5ad2fa638ad2ef7c9ba2a",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    },
+    {
+      "id": "ru-read-pilot01-economics",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=16691703",
+      "archive_html_sha256": "18a3dcbbc134ca2f8e1eed1c5c8ee927251bff1bacbdee9706b4a00a7bf7f013",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    },
+    {
+      "id": "ru-read-pilot01-buses",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=17250272",
+      "archive_html_sha256": "483384e338930aa6e992514f79bf761d2234dec631a3743591bcf4750473d2da",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    },
+    {
+      "id": "ru-read-pilot01-bees",
+      "archive_url": "https://ru.wikinews.org/w/index.php?oldid=17705701",
+      "archive_html_sha256": "8bfeb13d896cd3ae08889e18f794b8d46b7f652adf5664b749f81e424859f9b9",
+      "article_specific_cc_by_4_notice": true,
+      "paragraphs_match": true
+    }
+  ]
+}

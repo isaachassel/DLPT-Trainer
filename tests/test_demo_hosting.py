@@ -33,7 +33,10 @@ def test_local_preview_keeps_its_existing_behavior(monkeypatch):
     monkeypatch.delenv('SPACE_ID', raising=False)
     monkeypatch.delenv('DEMO_HOSTED', raising=False)
     assert not is_hosted_demo()
-    assert 'blocked_paths' not in launch_kwargs()
+    settings = launch_kwargs()
+    assert str(ROOT / 'data/content_packs') in settings['blocked_paths']
+    assert str(ROOT / 'data/assessment/bank.json') in settings['blocked_paths']
+    assert str(ROOT / 'storage') not in settings['blocked_paths']
 
 
 def test_deployment_allowlist_excludes_private_local_data():

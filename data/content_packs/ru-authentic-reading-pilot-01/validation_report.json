@@ -1,0 +1,31 @@
+{
+  "passages": 6,
+  "questions": 18,
+  "keys": {
+    "B": 5,
+    "D": 4,
+    "A": 5,
+    "C": 4
+  },
+  "checks_passed": [
+    "unique passage and question IDs",
+    "four distinct choices per question",
+    "valid single answer key",
+    "all evidence quotations occur in referenced paragraphs",
+    "all options have rationales",
+    "all sources have original and archived URLs and license metadata"
+  ],
+  "not_performed": [
+    "human teacher approval",
+    "empirical difficulty calibration",
+    "integration into an existing repository"
+  ],
+  "word_counts": {
+    "ru-read-pilot01-museum": 117,
+    "ru-read-pilot01-sorting": 104,
+    "ru-read-pilot01-library": 92,
+    "ru-read-pilot01-economics": 154,
+    "ru-read-pilot01-buses": 155,
+    "ru-read-pilot01-bees": 95
+  }
+}

@@ -37,6 +37,13 @@ def promote(package_path, item_id, reviewer, notes, reuse_attested, manifest=MAN
     if destination:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(source.read_bytes())
+    if prior:
+        # Keep the exact prior decision and wording when revising or rejecting.
+        import hashlib
+        digest = hashlib.sha256(prior.model_dump_json().encode()).hexdigest()[:16]
+        archive = root / "data/assessment/revisions" / f"{prior.id}-v{prior.content_version}-{digest}.json"
+        if not archive.exists():
+            write_package(archive, ContentPackage(items=[prior]))
     write_package(manifest, merged)
 
 

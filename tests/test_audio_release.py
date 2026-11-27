@@ -32,7 +32,7 @@ def release_root(tmp_path):
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('fixture', encoding='utf-8')
-    manifest = {'items': [{'id': 'fixture', 'recording': {'account_tier': 'starter',
+    manifest = {'items': [{'id': 'fixture', 'review': {'status': 'approved'}, 'recording': {'account_tier': 'starter',
         'license_review': {'commercial_use': True,
             'attribution_required': False, 'model_status': 'generally_available'}},
         'audio': {'path': 'data/assessment/audio/current.mp3'}}]}

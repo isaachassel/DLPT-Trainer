@@ -147,7 +147,7 @@ def present(result, *, preserve_audio=False):
             gr.update(value='Begin test' if not state else 'Start a new test', interactive=not active)]
 
 
-def start_demo(language, skill='Reading', starting_level='1+'):
+def start_demo(language, skill='Reading', starting_level='1+', seen_family_ids=None):
     if language not in ('Russian', 'Chinese'):
         raise gr.Error('Choose Russian or Chinese.')
     if skill not in ('Reading', 'Listening'):
@@ -159,7 +159,7 @@ def start_demo(language, skill='Reading', starting_level='1+'):
         'Shortened practice — 12 questions per skill / 30 minutes', 'Strict countdown',
         [], [], 'End of session', False, False, 'Automatic natural Russian voice', 'Normal', '',
         language_label='Mandarin Chinese' if language == 'Chinese' else 'Russian',
-        simulation_start_level=starting_level, progress=None)
+        simulation_start_level=starting_level, seen_family_ids=seen_family_ids, progress=None)
     state = result[0]
     if state:
         state.demo_mode = True
@@ -237,6 +237,10 @@ def build_app():
                         'Independent practice—not an official DLPT or an official score.', elem_classes=['demo-intro'])
             report = gr.HTML(visible=False)
             state, bundle, nonce = gr.State(), gr.State(), gr.State()
+            # Only public family IDs, no identity, answers or secrets. This is a
+            # best-effort same-browser exposure memory, not an account system.
+            exposure = gr.BrowserState([], storage_key='dlpt-passage-families-v1',
+                                       secret='public-passage-family-exposure-v1')
             with gr.Column(elem_classes=['demo-setup']) as setup:
                 language = gr.Radio(['Russian', 'Chinese'], value='Russian', label='Choose your language')
                 skill = gr.Radio(['Reading', 'Listening'], value='Reading', label='Choose your test')
@@ -245,7 +249,10 @@ def build_app():
                     value='1+', label='Choose your starting difficulty')
                 gr.Markdown('Difficulty can move up or down from either starting point. '
                             'Your answers determine your practice estimate.')
-                gr.Markdown('**One skill per test** · 12 questions · up to 30 minutes.\n\n'
+                gr.Markdown('This browser remembers authentic passages you have seen so they are not reused '
+                            'as fresh test material. This does not carry across devices or cleared browser storage.')
+                gr.Markdown('**One skill per test** · about 12 questions · up to 30 minutes. '
+                            'Authentic passage question groups stay together.\n\n'
                             'In Listening, each recording plays twice, with a beep between listens. Answer every question, then submit. '
                             'You cannot return to a submitted passage. Results appear at the end.')
                 begin = gr.Button('Begin test', variant='primary')
@@ -277,8 +284,12 @@ def build_app():
                        *question_outputs, test, submit, report, setup, begin]
             common = dict(show_progress='minimal', concurrency_id='demo-events', concurrency_limit=1)
             app.load(restore_demo, outputs=outputs, **common)
-            begin.click(start_demo, [language, skill, starting_level], outputs, trigger_mode='once', **common)
-            submit.click(submit_demo, [state, bundle, nonce, *answers], outputs, trigger_mode='once', **common)
+            def remember(result):
+                return [*result, result[0].seen_family_ids if result[0] else gr.skip()]
+            begin.click(lambda *args: remember(start_demo(*args)), [language, skill, starting_level, exposure],
+                        [*outputs, exposure], trigger_mode='once', **common)
+            submit.click(lambda *args: remember(submit_demo(*args)), [state, bundle, nonce, *answers],
+                         [*outputs, exposure], trigger_mode='once', **common)
             confirm_audio.click(audio_event, [state, event], [state, submit, status],
                                 js="(s,e) => [s, document.querySelector('#demo-audio-event textarea, #demo-audio-event input').value]",
                                 trigger_mode='multiple', **common)

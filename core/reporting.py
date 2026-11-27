@@ -11,6 +11,7 @@ from .storage import export_responses_csv, export_session_json
 from . import assessment
 from .adaptive import nearest_ilr
 from .constants import ILR_LEVELS
+from .source_credits import assessment_credits
 
 
 def _format_group(title: str, grouped: dict[str, tuple[int, int, float]]) -> list[str]:
@@ -165,6 +166,8 @@ def build_full_report(state: SessionState, bank: ItemBank) -> str:
     ]
     for skill in state.selected_skills:
         lines.append(build_skill_report(state, skill, bank, include_review=True))
+    if credits := assessment_credits(state, bank):
+        lines.append(credits)
     if state.mode == "assessment":
         return "\n\n".join(lines)
     return "\n\n---\n\n".join(lines)

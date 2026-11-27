@@ -137,6 +137,10 @@ def ensure_not_expired(state: SessionState, now: float | None = None) -> None:
 def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory | None = None) -> PassageBundle:
     ensure_not_expired(state)
     skill = state.active_skill
+    families = set(state.seen_family_ids) | (set(history.seen_family_ids) if history else set())
+    # Persist family exclusions so a legacy retry without history cannot re-use
+    # an authentic excerpt or another version of it as fresh diagnostic evidence.
+    state.seen_family_ids = sorted(families)
     if state.mode == "assessment":
         if state.status != "active" or assessment.stop_reason(state, skill):
             raise SessionFlowError("This assessment section has ended")
@@ -144,6 +148,7 @@ def select_next_bundle(state: SessionState, bank: ItemBank, history: UserHistory
         return activate_bundle(state, passage, shuffled_bundle(questions, seed=f"{state.session_id}:{passage.id}"))
     estimate = state.ability_for(skill)
     history_seen_passages = set(history.seen_passage_ids) if history else set()
+    history_seen_passages.update(p.id for p in bank.passages.values() if p.family_id and p.family_id in families)
     history_seen_questions = set(history.seen_question_ids) if history else set()
     first_passage = state.completed_count(skill) == 0
     if state.mode == "diagnostic" and state.adaptive_start_policy == "selected":
@@ -190,7 +195,7 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
             f"Cannot activate a {passage.language} passage in a {state.language} session."
         )
     remaining_target = state.max_questions_per_skill - state.completed_count(skill)
-    if state.mode != "assessment" and remaining_target > 0 and len(questions) > remaining_target:
+    if state.mode != "assessment" and not passage.family_id and remaining_target > 0 and len(questions) > remaining_target:
         questions = questions[:remaining_target]
     if not questions:
         raise SessionFlowError("No questions remain in the selected bundle.")
@@ -202,6 +207,12 @@ def activate_bundle(state: SessionState, passage: PassageItem, questions: list[Q
     state.current_listening_plays = 0
     state.current_listening_completed = 0
     state.current_started_at_epoch = time.time()
+    if passage.family_id:
+        state.seen_family_ids = sorted(set(state.seen_family_ids) | {passage.family_id})
+    from .source_credits import source_snapshot
+    credit = source_snapshot(passage)
+    if credit:
+        state.source_credits[passage.id] = credit
     return PassageBundle(passage=passage, questions=questions)
 
 
@@ -282,6 +293,7 @@ def submit_current_bundle(
             evidence_ru=question.evidence_ru,
             selected_key=selected,
             correct_key=question.correct_key,
+            option_id_map=question.answer_position_metadata.get("shuffle_map", {k: k for k in question.choices}),
             is_correct=selected == question.correct_key,
             # This is the observed latency from passage display to the learner's
             # final selection for this question. It is not an artificial equal
@@ -374,6 +386,7 @@ def update_history(history: UserHistory, state: SessionState) -> UserHistory:
     if history.language != state.language:
         raise SessionFlowError("Profile history language does not match the active session language.")
     history.seen_passage_ids = sorted(set(history.seen_passage_ids) | set(state.completed_passage_ids))
+    history.seen_family_ids = sorted(set(history.seen_family_ids) | set(state.seen_family_ids))
     history.seen_question_ids = sorted(set(history.seen_question_ids) | set(state.completed_question_ids))
     history.response_records.extend(state.responses)
     if state.reading_ability.items_answered:

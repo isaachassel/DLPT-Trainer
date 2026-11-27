@@ -74,12 +74,14 @@ def launch_kwargs() -> dict:
         "footer_links": [],
         # Serve only approved audio and the controlled runtime assets.
         "allowed_paths": [str(preset_audio), str(runtime_audio), str(runtime_exports)],
+        "blocked_paths": [str(ROOT / "data/content_packs"), str(ROOT / "data/assessment/bank.json"),
+                          str(ROOT / ".env"), str(ROOT / ".git")],
     }
     if is_hosted_demo():
         # Public demo endpoints serve recordings, never learner checkpoints or
         # exports. The local resume workflow remains available on this machine.
         kwargs["allowed_paths"] = [str(preset_audio)]
-        kwargs["blocked_paths"] = [
+        kwargs["blocked_paths"] += [
             str(ROOT / "storage"), str(ROOT / ".env"), str(ROOT / ".git"),
             str(settings.session_runtime_path(ROOT)),
             str(settings.history_runtime_path(ROOT)), str(runtime_exports),
