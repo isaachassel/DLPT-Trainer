@@ -1,0 +1,3049 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "id": "ru-listen-pilot01-sotnikova",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-sotnikova",
+        "family_id": "ru-listen-pilot01-sotnikova",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "1+",
+        "provisional_difficulty": -0.25,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Sport / self-description",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "На льду я чувствую себя по-другому, чем в жизни. В жизни я такая тихая, скромная, спокойная девочка, а, когда я выхожу на лед, я чувствую себя совсем другой. Я чувствую себя, можно сказать, королевой на льду, потому что я никогда не… поделю лед, потому что это уже моё, это другие ощущения.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Аделина Сотникова — radio excerpt",
+          "source_author": "Аделина Сотникова",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2014-03-01",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=610527981",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Adelina_Sotnikova_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "Familiar adjectives and an explicit contrast between daily life and performing. Repeated я чувствую себя supports comprehension; the figurative description raises the second item’s demand.",
+          "auditory_review_focus": "Check the fast delivery suggested by the caption-based pace. Do not test the unusual поделю лед phrase without confirming the sound and interpretation. Two questions are enough for this short, narrow excerpt.",
+          "attribution": "Аделина Сотникова, 2014-03-01, Adelina Sotnikova voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=610527981, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 51,
+        "audio_duration_seconds": 17.737125,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-sotnikova-q1",
+          "ru-listen-pilot01-sotnikova-q2"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-sotnikova-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "428711450b59ea3e96863bbf961e6d03e23313834176a4f730261eaf3dddfcdd",
+        "duplicate_detection_hash": "428711450b59ea3e96863bbf961e6d03e23313834176a4f730261eaf3dddfcdd"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-sotnikova-q1",
+          "passage_id": "ru-listen-pilot01-sotnikova",
+          "stem_en": "How does the speaker contrast her everyday self with her experience on the ice?",
+          "choices": {
+            "A": "She is sociable in everyday life but withdrawn on the ice.",
+            "B": "She is reserved in everyday life but feels commanding on the ice.",
+            "C": "She feels equally calm and modest in both settings.",
+            "D": "She is confident in everyday life but feels out of place on the ice."
+          },
+          "correct_key": "B",
+          "rationale_en": "The answer combines both sides of the contrast; it does not require knowing who the athlete is.",
+          "evidence_ru": "На льду я чувствую себя по-другому, чем в жизни.",
+          "question_type": "relationship of ideas",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "contrast",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-sotnikova-q2",
+          "passage_id": "ru-listen-pilot01-sotnikova",
+          "stem_en": "How does she describe herself in ordinary life?",
+          "choices": {
+            "A": "Competitive and demanding.",
+            "B": "Talkative and energetic.",
+            "C": "Anxious and indecisive.",
+            "D": "Quiet, modest, and calm."
+          },
+          "correct_key": "D",
+          "rationale_en": "This lower-demand item checks a concrete description rather than knowledge of skating.",
+          "evidence_ru": "В жизни я такая тихая, скромная, спокойная девочка,",
+          "question_type": "prominent detail",
+          "target_ilr": "1+",
+          "provisional_difficulty": -0.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "explicit_detail",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-sotnikova-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/7c3c524f477d981a9492f3168d05b361b06bb7660f97f1d2962694f49ab5b9dc.mp3",
+        "url": null,
+        "content_hash": "7c3c524f477d981a9492f3168d05b361b06bb7660f97f1d2962694f49ab5b9dc",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 17.737125,
+        "transcript_hash": "428711450b59ea3e96863bbf961e6d03e23313834176a4f730261eaf3dddfcdd",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "7c3c524f477d981a9492f3168d05b361b06bb7660f97f1d2962694f49ab5b9dc",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-sotnikova",
+        "family_id": "ru-listen-pilot01-sotnikova",
+        "speaker": "Аделина Сотникова",
+        "topic": "Sport / self-description",
+        "recording_date": "2014-03-01",
+        "provisional_ilr": "1+",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "На льду я чувствую себя по-другому, чем в жизни. В жизни я такая тихая, скромная, спокойная девочка, а, когда я выхожу на лед, я чувствую себя совсем другой. Я чувствую себя, можно сказать, королевой на льду, потому что я никогда не… поделю лед, потому что это уже моё, это другие ощущения.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 2.92,
+            "timing": "00:00.00–00:02.92",
+            "text": "На льду я чувствую себя по-другому, чем в жизни."
+          },
+          {
+            "id": "c2",
+            "start": 2.96,
+            "end": 6.11,
+            "timing": "00:02.96–00:06.11",
+            "text": "В жизни я такая тихая, скромная, спокойная девочка,"
+          },
+          {
+            "id": "c3",
+            "start": 6.14,
+            "end": 8.76,
+            "timing": "00:06.14–00:08.76",
+            "text": "а, когда я выхожу на лед, я чувствую себя совсем другой."
+          },
+          {
+            "id": "c4",
+            "start": 8.78,
+            "end": 11.73,
+            "timing": "00:08.78–00:11.73",
+            "text": "Я чувствую себя, можно сказать, королевой на льду, потому что"
+          },
+          {
+            "id": "c5",
+            "start": 11.78,
+            "end": 13.19,
+            "timing": "00:11.78–00:13.19",
+            "text": "я никогда не…"
+          },
+          {
+            "id": "c6",
+            "start": 13.26,
+            "end": 15.7,
+            "timing": "00:13.26–00:15.70",
+            "text": "поделю лед, потому что это уже моё,"
+          },
+          {
+            "id": "c7",
+            "start": 15.74,
+            "end": 17.79,
+            "timing": "00:15.74–00:17.79",
+            "text": "это другие ощущения."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-sotnikova-q1",
+            "stem_en": "How does the speaker contrast her everyday self with her experience on the ice?",
+            "skill": "contrast",
+            "choices": {
+              "A": "She is sociable in everyday life but withdrawn on the ice.",
+              "B": "She is reserved in everyday life but feels commanding on the ice.",
+              "C": "She feels equally calm and modest in both settings.",
+              "D": "She is confident in everyday life but feels out of place on the ice."
+            },
+            "correct_key": "B",
+            "explanation_en": "The answer combines both sides of the contrast; it does not require knowing who the athlete is.",
+            "evidence": [
+              {
+                "caption_id": "c1",
+                "timing": "00:00.00–00:02.92",
+                "quote_ru": "На льду я чувствую себя по-другому, чем в жизни."
+              },
+              {
+                "caption_id": "c2",
+                "timing": "00:02.96–00:06.11",
+                "quote_ru": "В жизни я такая тихая, скромная, спокойная девочка,"
+              },
+              {
+                "caption_id": "c3",
+                "timing": "00:06.14–00:08.76",
+                "quote_ru": "а, когда я выхожу на лед, я чувствую себя совсем другой."
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:08.78–00:11.73",
+                "quote_ru": "Я чувствую себя, можно сказать, королевой на льду, потому что"
+              }
+            ],
+            "option_rationales": {
+              "A": "This reverses the everyday description and does not match the image of a queen on the ice.",
+              "B": "Quiet, modest, and calm contrast with feeling like a queen in her own domain.",
+              "C": "She explicitly says she feels different when she goes onto the ice.",
+              "D": "The passage places the reserved description in everyday life and a sense of ownership on the ice."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-sotnikova-q2",
+            "stem_en": "How does she describe herself in ordinary life?",
+            "skill": "explicit_detail",
+            "choices": {
+              "A": "Competitive and demanding.",
+              "B": "Talkative and energetic.",
+              "C": "Anxious and indecisive.",
+              "D": "Quiet, modest, and calm."
+            },
+            "correct_key": "D",
+            "explanation_en": "This lower-demand item checks a concrete description rather than knowledge of skating.",
+            "evidence": [
+              {
+                "caption_id": "c2",
+                "timing": "00:02.96–00:06.11",
+                "quote_ru": "В жизни я такая тихая, скромная, спокойная девочка,"
+              }
+            ],
+            "option_rationales": {
+              "A": "These traits are not her stated everyday self-description.",
+              "B": "She instead calls herself quiet and calm.",
+              "C": "Neither trait is stated; quiet does not mean anxious.",
+              "D": "These directly paraphrase тихая, скромная, спокойная."
+            }
+          }
+        ],
+        "duration_seconds": 17.737125,
+        "reported_ogg_duration_seconds": 17.74,
+        "caption_overrun_seconds": 0.05288,
+        "difficulty_rationale": "Familiar adjectives and an explicit contrast between daily life and performing. Repeated я чувствую себя supports comprehension; the figurative description raises the second item’s demand.",
+        "auditory_review_focus": "Check the fast delivery suggested by the caption-based pace. Do not test the unusual поделю лед phrase without confirming the sound and interpretation. Two questions are enough for this short, narrow excerpt.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=610527981",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Adelina_Sotnikova_voice.oga",
+        "attribution": "Аделина Сотникова, 2014-03-01, Adelina Sotnikova voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=610527981, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "7c3c524f477d981a9492f3168d05b361b06bb7660f97f1d2962694f49ab5b9dc",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    },
+    {
+      "id": "ru-listen-pilot01-shparo",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-shparo",
+        "family_id": "ru-listen-pilot01-shparo",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Creative work / thinking habits",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "Я все-таки много пишу, и вот когда я пишу, когда я занимаюсь творчеством, связанным с тем, что ты мыслишь и что-то такое записываешь, а потом это исправляешь, исправляешь, исправляешь, исправляешь… И это очень похоже на то, как я доказывал теоремы. Я доказывал теоремы, там, в трамвае, в метро, и сейчас всё это продолжается. Я ложусь спать и составляю те предложения, которые на следующее утро, если не забуду, постараюсь написать.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Дмитрий Шпаро — radio excerpt",
+          "source_author": "Дмитрий Шпаро",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2014-07-26",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=633847801",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Dmitrij_Shparo_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "A connected personal explanation compares writing with mathematical problem-solving and ends with a conditional intention. Repetitions and embedded clauses require following an unfinished spoken thought.",
+          "auditory_review_focus": "Confirm that the listener can follow the long opening sentence at natural speed. Knowledge of how to prove a theorem is unnecessary; the comparison is stated.",
+          "attribution": "Дмитрий Шпаро, 2014-07-26, Dmitrij Shparo voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=633847801, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 69,
+        "audio_duration_seconds": 32.0925,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-shparo-q1",
+          "ru-listen-pilot01-shparo-q2",
+          "ru-listen-pilot01-shparo-q3"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-shparo-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "b72f83d8cf2d9d5297126366c0b1febf066a7d72f5479e8d3de07bf3c7f34b19",
+        "duplicate_detection_hash": "b72f83d8cf2d9d5297126366c0b1febf066a7d72f5479e8d3de07bf3c7f34b19"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-shparo-q1",
+          "passage_id": "ru-listen-pilot01-shparo",
+          "stem_en": "What similarity does the speaker draw between writing and proving theorems?",
+          "choices": {
+            "A": "Both involve thinking through ideas and working them over.",
+            "B": "Both must be completed at a desk before going to bed.",
+            "C": "Both depend on copying a solution that already exists.",
+            "D": "Both have become activities that he no longer pursues."
+          },
+          "correct_key": "A",
+          "rationale_en": "Follow the comparison introduced by похоже на то, как; it concerns a mental process, not a shared workplace.",
+          "evidence_ru": "Я все-таки много пишу, и вот когда я пишу,",
+          "question_type": "main idea",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "main_idea",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-shparo-q2",
+          "passage_id": "ru-listen-pilot01-shparo",
+          "stem_en": "What does he describe doing as he goes to bed?",
+          "choices": {
+            "A": "Reading the sentences he wrote that morning.",
+            "B": "Writing down solutions to other people’s theorems.",
+            "C": "Composing sentences in his mind for possible use the next morning.",
+            "D": "Correcting a manuscript with another writer."
+          },
+          "correct_key": "C",
+          "rationale_en": "Distinguish mentally composing sentences now from writing them down later.",
+          "evidence_ru": "Я ложусь спать и составляю те предложения, которые на следующее утро,",
+          "question_type": "prominent detail",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "detail_paraphrase",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-shparo-q3",
+          "passage_id": "ru-listen-pilot01-shparo",
+          "stem_en": "What qualification does he place on writing those sentences the next morning?",
+          "choices": {
+            "A": "He will do so only while traveling on the metro.",
+            "B": "He will try to write them if he has not forgotten them.",
+            "C": "He is certain to write every sentence exactly as planned.",
+            "D": "He will first ask someone else to check their grammar."
+          },
+          "correct_key": "B",
+          "rationale_en": "A plan qualified by memory and effort is not a guaranteed result.",
+          "evidence_ru": "если не забуду, постараюсь написать.",
+          "question_type": "speaker/writer intent",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "conditional_intention",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-shparo-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/05793e993f3850eeb257702029334645f928f6eed384e6b07593c04cd97d6f5f.mp3",
+        "url": null,
+        "content_hash": "05793e993f3850eeb257702029334645f928f6eed384e6b07593c04cd97d6f5f",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 32.0925,
+        "transcript_hash": "b72f83d8cf2d9d5297126366c0b1febf066a7d72f5479e8d3de07bf3c7f34b19",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "05793e993f3850eeb257702029334645f928f6eed384e6b07593c04cd97d6f5f",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-shparo",
+        "family_id": "ru-listen-pilot01-shparo",
+        "speaker": "Дмитрий Шпаро",
+        "topic": "Creative work / thinking habits",
+        "recording_date": "2014-07-26",
+        "provisional_ilr": "2",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "Я все-таки много пишу, и вот когда я пишу, когда я занимаюсь творчеством, связанным с тем, что ты мыслишь и что-то такое записываешь, а потом это исправляешь, исправляешь, исправляешь, исправляешь… И это очень похоже на то, как я доказывал теоремы. Я доказывал теоремы, там, в трамвае, в метро, и сейчас всё это продолжается. Я ложусь спать и составляю те предложения, которые на следующее утро, если не забуду, постараюсь написать.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 5.43,
+            "timing": "00:00.00–00:05.43",
+            "text": "Я все-таки много пишу, и вот когда я пишу,"
+          },
+          {
+            "id": "c2",
+            "start": 5.45,
+            "end": 7.76,
+            "timing": "00:05.45–00:07.76",
+            "text": "когда я занимаюсь творчеством,"
+          },
+          {
+            "id": "c3",
+            "start": 7.8,
+            "end": 12.41,
+            "timing": "00:07.80–00:12.41",
+            "text": "связанным с тем, что ты мыслишь и что-то такое записываешь,"
+          },
+          {
+            "id": "c4",
+            "start": 12.43,
+            "end": 17.78,
+            "timing": "00:12.43–00:17.78",
+            "text": "а потом это исправляешь, исправляешь, исправляешь, исправляешь…"
+          },
+          {
+            "id": "c5",
+            "start": 18.77,
+            "end": 21.41,
+            "timing": "00:18.77–00:21.41",
+            "text": "И это очень похоже на то, как я доказывал теоремы."
+          },
+          {
+            "id": "c6",
+            "start": 21.53,
+            "end": 26.35,
+            "timing": "00:21.53–00:26.35",
+            "text": "Я доказывал теоремы, там, в трамвае, в метро, и сейчас всё это продолжается."
+          },
+          {
+            "id": "c7",
+            "start": 26.38,
+            "end": 30.1,
+            "timing": "00:26.38–00:30.10",
+            "text": "Я ложусь спать и составляю те предложения, которые на следующее утро,"
+          },
+          {
+            "id": "c8",
+            "start": 30.14,
+            "end": 32.09,
+            "timing": "00:30.14–00:32.09",
+            "text": "если не забуду, постараюсь написать."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-shparo-q1",
+            "stem_en": "What similarity does the speaker draw between writing and proving theorems?",
+            "skill": "main_idea",
+            "choices": {
+              "A": "Both involve thinking through ideas and working them over.",
+              "B": "Both must be completed at a desk before going to bed.",
+              "C": "Both depend on copying a solution that already exists.",
+              "D": "Both have become activities that he no longer pursues."
+            },
+            "correct_key": "A",
+            "explanation_en": "Follow the comparison introduced by похоже на то, как; it concerns a mental process, not a shared workplace.",
+            "evidence": [
+              {
+                "caption_id": "c1",
+                "timing": "00:00.00–00:05.43",
+                "quote_ru": "Я все-таки много пишу, и вот когда я пишу,"
+              },
+              {
+                "caption_id": "c3",
+                "timing": "00:07.80–00:12.41",
+                "quote_ru": "связанным с тем, что ты мыслишь и что-то такое записываешь,"
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:12.43–00:17.78",
+                "quote_ru": "а потом это исправляешь, исправляешь, исправляешь, исправляешь…"
+              },
+              {
+                "caption_id": "c5",
+                "timing": "00:18.77–00:21.41",
+                "quote_ru": "И это очень похоже на то, как я доказывал теоремы."
+              }
+            ],
+            "option_rationales": {
+              "A": "He links thinking, recording, and repeated correction in writing to his earlier theorem work.",
+              "B": "He recalls proving theorems on public transport and composing sentences at bedtime.",
+              "C": "No copying or external model is described.",
+              "D": "He says he writes a lot and that the thinking process continues."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-shparo-q2",
+            "stem_en": "What does he describe doing as he goes to bed?",
+            "skill": "detail_paraphrase",
+            "choices": {
+              "A": "Reading the sentences he wrote that morning.",
+              "B": "Writing down solutions to other people’s theorems.",
+              "C": "Composing sentences in his mind for possible use the next morning.",
+              "D": "Correcting a manuscript with another writer."
+            },
+            "correct_key": "C",
+            "explanation_en": "Distinguish mentally composing sentences now from writing them down later.",
+            "evidence": [
+              {
+                "caption_id": "c7",
+                "timing": "00:26.38–00:30.10",
+                "quote_ru": "Я ложусь спать и составляю те предложения, которые на следующее утро,"
+              },
+              {
+                "caption_id": "c8",
+                "timing": "00:30.14–00:32.09",
+                "quote_ru": "если не забуду, постараюсь написать."
+              }
+            ],
+            "option_rationales": {
+              "A": "He is forming sentences for the following morning, not reading a completed text.",
+              "B": "The theorem example concerns his earlier activity; this final example concerns sentences.",
+              "C": "He forms sentences at bedtime and hopes to write them the next morning if he remembers.",
+              "D": "No collaborator is mentioned."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-shparo-q3",
+            "stem_en": "What qualification does he place on writing those sentences the next morning?",
+            "skill": "conditional_intention",
+            "choices": {
+              "A": "He will do so only while traveling on the metro.",
+              "B": "He will try to write them if he has not forgotten them.",
+              "C": "He is certain to write every sentence exactly as planned.",
+              "D": "He will first ask someone else to check their grammar."
+            },
+            "correct_key": "B",
+            "explanation_en": "A plan qualified by memory and effort is not a guaranteed result.",
+            "evidence": [
+              {
+                "caption_id": "c8",
+                "timing": "00:30.14–00:32.09",
+                "quote_ru": "если не забуду, постараюсь написать."
+              }
+            ],
+            "option_rationales": {
+              "A": "The metro belongs to the earlier theorem example.",
+              "B": "This preserves both если не забуду and постараюсь.",
+              "C": "The conditional and the verb of trying rule out certainty.",
+              "D": "No such check is mentioned."
+            }
+          }
+        ],
+        "duration_seconds": 32.0925,
+        "reported_ogg_duration_seconds": 32.09,
+        "caption_overrun_seconds": 0,
+        "difficulty_rationale": "A connected personal explanation compares writing with mathematical problem-solving and ends with a conditional intention. Repetitions and embedded clauses require following an unfinished spoken thought.",
+        "auditory_review_focus": "Confirm that the listener can follow the long opening sentence at natural speed. Knowledge of how to prove a theorem is unnecessary; the comparison is stated.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=633847801",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Dmitrij_Shparo_voice.oga",
+        "attribution": "Дмитрий Шпаро, 2014-07-26, Dmitrij Shparo voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=633847801, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "05793e993f3850eeb257702029334645f928f6eed384e6b07593c04cd97d6f5f",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    },
+    {
+      "id": "ru-listen-pilot01-zasov",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-zasov",
+        "family_id": "ru-listen-pilot01-zasov",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Science / childhood curiosity",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "Люди с детства сталкиваются с астрономическими явлениями, и им интересно понять, что это такое. А взрослые, как правило, не могут ответить на их вопросы. Тогда начинают искать, начинают интересоваться. А потом со временем либо взрослые гасят всякую любознательность, либо другие интересы настолько перебивают, что уже люди забывают, что мы часть большого мира, большой Вселенной, и уже занимаются более прагматичными вещами. Но любителей-то астрономии всегда много и было, и есть.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Анатолий Засов — radio excerpt",
+          "source_author": "Анатолий Засов",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2014-08-23",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=630394118",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Anatolij_Zasov_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "The speaker explains a familiar social process using abstract vocabulary, alternative causes, and a qualifying conclusion. No astronomy facts are needed.",
+          "auditory_review_focus": "Review whether the abstract vocabulary pushes the clip toward 2+ for the target group. The question about lost interest should preserve the alternatives rather than assert both occur in every case.",
+          "attribution": "Анатолий Засов, 2014-08-23, Anatolij Zasov voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=630394118, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 69,
+        "audio_duration_seconds": 30.8125,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-zasov-q1",
+          "ru-listen-pilot01-zasov-q2",
+          "ru-listen-pilot01-zasov-q3"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-zasov-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "60f231601eb32b4daf8f9b24a6881298ef646008e6dd4f92bdb6cf950290f750",
+        "duplicate_detection_hash": "60f231601eb32b4daf8f9b24a6881298ef646008e6dd4f92bdb6cf950290f750"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-zasov-q1",
+          "passage_id": "ru-listen-pilot01-zasov",
+          "stem_en": "What initially draws children toward astronomy in the speaker’s account?",
+          "choices": {
+            "A": "Encountering phenomena that they want to understand.",
+            "B": "Receiving complete explanations from adults.",
+            "C": "Discovering that astronomy offers practical career benefits.",
+            "D": "Being required to memorize scientific terminology."
+          },
+          "correct_key": "A",
+          "rationale_en": "The starting point is curiosity about observed phenomena, not formal study or a career plan.",
+          "evidence_ru": "Люди с детства сталкиваются с астрономическими явлениями,",
+          "question_type": "cause and effect",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "explicit_cause",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-zasov-q2",
+          "passage_id": "ru-listen-pilot01-zasov",
+          "stem_en": "What reasons does he give for interest in astronomy fading?",
+          "choices": {
+            "A": "Children receive so many answers that there is nothing left to discover.",
+            "B": "Astronomical phenomena become less visible as people grow older.",
+            "C": "Astronomy clubs stop accepting people once they become adults.",
+            "D": "Adults may discourage curiosity, or other interests may crowd it out."
+          },
+          "correct_key": "D",
+          "rationale_en": "The correct choice retains the alternatives and avoids treating either cause as universal.",
+          "evidence_ru": "А потом со временем либо взрослые гасят всякую любознательность,",
+          "question_type": "cause and effect",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "alternative_causes",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-zasov-q3",
+          "passage_id": "ru-listen-pilot01-zasov",
+          "stem_en": "What does the speaker emphasize at the end?",
+          "choices": {
+            "A": "Only professional scientists remain interested in astronomy.",
+            "B": "Interest in astronomy has disappeared from society.",
+            "C": "There have nevertheless always been many astronomy enthusiasts.",
+            "D": "Adults have recently become able to answer all children’s questions."
+          },
+          "correct_key": "C",
+          "rationale_en": "The final contrast prevents an overly pessimistic interpretation of the earlier generalization.",
+          "evidence_ru": "Но любителей-то астрономии всегда много и было, и есть.",
+          "question_type": "relationship of ideas",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "qualifying_conclusion",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-zasov-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/0d5072058ba24f83cdc800884db1ec84ea02e5ea52ae126c6072cc33e0bdbcde.mp3",
+        "url": null,
+        "content_hash": "0d5072058ba24f83cdc800884db1ec84ea02e5ea52ae126c6072cc33e0bdbcde",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 30.8125,
+        "transcript_hash": "60f231601eb32b4daf8f9b24a6881298ef646008e6dd4f92bdb6cf950290f750",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "0d5072058ba24f83cdc800884db1ec84ea02e5ea52ae126c6072cc33e0bdbcde",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-zasov",
+        "family_id": "ru-listen-pilot01-zasov",
+        "speaker": "Анатолий Засов",
+        "topic": "Science / childhood curiosity",
+        "recording_date": "2014-08-23",
+        "provisional_ilr": "2",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "Люди с детства сталкиваются с астрономическими явлениями, и им интересно понять, что это такое. А взрослые, как правило, не могут ответить на их вопросы. Тогда начинают искать, начинают интересоваться. А потом со временем либо взрослые гасят всякую любознательность, либо другие интересы настолько перебивают, что уже люди забывают, что мы часть большого мира, большой Вселенной, и уже занимаются более прагматичными вещами. Но любителей-то астрономии всегда много и было, и есть.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 2.69,
+            "timing": "00:00.00–00:02.69",
+            "text": "Люди с детства сталкиваются с астрономическими явлениями,"
+          },
+          {
+            "id": "c2",
+            "start": 2.71,
+            "end": 4.83,
+            "timing": "00:02.71–00:04.83",
+            "text": "и им интересно понять, что это такое."
+          },
+          {
+            "id": "c3",
+            "start": 5.32,
+            "end": 8.22,
+            "timing": "00:05.32–00:08.22",
+            "text": "А взрослые, как правило, не могут ответить на их вопросы."
+          },
+          {
+            "id": "c4",
+            "start": 8.27,
+            "end": 10.51,
+            "timing": "00:08.27–00:10.51",
+            "text": "Тогда начинают искать, начинают интересоваться."
+          },
+          {
+            "id": "c5",
+            "start": 10.77,
+            "end": 15.24,
+            "timing": "00:10.77–00:15.24",
+            "text": "А потом со временем либо взрослые гасят всякую любознательность,"
+          },
+          {
+            "id": "c6",
+            "start": 15.27,
+            "end": 20.77,
+            "timing": "00:15.27–00:20.77",
+            "text": "либо другие интересы настолько перебивают, что уже люди забывают,"
+          },
+          {
+            "id": "c7",
+            "start": 20.79,
+            "end": 23.84,
+            "timing": "00:20.79–00:23.84",
+            "text": "что мы часть большого мира, большой Вселенной,"
+          },
+          {
+            "id": "c8",
+            "start": 23.88,
+            "end": 26.84,
+            "timing": "00:23.88–00:26.84",
+            "text": "и уже занимаются более прагматичными вещами."
+          },
+          {
+            "id": "c9",
+            "start": 26.88,
+            "end": 30.79,
+            "timing": "00:26.88–00:30.79",
+            "text": "Но любителей-то астрономии всегда много и было, и есть."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-zasov-q1",
+            "stem_en": "What initially draws children toward astronomy in the speaker’s account?",
+            "skill": "explicit_cause",
+            "choices": {
+              "A": "Encountering phenomena that they want to understand.",
+              "B": "Receiving complete explanations from adults.",
+              "C": "Discovering that astronomy offers practical career benefits.",
+              "D": "Being required to memorize scientific terminology."
+            },
+            "correct_key": "A",
+            "explanation_en": "The starting point is curiosity about observed phenomena, not formal study or a career plan.",
+            "evidence": [
+              {
+                "caption_id": "c1",
+                "timing": "00:00.00–00:02.69",
+                "quote_ru": "Люди с детства сталкиваются с астрономическими явлениями,"
+              },
+              {
+                "caption_id": "c2",
+                "timing": "00:02.71–00:04.83",
+                "quote_ru": "и им интересно понять, что это такое."
+              },
+              {
+                "caption_id": "c3",
+                "timing": "00:05.32–00:08.22",
+                "quote_ru": "А взрослые, как правило, не могут ответить на их вопросы."
+              }
+            ],
+            "option_rationales": {
+              "A": "The opening connects exposure to astronomical phenomena with wanting to know what they are.",
+              "B": "The speaker says adults generally cannot answer their questions.",
+              "C": "Practical concerns appear later as competing interests, not the initial attraction.",
+              "D": "No memorization requirement is described."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-zasov-q2",
+            "stem_en": "What reasons does he give for interest in astronomy fading?",
+            "skill": "alternative_causes",
+            "choices": {
+              "A": "Children receive so many answers that there is nothing left to discover.",
+              "B": "Astronomical phenomena become less visible as people grow older.",
+              "C": "Astronomy clubs stop accepting people once they become adults.",
+              "D": "Adults may discourage curiosity, or other interests may crowd it out."
+            },
+            "correct_key": "D",
+            "explanation_en": "The correct choice retains the alternatives and avoids treating either cause as universal.",
+            "evidence": [
+              {
+                "caption_id": "c5",
+                "timing": "00:10.77–00:15.24",
+                "quote_ru": "А потом со временем либо взрослые гасят всякую любознательность,"
+              },
+              {
+                "caption_id": "c6",
+                "timing": "00:15.27–00:20.77",
+                "quote_ru": "либо другие интересы настолько перебивают, что уже люди забывают,"
+              },
+              {
+                "caption_id": "c8",
+                "timing": "00:23.88–00:26.84",
+                "quote_ru": "и уже занимаются более прагматичными вещами."
+              }
+            ],
+            "option_rationales": {
+              "A": "The excerpt begins with unanswered questions, not complete explanations.",
+              "B": "The explanation concerns social and personal interests, not visibility.",
+              "C": "No admission rule or age restriction is mentioned.",
+              "D": "The two alternatives follow либо ... либо."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-zasov-q3",
+            "stem_en": "What does the speaker emphasize at the end?",
+            "skill": "qualifying_conclusion",
+            "choices": {
+              "A": "Only professional scientists remain interested in astronomy.",
+              "B": "Interest in astronomy has disappeared from society.",
+              "C": "There have nevertheless always been many astronomy enthusiasts.",
+              "D": "Adults have recently become able to answer all children’s questions."
+            },
+            "correct_key": "C",
+            "explanation_en": "The final contrast prevents an overly pessimistic interpretation of the earlier generalization.",
+            "evidence": [
+              {
+                "caption_id": "c9",
+                "timing": "00:26.88–00:30.79",
+                "quote_ru": "Но любителей-то астрономии всегда много и было, и есть."
+              }
+            ],
+            "option_rationales": {
+              "A": "Любителей means enthusiasts; the conclusion is not limited to professionals.",
+              "B": "This contradicts the closing statement that there have always been many enthusiasts.",
+              "C": "The final Но qualifies the preceding account of fading curiosity.",
+              "D": "No such improvement is stated."
+            }
+          }
+        ],
+        "duration_seconds": 30.8125,
+        "reported_ogg_duration_seconds": 30.81,
+        "caption_overrun_seconds": 0,
+        "difficulty_rationale": "The speaker explains a familiar social process using abstract vocabulary, alternative causes, and a qualifying conclusion. No astronomy facts are needed.",
+        "auditory_review_focus": "Review whether the abstract vocabulary pushes the clip toward 2+ for the target group. The question about lost interest should preserve the alternatives rather than assert both occur in every case.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=630394118",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Anatolij_Zasov_voice.oga",
+        "attribution": "Анатолий Засов, 2014-08-23, Anatolij Zasov voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=630394118, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "0d5072058ba24f83cdc800884db1ec84ea02e5ea52ae126c6072cc33e0bdbcde",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    },
+    {
+      "id": "ru-listen-pilot01-lazutkin",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-lazutkin",
+        "family_id": "ru-listen-pilot01-lazutkin",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "2",
+        "provisional_difficulty": 0.5,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Spaceflight / response to danger",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "Если ты начнёшь осознавать степень опасности, ты подумаешь: а вообще мне стоит лететь туда или не стоит, стоит так делать или не стоит. Допустим, когда у нас какие-то там ситуации были страшные, тот же пожар или столкновение со станцией, когда наступал момент, то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно — или дырочку закрываешь. А потом, когда ты осмысливаешь ситуацию, уже вроде всё улеглось, и тебе становится потом страшно, думаешь: ёлки-палки, вот если бы я бы вот... по-другому пошло бы всё, то я бы уже, может быть, и не думал бы.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Александр Лазуткин — radio excerpt",
+          "source_author": "Александр Лазуткин",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2012-10-01",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=628701793",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Aleksandr_Lazutkin_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "A concrete account of emergency action is contrasted with later emotional processing. Hypotheticals, false starts, and the elliptical ending increase the inference demand.",
+          "auditory_review_focus": "Check that the fire/collision references and the final counterfactual are intelligible. Keep the inference narrow: he fears a fatal alternative, without specifying an accident outcome beyond what he says.",
+          "attribution": "Александр Лазуткин, 2012-10-01, Aleksandr Lazutkin voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=628701793, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 94,
+        "audio_duration_seconds": 38.0081875,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-lazutkin-q1",
+          "ru-listen-pilot01-lazutkin-q2",
+          "ru-listen-pilot01-lazutkin-q3"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-lazutkin-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "a740c86e84ace5e77aa39ccfeb820c9d68c291d4002a074d94229aa7cf63f7f7",
+        "duplicate_detection_hash": "a740c86e84ace5e77aa39ccfeb820c9d68c291d4002a074d94229aa7cf63f7f7"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-lazutkin-q1",
+          "passage_id": "ru-listen-pilot01-lazutkin",
+          "stem_en": "When does the speaker say fear can become prominent?",
+          "choices": {
+            "A": "Before every task, preventing him from taking action.",
+            "B": "After the immediate crisis, when he reflects on what happened.",
+            "C": "Only after someone else explains the situation to him.",
+            "D": "Only while deciding whether to begin his first spaceflight."
+          },
+          "correct_key": "B",
+          "rationale_en": "Track the shift from immediate action to later reflection rather than attaching fear to the opening hypothetical alone.",
+          "evidence_ru": "то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно —",
+          "question_type": "sequence",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "sequence",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-lazutkin-q2",
+          "passage_id": "ru-listen-pilot01-lazutkin",
+          "stem_en": "What does he describe doing during an emergency?",
+          "choices": {
+            "A": "Trying to extinguish a fire or close a hole.",
+            "B": "Waiting until he has calculated every possible danger.",
+            "C": "Leaving all repairs to people outside the station.",
+            "D": "Recording his thoughts before responding."
+          },
+          "correct_key": "A",
+          "rationale_en": "The item tests the named actions, not technical knowledge of spacecraft repairs.",
+          "evidence_ru": "то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно —",
+          "question_type": "prominent detail",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "explicit_detail",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-lazutkin-q3",
+          "passage_id": "ru-listen-pilot01-lazutkin",
+          "stem_en": "What is implied by the final thought that, had events gone differently, he might no longer be thinking?",
+          "choices": {
+            "A": "He expected to forget the incident once he went home.",
+            "B": "He believed thinking itself had caused the emergency.",
+            "C": "He planned to stop considering the risks of future flights.",
+            "D": "He realizes that a different outcome could have cost him his life."
+          },
+          "correct_key": "D",
+          "rationale_en": "The phrase is indirect. The context supports possible death, not a specific injury or a claim that the actual event was fatal.",
+          "evidence_ru": "уже вроде всё улеглось, и тебе становится потом страшно,",
+          "question_type": "inference",
+          "target_ilr": "2",
+          "provisional_difficulty": 0.5,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "supported_inference",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-lazutkin-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/c591d9ea25b1c10c4c46c3b417325503d0e85f7b9bb2717a1290cca3a4c2eef8.mp3",
+        "url": null,
+        "content_hash": "c591d9ea25b1c10c4c46c3b417325503d0e85f7b9bb2717a1290cca3a4c2eef8",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 38.0081875,
+        "transcript_hash": "a740c86e84ace5e77aa39ccfeb820c9d68c291d4002a074d94229aa7cf63f7f7",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "c591d9ea25b1c10c4c46c3b417325503d0e85f7b9bb2717a1290cca3a4c2eef8",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-lazutkin",
+        "family_id": "ru-listen-pilot01-lazutkin",
+        "speaker": "Александр Лазуткин",
+        "topic": "Spaceflight / response to danger",
+        "recording_date": "2012-10-01",
+        "provisional_ilr": "2",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "Если ты начнёшь осознавать степень опасности, ты подумаешь: а вообще мне стоит лететь туда или не стоит, стоит так делать или не стоит. Допустим, когда у нас какие-то там ситуации были страшные, тот же пожар или столкновение со станцией, когда наступал момент, то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно — или дырочку закрываешь. А потом, когда ты осмысливаешь ситуацию, уже вроде всё улеглось, и тебе становится потом страшно, думаешь: ёлки-палки, вот если бы я бы вот... по-другому пошло бы всё, то я бы уже, может быть, и не думал бы.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 3.51,
+            "timing": "00:00.00–00:03.51",
+            "text": "Если ты начнёшь осознавать степень опасности, ты подумаешь:"
+          },
+          {
+            "id": "c2",
+            "start": 3.53,
+            "end": 5.71,
+            "timing": "00:03.53–00:05.71",
+            "text": "а вообще мне стоит лететь туда или не стоит,"
+          },
+          {
+            "id": "c3",
+            "start": 5.73,
+            "end": 7.21,
+            "timing": "00:05.73–00:07.21",
+            "text": "стоит так делать или не стоит."
+          },
+          {
+            "id": "c4",
+            "start": 7.25,
+            "end": 9.97,
+            "timing": "00:07.25–00:09.97",
+            "text": "Допустим, когда у нас какие-то там ситуации были страшные,"
+          },
+          {
+            "id": "c5",
+            "start": 9.99,
+            "end": 12.59,
+            "timing": "00:09.99–00:12.59",
+            "text": "тот же пожар или столкновение со станцией,"
+          },
+          {
+            "id": "c6",
+            "start": 14.45,
+            "end": 16.47,
+            "timing": "00:14.45–00:16.47",
+            "text": "когда наступал момент,"
+          },
+          {
+            "id": "c7",
+            "start": 16.52,
+            "end": 21.24,
+            "timing": "00:16.52–00:21.24",
+            "text": "то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно —"
+          },
+          {
+            "id": "c8",
+            "start": 21.54,
+            "end": 24.54,
+            "timing": "00:21.54–00:24.54",
+            "text": "или дырочку закрываешь."
+          },
+          {
+            "id": "c9",
+            "start": 25.2,
+            "end": 28.31,
+            "timing": "00:25.20–00:28.31",
+            "text": "А потом, когда ты осмысливаешь ситуацию,"
+          },
+          {
+            "id": "c10",
+            "start": 28.92,
+            "end": 31.97,
+            "timing": "00:28.92–00:31.97",
+            "text": "уже вроде всё улеглось, и тебе становится потом страшно,"
+          },
+          {
+            "id": "c11",
+            "start": 31.99,
+            "end": 34.78,
+            "timing": "00:31.99–00:34.78",
+            "text": "думаешь: ёлки-палки, вот если бы я бы вот..."
+          },
+          {
+            "id": "c12",
+            "start": 34.81,
+            "end": 38.06,
+            "timing": "00:34.81–00:38.06",
+            "text": "по-другому пошло бы всё, то я бы уже, может быть, и не думал бы."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-lazutkin-q1",
+            "stem_en": "When does the speaker say fear can become prominent?",
+            "skill": "sequence",
+            "choices": {
+              "A": "Before every task, preventing him from taking action.",
+              "B": "After the immediate crisis, when he reflects on what happened.",
+              "C": "Only after someone else explains the situation to him.",
+              "D": "Only while deciding whether to begin his first spaceflight."
+            },
+            "correct_key": "B",
+            "explanation_en": "Track the shift from immediate action to later reflection rather than attaching fear to the opening hypothetical alone.",
+            "evidence": [
+              {
+                "caption_id": "c7",
+                "timing": "00:16.52–00:21.24",
+                "quote_ru": "то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно —"
+              },
+              {
+                "caption_id": "c9",
+                "timing": "00:25.20–00:28.31",
+                "quote_ru": "А потом, когда ты осмысливаешь ситуацию,"
+              },
+              {
+                "caption_id": "c10",
+                "timing": "00:28.92–00:31.97",
+                "quote_ru": "уже вроде всё улеглось, и тебе становится потом страшно,"
+              }
+            ],
+            "option_rationales": {
+              "A": "He says he acts during the emergency without thinking about how dangerous it is.",
+              "B": "The later reflection follows the urgent response and the situation settling down.",
+              "C": "No outside explanation is required in his account.",
+              "D": "The opening is hypothetical; the main example concerns reflection after emergencies."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-lazutkin-q2",
+            "stem_en": "What does he describe doing during an emergency?",
+            "skill": "explicit_detail",
+            "choices": {
+              "A": "Trying to extinguish a fire or close a hole.",
+              "B": "Waiting until he has calculated every possible danger.",
+              "C": "Leaving all repairs to people outside the station.",
+              "D": "Recording his thoughts before responding."
+            },
+            "correct_key": "A",
+            "explanation_en": "The item tests the named actions, not technical knowledge of spacecraft repairs.",
+            "evidence": [
+              {
+                "caption_id": "c7",
+                "timing": "00:16.52–00:21.24",
+                "quote_ru": "то там кидаешься пожар тушить — ты даже не думаешь, насколько это опасно —"
+              },
+              {
+                "caption_id": "c8",
+                "timing": "00:21.54–00:24.54",
+                "quote_ru": "или дырочку закрываешь."
+              }
+            ],
+            "option_rationales": {
+              "A": "These are the two concrete responses he names.",
+              "B": "He emphasizes acting without dwelling on the danger.",
+              "C": "No such division of responsibility is described.",
+              "D": "Reflection is described as following action, not preceding it."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-lazutkin-q3",
+            "stem_en": "What is implied by the final thought that, had events gone differently, he might no longer be thinking?",
+            "skill": "supported_inference",
+            "choices": {
+              "A": "He expected to forget the incident once he went home.",
+              "B": "He believed thinking itself had caused the emergency.",
+              "C": "He planned to stop considering the risks of future flights.",
+              "D": "He realizes that a different outcome could have cost him his life."
+            },
+            "correct_key": "D",
+            "explanation_en": "The phrase is indirect. The context supports possible death, not a specific injury or a claim that the actual event was fatal.",
+            "evidence": [
+              {
+                "caption_id": "c10",
+                "timing": "00:28.92–00:31.97",
+                "quote_ru": "уже вроде всё улеглось, и тебе становится потом страшно,"
+              },
+              {
+                "caption_id": "c11",
+                "timing": "00:31.99–00:34.78",
+                "quote_ru": "думаешь: ёлки-палки, вот если бы я бы вот..."
+              },
+              {
+                "caption_id": "c12",
+                "timing": "00:34.81–00:38.06",
+                "quote_ru": "по-другому пошло бы всё, то я бы уже, может быть, и не думал бы."
+              }
+            ],
+            "option_rationales": {
+              "A": "The counterfactual concerns what could have happened during the dangerous event, not later memory.",
+              "B": "He never makes that causal claim.",
+              "C": "The passage does not state a future decision of that kind.",
+              "D": "The euphemistic ending follows reflection on a dangerous emergency and supports this limited inference."
+            }
+          }
+        ],
+        "duration_seconds": 38.0081875,
+        "reported_ogg_duration_seconds": 38.01,
+        "caption_overrun_seconds": 0.05181,
+        "difficulty_rationale": "A concrete account of emergency action is contrasted with later emotional processing. Hypotheticals, false starts, and the elliptical ending increase the inference demand.",
+        "auditory_review_focus": "Check that the fire/collision references and the final counterfactual are intelligible. Keep the inference narrow: he fears a fatal alternative, without specifying an accident outcome beyond what he says.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=628701793",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Aleksandr_Lazutkin_voice.oga",
+        "attribution": "Александр Лазуткин, 2012-10-01, Aleksandr Lazutkin voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=628701793, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "c591d9ea25b1c10c4c46c3b417325503d0e85f7b9bb2717a1290cca3a4c2eef8",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    },
+    {
+      "id": "ru-listen-pilot01-liepa",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-liepa",
+        "family_id": "ru-listen-pilot01-liepa",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "2+",
+        "provisional_difficulty": 1.25,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Arts / family expectations",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "Всегда старался делать всё не на 100, а на 200 %. Я понимал, что родился не в простой семье. Мама – актриса замечательная драматическая. Папа – величайший танцовщик 20 века. И, конечно, надо было как-то соответствовать уровню творческого какого-то потенциала семьи. И часто говорят, что природа на детях отдыхает. И это очень часто в нашей семье звучало. И сейчас приятные какие-то впечатления от тех людей, которые смотрят за нами, и видят, и говорят, что это изречение не совсем правильное в формате Вашей семьи.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Андрис Лиепа — radio excerpt",
+          "source_author": "Андрис Лиепа",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2009-12-01",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=631766019",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Andris_Liepa_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "The account moves from concrete parental occupations to family expectations and an idiomatic saying whose applicability is challenged. This is a stretch selection rather than an easy biographical clip.",
+          "auditory_review_focus": "Listen for whether the proverb and the final qualification are clear. The proverb’s meaning must be inferred from this family context; do not require prior knowledge of the speaker’s biography.",
+          "attribution": "Андрис Лиепа, 2009-12-01, Andris Liepa voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=631766019, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 80,
+        "audio_duration_seconds": 39.7725,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-liepa-q1",
+          "ru-listen-pilot01-liepa-q2",
+          "ru-listen-pilot01-liepa-q3"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-liepa-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "af8f2a788c62d318b477305ccde3628aa3f76fd15a3988b4016ae59072449acb",
+        "duplicate_detection_hash": "af8f2a788c62d318b477305ccde3628aa3f76fd15a3988b4016ae59072449acb"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-liepa-q1",
+          "passage_id": "ru-listen-pilot01-liepa",
+          "stem_en": "Why does he say he tried to give more than an ordinary effort?",
+          "choices": {
+            "A": "His parents had discouraged him from entering the arts.",
+            "B": "He was required to work twice as many hours as his colleagues.",
+            "C": "He felt he needed to live up to his family’s artistic achievements.",
+            "D": "He wanted to show that artistic success requires no family influence."
+          },
+          "correct_key": "C",
+          "rationale_en": "Connect the exaggerated percentage to the reason he gives, rather than treating it as a measurable workload.",
+          "evidence_ru": "Всегда старался делать всё не на 100, а на 200 %.",
+          "question_type": "speaker/writer intent",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "motivation",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-liepa-q2",
+          "passage_id": "ru-listen-pilot01-liepa",
+          "stem_en": "In this context, what idea is expressed by the saying that “nature rests on the children”?",
+          "choices": {
+            "A": "Children of artists need more rest than their parents.",
+            "B": "Children of gifted parents may fail to match their parents’ talents.",
+            "C": "Artistic talent develops only when children live close to nature.",
+            "D": "Parents should leave all career decisions to their children."
+          },
+          "correct_key": "B",
+          "rationale_en": "Use the surrounding account of a talented family to interpret the figurative expression.",
+          "evidence_ru": "Мама – актриса замечательная драматическая.",
+          "question_type": "meaning from context",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "idiom_in_context",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-liepa-q3",
+          "passage_id": "ru-listen-pilot01-liepa",
+          "stem_en": "What reaction from observers does he find gratifying?",
+          "choices": {
+            "A": "They believe his family should leave the performing arts.",
+            "B": "They say his parents’ achievements were exaggerated.",
+            "C": "They agree that the saying accurately describes his family.",
+            "D": "They suggest that his family is an exception to the saying."
+          },
+          "correct_key": "D",
+          "rationale_en": "Track the negative qualification не совсем правильное instead of assuming that quoting a saying endorses it.",
+          "evidence_ru": "И сейчас приятные какие-то впечатления",
+          "question_type": "tone or attitude",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "reported_evaluation",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-liepa-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/9edbee034396b1fa793e674f96859dec899392bc634fb7be9537490b3baa62f1.mp3",
+        "url": null,
+        "content_hash": "9edbee034396b1fa793e674f96859dec899392bc634fb7be9537490b3baa62f1",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 39.7725,
+        "transcript_hash": "af8f2a788c62d318b477305ccde3628aa3f76fd15a3988b4016ae59072449acb",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "9edbee034396b1fa793e674f96859dec899392bc634fb7be9537490b3baa62f1",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-liepa",
+        "family_id": "ru-listen-pilot01-liepa",
+        "speaker": "Андрис Лиепа",
+        "topic": "Arts / family expectations",
+        "recording_date": "2009-12-01",
+        "provisional_ilr": "2+",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "Всегда старался делать всё не на 100, а на 200 %. Я понимал, что родился не в простой семье. Мама – актриса замечательная драматическая. Папа – величайший танцовщик 20 века. И, конечно, надо было как-то соответствовать уровню творческого какого-то потенциала семьи. И часто говорят, что природа на детях отдыхает. И это очень часто в нашей семье звучало. И сейчас приятные какие-то впечатления от тех людей, которые смотрят за нами, и видят, и говорят, что это изречение не совсем правильное в формате Вашей семьи.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 3.95,
+            "timing": "00:00.00–00:03.95",
+            "text": "Всегда старался делать всё не на 100, а на 200 %."
+          },
+          {
+            "id": "c2",
+            "start": 4.18,
+            "end": 6.72,
+            "timing": "00:04.18–00:06.72",
+            "text": "Я понимал, что родился не в простой семье."
+          },
+          {
+            "id": "c3",
+            "start": 7.63,
+            "end": 9.8,
+            "timing": "00:07.63–00:09.80",
+            "text": "Мама – актриса замечательная драматическая."
+          },
+          {
+            "id": "c4",
+            "start": 9.85,
+            "end": 14.27,
+            "timing": "00:09.85–00:14.27",
+            "text": "Папа – величайший танцовщик 20 века."
+          },
+          {
+            "id": "c5",
+            "start": 14.32,
+            "end": 18.52,
+            "timing": "00:14.32–00:18.52",
+            "text": "И, конечно, надо было как-то соответствовать уровню"
+          },
+          {
+            "id": "c6",
+            "start": 18.55,
+            "end": 21.05,
+            "timing": "00:18.55–00:21.05",
+            "text": "творческого какого-то потенциала семьи."
+          },
+          {
+            "id": "c7",
+            "start": 21.3,
+            "end": 24.6,
+            "timing": "00:21.30–00:24.60",
+            "text": "И часто говорят, что природа на детях отдыхает."
+          },
+          {
+            "id": "c8",
+            "start": 24.64,
+            "end": 28.36,
+            "timing": "00:24.64–00:28.36",
+            "text": "И это очень часто в нашей семье звучало."
+          },
+          {
+            "id": "c9",
+            "start": 28.96,
+            "end": 30.78,
+            "timing": "00:28.96–00:30.78",
+            "text": "И сейчас приятные какие-то впечатления"
+          },
+          {
+            "id": "c10",
+            "start": 30.83,
+            "end": 34.77,
+            "timing": "00:30.83–00:34.77",
+            "text": "от тех людей, которые смотрят за нами, и видят, и говорят,"
+          },
+          {
+            "id": "c11",
+            "start": 34.83,
+            "end": 39.84,
+            "timing": "00:34.83–00:39.84",
+            "text": "что это изречение не совсем правильное в формате Вашей семьи."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-liepa-q1",
+            "stem_en": "Why does he say he tried to give more than an ordinary effort?",
+            "skill": "motivation",
+            "choices": {
+              "A": "His parents had discouraged him from entering the arts.",
+              "B": "He was required to work twice as many hours as his colleagues.",
+              "C": "He felt he needed to live up to his family’s artistic achievements.",
+              "D": "He wanted to show that artistic success requires no family influence."
+            },
+            "correct_key": "C",
+            "explanation_en": "Connect the exaggerated percentage to the reason he gives, rather than treating it as a measurable workload.",
+            "evidence": [
+              {
+                "caption_id": "c1",
+                "timing": "00:00.00–00:03.95",
+                "quote_ru": "Всегда старался делать всё не на 100, а на 200 %."
+              },
+              {
+                "caption_id": "c2",
+                "timing": "00:04.18–00:06.72",
+                "quote_ru": "Я понимал, что родился не в простой семье."
+              },
+              {
+                "caption_id": "c3",
+                "timing": "00:07.63–00:09.80",
+                "quote_ru": "Мама – актриса замечательная драматическая."
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:09.85–00:14.27",
+                "quote_ru": "Папа – величайший танцовщик 20 века."
+              },
+              {
+                "caption_id": "c5",
+                "timing": "00:14.32–00:18.52",
+                "quote_ru": "И, конечно, надо было как-то соответствовать уровню"
+              },
+              {
+                "caption_id": "c6",
+                "timing": "00:18.55–00:21.05",
+                "quote_ru": "творческого какого-то потенциала семьи."
+              }
+            ],
+            "option_rationales": {
+              "A": "He describes their achievements and his wish to meet the family standard, not discouragement.",
+              "B": "The percentage is rhetorical effort, not a literal work schedule.",
+              "C": "The descriptions of his parents lead directly to the need to match the family’s creative level.",
+              "D": "That general claim is not made."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-liepa-q2",
+            "stem_en": "In this context, what idea is expressed by the saying that “nature rests on the children”?",
+            "skill": "idiom_in_context",
+            "choices": {
+              "A": "Children of artists need more rest than their parents.",
+              "B": "Children of gifted parents may fail to match their parents’ talents.",
+              "C": "Artistic talent develops only when children live close to nature.",
+              "D": "Parents should leave all career decisions to their children."
+            },
+            "correct_key": "B",
+            "explanation_en": "Use the surrounding account of a talented family to interpret the figurative expression.",
+            "evidence": [
+              {
+                "caption_id": "c3",
+                "timing": "00:07.63–00:09.80",
+                "quote_ru": "Мама – актриса замечательная драматическая."
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:09.85–00:14.27",
+                "quote_ru": "Папа – величайший танцовщик 20 века."
+              },
+              {
+                "caption_id": "c5",
+                "timing": "00:14.32–00:18.52",
+                "quote_ru": "И, конечно, надо было как-то соответствовать уровню"
+              },
+              {
+                "caption_id": "c6",
+                "timing": "00:18.55–00:21.05",
+                "quote_ru": "творческого какого-то потенциала семьи."
+              },
+              {
+                "caption_id": "c7",
+                "timing": "00:21.30–00:24.60",
+                "quote_ru": "И часто говорят, что природа на детях отдыхает."
+              }
+            ],
+            "option_rationales": {
+              "A": "The phrase is not a literal statement about sleep or workload.",
+              "B": "The family’s artistic achievements and pressure to live up to them establish the intended meaning.",
+              "C": "Neither environment nor outdoor life is discussed.",
+              "D": "The saying concerns talent across generations, not decision-making autonomy."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-liepa-q3",
+            "stem_en": "What reaction from observers does he find gratifying?",
+            "skill": "reported_evaluation",
+            "choices": {
+              "A": "They believe his family should leave the performing arts.",
+              "B": "They say his parents’ achievements were exaggerated.",
+              "C": "They agree that the saying accurately describes his family.",
+              "D": "They suggest that his family is an exception to the saying."
+            },
+            "correct_key": "D",
+            "explanation_en": "Track the negative qualification не совсем правильное instead of assuming that quoting a saying endorses it.",
+            "evidence": [
+              {
+                "caption_id": "c9",
+                "timing": "00:28.96–00:30.78",
+                "quote_ru": "И сейчас приятные какие-то впечатления"
+              },
+              {
+                "caption_id": "c10",
+                "timing": "00:30.83–00:34.77",
+                "quote_ru": "от тех людей, которые смотрят за нами, и видят, и говорят,"
+              },
+              {
+                "caption_id": "c11",
+                "timing": "00:34.83–00:39.84",
+                "quote_ru": "что это изречение не совсем правильное в формате Вашей семьи."
+              }
+            ],
+            "option_rationales": {
+              "A": "No such recommendation is reported.",
+              "B": "The parents’ achievements are not dismissed.",
+              "C": "The concluding qualification says the saying does not quite fit this family.",
+              "D": "This paraphrases the reported view that the saying is not quite right for his family."
+            }
+          }
+        ],
+        "duration_seconds": 39.7725,
+        "reported_ogg_duration_seconds": 39.77,
+        "caption_overrun_seconds": 0.0675,
+        "difficulty_rationale": "The account moves from concrete parental occupations to family expectations and an idiomatic saying whose applicability is challenged. This is a stretch selection rather than an easy biographical clip.",
+        "auditory_review_focus": "Listen for whether the proverb and the final qualification are clear. The proverb’s meaning must be inferred from this family context; do not require prior knowledge of the speaker’s biography.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=631766019",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Andris_Liepa_voice.oga",
+        "attribution": "Андрис Лиепа, 2009-12-01, Andris Liepa voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=631766019, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "9edbee034396b1fa793e674f96859dec899392bc634fb7be9537490b3baa62f1",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    },
+    {
+      "id": "ru-listen-pilot01-dontsova",
+      "content_version": 1,
+      "passage": {
+        "id": "ru-listen-pilot01-dontsova",
+        "family_id": "ru-listen-pilot01-dontsova",
+        "language": "ru",
+        "skill": "listening",
+        "target_ilr": "2+",
+        "provisional_difficulty": 1.25,
+        "calibrated_difficulty": null,
+        "genre": "radio excerpt",
+        "topic": "Literature / readers’ expectations",
+        "subtopic": "Published radio speech",
+        "orientation_en": "Listen to a short excerpt from a radio broadcast.",
+        "passage_ru": "Вопрос по поводу того, не противно ли Вам писать паршивые дюдики, задают только журналисты в России. Потому что западные журналисты как-то очень хорошо понимают, что литература состоит из жанров. И в каждом жанре есть свои условия. Есть детектив, есть экшн, есть, предположим, философский роман. Если Вы хотите узнать какие-нибудь знания по географии — бога ради, не читайте госпожу Донцову. Если Вы хотите получить ответ на сакральный вопрос: что делать? Ну, тоже я не для Вас. Надо понимать, для чего ты берёшь какую книгу в руки.",
+        "source_type": "authentic/open-licensed",
+        "provenance": {
+          "source_title": "Дарья Донцова — radio excerpt",
+          "source_author": "Дарья Донцова",
+          "source_publisher": "Echo of Moscow radio station archive",
+          "publication_date": "2008-01-30",
+          "source_original_url": "https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga",
+          "source_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "audio_license": "CC BY 3.0",
+          "audio_license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "caption_license": "CC BY-SA 4.0",
+          "caption_license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "caption_source_url": "https://commons.wikimedia.org/w/index.php?oldid=633582204",
+          "caption_author": "Wikimedia Commons contributors",
+          "source_archive_publisher": "Wikimedia Commons",
+          "source_archive_revision_url": "https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga",
+          "source_license_basis": "Per-file Commons license notice and Echo of Moscow media project release. Applies to this released excerpt, not the full program.",
+          "source_license_evidence_url": "https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga",
+          "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Dar%27ya_Dontsova_voice.oga",
+          "selection": "Full released excerpt retained; MP3 is a format conversion.",
+          "modifications": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech. Published timed caption lines joined into prose; source repetitions retained.",
+          "difficulty_rationale": "An argumentative answer distinguishes genres and uses ironic recommendations and colloquial wording. Understanding the speaker’s position is more demanding than recognizing the listed genres.",
+          "auditory_review_focus": "The source includes the colloquial disparaging phrase паршивые дюдики and the rhetorical что делать. Neither should become an isolated vocabulary test. Confirm delivery and nuance by listening before approval.",
+          "attribution": "Дарья Донцова, 2008-01-30, Dar'ya Dontsova voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=633582204, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+          "pack_id": "ru-authentic-listening-pilot-01"
+        },
+        "license": "CC BY-SA 4.0 (published captions)",
+        "word_count": 84,
+        "audio_duration_seconds": 37.526,
+        "segment_count": 1,
+        "vocabulary_metadata": {},
+        "discourse_metadata": {},
+        "question_ids": [
+          "ru-listen-pilot01-dontsova-q1",
+          "ru-listen-pilot01-dontsova-q2",
+          "ru-listen-pilot01-dontsova-q3"
+        ],
+        "audio_asset_id": "ru-listen-pilot01-dontsova-audio",
+        "voice_metadata": {},
+        "generation": {
+          "provider": "contributor import",
+          "model": "unspecified question authoring",
+          "model_revision": null,
+          "prompt_version": "ru-authentic-listening-pilot-01",
+          "pipeline_version": null,
+          "verifier_provider": null,
+          "verifier_model": null,
+          "secondary_verifier_provider": null,
+          "secondary_verifier_model": null,
+          "request_count": 0,
+          "repair_count": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "generated_at": "2026-11-27T00:00:00Z",
+          "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+        },
+        "validation_status": "accepted",
+        "validation_report_id": null,
+        "created_at": "2026-11-27T00:00:00Z",
+        "exposure_count": 0,
+        "status": "active",
+        "content_hash": "61d4548dd290dbc3013279554766826350cb1679f6a1ea2d0c87a44b9a9a5660",
+        "duplicate_detection_hash": "61d4548dd290dbc3013279554766826350cb1679f6a1ea2d0c87a44b9a9a5660"
+      },
+      "questions": [
+        {
+          "id": "ru-listen-pilot01-dontsova-q1",
+          "passage_id": "ru-listen-pilot01-dontsova",
+          "stem_en": "What is the main point of the speaker’s response?",
+          "choices": {
+            "A": "Books should be approached with expectations suited to their genre and purpose.",
+            "B": "Every successful novel should teach geography and answer philosophical questions.",
+            "C": "Detective fiction should be replaced by philosophical novels.",
+            "D": "Journalists should stop asking writers about their work altogether."
+          },
+          "correct_key": "A",
+          "rationale_en": "The examples support a principle about appropriate expectations, not a rejection of other genres.",
+          "evidence_ru": "Потому что западные журналисты как-то очень хорошо понимают,",
+          "question_type": "main idea",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "main_idea",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-dontsova-q2",
+          "passage_id": "ru-listen-pilot01-dontsova",
+          "stem_en": "What does she advise someone seeking geographical knowledge from a book?",
+          "choices": {
+            "A": "Choose her books because they provide that knowledge indirectly.",
+            "B": "Read her detective stories before trying any other genre.",
+            "C": "Choose something other than her books for that purpose.",
+            "D": "Avoid reading books and ask a journalist instead."
+          },
+          "correct_key": "C",
+          "rationale_en": "Understand the negative recommendation within its stated purpose; it is not a claim that nobody should read her.",
+          "evidence_ru": "Если Вы хотите узнать какие-нибудь знания по географии —",
+          "question_type": "speaker/writer intent",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "speaker_recommendation",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        },
+        {
+          "id": "ru-listen-pilot01-dontsova-q3",
+          "passage_id": "ru-listen-pilot01-dontsova",
+          "stem_en": "Why, in her account, do Western journalists avoid the particular disparaging question she mentions?",
+          "choices": {
+            "A": "They have not encountered detective fiction before.",
+            "B": "They understand that different literary genres have different conventions.",
+            "C": "They believe all books should follow the same literary rules.",
+            "D": "They are interested only in facts about geography."
+          },
+          "correct_key": "B",
+          "rationale_en": "This is the speaker’s characterization of journalists. The item does not assert it as an independently established cultural fact.",
+          "evidence_ru": "задают только журналисты в России.",
+          "question_type": "cause and effect",
+          "target_ilr": "2+",
+          "provisional_difficulty": 1.25,
+          "calibrated_difficulty": null,
+          "discrimination": 1.0,
+          "validator_scores": {},
+          "ambiguity_flags": [],
+          "answer_position_metadata": {
+            "source_skill": "attributed_explanation",
+            "stable_option_ids": {
+              "A": "A",
+              "B": "B",
+              "C": "C",
+              "D": "D"
+            }
+          },
+          "distractor_quality": {},
+          "generation": {
+            "provider": "contributor import",
+            "model": "unspecified question authoring",
+            "model_revision": null,
+            "prompt_version": "ru-authentic-listening-pilot-01",
+            "pipeline_version": null,
+            "verifier_provider": null,
+            "verifier_model": null,
+            "secondary_verifier_provider": null,
+            "secondary_verifier_model": null,
+            "request_count": 0,
+            "repair_count": 0,
+            "input_tokens": null,
+            "output_tokens": null,
+            "generated_at": "2026-11-27T00:00:00Z",
+            "authoring_notes": "Authentic radio excerpts and published captions. Newly authored questions; auditory/teacher review pending."
+          },
+          "validation_status": "accepted",
+          "validation_report_id": null,
+          "created_at": "2026-11-27T00:00:00Z",
+          "status": "active",
+          "statistics": {
+            "exposure_count": 0,
+            "correct_count": 0,
+            "incorrect_count": 0,
+            "distractor_counts": {},
+            "item_total_correlation": null,
+            "passage_effect": null,
+            "discrimination": null,
+            "calibrated_difficulty": null,
+            "calibration_sample_size": 0,
+            "mode_counts": {},
+            "retired_reason": null,
+            "last_exposed_at": null
+          }
+        }
+      ],
+      "turns": [],
+      "speakers": {},
+      "audio": {
+        "id": "ru-listen-pilot01-dontsova-audio",
+        "source_type": "authentic/open-licensed",
+        "path": "audio/f47b076a0bdcab74c1961c8e2ce73428c1430259e390fa3a7de061d0138c5ead.mp3",
+        "url": null,
+        "content_hash": "f47b076a0bdcab74c1961c8e2ce73428c1430259e390fa3a7de061d0138c5ead",
+        "voice": null,
+        "rate": null,
+        "engine": "Source MP3 format conversion",
+        "engine_version": null,
+        "duration_seconds": 37.526,
+        "transcript_hash": "61d4548dd290dbc3013279554766826350cb1679f6a1ea2d0c87a44b9a9a5660",
+        "license": "CC BY 3.0",
+        "synthetic_tts": false,
+        "validated": false
+      },
+      "audio_sha256": "f47b076a0bdcab74c1961c8e2ce73428c1430259e390fa3a7de061d0138c5ead",
+      "recording": {
+        "provider": "authentic radio",
+        "model": "not applicable",
+        "voice_ids": {},
+        "seed": null,
+        "generated_at": "",
+        "account_tier": "unknown",
+        "usage_terms": "Audio CC BY 3.0; published captions CC BY-SA 4.0. Attribution required. No synthesized voices.",
+        "license_review": null
+      },
+      "review": {
+        "status": "draft",
+        "reviewer": "",
+        "reviewed_at": "",
+        "notes": "Pending normal-speed audition, caption accuracy, source rights, question and level review.",
+        "reuse_attested": false
+      },
+      "authoring_record": {
+        "id": "ru-listen-pilot01-dontsova",
+        "family_id": "ru-listen-pilot01-dontsova",
+        "speaker": "Дарья Донцова",
+        "topic": "Literature / readers’ expectations",
+        "recording_date": "2008-01-30",
+        "provisional_ilr": "2+",
+        "review_status": "draft",
+        "diagnostic_eligible": false,
+        "calibrated": false,
+        "transcript": "Вопрос по поводу того, не противно ли Вам писать паршивые дюдики, задают только журналисты в России. Потому что западные журналисты как-то очень хорошо понимают, что литература состоит из жанров. И в каждом жанре есть свои условия. Есть детектив, есть экшн, есть, предположим, философский роман. Если Вы хотите узнать какие-нибудь знания по географии — бога ради, не читайте госпожу Донцову. Если Вы хотите получить ответ на сакральный вопрос: что делать? Ну, тоже я не для Вас. Надо понимать, для чего ты берёшь какую книгу в руки.",
+        "captions": [
+          {
+            "id": "c1",
+            "start": 0.0,
+            "end": 4.05,
+            "timing": "00:00.00–00:04.05",
+            "text": "Вопрос по поводу того, не противно ли Вам писать паршивые дюдики,"
+          },
+          {
+            "id": "c2",
+            "start": 4.1,
+            "end": 6.62,
+            "timing": "00:04.10–00:06.62",
+            "text": "задают только журналисты в России."
+          },
+          {
+            "id": "c3",
+            "start": 6.86,
+            "end": 9.86,
+            "timing": "00:06.86–00:09.86",
+            "text": "Потому что западные журналисты как-то очень хорошо понимают,"
+          },
+          {
+            "id": "c4",
+            "start": 9.89,
+            "end": 12.03,
+            "timing": "00:09.89–00:12.03",
+            "text": "что литература состоит из жанров."
+          },
+          {
+            "id": "c5",
+            "start": 12.23,
+            "end": 14.52,
+            "timing": "00:12.23–00:14.52",
+            "text": "И в каждом жанре есть свои условия."
+          },
+          {
+            "id": "c6",
+            "start": 14.55,
+            "end": 20.48,
+            "timing": "00:14.55–00:20.48",
+            "text": "Есть детектив, есть экшн, есть, предположим, философский роман."
+          },
+          {
+            "id": "c7",
+            "start": 20.52,
+            "end": 24.22,
+            "timing": "00:20.52–00:24.22",
+            "text": "Если Вы хотите узнать какие-нибудь знания по географии —"
+          },
+          {
+            "id": "c8",
+            "start": 24.25,
+            "end": 26.63,
+            "timing": "00:24.25–00:26.63",
+            "text": "бога ради, не читайте госпожу Донцову."
+          },
+          {
+            "id": "c9",
+            "start": 26.73,
+            "end": 31.51,
+            "timing": "00:26.73–00:31.51",
+            "text": "Если Вы хотите получить ответ на сакральный вопрос: что делать?"
+          },
+          {
+            "id": "c10",
+            "start": 31.54,
+            "end": 34.05,
+            "timing": "00:31.54–00:34.05",
+            "text": "Ну, тоже я не для Вас."
+          },
+          {
+            "id": "c11",
+            "start": 34.1,
+            "end": 37.56,
+            "timing": "00:34.10–00:37.56",
+            "text": "Надо понимать, для чего ты берёшь какую книгу в руки."
+          }
+        ],
+        "questions": [
+          {
+            "id": "ru-listen-pilot01-dontsova-q1",
+            "stem_en": "What is the main point of the speaker’s response?",
+            "skill": "main_idea",
+            "choices": {
+              "A": "Books should be approached with expectations suited to their genre and purpose.",
+              "B": "Every successful novel should teach geography and answer philosophical questions.",
+              "C": "Detective fiction should be replaced by philosophical novels.",
+              "D": "Journalists should stop asking writers about their work altogether."
+            },
+            "correct_key": "A",
+            "explanation_en": "The examples support a principle about appropriate expectations, not a rejection of other genres.",
+            "evidence": [
+              {
+                "caption_id": "c3",
+                "timing": "00:06.86–00:09.86",
+                "quote_ru": "Потому что западные журналисты как-то очень хорошо понимают,"
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:09.89–00:12.03",
+                "quote_ru": "что литература состоит из жанров."
+              },
+              {
+                "caption_id": "c5",
+                "timing": "00:12.23–00:14.52",
+                "quote_ru": "И в каждом жанре есть свои условия."
+              },
+              {
+                "caption_id": "c6",
+                "timing": "00:14.55–00:20.48",
+                "quote_ru": "Есть детектив, есть экшн, есть, предположим, философский роман."
+              },
+              {
+                "caption_id": "c11",
+                "timing": "00:34.10–00:37.56",
+                "quote_ru": "Надо понимать, для чего ты берёшь какую книгу в руки."
+              }
+            ],
+            "option_rationales": {
+              "A": "She distinguishes genres and concludes that readers should understand why they pick up a particular book.",
+              "B": "She uses those expectations as reasons certain readers should not choose her books.",
+              "C": "She recognizes different genres rather than proposing that one replace another.",
+              "D": "Her criticism targets a particular kind of question, not all questions about writing."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-dontsova-q2",
+            "stem_en": "What does she advise someone seeking geographical knowledge from a book?",
+            "skill": "speaker_recommendation",
+            "choices": {
+              "A": "Choose her books because they provide that knowledge indirectly.",
+              "B": "Read her detective stories before trying any other genre.",
+              "C": "Choose something other than her books for that purpose.",
+              "D": "Avoid reading books and ask a journalist instead."
+            },
+            "correct_key": "C",
+            "explanation_en": "Understand the negative recommendation within its stated purpose; it is not a claim that nobody should read her.",
+            "evidence": [
+              {
+                "caption_id": "c7",
+                "timing": "00:20.52–00:24.22",
+                "quote_ru": "Если Вы хотите узнать какие-нибудь знания по географии —"
+              },
+              {
+                "caption_id": "c8",
+                "timing": "00:24.25–00:26.63",
+                "quote_ru": "бога ради, не читайте госпожу Донцову."
+              }
+            ],
+            "option_rationales": {
+              "A": "She explicitly says not to read her for that purpose.",
+              "B": "No such reading sequence is recommended.",
+              "C": "The conditional example ends with не читайте госпожу Донцову.",
+              "D": "She does not recommend replacing reading with an interview."
+            }
+          },
+          {
+            "id": "ru-listen-pilot01-dontsova-q3",
+            "stem_en": "Why, in her account, do Western journalists avoid the particular disparaging question she mentions?",
+            "skill": "attributed_explanation",
+            "choices": {
+              "A": "They have not encountered detective fiction before.",
+              "B": "They understand that different literary genres have different conventions.",
+              "C": "They believe all books should follow the same literary rules.",
+              "D": "They are interested only in facts about geography."
+            },
+            "correct_key": "B",
+            "explanation_en": "This is the speaker’s characterization of journalists. The item does not assert it as an independently established cultural fact.",
+            "evidence": [
+              {
+                "caption_id": "c2",
+                "timing": "00:04.10–00:06.62",
+                "quote_ru": "задают только журналисты в России."
+              },
+              {
+                "caption_id": "c3",
+                "timing": "00:06.86–00:09.86",
+                "quote_ru": "Потому что западные журналисты как-то очень хорошо понимают,"
+              },
+              {
+                "caption_id": "c4",
+                "timing": "00:09.89–00:12.03",
+                "quote_ru": "что литература состоит из жанров."
+              },
+              {
+                "caption_id": "c5",
+                "timing": "00:12.23–00:14.52",
+                "quote_ru": "И в каждом жанре есть свои условия."
+              }
+            ],
+            "option_rationales": {
+              "A": "She credits them with understanding genre distinctions, not ignorance of a genre.",
+              "B": "Her Потому что explanation connects their behavior to recognizing genres and their conditions.",
+              "C": "This reverses her explanation of genre differences.",
+              "D": "Geography is a later example of a reader’s purpose, not an explanation of journalists’ behavior."
+            }
+          }
+        ],
+        "duration_seconds": 37.526,
+        "reported_ogg_duration_seconds": 37.53,
+        "caption_overrun_seconds": 0.034,
+        "difficulty_rationale": "An argumentative answer distinguishes genres and uses ironic recommendations and colloquial wording. Understanding the speaker’s position is more demanding than recognizing the listed genres.",
+        "auditory_review_focus": "The source includes the colloquial disparaging phrase паршивые дюдики and the rhetorical что делать. Neither should become an isolated vocabulary test. Confirm delivery and nuance by listening before approval.",
+        "source": {
+          "Audio source": "https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga",
+          "Caption revision": "https://commons.wikimedia.org/w/index.php?oldid=633582204",
+          "Audio license": "https://creativecommons.org/licenses/by/3.0/",
+          "Caption license": "https://creativecommons.org/licenses/by-sa/4.0/"
+        },
+        "original_audio_url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Dar%27ya_Dontsova_voice.oga",
+        "attribution": "Дарья Донцова, 2008-01-30, Dar'ya Dontsova voice.oga. Audio: «Echo of Moscow» radio station archive, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Full released excerpt retained; MP3 is a format conversion. Captions: Wikimedia Commons contributors, https://commons.wikimedia.org/w/index.php?oldid=633582204, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); caption lines also joined into prose. No endorsement by the speakers, broadcaster, Wikimedia, NFLC, or DLI is implied.",
+        "audio_sha256": "f47b076a0bdcab74c1961c8e2ce73428c1430259e390fa3a7de061d0138c5ead",
+        "audio_note": "MP3 recovered byte-for-byte from the supplied HTML. No re-encoding, speed change, denoising or generated speech."
+      }
+    }
+  ]
+}

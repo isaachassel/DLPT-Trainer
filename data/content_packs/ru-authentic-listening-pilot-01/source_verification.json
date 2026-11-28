@@ -1,0 +1,78 @@
+{
+  "checked_on": "2026-11-27",
+  "method": "Read each Commons file page and fixed caption revision. Compare caption lines joined with spaces. Fully decode embedded MP3 without modifying it. No independent auditory review or waveform comparison against original Ogg performed.",
+  "sources": [
+    {
+      "id": "ru-listen-pilot01-sotnikova",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Adelina_Sotnikova_voice.oga",
+      "audio_page_sha256": "ebfad0f158080477b6d40d1688b11f83d406642d9284b4762240b0b902d6d00f",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=610527981",
+      "caption_page_sha256": "0dd3910064717efb2582e3801da1f88379269fea7e1469619604aa9d9da72870",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "7c3c524f477d981a9492f3168d05b361b06bb7660f97f1d2962694f49ab5b9dc",
+      "fully_decoded_mp3_seconds": 17.737125
+    },
+    {
+      "id": "ru-listen-pilot01-shparo",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Dmitrij_Shparo_voice.oga",
+      "audio_page_sha256": "ac9aa4d8f3e4a21542505b77ac3c2a034ebd3b8e39f977582a91f17e08892dbb",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=633847801",
+      "caption_page_sha256": "513d2a8eab390ac2413b704f66b64aa7b89a201d175887185be66266cd12410e",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "05793e993f3850eeb257702029334645f928f6eed384e6b07593c04cd97d6f5f",
+      "fully_decoded_mp3_seconds": 32.0925
+    },
+    {
+      "id": "ru-listen-pilot01-zasov",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Anatolij_Zasov_voice.oga",
+      "audio_page_sha256": "7927ae0b4ca9f29e82a54ab98e8a0ac84e68dc2080a6044c883865407beee1e0",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=630394118",
+      "caption_page_sha256": "520da349ec4dfd1d161a3283aa63cb5b56c6b472d66fdcaf65d5a04834ed7573",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "0d5072058ba24f83cdc800884db1ec84ea02e5ea52ae126c6072cc33e0bdbcde",
+      "fully_decoded_mp3_seconds": 30.8125
+    },
+    {
+      "id": "ru-listen-pilot01-lazutkin",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Aleksandr_Lazutkin_voice.oga",
+      "audio_page_sha256": "43df91fcd9565409b0fd3c35e5971ef16d3aceb675c0e68229f1f20d24109a33",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=628701793",
+      "caption_page_sha256": "56159c666a3a2aa821b211839b767314ad7dc7bfb2a3292e4393905fa28bfb30",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "c591d9ea25b1c10c4c46c3b417325503d0e85f7b9bb2717a1290cca3a4c2eef8",
+      "fully_decoded_mp3_seconds": 38.0081875
+    },
+    {
+      "id": "ru-listen-pilot01-liepa",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Andris_Liepa_voice.oga",
+      "audio_page_sha256": "13fd0eb47678fa3f0de5e8c5818d75c20103fc178d85623c3199b92803519844",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=631766019",
+      "caption_page_sha256": "356a479675878424af7d41f3c6457b815b8ead3473bbed950e8245a64d3d61b4",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "9edbee034396b1fa793e674f96859dec899392bc634fb7be9537490b3baa62f1",
+      "fully_decoded_mp3_seconds": 39.7725
+    },
+    {
+      "id": "ru-listen-pilot01-dontsova",
+      "audio_source": "https://commons.wikimedia.org/wiki/File:Dar%27ya_Dontsova_voice.oga",
+      "audio_page_sha256": "bc77ac0db3316a1952924538cb53dd5c5ad32402b3e6d51f28a27ca850ee2072",
+      "cc_by_3_notice": true,
+      "caption_revision": "https://commons.wikimedia.org/w/index.php?oldid=633582204",
+      "caption_page_sha256": "4925d0dc65a9b2d003739299988ff8386b2570aaafdf202d637cebffab2c5035",
+      "caption_cc_by_sa_4_notice": true,
+      "caption_text_matches_fixed_revision": true,
+      "audio_sha256": "f47b076a0bdcab74c1961c8e2ce73428c1430259e390fa3a7de061d0138c5ead",
+      "fully_decoded_mp3_seconds": 37.526
+    }
+  ]
+}

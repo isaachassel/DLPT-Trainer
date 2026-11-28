@@ -1,9 +1,14 @@
 # Listening audio provenance and usage
 
-All 38 active assessment recordings were generated during Isaac's paid
+This notice covers the 38 synthetic assessment recordings generated during Isaac's paid
 ElevenLabs Starter subscription using generally available Eleven v3 and the
 Jessica/Eric premade voices. They are synthetic recordings of original
 AI-assisted project scripts, not recordings from an official language test.
+
+Authentic source excerpts, when separately approved, carry their own audio and
+caption licenses and attribution in the completed assessment report and the
+deployment's `SOURCE_CREDITS.html`. The paid-plan terms below do not apply to
+those third-party recordings or captions.
 
 On October 6, 2026, the 24 Russian Free-plan recordings were replaced with new
 paid-plan generations. Their old hashes remain in ../audio_license_audit.json

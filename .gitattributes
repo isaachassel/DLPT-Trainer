@@ -56,3 +56,5 @@ data/assessment/audio/*.mp3 filter=lfs diff=lfs merge=lfs -text
 tests/fixtures/legacy/audio/*.mp3 filter=lfs diff=lfs merge=lfs -text
 # Keep imported source archives byte-exact across Windows/Linux checkouts.
 data/content_packs/**/versions/*/reading_bank.json -text
+data/content_packs/**/versions/*/listening_review.* -text
+data/content_packs/**/audio/*.mp3 filter=lfs diff=lfs merge=lfs -text
